@@ -1,3 +1,9 @@
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by the LGPL, which can be found in the
+// COPYING.LGPL file.
+//
+// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
+
 // FILE: EDU.Washington.grad.gjb.cassowary
 // package EDU.Washington.grad.gjb.cassowary;
 // Has ClConstraint <- ClEditOrStayConstraint

@@ -1,6 +1,12 @@
-(function(Cl) {
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by the LGPL, which can be found in the
+// COPYING.LGPL file.
+//
+// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
-Cl.Tableau = Cl.inherit(
+(function(c) {
+
+c.Tableau = c.inherit(
   function() {
     /* FIELDS:
         var _columns //Hashtable of vars -> set of vars
@@ -18,14 +24,14 @@ Cl.Tableau = Cl.inherit(
   null,
   {
     noteRemovedVariable: function(v /*ClAbstractVariable*/, subject /*ClAbstractVariable*/) {
-      if (CL.fVerboseTraceOn) CL.fnenterprint("noteRemovedVariable: " + v + ", " + subject);
+      if (c.fVerboseTraceOn) c.fnenterprint("noteRemovedVariable: " + v + ", " + subject);
       if (subject != null) {
         this._columns.get(v).remove(subject);
       }
     },
 
     noteAddedVariable: function(v /*ClAbstractVariable*/, subject /*ClAbstractVariable*/) {
-      if (CL.fVerboseTraceOn) CL.fnenterprint("noteAddedVariable: " + v + ", " + subject);
+      if (c.fVerboseTraceOn) c.fnenterprint("noteAddedVariable: " + v + ", " + subject);
       if (subject) {
         this.insertColVar(v, subject);
       }
@@ -53,13 +59,13 @@ Cl.Tableau = Cl.inherit(
         bstr += "\n";
       });
       bstr += "\nColumns:\n";
-      bstr += CL.hashToString(this._columns);
+      bstr += c.hashToString(this._columns);
       bstr += "\nInfeasible rows: ";
-      bstr += CL.setToString(this._infeasibleRows);
+      bstr += c.setToString(this._infeasibleRows);
       bstr += "External basic variables: ";
-      bstr += CL.setToString(this._externalRows);
+      bstr += c.setToString(this._externalRows);
       bstr += "External parametric variables: ";
-      bstr += CL.setToString(this._externalParametricVars);
+      bstr += c.setToString(this._externalParametricVars);
       return bstr;
     },
 
@@ -73,14 +79,14 @@ Cl.Tableau = Cl.inherit(
       rowset.add(rowvar);
       /*
       print("rowvar =" + rowvar);
-      print("rowset = " + CL.setToString(rowset));
-      print("this._columns = " + CL.hashToString(this._columns));
+      print("rowset = " + c.setToString(rowset));
+      print("this._columns = " + c.hashToString(this._columns));
       */
     },
 
     addRow: function(aVar /*ClAbstractVariable*/, expr /*ClLinearExpression*/) {
       var that=this;
-      if (CL.fTraceOn) CL.fnenterprint("addRow: " + aVar + ", " + expr);
+      if (c.fTraceOn) c.fnenterprint("addRow: " + aVar + ", " + expr);
       this._rows.put(aVar, expr);
       expr.terms().each(function(clv, coeff) {
         // print("insertColVar(" + clv + ", " + aVar + ")");
@@ -88,18 +94,18 @@ Cl.Tableau = Cl.inherit(
         if (clv.isExternal) {
           that._externalParametricVars.add(clv);
           // print("External parametric variables added to: " + 
-          //       CL.setToString(that._externalParametricVars));
+          //       c.setToString(that._externalParametricVars));
         }
       });
       if (aVar.isExternal) {
         this._externalRows.add(aVar);
       }
-      if (CL.fTraceOn) CL.traceprint(this.toString());
+      if (c.fTraceOn) c.traceprint(this.toString());
     },
 
     removeColumn: function(aVar /*ClAbstractVariable*/) {
       var that=this;
-      if (CL.fTraceOn) CL.fnenterprint("removeColumn:" + aVar);
+      if (c.fTraceOn) c.fnenterprint("removeColumn:" + aVar);
       var rows = /* Set */ this._columns.remove(aVar);
       if (rows) {
         rows.each(function(clv) {
@@ -107,7 +113,7 @@ Cl.Tableau = Cl.inherit(
           expr.terms().remove(aVar);
         });
       } else {
-        if (CL.fTraceOn) CL.debugprint("Could not find var " + aVar + " in _columns");
+        if (c.fTraceOn) c.debugprint("Could not find var " + aVar + " in _columns");
       }
       if (aVar.isExternal) {
         this._externalRows.remove(aVar);
@@ -117,13 +123,13 @@ Cl.Tableau = Cl.inherit(
 
     removeRow: function(aVar /*ClAbstractVariable*/) {
       var that=this;
-      if (CL.fTraceOn) CL.fnenterprint("removeRow:" + aVar);
+      if (c.fTraceOn) c.fnenterprint("removeRow:" + aVar);
       var expr = /* ClLinearExpression */this._rows.get(aVar);
-      CL.Assert(expr != null);
+      c.Assert(expr != null);
       expr.terms().each(function(clv, coeff) {
         var varset = that._columns.get(clv);
         if (varset != null) {
-          if (CL.fTraceOn) CL.debugprint("removing from varset " + aVar);
+          if (c.fTraceOn) c.debugprint("removing from varset " + aVar);
           varset.remove(aVar);
         }
       });
@@ -132,14 +138,14 @@ Cl.Tableau = Cl.inherit(
         this._externalRows.remove(aVar);
       }
       this._rows.remove(aVar);
-      if (CL.fTraceOn) CL.fnexitprint("returning " + expr);
+      if (c.fTraceOn) c.fnexitprint("returning " + expr);
       return expr;
     },
 
     substituteOut: function(oldVar /*ClAbstractVariable*/, expr /*ClLinearExpression*/) {
       var that=this;
-      if (CL.fTraceOn) CL.fnenterprint("substituteOut:" + oldVar + ", " + expr);
-      if (CL.fTraceOn) CL.traceprint(this.toString());
+      if (c.fTraceOn) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
+      if (c.fTraceOn) c.traceprint(this.toString());
       var varset = /* Set */this._columns.get(oldVar);
       varset.each(function(v) {
         var row = /* ClLinearExpression */that._rows.get(v);

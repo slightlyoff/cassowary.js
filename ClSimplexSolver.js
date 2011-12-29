@@ -1,10 +1,14 @@
-(function(CL) {
-var c = CL;
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by the LGPL, which can be found in the
+// COPYING.LGPL file.
+//
+// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
+(function(c) {
 var t = c.Tableau;
 var tp = t.prototype;
 
-CL.SimplexSolver = c.inherit({
+c.SimplexSolver = c.inherit({
   extends: c.Tableau, 
   initialize: function(){
   /* FIELDS:

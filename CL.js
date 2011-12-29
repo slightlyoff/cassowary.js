@@ -1,39 +1,10 @@
-// FILE: EDU.Washington.grad.gjb.cassowary
-// package EDU.Washington.grad.gjb.cassowary;
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by the LGPL, which can be found in the
+// COPYING.LGPL file.
+//
+// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 (function(){
-
-var empty = {};
-
-// Parts borrowed from Dojo
-// FIXME(slightlyoff): still needed?
-var _mixin = function(dest, source, copyFunc){
-  var name, s, i;
-  for(name in source){
-    // the (!(name in empty) || empty[name] !== s) condition avoids copying properties in "source"
-    // inherited from Object.prototype.	 For example, if dest has a custom toString() method,
-    // don't overwrite it with the toString() method that source inherited from Object.prototype
-    s = source[name];
-    if(!(name in dest) || 
-        (dest[name] !== s && 
-          (!(name in empty) || empty[name] !== s)
-        )
-    ){ dest[name] = copyFunc ? copyFunc(s) : s; }
-  }
-  return dest;
-};
-
-/*
-if (!console && !print) {
-  var print;
-  if (!!this['console']) {
-    print = console.log;
-  } else {
-    print = function(){};
-  }
-}
-*/
-
 
 // Global
 c = CL = {
@@ -46,21 +17,6 @@ c = CL = {
   //fTraceAdded: true,
   GEQ: 1,
   LEQ: 2,
-
-  mixin: function(dest, sources){
-    if(!dest){ dest = {}; }
-    for(var i = 1, l = arguments.length; i < l; i++){
-      _mixin(dest, arguments[i]);
-    }
-    return dest; // Object
-  },
-
-  extend: function(constructor, props) {
-    for(var i=1, l=arguments.length; i<l; i++){
-      _mixin(constructor.prototype, arguments[i]);
-    }
-    return constructor; // Object
-  },
 
   inherit: function(ctor, parent, props) {
     var al = arguments.length;

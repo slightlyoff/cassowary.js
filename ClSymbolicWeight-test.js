@@ -1,3 +1,6 @@
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by the LGPL, which can be found in the
+// COPYING.LGPL file.
 
 c1 = new ClSymbolicWeight(1,1,1);
 c2 = new ClSymbolicWeight(2,3,4);
