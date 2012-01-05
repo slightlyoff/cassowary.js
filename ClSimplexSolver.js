@@ -28,11 +28,11 @@ c.SimplexSolver = c.inherit({
       var _stkCedcns //Stack
   */
     CL.Tableau.call(this);
-    this._stayMinusErrorVars = new Array();
-    this._stayPlusErrorVars = new Array();
+    this._stayMinusErrorVars = [];
+    this._stayPlusErrorVars = [];
     this._errorVars = new Hashtable(); // cn -> Set of clv
     this._markerVars = new Hashtable(); // cn -> Set of clv
-    this._resolve_pair = new Array(0,0); 
+    this._resolve_pair = [0, 0]; 
     this._objective = new c.ObjectiveVariable("Z");
     this._editVarMap = new Hashtable(); // clv -> c.EditInfo
     this._slackCounter = 0;
@@ -43,7 +43,7 @@ c.SimplexSolver = c.inherit({
     this._fNeedsSolving = false;
     this._rows = new Hashtable(); // clv -> expression
     this._rows.put(this._objective, new c.LinearExpression());
-    this._stkCedcns = new Array(); // Stack
+    this._stkCedcns = []; // Stack
     this._stkCedcns.push(0);
     if (CL.fTraceOn)
       CL.traceprint("objective expr == " + this.rowExpression(this._objective));
