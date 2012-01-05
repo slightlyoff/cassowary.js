@@ -289,6 +289,9 @@ ClTests = c.inherit({
   },
 
   addDelSolvers: function(nCns /*int*/, nResolves /*int*/, nSolvers /*int*/, testNum /*int*/) {
+    var totalTimer = new Timer();
+    totalTimer.Start();
+
     var timer = new Timer();
     var tmAddvar, tmEditvar, tmResolvevar, tmEndEdit;
     var ineqProb = 0.12;
@@ -339,6 +342,7 @@ ClTests = c.inherit({
     }
     timer.Stop();
     print("done building data structures");
+    print("time = " + timer.ElapsedTime());
     for (var is = 0; is < nSolvers; ++is)
     {
       var cCns = 0;
@@ -382,6 +386,7 @@ ClTests = c.inherit({
       }
       print("done adding " + cCns + " constraints [" + j + " attempted, " + cExceptions + " exceptions]");
       solver.solve();
+      print("time = " + timer.ElapsedTime());
     }
     timer.Stop();
     tmAdd = timer.ElapsedTime();
@@ -417,8 +422,25 @@ ClTests = c.inherit({
     }
     timer.Stop();
     tmEndEdit = timer.ElapsedTime();
+
+    totalTimer.Stop();
+    print("total time = " + totalTimer.ElapsedTime());
+
+    var s = "\n  ";
     var mspersec = 1000;
-    print(nCns + "," + nSolvers + "," + nResolves + "," + testNum + "," + tmAdd * mspersec + "," + tmEdit * mspersec + "," + tmResolve * mspersec + "," + tmEndEdit * mspersec + "," + tmAdd / nCns / nSolvers * mspersec + "," + tmEdit / nSolvers / 2 * mspersec + "," + tmResolve / nResolves / nSolvers * mspersec + "," + tmEndEdit / nSolvers / 2 * mspersec);
+    print(s +
+          "number of constraints: \t\t" + nCns + s + 
+          "number of solvers: \t\t\t" + nSolvers + s + 
+          "numbers of resolves: \t\t\t" + nResolves + s +
+          "tests: \t\t\t\t" + testNum + s +
+          "time to add (ms): \t\t\t" + tmAdd * mspersec + s +
+          "time to edit (ms): \t\t\t" + tmEdit * mspersec + s +
+          "time to resolve (ms): \t\t" + tmResolve * mspersec + s +
+          "time to edit (ms): \t\t\t" + tmEndEdit * mspersec + s +
+          "add time per solver (ms): \t\t" + tmAdd / nCns / nSolvers * mspersec + s +
+          "edit time per solver (ms): \t\t" + tmEdit / nSolvers / 2 * mspersec + s +
+          "resolve time per resolve (ms): \t" + tmResolve / nResolves / nSolvers * mspersec + s +
+          "time to end edits per solver (ms): \t" + tmEndEdit / nSolvers / 2 * mspersec);
     return true;
   },
 
