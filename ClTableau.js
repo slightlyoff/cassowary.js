@@ -85,8 +85,10 @@ c.Tableau = c.inherit(
     },
 
     addRow: function(aVar /*ClAbstractVariable*/, expr /*ClLinearExpression*/) {
-      var that=this;
+      var that = this;
       if (c.fTraceOn) c.fnenterprint("addRow: " + aVar + ", " + expr);
+      // print("addRow: " + aVar + " (key), " + expr + " (value)");
+      // print(this._rows.size());
       this._rows.put(aVar, expr);
       expr.terms().each(function(clv, coeff) {
         // print("insertColVar(" + clv + ", " + aVar + ")");
@@ -104,7 +106,7 @@ c.Tableau = c.inherit(
     },
 
     removeColumn: function(aVar /*ClAbstractVariable*/) {
-      var that=this;
+      var that = this;
       if (c.fTraceOn) c.fnenterprint("removeColumn:" + aVar);
       var rows = /* Set */ this._columns.remove(aVar);
       if (rows) {
@@ -122,7 +124,7 @@ c.Tableau = c.inherit(
     },
 
     removeRow: function(aVar /*ClAbstractVariable*/) {
-      var that=this;
+      var that = this;
       if (c.fTraceOn) c.fnenterprint("removeRow:" + aVar);
       var expr = /* ClLinearExpression */this._rows.get(aVar);
       c.Assert(expr != null);
@@ -143,7 +145,7 @@ c.Tableau = c.inherit(
     },
 
     substituteOut: function(oldVar /*ClAbstractVariable*/, expr /*ClLinearExpression*/) {
-      var that=this;
+      var that = this;
       if (c.fTraceOn) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
       if (c.fTraceOn) c.traceprint(this.toString());
       var varset = /* Set */this._columns.get(oldVar);
