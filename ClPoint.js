@@ -6,8 +6,8 @@
 
 (function(c) {
 
-c.Point = c.inherit(
-  function(x, y, suffix) {
+c.Point = c.inherit({
+  initialize: function(x, y, suffix) {
     if (x instanceof c.Variable) {
       this.x = x;
     } else {
@@ -27,37 +27,34 @@ c.Point = c.inherit(
       }
     }
   },
-  null,
-  {
-    SetXY: function(x, y) {
-      if (x instanceof c.Variable) {
-        this.x = x;
-      } else {
-        this.x.set_value(x);
-      }
-      if (y instanceof c.Variable) {
-        this.y = y;
-      } else {
-        this.y.set_value(y);
-      }
-    },
+  SetXY: function(x, y) {
+    if (x instanceof c.Variable) {
+      this.x = x;
+    } else {
+      this.x.set_value(x);
+    }
+    if (y instanceof c.Variable) {
+      this.y = y;
+    } else {
+      this.y.set_value(y);
+    }
+  },
 
-    X: function() { return this.x; },
+  X: function() { return this.x; },
 
-    Y: function() { return this.y; },
+  Y: function() { return this.y; },
 
-    Xvalue: function() {
-      return this.x.value();
-    },
+  Xvalue: function() {
+    return this.x.value();
+  },
 
-    Yvalue: function() {
-      return this.y.value();
-    },
+  Yvalue: function() {
+    return this.y.value();
+  },
 
-    toString: function() {
-      return "(" + this.x + ", " + this.y + ")";
-    },
-  }
-);
+  toString: function() {
+    return "(" + this.x + ", " + this.y + ")";
+  },
+});
 
 })(CL);
