@@ -4,17 +4,16 @@
 //
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
-(function(){
+(function(scope){
 
 // Global
 c = CL = {
-  fDebugOn: true,
-  fVerboseTraceOn: false,
-  fTraceOn: false,
-  fTraceAdded: false,
-  fGC: false,
-  //fTraceOn: true,
-  //fTraceAdded: true,
+  debug: true,
+  trace: false,
+  verbose: false,
+  traceAdded: false,
+  simpleHT: false,
+  GC: false,
   GEQ: 1,
   LEQ: 2,
 
@@ -63,12 +62,12 @@ c = CL = {
   },
 
   debugprint: function(s /*String*/) {
-    if (!CL.fVerboseTraceOn) return;
+    if (!CL.verbose) return;
     console.log(s);
   },
 
   traceprint: function(s /*String*/) {
-    if (!CL.fVerboseTraceOn) return;
+    if (!CL.verbose) return;
     console.log(s);
   },
 
@@ -155,7 +154,7 @@ c = CL = {
 
   hashToString: function(h) {
     var answer = "";
-    CL.Assert(h instanceof Hashtable);
+    CL.Assert(h instanceof Hashtable || h instanceof SimpleHashtable);
     h.each( function(k,v) {
       answer += k + " => ";
       if (v instanceof Hashtable) {
@@ -187,4 +186,4 @@ c = CL = {
   }       
 };
 
-})();
+})(this);
