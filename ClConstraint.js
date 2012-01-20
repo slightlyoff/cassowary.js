@@ -36,12 +36,12 @@ c.Constraint = c.inherit({
   isInequality:     false,
   isStayConstraint: false,
   // FIXME(slightlyoff): value, at worst a getter
-  isRequired:         function() { return this.strength.isRequired(); },
+  isRequired: function() { return this.strength.isRequired(); },
 
   toString: function() {
     // this is abstract -- it intentionally leaves the parens unbalanced for
     // the subclasses to complete (e.g., with ' = 0', etc.
-    return this.strength + ' {' + this.weight + '} (' + this.expression +')';
+    return this.strength + " {" + this.weight + "} (" + this.expression +")";
   },
 
   setAttachedObject: function(o /*Object*/) {
@@ -73,8 +73,7 @@ c.Constraint = c.inherit({
 var EditOrStayCtor = function(clv /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
   c.Constraint.call(this, strength, weight);
   this.variable = clv;
-  this.expression = new c.LinearExpression(this.variable, -1.0, 
-                                           this.variable.value());
+  this.expression = new c.LinearExpression(clv, -1.0, clv.value());
 };
 
 c.EditConstraint = c.inherit({
