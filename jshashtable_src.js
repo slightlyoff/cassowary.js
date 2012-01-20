@@ -162,6 +162,9 @@ var Hashtable = (function() {
 
 		getEntries: function(entries) {
 			var startIndex = entries.length;
+      // console.log("Bucket.getEntries(", entries, "), startIndex:", startIndex);
+      // console.log("  existing entries (" + this.entries.length + "):",
+      //             JSON.stringify(this.entries));
 			for (var i = 0, len = this.entries.length; i < len; ++i) {
 				// Clone the entry stored in the bucket before adding to array
 				entries[startIndex + i] = this.entries[i].slice(0);
@@ -217,6 +220,7 @@ var Hashtable = (function() {
 			checkKey(key);
 			checkValue(value);
 			var hash = hashingFunction(key), bucket, bucketEntry, oldValue = null;
+      // console.log("Hashtable.put(", "key:", key, "value:", value, "hash:", hash, ")");
 
 			// Check if a bucket exists for the bucket key
 			bucket = getBucketForHash(bucketsByHash, hash);
@@ -241,6 +245,7 @@ var Hashtable = (function() {
 		};
 
 		this.get = function(key) {
+      // console.log("Hashtable.get(", "key:", key, ")");
 			checkKey(key);
 
 			var hash = hashingFunction(key);
@@ -336,6 +341,7 @@ var Hashtable = (function() {
 
 		this.each = function(callback) {
 			var entries = that.entries(), i = entries.length, entry;
+      // console.log("Hashtable.each(), size:", i);
 			while (i--) {
 				entry = entries[i];
 				context = callback(entry[0], entry[1]);
@@ -345,11 +351,24 @@ var Hashtable = (function() {
 		this.escapingEach = function(callback) {
 			var entries = that.entries(), i = entries.length, entry;
                         var context = {}  // GJB
+      // console.log("Hashtable.escapingEach(), size:", i);
 			while (i--) {
 				entry = entries[i];
 				context = callback(entry[0], entry[1]);
+        /*
                                 if (context.return) { return context.return; }
                                 if (context.break) { break; }
+        */
+        if (context) {
+            if (context.retval !== undefined) {
+                // console.log("  returning from:", entry, context.retval);
+                return context;
+            }
+            if (context.brk) {
+                // console.log("  breaking from:", entry, context.retval);
+                break;
+            }
+        }
 			}
 		};
 
