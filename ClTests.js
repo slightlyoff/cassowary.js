@@ -41,7 +41,8 @@ ClTests = c.inherit({
     var fOkResult = true;
     var x = new c.Variable("x");
     var solver = new c.SimplexSolver();
-    solver.addConstraint(new c.LinearEquation(x, 100, c.Strength.weak));
+    var cbl = new c.LinearEquation(x, 100, c.Strength.weak);
+    solver.addConstraint(cbl);
     var c10 = new c.LinearInequality(x, CL.LEQ, 10.0);
     var c20 = new c.LinearInequality(x, CL.LEQ, 20.0);
     solver.addConstraint(c10).addConstraint(c20);
@@ -65,6 +66,7 @@ ClTests = c.inherit({
     print("x == " + x.value());
     return (fOkResult);
   },
+
   addDelete2: function() {
     var fOkResult = true;
     var x = new c.Variable("x");
@@ -197,7 +199,7 @@ ClTests = c.inherit({
     for (j = 0; j < nCnsMade; ++j)
     {
       nvs = this.RandomInRange(1, maxVars);
-      if (this.fTraceOn) this.traceprint("Using nvs = " + nvs);
+      if (this.trace) this.traceprint("Using nvs = " + nvs);
       var expr = new c.LinearExpression(this.UniformRandomDiscretized() * 20.0 - 10.0);
       for (k = 0; k < nvs; k++)
       {
@@ -211,7 +213,7 @@ ClTests = c.inherit({
       else {
         rgpcns[j] = new c.LinearEquation(expr);
       }
-      if (this.fTraceOn) this.traceprint("Constraint " + j + " is " + rgpcns[j]);
+      if (this.trace) this.traceprint("Constraint " + j + " is " + rgpcns[j]);
     }
     timer.Stop();
     print("done building data structures");
@@ -225,12 +227,12 @@ ClTests = c.inherit({
       try {
         solver.addConstraint(rgpcns[j]);
         rgpcnsAdded[cCns++] = rgpcns[j];
-        if (this.fTraceAdded) this.traceprint("Added cn: " + rgpcns[j]);
+        if (this.traceAdded) this.traceprint("Added cn: " + rgpcns[j]);
       }
       catch (err /*ExCLRequiredFailure*/){
         cExceptions++;
-        if (this.fTraceOn) this.traceprint("got exception adding " + rgpcns[j]);
-        if (this.fTraceAdded) this.traceprint("got exception adding " + rgpcns[j]);
+        if (this.trace) this.traceprint("got exception adding " + rgpcns[j]);
+        if (this.traceAdded) this.traceprint("got exception adding " + rgpcns[j]);
         rgpcns[j] = null;
       }
     }
@@ -325,7 +327,7 @@ ClTests = c.inherit({
     for (j = 0; j < nCnsMade; ++j)
     {
       nvs = this.RandomInRange(1, maxVars);
-      if (this.fTraceOn) this.traceprint("Using nvs = " + nvs);
+      if (this.trace) this.traceprint("Using nvs = " + nvs);
       var expr = new c.LinearExpression(this.GrainedUniformRandom() * 20.0 - 10.0);
       for (k = 0; k < nvs; k++)
       {
@@ -338,7 +340,7 @@ ClTests = c.inherit({
       } else {
         rgpcns[j] = new c.LinearEquation(expr);
       }
-      if (this.fTraceOn) this.traceprint("Constraint " + j + " is " + rgpcns[j]);
+      if (this.trace) this.traceprint("Constraint " + j + " is " + rgpcns[j]);
     }
     timer.Stop();
     print("done building data structures");
@@ -449,61 +451,71 @@ ClTests = c.inherit({
     var fAllOkResult = true;
     var fResult;
     if (true) {
+      /*
+      */
       print("simple1:");
       fResult = this.simple1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\njustStay1:");
       fResult = this.justStay1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      /*
+      */
 
       print("\n\n\naddDelete1:");
       fResult = this.addDelete1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
+      /*
+       */
       print("\n\n\naddDelete2:");
       fResult = this.addDelete2();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\ncasso1:");
       fResult = this.casso1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\ninconsistent1:");
       fResult = this.inconsistent1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\ninconsistent2:");
       fResult = this.inconsistent2();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\ninconsistent3:");
       fResult = this.inconsistent3();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\nmultiedit:");
       fResult = this.multiedit();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      /*
+       */
     }
 
+    /*
+     */
     print("\n\n\naddDel:");
     var testNum = 1;
     var cns = 900;
@@ -518,9 +530,11 @@ ClTests = c.inherit({
       fResult = this.addDel(cns, cns, resolves);
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.fGC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
     }
     this.addDelSolvers(cns, resolves, solvers, testNum);
+    /*
+    */
   },
 });
 
