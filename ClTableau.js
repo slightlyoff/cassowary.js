@@ -15,8 +15,11 @@ c.Tableau = c.inherit(
         var _externalRows //Set of vars
         var _externalParametricVars //Set of vars
    */
-    this._columns = new Hashtable(); // values are sets
-    this._rows = new Hashtable(); // values are ClLinearExpressions
+
+    this._columns = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // values are sets
+
+    this._rows = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // values are ClLinearExpressions
+
     this._infeasibleRows = new HashSet();
     this._externalRows = new HashSet();
     this._externalParametricVars = new HashSet();
@@ -24,14 +27,14 @@ c.Tableau = c.inherit(
   null,
   {
     noteRemovedVariable: function(v /*ClAbstractVariable*/, subject /*ClAbstractVariable*/) {
-      if (c.fVerboseTraceOn) c.fnenterprint("noteRemovedVariable: " + v + ", " + subject);
+      if (c.verbose) c.fnenterprint("noteRemovedVariable: " + v + ", " + subject);
       if (subject != null) {
         this._columns.get(v).remove(subject);
       }
     },
 
     noteAddedVariable: function(v /*ClAbstractVariable*/, subject /*ClAbstractVariable*/) {
-      if (c.fVerboseTraceOn) c.fnenterprint("noteAddedVariable: " + v + ", " + subject);
+      if (c.verbose) c.fnenterprint("noteAddedVariable: " + v + ", " + subject);
       if (subject) {
         this.insertColVar(v, subject);
       }
@@ -86,7 +89,7 @@ c.Tableau = c.inherit(
 
     addRow: function(aVar /*ClAbstractVariable*/, expr /*ClLinearExpression*/) {
       var that = this;
-      if (c.fTraceOn) c.fnenterprint("addRow: " + aVar + ", " + expr);
+      if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
       // print("addRow: " + aVar + " (key), " + expr + " (value)");
       // print(this._rows.size());
       this._rows.put(aVar, expr);
@@ -102,12 +105,12 @@ c.Tableau = c.inherit(
       if (aVar.isExternal) {
         this._externalRows.add(aVar);
       }
-      if (c.fTraceOn) c.traceprint(this.toString());
+      if (c.trace) c.traceprint(this.toString());
     },
 
     removeColumn: function(aVar /*ClAbstractVariable*/) {
       var that = this;
-      if (c.fTraceOn) c.fnenterprint("removeColumn:" + aVar);
+      if (c.trace) c.fnenterprint("removeColumn:" + aVar);
       var rows = /* Set */ this._columns.remove(aVar);
       if (rows) {
         rows.each(function(clv) {
@@ -115,7 +118,7 @@ c.Tableau = c.inherit(
           expr.terms().remove(aVar);
         });
       } else {
-        if (c.fTraceOn) c.debugprint("Could not find var " + aVar + " in _columns");
+        if (c.trace) c.debugprint("Could not find var " + aVar + " in _columns");
       }
       if (aVar.isExternal) {
         this._externalRows.remove(aVar);
@@ -125,13 +128,13 @@ c.Tableau = c.inherit(
 
     removeRow: function(aVar /*ClAbstractVariable*/) {
       var that = this;
-      if (c.fTraceOn) c.fnenterprint("removeRow:" + aVar);
+      if (c.trace) c.fnenterprint("removeRow:" + aVar);
       var expr = /* ClLinearExpression */this._rows.get(aVar);
       c.Assert(expr != null);
       expr.terms().each(function(clv, coeff) {
         var varset = that._columns.get(clv);
         if (varset != null) {
-          if (c.fTraceOn) c.debugprint("removing from varset " + aVar);
+          if (c.trace) c.debugprint("removing from varset " + aVar);
           varset.remove(aVar);
         }
       });
@@ -140,14 +143,14 @@ c.Tableau = c.inherit(
         this._externalRows.remove(aVar);
       }
       this._rows.remove(aVar);
-      if (c.fTraceOn) c.fnexitprint("returning " + expr);
+      if (c.trace) c.fnexitprint("returning " + expr);
       return expr;
     },
 
     substituteOut: function(oldVar /*ClAbstractVariable*/, expr /*ClLinearExpression*/) {
       var that = this;
-      if (c.fTraceOn) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
-      if (c.fTraceOn) c.traceprint(this.toString());
+      if (c.trace) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
+      if (c.trace) c.traceprint(this.toString());
       var varset = /* Set */this._columns.get(oldVar);
       varset.each(function(v) {
         var row = /* ClLinearExpression */that._rows.get(v);
