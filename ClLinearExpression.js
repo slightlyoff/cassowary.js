@@ -15,9 +15,9 @@ c.LinearExpression = c.inherit({
      private Hashtable _terms
  */
   initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
-    if (CL.fGC) print("new c.LinearExpression");
+    if (CL.GC) print("new c.LinearExpression");
     this.constant = constant || 0;
-    this._terms = new Hashtable();
+    this._terms = new (CL.simpleHT ? SimpleHashtable : Hashtable)();
 
     if (clv instanceof c.AbstractVariable) {
       this._terms.put(clv, value || 1);
@@ -27,7 +27,13 @@ c.LinearExpression = c.inherit({
   },
 
   initializeFromHash: function(constant /*ClDouble*/, terms /*Hashtable*/) {
-    if (CL.fGC) print("clone c.LinearExpression");
+    if(CL.verbose) {
+      console.log("*******************************");
+      console.log("clone c.initializeFromHash");
+      console.log("*******************************");
+    }
+
+    if (CL.GC) print("clone c.LinearExpression");
     this.constant = constant;
     this._terms = terms.clone();
     return this;
@@ -43,7 +49,15 @@ c.LinearExpression = c.inherit({
   },
 
   clone: function() {
-    return new c.LinearExpression().initializeFromHash(this.constant, this._terms);
+    if(CL.verbose) {
+      console.log("*******************************");
+      console.log("clone c.LinearExpression");
+      console.log("*******************************");
+    }
+
+    var le = new c.LinearExpression();
+    le.initializeFromHash(this.constant, this._terms);
+    return le;
   },
 
   times: function(x) {
@@ -119,7 +133,7 @@ c.LinearExpression = c.inherit({
 
   addVariable: function(v /*c.AbstractVariable*/, c /*double*/, subject, solver) {
     c = c || 1.0;
-    if (CL.fTraceOn) CL.fnenterprint("CLE: addVariable:" + v + ", " + c);
+    if (CL.trace) CL.fnenterprint("CLE: addVariable:" + v + ", " + c);
     coeff = this._terms.get(v);
     if (coeff) {
       new_coefficient = coeff + c;
@@ -160,8 +174,8 @@ c.LinearExpression = c.inherit({
   
   substituteOut: function(outvar /*c.AbstractVariable*/, expr /*c.LinearExpression*/, subject /*c.AbstractVariable*/, solver /*ClTableau*/) {
     var that = this;
-    if (CL.fTraceOn) CL.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
-    if (CL.fTraceOn) CL.traceprint("this = " + this);
+    if (CL.trace) CL.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
+    if (CL.trace) CL.traceprint("this = " + this);
     var multiplier = this._terms.remove(outvar);
     this.constant += (multiplier * expr.constant);
     expr.terms().each(function(clv, coeff) {
@@ -179,7 +193,7 @@ c.LinearExpression = c.inherit({
         solver.noteAddedVariable(clv, subject);
       }
     });
-    if (CL.fTraceOn) CL.traceprint("Now this is " + this);
+    if (CL.trace) CL.traceprint("Now this is " + this);
   },
 
   changeSubject: function(old_subject /*c.AbstractVariable*/, new_subject /*c.AbstractVariable*/) {
@@ -187,7 +201,7 @@ c.LinearExpression = c.inherit({
   },
 
   newSubject: function(subject /*c.AbstractVariable*/) {
-    if (CL.fTraceOn) CL.fnenterprint("newSubject:" + subject);
+    if (CL.trace) CL.fnenterprint("newSubject:" + subject);
     
     var reciprocal = 1.0 / this._terms.remove(subject);
     this.multiplyMe(-reciprocal);
