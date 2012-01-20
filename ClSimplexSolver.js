@@ -11,41 +11,49 @@ var tp = t.prototype;
 c.SimplexSolver = c.inherit({
   extends: c.Tableau, 
   initialize: function(){
-  /* FIELDS:
-      var _stayMinusErrorVars //Vector
-      var _stayPlusErrorVars //Vector
-      var _errorVars //Hashtable
-      var _markerVars //Hashtable
-      var _objective //c.ObjectiveVariable
-      var _editVarMap //Hashtable
-      var _slackCounter //long
-      var _artificialCounter //long
-      var _dummyCounter //long
-      var _resolve_pair //Vector
-      var _epsilon //double
-      var _fOptimizeAutomatically //boolean
-      var _fNeedsSolving //boolean
-      var _stkCedcns //Stack
-  */
+    /* FIELDS:
+        var _stayMinusErrorVars //Vector
+        var _stayPlusErrorVars //Vector
+        var _errorVars //Hashtable
+        var _markerVars //Hashtable
+        var _objective //c.ObjectiveVariable
+        var _editVarMap //Hashtable
+        var _slackCounter //long
+        var _artificialCounter //long
+        var _dummyCounter //long
+        var _resolve_pair //Vector
+        var _epsilon //double
+        var _fOptimizeAutomatically //boolean
+        var _fNeedsSolving //boolean
+        var _stkCedcns //Stack
+    */
+
     CL.Tableau.call(this);
     this._stayMinusErrorVars = [];
     this._stayPlusErrorVars = [];
-    this._errorVars = new Hashtable(); // cn -> Set of clv
-    this._markerVars = new Hashtable(); // cn -> Set of clv
+
+    this._errorVars = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // cn -> Set of clv
+
+    this._markerVars = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // cn -> Set of clv
+
     this._resolve_pair = [0, 0]; 
     this._objective = new c.ObjectiveVariable("Z");
-    this._editVarMap = new Hashtable(); // clv -> c.EditInfo
+
+    this._editVarMap = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // clv -> c.EditInfo
+
     this._slackCounter = 0;
     this._artificialCounter = 0;
     this._dummyCounter = 0;
     this._epsilon = 1e-8;
     this._fOptimizeAutomatically = true;
     this._fNeedsSolving = false;
-    this._rows = new Hashtable(); // clv -> expression
+
+    this._rows = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // clv -> expression
+
     this._rows.put(this._objective, new c.LinearExpression());
     this._stkCedcns = []; // Stack
     this._stkCedcns.push(0);
-    if (CL.fTraceOn)
+    if (CL.trace)
       CL.traceprint("objective expr == " + this.rowExpression(this._objective));
   },
 
@@ -67,7 +75,7 @@ c.SimplexSolver = c.inherit({
 
   addConstraint: function(cn /*c.Constraint*/) {
     // console.log("addConstraint: " + cn);
-    if (CL.fTraceOn) CL.fnenterprint("addConstraint: " + cn);
+    if (CL.trace) CL.fnenterprint("addConstraint: " + cn);
     var eplus_eminus = new Array(2);
     var prevEConstant = new Array(1); // so it can be output to
     var expr = this.newExpression(cn, /*output to*/ eplus_eminus, prevEConstant);
@@ -106,7 +114,7 @@ c.SimplexSolver = c.inherit({
   },
 
   addConstraintNoException: function(cn /*c.Constraint*/) {
-    if (CL.fTraceOn) CL.fnenterprint("addConstraintNoException: " + cn);
+    if (CL.trace) CL.fnenterprint("addConstraintNoException: " + cn);
     try {
       this.addConstraint(cn);
       return true;
@@ -116,7 +124,7 @@ c.SimplexSolver = c.inherit({
   },
 
   addEditVar: function(v /*ClVariable*/, strength /*c.Strength*/) {
-    if (CL.fTraceOn) CL.fnenterprint("addEditVar: " + v + " @ " + strength);
+    if (CL.trace) CL.fnenterprint("addEditVar: " + v + " @ " + strength);
     strength = strength || c.Strength.strong;
     var cnEdit = new c.EditConstraint(v, strength);
     return this.addConstraint(cnEdit);
@@ -167,7 +175,7 @@ c.SimplexSolver = c.inherit({
   },
 
   addPointStays: function(listOfPoints /*Vector*/) {
-    if (CL.fTraceOn) CL.fnenterprint("addPointStays" + listOfPoints);
+    if (CL.trace) CL.fnenterprint("addPointStays" + listOfPoints);
     var weight = 1.0;
     var multiplier = 2.0;
     for (var i = 0; i < listOfPoints.length; i++)
@@ -203,14 +211,15 @@ c.SimplexSolver = c.inherit({
   },
 
   removeConstraintInternal: function(cn /*c.Constraint*/) {
+    // print("removeConstraintInternal('" + cn + "')");
     var that = this;
-    if (CL.fTraceOn) CL.fnenterprint("removeConstraint: " + cn);
-    if (CL.fTraceOn) CL.traceprint(this.toString());
+    if (CL.trace) CL.fnenterprint("removeConstraint: " + cn);
+    if (CL.trace) CL.traceprint(this.toString());
     this._fNeedsSolving = true;
     this.resetStayConstants();
     var zRow = this.rowExpression(this._objective);
     var eVars = /* Set */this._errorVars.get(cn);
-    if (CL.fTraceOn) CL.traceprint("eVars == " + CL.setToString(eVars));
+    if (CL.trace) CL.traceprint("eVars == " + CL.setToString(eVars));
     if (eVars != null) {
       eVars.each(function(clv) {
         var expr = that.rowExpression(clv);
@@ -219,24 +228,25 @@ c.SimplexSolver = c.inherit({
         } else {
           zRow.addExpression(expr, -cn.weight * cn.strength.symbolicWeight.toDouble(), that._objective, that);
         }
-        if (CL.fTraceOn) CL.traceprint("now eVars == " + CL.setToString(eVars));
+        if (CL.trace) CL.traceprint("now eVars == " + CL.setToString(eVars));
       });
     }
     var marker = this._markerVars.remove(cn);
     if (marker == null) {
       throw new Exc.ConstraintNotFound();
     }
-    if (CL.fTraceOn) CL.traceprint("Looking to remove var " + marker);
+    if (CL.trace) CL.traceprint("Looking to remove var " + marker);
     if (this.rowExpression(marker) == null) {
       var col = this._columns.get(marker);
-      if (CL.fTraceOn) CL.traceprint("Must pivot -- columns are " + col);
+      // console.log("col is:", col, "from marker:", marker);
+      if (CL.trace) CL.traceprint("Must pivot -- columns are " + col);
       var exitVar = null;
       var minRatio = 0.0;
       col.each(function(v) {
         if (v.isRestricted) {
           var expr = that.rowExpression(v);
           var coeff = expr.coefficientFor(marker);
-          if (that.fTraceOn) that.traceprint("Marker " + marker + "'s coefficient in " + expr + " is " + coeff);
+          if (that.trace) that.traceprint("Marker " + marker + "'s coefficient in " + expr + " is " + coeff);
           if (coeff < 0.0) {
             var r = -expr.constant / coeff;
             if (exitVar == null || r < minRatio || (CL.approx(r, minRatio) && v.hashCode() < exitVar.hashCode())) {
@@ -247,7 +257,7 @@ c.SimplexSolver = c.inherit({
         }
       });
       if (exitVar == null) {
-        if (CL.fTraceOn) CL.traceprint("exitVar is still null");
+        if (CL.trace) CL.traceprint("exitVar is still null");
         col.each(function(v) {
           if (v.isRestricted) {
             var expr = that.rowExpression(v);
@@ -319,12 +329,12 @@ c.SimplexSolver = c.inherit({
   },
 
   reset: function() {
-    if (CL.fTraceOn) CL.fnenterprint("reset");
+    if (CL.trace) CL.fnenterprint("reset");
     throw new c.InternalError("reset not implemented");
   },
 
   resolveArray: function(newEditConstants /*Vector*/) {
-    if (CL.fTraceOn) CL.fnenterprint("resolveArray" + newEditConstants);
+    if (CL.trace) CL.fnenterprint("resolveArray" + newEditConstants);
     var that = this;
     this._editVarMap.each(function(v, cei) {
       var i = cei.index;
@@ -341,7 +351,7 @@ c.SimplexSolver = c.inherit({
   },
 
   resolve: function() {
-    if (CL.fTraceOn) CL.fnenterprint("resolve()");
+    if (CL.trace) CL.fnenterprint("resolve()");
     this.dualOptimize();
     this.setExternalVariables();
     this._infeasibleRows.clear();
@@ -349,7 +359,7 @@ c.SimplexSolver = c.inherit({
   },
 
   suggestValue: function(v /*ClVariable*/, x /*double*/) {
-    if (CL.fTraceOn) CL.fnenterprint("suggestValue(" + v + ", " + x + ")");
+    if (CL.trace) CL.fnenterprint("suggestValue(" + v + ", " + x + ")");
     var cei = this._editVarMap.get(v);
     if (cei == null) {
       // console.log("suggestValue for variable " + v + ", but var is not an edit variable\n");
@@ -414,7 +424,7 @@ c.SimplexSolver = c.inherit({
       catch (e /*ExCLRequiredFailure*/){
         throw new c.InternalError("Error in addVar -- required failure is impossible");
       }
-      if (CL.fTraceOn) {
+      if (CL.trace) {
         CL.traceprint("added initial stay on " + v);
       }
     }
@@ -454,17 +464,17 @@ c.SimplexSolver = c.inherit({
   },
 
   addWithArtificialVariable: function(expr /*c.LinearExpression*/) {
-    if (CL.fTraceOn) CL.fnenterprint("addWithArtificialVariable: " + expr);
+    if (CL.trace) CL.fnenterprint("addWithArtificialVariable: " + expr);
     var av = new c.SlackVariable(++this._artificialCounter, "a");
     var az = new c.ObjectiveVariable("az");
     var azRow = /* c.LinearExpression */expr.clone();
-    if (CL.fTraceOn) CL.traceprint("before addRows:\n" + this);
+    if (CL.trace) CL.traceprint("before addRows:\n" + this);
     this.addRow(az, azRow);
     this.addRow(av, expr);
-    if (CL.fTraceOn) CL.traceprint("after addRows:\n" + this);
+    if (CL.trace) CL.traceprint("after addRows:\n" + this);
     this.optimize(az);
     var azTableauRow = this.rowExpression(az);
-    if (CL.fTraceOn) CL.traceprint("azTableauRow.constant == " + azTableauRow.constant);
+    if (CL.trace) CL.traceprint("azTableauRow.constant == " + azTableauRow.constant);
     if (!CL.approx(azTableauRow.constant, 0.0)) {
       this.removeRow(az);
       this.removeColumn(av);
@@ -486,10 +496,10 @@ c.SimplexSolver = c.inherit({
   },
 
   tryAddingDirectly: function(expr /*c.LinearExpression*/) {
-    if (CL.fTraceOn) CL.fnenterprint("tryAddingDirectly: " + expr);
+    if (CL.trace) CL.fnenterprint("tryAddingDirectly: " + expr);
     var subject = this.chooseSubject(expr);
     if (subject == null) {
-      if (CL.fTraceOn) CL.fnexitprint("returning false");
+      if (CL.trace) CL.fnexitprint("returning false");
       return false;
     }
     expr.newSubject(subject);
@@ -497,13 +507,13 @@ c.SimplexSolver = c.inherit({
       this.substituteOut(subject, expr);
     }
     this.addRow(subject, expr);
-    if (CL.fTraceOn) CL.fnexitprint("returning true");
+    if (CL.trace) CL.fnexitprint("returning true");
     return true;
   },
 
   chooseSubject: function(expr /*c.LinearExpression*/) {
     var that=this;
-    if (CL.fTraceOn) CL.fnenterprint("chooseSubject: " + expr);
+    if (CL.trace) CL.fnenterprint("chooseSubject: " + expr);
     var subject = null;
     var foundUnrestricted = false;
     var foundNewRestricted = false;
@@ -565,7 +575,7 @@ c.SimplexSolver = c.inherit({
                               minusErrorVar /*c.AbstractVariable*/) {
     var that = this;
 
-    if (CL.fTraceOn) 
+    if (CL.trace) 
       CL.fnenterprint("deltaEditConstant :" + delta + ", " + plusErrorVar + ", " + minusErrorVar);
 
     var exprPlus = this.rowExpression(plusErrorVar);
@@ -599,7 +609,7 @@ c.SimplexSolver = c.inherit({
   },
 
   dualOptimize: function() {
-    if (CL.fTraceOn) CL.fnenterprint("dualOptimize:");
+    if (CL.trace) CL.fnenterprint("dualOptimize:");
     var zRow = this.rowExpression(this._objective);
     while (!this._infeasibleRows.isEmpty()) {
       var exitVar = this._infeasibleRows.values()[0];
@@ -633,7 +643,7 @@ c.SimplexSolver = c.inherit({
   newExpression: function(cn /*c.Constraint*/, /** outputs to **/
                           eplus_eminus /*Vector*/, prevEConstant /*ClDouble*/) {
     var that = this;
-    if (CL.fTraceOn) {
+    if (CL.trace) {
       CL.fnenterprint("newExpression: " + cn);
       CL.traceprint("cn.isInequality == " + cn.isInequality);
       CL.traceprint("cn.isRequired() == " + cn.isRequired());
@@ -645,12 +655,14 @@ c.SimplexSolver = c.inherit({
     var eminus = new c.SlackVariable();
     var eplus = new c.SlackVariable();
     var cnTerms = cnExpr.terms();
+    // console.log(cnTerms.size());
     cnTerms.each(function(v, c) {
       var e = that.rowExpression(v);
       if (e == null) expr.addVariable(v, c);
       else expr.addExpression(e, c);
     });
     if (cn.isInequality) {
+      if (CL.trace) CL.traceprint("Inequality, adding slack");
       ++this._slackCounter;
       slackVar = new c.SlackVariable(this._slackCounter, "s");
       expr.setVariable(slackVar, -1);
@@ -667,12 +679,14 @@ c.SimplexSolver = c.inherit({
       }
     } else {
       if (cn.isRequired()) {
+        if (CL.trace) CL.traceprint("Equality, required");
         ++this._dummyCounter;
         dummyVar = new c.DummyVariable(this._dummyCounter, "d");
         expr.setVariable(dummyVar, 1.0);
         this._markerVars.put(cn, dummyVar);
-        if (CL.fTraceOn) CL.traceprint("Adding dummyVar == d" + this._dummyCounter);
+        if (CL.trace) CL.traceprint("Adding dummyVar == d" + this._dummyCounter);
       } else {
+        if (CL.trace) CL.traceprint("Equality, not required");
         ++this._slackCounter;
         eplus = new c.SlackVariable(this._slackCounter, "ep");
         eminus = new c.SlackVariable(this._slackCounter, "em");
@@ -680,12 +694,13 @@ c.SimplexSolver = c.inherit({
         expr.setVariable(eminus, 1.0);
         this._markerVars.put(cn, eplus);
         var zRow = this.rowExpression(this._objective);
+        if (CL.trace) console.log(zRow);
         var sw = cn.strength.symbolicWeight.times(cn.weight);
         var swCoeff = sw.toDouble();
         if (swCoeff == 0) {
-          if (CL.fTraceOn) CL.traceprint("sw == " + sw);
-          if (CL.fTraceOn) CL.traceprint("cn == " + cn);
-          if (CL.fTraceOn) CL.traceprint("adding " + eplus + " and " + eminus + " with swCoeff == " + swCoeff);
+          if (CL.trace) CL.traceprint("sw == " + sw);
+          if (CL.trace) CL.traceprint("cn == " + cn);
+          if (CL.trace) CL.traceprint("adding " + eplus + " and " + eminus + " with swCoeff == " + swCoeff);
         }
         zRow.setVariable(eplus, swCoeff);
         this.noteAddedVariable(eplus, this._objective);
@@ -704,14 +719,14 @@ c.SimplexSolver = c.inherit({
       }
     }
     if (expr.constant < 0) expr.multiplyMe(-1);
-    if (CL.fTraceOn) CL.fnexitprint("returning " + expr);
+    if (CL.trace) CL.fnexitprint("returning " + expr);
     return expr;
   },
 
   optimize: function(zVar /*c.ObjectiveVariable*/) {
     var that=this;
-    if (CL.fTraceOn) CL.fnenterprint("optimize: " + zVar);
-    if (CL.fTraceOn) CL.traceprint(this.toString());
+    if (CL.trace) CL.fnenterprint("optimize: " + zVar);
+    if (CL.trace) CL.traceprint(this.toString());
     var zRow = this.rowExpression(zVar);
     CL.Assert(zRow != null, "zRow != null");
     var entryVar = null;
@@ -729,18 +744,18 @@ c.SimplexSolver = c.inherit({
       });
       if (objectiveCoeff >= -this._epsilon) 
         return;
-      if (CL.fTraceOn) {
+      if (CL.trace) {
         CL.traceprint("entryVar == " + entryVar + ", objectiveCoeff == " + objectiveCoeff);
       }
       var minRatio = Number.MAX_VALUE;
       var columnVars = this._columns.get(entryVar);
       var r = 0.0;
       columnVars.each(function(v) {
-        if (that.fTraceOn) that.traceprint("Checking " + v);
+        if (that.trace) that.traceprint("Checking " + v);
         if (v.isPivotable) {
           var expr = that.rowExpression(v);
           var coeff = expr.coefficientFor(entryVar);
-          if (that.fTraceOn) that.traceprint("pivotable, coeff = " + coeff);
+          if (that.trace) that.traceprint("pivotable, coeff = " + coeff);
           if (coeff < 0.0) {
             r = -expr.constant / coeff;
             if (r < minRatio || (CL.approx(r, minRatio) && v.hashCode() < exitVar.hashCode())) {
@@ -754,12 +769,12 @@ c.SimplexSolver = c.inherit({
         throw new c.InternalError("Objective function is unbounded in optimize");
       }
       this.pivot(entryVar, exitVar);
-      if (CL.fTraceOn) CL.traceprint(this.toString());
+      if (CL.trace) CL.traceprint(this.toString());
     }
   },
 
   pivot: function(entryVar /*c.AbstractVariable*/, exitVar /*c.AbstractVariable*/) {
-    if (CL.fTraceOn) CL.fnenterprint("pivot: " + entryVar + ", " + exitVar);
+    if (CL.trace) CL.fnenterprint("pivot: " + entryVar + ", " + exitVar);
     if (entryVar == null) {
       console.warn("pivot: entryVar == null");
     }
@@ -773,7 +788,7 @@ c.SimplexSolver = c.inherit({
   },
 
   resetStayConstants: function() {
-    if (CL.fTraceOn) CL.fnenterprint("resetStayConstants");
+    if (CL.trace) CL.fnenterprint("resetStayConstants");
     for (var i = 0; i < this._stayPlusErrorVars.length; i++)
     {
       var expr = this.rowExpression(/* c.AbstractVariable */this._stayPlusErrorVars[i]);
@@ -786,8 +801,8 @@ c.SimplexSolver = c.inherit({
 
   setExternalVariables: function() {
     var that=this;
-    if (CL.fTraceOn) CL.fnenterprint("setExternalVariables:");
-    if (CL.fTraceOn) CL.traceprint(this.toString());
+    if (CL.trace) CL.fnenterprint("setExternalVariables:");
+    if (CL.trace) CL.traceprint(this.toString());
     this._externalParametricVars.each(function(v) {
       if (that.rowExpression(v) != null) {
         console.log("Error: variable" + v + " in _externalParametricVars is basic");
@@ -797,18 +812,18 @@ c.SimplexSolver = c.inherit({
     });
     this._externalRows.each(function(v) {
       var expr = that.rowExpression(v);
-      if (CL.fTraceOn) CL.debugprint("v == " + v);
-      if (CL.fTraceOn) CL.debugprint("expr == " + expr);
+      if (CL.trace) CL.debugprint("v == " + v);
+      if (CL.trace) CL.debugprint("expr == " + expr);
       v.change_value(expr.constant);
     });
     this._fNeedsSolving = false;
   },
 
   insertErrorVar: function(cn /*c.Constraint*/, aVar /*c.AbstractVariable*/) {
-    if (CL.fTraceOn) CL.fnenterprint("insertErrorVar:" + cn + ", " + aVar);
+    if (CL.trace) CL.fnenterprint("insertErrorVar:" + cn + ", " + aVar);
     var cnset = /* Set */this._errorVars.get(aVar);
     if (cnset == null) 
-      this._errorVars.put(cn,cnset = new HashSet());
+      this._errorVars.put(cn, cnset = new HashSet());
     cnset.add(aVar);
   },
 });
