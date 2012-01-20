@@ -50,9 +50,16 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
     <canvas id="c" width="800" height="600" style="background-color: lightgray"></canvas>
   </body>
 
-  <script src='jshashtable-2.1-gjb.js'></script>
-  <script src='jshashset-gjb.js'></script>
+  <script src='jshashtable_src.js'></script>
+  <!-- <script src='jshashset-gjb.js'></script> -->
+  <script src='jshashset-pretty.js'></script>
+
   <script src='CL.js'></script>
+  <script>
+    c.simpleHT = true;
+  </script>
+
+  <script src='simple-hashtable.js'></script>
   <script src='ExCLError.js'></script>
   <script src='ClSymbolicWeight.js'></script>
   <script src='ClStrength.js'></script>
