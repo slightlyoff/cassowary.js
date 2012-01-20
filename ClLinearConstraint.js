@@ -19,7 +19,11 @@ c.LinearConstraint = c.inherit({
 
 c.LinearInequality = c.inherit({
   extends: c.LinearConstraint,
+
   initialize: function(a1, a2, a3, a4, a5) {
+    // FIXME(slightlyoff): what a disgusting mess. Should at least add docs.
+
+    // console.log("c.LinearInequality.initialize(", a1, a2, a3, a4, a5, ")");
     if (a1 instanceof c.LinearExpression &&
         a3 instanceof c.AbstractVariable) {
       var cle = a1, op = a2, clv = a3, strength = a4, weight = a5;
@@ -49,7 +53,8 @@ c.LinearInequality = c.inherit({
   isInequality: true,
 
   toString: function() {
-    return c.LinearConstraint.prototype.toString.call(this) + " >= 0 )";
+    // return "c.LinearInequality: " + this.hashCode();
+    return c.LinearConstraint.prototype.toString.call(this) + " >= 0 ) id: " + this.hash_code;
   },
 });
 
@@ -58,6 +63,7 @@ var lc = c.LinearConstraint;
 c.LinearEquation = c.inherit({
   extends: c.LinearConstraint,
   initialize: function(a1, a2, a3, a4) {
+    // FIXME(slightlyoff): this is just a huge mess.
     if (a1 instanceof c.LinearExpression && !a2 || a2 instanceof c.Strength) {
       lc.call(this, a1, a2, a3);
     } else if ((a1 instanceof c.AbstractVariable) &&
