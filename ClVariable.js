@@ -6,12 +6,14 @@
 
 (function(c) {
 
-var varCount = 1;
+var inc = (function(c){
+  return function() { return c++; };
+})(0);
 
 var av = 
 c.AbstractVariable = c.inherit({
   initialize: function(a1,a2) {
-    this.hash_code = varCount++;
+    this.hash_code = inc();
     if (typeof(a1) == "string" || (a1 == null)) {
       this._name = a1 || "v" + this.hash_code;
     } else {
@@ -21,17 +23,10 @@ c.AbstractVariable = c.inherit({
   },
 
   hashCode: function() {
+    // return "[v:" + this.hash_code + "]";
     return this.hash_code;
   },
   
-  name: function() {
-    return this._name;
-  },
-
-  setName: function(name) {
-    this._name = name;
-  },
-
   isDummy: false,
   /*
   isExternal: function() { throw "abstract isExternal"; },
@@ -48,6 +43,7 @@ c.AbstractVariable = c.inherit({
 c.Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, value) {
+    this.hash_code = inc();
     this._name = "";
     this._value = 0.0;
     if (typeof(name_or_val) == "string") {
@@ -69,7 +65,7 @@ c.Variable = c.inherit({
   isRestricted:   false,
 
   toString: function() {
-    return "[" + this.name() + ":" + this._value + "]";
+    return "[" + this._name + ":" + this._value + "]";
   },
 
   // FIXME(slightlyoff)
@@ -92,7 +88,7 @@ c.DummyVariable = c.inherit({
   isPivotable:    false,
   isExternal:     false,
   isRestricted:   true,
-  toString: function() { return "[" + this.name() + ":dummy]"; },
+  toString: function() { return "[" + this._name + ":dummy]"; },
 });
 
 c.ObjectiveVariable = c.inherit({
@@ -106,7 +102,7 @@ c.ObjectiveVariable = c.inherit({
   isRestricted:   false,
 
   toString: function() {
-    return "[" + this.name() + ":obj]";
+    return "[" + this._name + ":obj]";
   },
 });
 
@@ -121,7 +117,7 @@ c.SlackVariable = c.inherit({
   isRestricted:   true,
 
   toString: function() {
-    return "[" + this.name() + ":slack]";
+    return "[" + this._name + ":slack]";
   },
 });
 
