@@ -40,9 +40,7 @@
 
 })()
 
-// load('jshashtable-2.1-gjb.js');
 load('jshashtable_src.js');
-// load('jshashset-gjb.js');
 load('jshashset-pretty.js');
 
 load('CL.js')
