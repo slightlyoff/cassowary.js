@@ -30,7 +30,7 @@ function HashSet(c,a){
   };
 
   this.values = function(){
-    return b.keys()
+    return b.keys();
   };
 
   this.remove = function(d){
@@ -42,11 +42,11 @@ function HashSet(c,a){
   };
 
   this.clear = function(){
-    b.clear()
+    b.clear();
   };
 
   this.size = function(){
-    return b.size()
+    return b.size();
   };
 
   this.isEmpty = function(){
@@ -84,7 +84,8 @@ function HashSet(c,a){
   };
   
   this.isSubsetOf = function(d){
-    var e=b.keys(),f=e.length;
+    var e = b.keys();
+    var f = e.length;
     while(f--){
       if(!d.contains(e[f])){
         return false
@@ -94,10 +95,10 @@ function HashSet(c,a){
   };
 
   this.each = function(f){
-    var e=b.keys();
-    i=e.length;
+    var e = b.keys();
+    var i = e.length;
     while (i--){
-      f(b.keys()[i]);
+      f(e[i]);
     }
   };
 };
