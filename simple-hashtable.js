@@ -32,7 +32,7 @@
  *
  *  This is a (mostly) API compatible version of jshashtable, but hopefully
  *  with all of the slow and busted removed. It's a first step to using a saner
- *  system in cassowary alltogether. But baby steps. Baby steps.
+ *  system in cassowary alltogether. Baby steps. Baby steps.
  *
  *  Features removed:
  *
@@ -58,7 +58,8 @@
  *      - new "scope" parameter to each() and escapingEach()
  */
 
-(function(c) {
+(function(scope, c) {
+"use strict";
 
 var keyCode = function(key) {
   var kc = (typeof key.hashCode == "function") ? key.hashCode() : key.toString();
@@ -74,7 +75,7 @@ var copyOwn = function(src, dest) {
 }
 
 /* Global */
-SimpleHashtable = c.inherit({
+scope.SimpleHashtable = c.inherit({
 
   initialize: function() {
     // console.log("SimpleHashtable.initialize()");
@@ -212,4 +213,4 @@ SimpleHashtable = c.inherit({
   }
 });
 
-})(CL);
+})(this, CL);

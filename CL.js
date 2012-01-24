@@ -5,9 +5,11 @@
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 (function(scope){
+"use strict";
 
 // Global
-c = CL = {
+scope.c =
+scope.CL = {
   debug: false,
   trace: false,
   verbose: false,
@@ -46,7 +48,7 @@ c = CL = {
 
     // Default
     var dprops = {};
-    var ctor = ctor || function() {};
+    var realCtor = ctor || function() {};
     for (var x in props) {
       if (props.hasOwnProperty(x)) {
         dprops[x] = {
@@ -57,8 +59,8 @@ c = CL = {
         }
       }
     }
-    ctor.prototype = Object.create(((parent) ? parent.prototype : Object.prototype), dprops);
-    return ctor;
+    realCtor.prototype = Object.create(((parent) ? parent.prototype : Object.prototype), dprops);
+    return realCtor;
   },
 
   debugprint: function(s /*String*/) {
@@ -142,7 +144,7 @@ c = CL = {
     if (b instanceof c.Variable) {
       b = b.value();
     }
-    epsilon = 1.0e-8;
+    var epsilon = 1.0e-8;
     if (a == 0.0) {
       return (Math.abs(b) < epsilon);
     } else if (b == 0.0) {
