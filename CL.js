@@ -8,11 +8,11 @@
 
 // Global
 c = CL = {
-  debug: true,
+  debug: false,
   trace: false,
   verbose: false,
   traceAdded: false,
-  simpleHT: false,
+  simpleHT: true,
   GC: false,
   GEQ: 1,
   LEQ: 2,
