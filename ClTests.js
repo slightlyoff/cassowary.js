@@ -451,8 +451,6 @@ ClTests = c.inherit({
     var fAllOkResult = true;
     var fResult;
     if (true) {
-      /*
-      */
       print("simple1:");
       fResult = this.simple1();
       fAllOkResult = fResult;
@@ -464,8 +462,6 @@ ClTests = c.inherit({
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
       if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
-      /*
-      */
 
       print("\n\n\naddDelete1:");
       fResult = this.addDelete1();
@@ -473,8 +469,6 @@ ClTests = c.inherit({
       if (!fResult) print("Failed!");
       if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
-      /*
-       */
       print("\n\n\naddDelete2:");
       fResult = this.addDelete2();
       fAllOkResult = fResult;
@@ -510,12 +504,8 @@ ClTests = c.inherit({
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
       if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
-      /*
-       */
     }
 
-    /*
-     */
     print("\n\n\naddDel:");
     var testNum = 1;
     var cns = 900;
@@ -533,8 +523,6 @@ ClTests = c.inherit({
       if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
     }
     this.addDelSolvers(cns, resolves, solvers, testNum);
-    /*
-    */
   },
 });
 
