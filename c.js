@@ -27,9 +27,8 @@ scope.CL = {
       ctor = null;
       parent = null
 
-      if (props["Extends"] || props["extends"]) {
-        parent = props["Extends"] || props["extends"];
-        delete props["Extends"];
+      if (props["extends"]) {
+        parent = props["extends"];
         delete props["extends"];
       }
 
