@@ -4,5 +4,5 @@
 //
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
-s = new ClSimplexSolver();
+s = new c.SimplexSolver();
 print(s);

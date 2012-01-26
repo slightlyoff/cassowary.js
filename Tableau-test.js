@@ -4,5 +4,5 @@
 //
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
-t = new Cl.Tableau();
+t = new c.Tableau();
 print(t);

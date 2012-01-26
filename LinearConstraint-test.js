@@ -4,16 +4,16 @@
 //
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
-c1 = new ClLinearEquation(ex);
+c1 = new c.LinearEquation(ex);
 print(c1);
 
-var x = new ClVariable(167);
-var y = new ClVariable(2);
-var cly = new ClLinearExpression(y);
+var x = new c.Variable(167);
+var y = new c.Variable(2);
+var cly = new c.LinearExpression(y);
 cly.addExpression(x);
 
-var x = new ClVariable(167);
-var y = new ClVariable(2);
-var cly = new ClLinearExpression(y);
-var eq = new ClLinearEquation(x, cly);
+var x = new c.Variable(167);
+var y = new c.Variable(2);
+var cly = new c.LinearExpression(y);
+var eq = new c.LinearEquation(x, cly);
 print(eq);
