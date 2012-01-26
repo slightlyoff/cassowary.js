@@ -40,9 +40,6 @@
 
 })()
 
-load('jshashtable_src.js');
-load('jshashset-pretty.js');
-
 load('CL.js')
 
 // Command-line argument processing
@@ -58,6 +55,7 @@ if (this.arguments) {
 }
 
 load('simple-hashtable.js');
+load('jshashset-pretty.js');
 load('ExCLError.js')
 load('ClSymbolicWeight.js')
 load('ClStrength.js')

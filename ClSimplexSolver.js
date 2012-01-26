@@ -14,10 +14,10 @@ c.SimplexSolver = c.inherit({
     /* FIELDS:
         var _stayMinusErrorVars //Vector
         var _stayPlusErrorVars //Vector
-        var _errorVars //Hashtable
-        var _markerVars //Hashtable
+        var _errorVars //SimpleHashtable
+        var _markerVars //SimpleHashtable
         var _objective //c.ObjectiveVariable
-        var _editVarMap //Hashtable
+        var _editVarMap //SimpleHashtable
         var _slackCounter //long
         var _artificialCounter //long
         var _dummyCounter //long
@@ -32,14 +32,14 @@ c.SimplexSolver = c.inherit({
     this._stayMinusErrorVars = [];
     this._stayPlusErrorVars = [];
 
-    this._errorVars = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // cn -> Set of clv
+    this._errorVars = new SimpleHashtable(); // cn -> Set of clv
 
-    this._markerVars = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // cn -> Set of clv
+    this._markerVars = new SimpleHashtable(); // cn -> Set of clv
 
     this._resolve_pair = [0, 0]; 
     this._objective = new c.ObjectiveVariable("Z");
 
-    this._editVarMap = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // clv -> c.EditInfo
+    this._editVarMap = new SimpleHashtable(); // clv -> c.EditInfo
 
     this._slackCounter = 0;
     this._artificialCounter = 0;
@@ -48,7 +48,7 @@ c.SimplexSolver = c.inherit({
     this._fOptimizeAutomatically = true;
     this._fNeedsSolving = false;
 
-    this._rows = new (CL.simpleHT ? SimpleHashtable : Hashtable)(); // clv -> expression
+    this._rows = new SimpleHashtable(); // clv -> expression
 
     this._rows.put(this._objective, new c.LinearExpression());
     this._stkCedcns = []; // Stack

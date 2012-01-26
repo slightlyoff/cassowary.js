@@ -156,10 +156,10 @@ scope.CL = {
 
   hashToString: function(h) {
     var answer = "";
-    CL.Assert(h instanceof Hashtable || h instanceof SimpleHashtable);
+    CL.Assert(h instanceof SimpleHashtable);
     h.each( function(k,v) {
       answer += k + " => ";
-      if (v instanceof Hashtable) {
+      if (v instanceof SimpleHashtable) {
         answer += CL.hashToString(v);
       } else if (v instanceof HashSet) {
         answer += CL.setToString(v);
