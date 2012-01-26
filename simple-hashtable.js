@@ -78,7 +78,7 @@ var copyOwn = function(src, dest) {
 scope.SimpleHashtable = c.inherit({
 
   initialize: function() {
-    // console.log("SimpleHashtable.initialize()");
+
     this._size = 0;
     this._store = {};
     this._keyStrMap = {};
@@ -87,7 +87,7 @@ scope.SimpleHashtable = c.inherit({
 
   put: function(key, value) { 
     var hash = keyCode(key);
-    // console.log("SimpleHashtable.put(", "key:", key, "value:", value, "hash:", hash, ")");
+
     var old = null;
     if (this._store.hasOwnProperty(hash)) {
       old = this._store[hash];
@@ -97,37 +97,27 @@ scope.SimpleHashtable = c.inherit({
     this._store[hash] = value;
     this._keyStrMap[hash] = key;
     if (this._keyList.indexOf(hash) == -1) {
-      // console.log("  putting", hash, "into keylist");
       this._keyList.push(hash);
     }
-    // console.log("SimpleHashtable.put(key=" + key + "), size: ", this._size, ", value:", value);
-    // console.log(this);
     return old;
   },
 
   get: function(key) {
-    // console.log("SimpleHashtable.get(", "key:", key, ")");
-
-    if(!this._size) {
-      // console.log("SimpleHashtable.get( key=" + key + " ) FAILED. Emtpy table!");
-      return null;
-    }
+    if(!this._size) { return null; }
 
     key = keyCode(key);
 
     if (this._store.hasOwnProperty(key)) {
       return this._store[key];
     }
-    // console.log("...FAILED");
     return null;
   }, 
 
   clear: function() {
-    // console.log("SimpleHashtable.clear()");
     this._size = 0;
     this._store = {};
     this._keyStrMap = {};
-    this._keyList = [];
+    // this._keyList = [];
   }, 
 
   // FIXME(slightlyoff):
@@ -148,7 +138,6 @@ scope.SimpleHashtable = c.inherit({
   remove: function(key) {
     key = keyCode(key);
     if (!this._store.hasOwnProperty(key)) {
-      // console.log("SimpleHashtable.remove(key=" + key + "), failed");
       return null;
     }
 
@@ -158,7 +147,6 @@ scope.SimpleHashtable = c.inherit({
     if (this._size > 0) {
       this._size--;
     }
-    // console.log("SimpleHashtable.remove(key=" + key + "), size:", this._size);
     return old;
   },
 
@@ -167,7 +155,6 @@ scope.SimpleHashtable = c.inherit({
   },
 
   each: function(callback, scope) {
-    // console.log("SimpleHashtable.each(), size:", this._size);
     if (!this._size) { return; }
 
     this._keyList.forEach(function(k){
@@ -177,9 +164,17 @@ scope.SimpleHashtable = c.inherit({
     }, this);
   },
 
+  _escapingEachCallback: function(callback, scope, key, value) {
+    var hash = keyCode(key);
+    if (this._store.hasOwnProperty(hash)) {
+      return callback.call(scope||null, hash, value);
+    }
+ },
+
+
   escapingEach: function(callback, scope) {
-    // console.log("SimpleHashtable.escapingEach(), size:", this._size);
     if (!this._size) { return; }
+
     var that = this;
     var context = {};
     var kl = this._keyList.slice();
@@ -191,24 +186,24 @@ scope.SimpleHashtable = c.inherit({
       })(kl[x]);
 
       if (context) {
-          if (context.retval !== undefined) {
-              // console.log("  returning from:", kl[x], context.retval);
-              return context;
-          }
-          if (context.brk) {
-              // console.log("  breaking from:", kl[x], context.retval);
-              break;
-          }
+        if (context.retval !== undefined) {
+          return context;
+        }
+        if (context.brk) {
+          break;
+        }
       }
     }
   },
 
   clone: function() {
     var n = new SimpleHashtable();
-    n._size = this._size;
-    n._keyList = this._keyList.slice();
-    copyOwn(this._store, n._store);
-    copyOwn(this._keyStrMap, n._keyStrMap);
+    if (this._size) {
+      n._size = this._size;
+      n._keyList = this._keyList.slice();
+      copyOwn(this._store, n._store);
+      copyOwn(this._keyStrMap, n._keyStrMap);
+    }
     return n;
   }
 });
