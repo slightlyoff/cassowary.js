@@ -39,7 +39,7 @@
  *      - multiple values per key
  *      - error tollerent hashing of any variety
  *      - overly careful (or lazy) size counting, etc.
- *      - Crockford's "class" pattern. We use the system from CL.js.
+ *      - Crockford's "class" pattern. We use the system from c.js.
  *      - any attempt at back-compat with broken runtimes.
  *
  *  APIs removed, mostly for lack of use in Cassowary:

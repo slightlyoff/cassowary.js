@@ -42,7 +42,7 @@
 
 })(this);
 
-load('CL.js')
+load('c.js')
 
 // Command-line argument processing
 if (this.arguments) {
