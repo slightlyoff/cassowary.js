@@ -60,7 +60,7 @@ load('simple-hashtable.js');
 load('jshashset-pretty.js');
 load('Error.js')
 load('ClSymbolicWeight.js')
-load('ClStrength.js')
+load('Strength.js')
 load('ClVariable.js')
 load('Point.js')
 load('ClLinearExpression.js')
