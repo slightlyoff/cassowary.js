@@ -5,7 +5,7 @@
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 
-print(ClStrength.required);
-print(ClStrength.strong);
-print(ClStrength.medium);
-print(ClStrength.weak);
+print(c.Strength.required);
+print(c.Strength.strong);
+print(c.Strength.medium);
+print(c.Strength.weak);
