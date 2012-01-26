@@ -58,7 +58,7 @@ if (this.arguments) {
 
 load('simple-hashtable.js');
 load('jshashset-pretty.js');
-load('ExCLError.js')
+load('Error.js')
 load('ClSymbolicWeight.js')
 load('ClStrength.js')
 load('ClVariable.js')
