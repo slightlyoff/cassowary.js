@@ -4,7 +4,9 @@
 //
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
-(function() {
+"use strict";
+
+(function(global) {
 
   var toString = function(item) {
     var t = (typeof item);
@@ -32,13 +34,13 @@
 	};
 
   // Intentionally define console in the global namespace
-  console = {
+  global.console = {
     log:    function() { log(0, Array.prototype.slice.call(arguments, 0)); },
     error:  function() { log("ERROR", Array.prototype.slice.call(arguments, 0)); },
     warn:   function() { log("WARN", Array.prototype.slice.call(arguments, 0)); }
   };
 
-})()
+})(this);
 
 load('CL.js')
 
