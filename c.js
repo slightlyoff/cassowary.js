@@ -48,6 +48,11 @@ scope.CL = {
     // Default
     var dprops = {};
     var realCtor = ctor || function() {};
+    /* 
+    // NOTE: would happily do this except it's 2x slower. Boo!
+    props.__proto__ = parent ? parent.prototype : Object.prototype;
+    realCtor.prototype = props;
+    */
     for (var x in props) {
       if (props.hasOwnProperty(x)) {
         dprops[x] = {
