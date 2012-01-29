@@ -65,7 +65,18 @@ begin to use them. You have been warned.
 Configuration
 =============
 
-TODO(slightlyoff)
+```
+// Log general debugging information
+c.debug = [ false || true ]; // default false
+// Detailed logging
+c.trace = [ false || true ]; // default false
+// Verbose logging
+c.verbose = [ false || true ]; // default false
+// Logging of tableau additions
+c.traceAdded = [ false || true ]; // default false
+// Logging of ...?
+c.GC = [ false || true ]; // default false
+```
 
 API
 ===
