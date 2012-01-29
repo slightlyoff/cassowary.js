@@ -6,17 +6,68 @@ port](http://www.badros.com/greg/cassowary/js/quaddemo.html "JS Quad Demo") of
 the [Cassowary hierarchial constraint
 toolkit](http://www.cs.washington.edu/research/constraints/cassowary/) to
 [JavaScript](http://cassowary.cvs.sourceforge.net/viewvc/cassowary/cassowary/js/).
-The work is happening here as I want nothing to do with either CVS or
-sourceforge.
 
-This fork removes many of the spurious library dependencies of previous
-versions and improves the overall code style. Work is underway to remove the
-remainder of the 3rd-party libaraies, make the solving core suitable for use
-inside web workers, and to improve the performance of the code by a large
-constant factor.
+This fork removes any external library dependencies and improves the overall
+code style. Work is underway to make the solving core suitable for use inside
+web workers and to improve the performance of the code by a large constant
+factor. Performance of this version is already 6x faster than the original.
 
-Say What?
-=========
+Getting Started
+===============
+
+To run the tests, check out this repository and point your thorougly modern
+browser at `unittests.html` or `quaddemo.html`. To run from the command line,
+check out a copy of V8 and building the latest debugging shell:
+
+`scons snapshot=on console=readline objectprint=on d8`
+
+Then invoke the command-line test runner with:
+
+```
+/path/to/v8/d8 --harmony run-cl-tests.js
+
+.
+.
+.
+done adding 63 constraints [500 attempted, 0 exceptions]
+time = 0.021
+done adding 63 constraints [500 attempted, 0 exceptions]
+time = 0.023
+Editing vars with indices 70, 56
+about to start resolves
+done resolves -- now ending edits
+total time = 0.325
+
+  number of constraints: 		100
+  number of solvers: 			10
+  numbers of resolves: 			50
+  tests: 				1
+  time to add (ms): 			23
+  time to edit (ms): 			5
+  time to resolve (ms): 		62
+  time to edit (ms): 			2
+  add time per solver (ms): 		0.023
+  edit time per solver (ms): 		0.25
+  resolve time per resolve (ms): 	0.124
+  time to end edits per solver (ms): 	0.1
+```
+
+Supported Runtimes
+==================
+
+This is an unapolgetically modern re-interpretation of the original code,
+optimized for size, complexity, and speed. And litle else. No, it won't work on
+IE < 10. Or old-skool FireFox. The idioms in use are tracking dev-channel
+Chrome and as soon as ES.next features become available there, this port will
+begin to use them. You have been warned.
+
+API
+===
+
+TODO(slightlyoff)
+
+Constraint Solver? Say What?
+============================
 
 Constraint solvers are iterative algorithms that work towards ever more ideal
 solutions, often using some variant of Dantzig's [simplex
