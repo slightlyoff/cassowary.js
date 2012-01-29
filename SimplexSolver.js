@@ -611,7 +611,7 @@ c.SimplexSolver = c.inherit({
   dualOptimize: function() {
     if (CL.trace) CL.fnenterprint("dualOptimize:");
     var zRow = this.rowExpression(this._objective);
-    while (!this._infeasibleRows.isEmpty()) {
+    while (this._infeasibleRows.size()) {
       var exitVar = this._infeasibleRows.values()[0];
       this._infeasibleRows.remove(exitVar);
       var entryVar = null;
