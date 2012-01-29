@@ -10,7 +10,8 @@ toolkit](http://www.cs.washington.edu/research/constraints/cassowary/) to
 This fork removes any external library dependencies and improves the overall
 code style. Work is underway to make the solving core suitable for use inside
 web workers and to improve the performance of the code by a large constant
-factor. Performance of this version is already 6x faster than the original.
+factor. This version is already 6x faster than the original at running the
+built-in test suite.
 
 Getting Started
 ===============
