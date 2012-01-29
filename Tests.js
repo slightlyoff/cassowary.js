@@ -4,8 +4,7 @@
 //
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
-ClTests = c.inherit({
-  initialize: function() {},
+c.Tests = c.inherit({
 
   InitializeRandoms: function() {
   },
@@ -447,7 +446,7 @@ ClTests = c.inherit({
   },
 
   main: function(args /*String[]*/) {
-    var clt = new ClTests();
+    var clt = new c.Tests();
     var fAllOkResult = true;
     var fResult;
     if (true) {
@@ -527,12 +526,12 @@ ClTests = c.inherit({
 });
 
 /* private static  */
-ClTests.iRandom = 0;
+c.Tests.iRandom = 0;
 /* private static  */
-ClTests.cRandom = 0;
+c.Tests.cRandom = 0;
 /* private static  */
-ClTests.vRandom;
+c.Tests.vRandom;
 
-clt = new ClTests();
+clt = new c.Tests();
 clt.main(new Array(1,100,10,50));
 //clt.main(new Array());
