@@ -62,6 +62,11 @@ IE < 10. Or old-skool FireFox. The idioms in use are tracking dev-channel
 Chrome and as soon as ES.next features become available there, this port will
 begin to use them. You have been warned.
 
+Configuration
+=============
+
+TODO(slightlyoff)
+
 API
 ===
 
