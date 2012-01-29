@@ -14,7 +14,6 @@ scope.CL = {
   trace: false,
   verbose: false,
   traceAdded: false,
-  simpleHT: true,
   GC: false,
   GEQ: 1,
   LEQ: 2,

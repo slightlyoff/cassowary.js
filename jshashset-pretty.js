@@ -16,7 +16,7 @@
  */
 function HashSet(c,a){
 
-  var b = new (CL.simpleHT ? SimpleHashtable : Hashtable)(c, a);
+  var b = new SimpleHashtable(c, a);
 
   this.add = function(d){
     b.put(d,true)
