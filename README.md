@@ -25,11 +25,8 @@ check out a copy of V8 and building the latest debugging shell:
 Then invoke the command-line test runner with:
 
 ```
-/path/to/v8/d8 --harmony run-cl-tests.js
-
-.
-.
-.
+obelisk:cassowary-js-refactor slightlyoff$ /path/to/v8/d8 --harmony run-cl-tests.js
+...
 done adding 63 constraints [500 attempted, 0 exceptions]
 time = 0.021
 done adding 63 constraints [500 attempted, 0 exceptions]
@@ -51,6 +48,34 @@ total time = 0.325
   edit time per solver (ms): 		0.25
   resolve time per resolve (ms): 	0.124
   time to end edits per solver (ms): 	0.1
+```
+
+If you would like to avoid building V8 but have Java installed, a copy of Rhino
+(`js.jar`) is included in this repo. To run the tests under it, simply invoke
+`rhino.sh` from a unix-like shell:
+
+```
+obelisk:cassowary-js-refactor slightlyoff$ ./rhino.sh 
+...
+done adding 36 constraints [500 attempted, 0 exceptions]
+time = 0.105
+Editing vars with indices 46, 48
+about to start resolves
+done resolves -- now ending edits
+total time = 1.445
+
+  number of constraints: 		100
+  number of solvers: 			10
+  numbers of resolves: 			50
+  tests: 				1
+  time to add (ms): 			106
+  time to edit (ms): 			19
+  time to resolve (ms): 		290
+  time to edit (ms): 			10
+  add time per solver (ms): 		0.106
+  edit time per solver (ms): 		0.95
+  resolve time per resolve (ms): 	0.58
+  time to end edits per solver (ms): 	0.5
 ```
 
 Supported Runtimes
