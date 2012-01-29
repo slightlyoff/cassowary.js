@@ -1,0 +1,5 @@
+- Update the Hashtable impl to use the built in Maps from harmony if available. Benchmark.
+- Write perf tests, get them running under JSPerf harness
+- Get solver loading/running in a worker
+	- Port the quads demo to use worker-hosted solver
+- Increase complexity of demo to actually stress the solver in modern browser/hardware configs
