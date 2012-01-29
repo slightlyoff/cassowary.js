@@ -1,6 +1,7 @@
 /**
  * Copyright 2010 Tim Down.
  * UPDATED TO SUPPORT .each(function) method by Greg Badros <badros@gmail.com>
+ * UPDATED TO REMOVE WHAT CASSOWARY DOESN"T NEED by Alex Russell <slightlyoff@google.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,91 +15,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function HashSet(c,a){
+HashSet = c.inherit({
+  initialize: function() {
+    this._ht = new SimpleHashtable();
+  },
 
-  var b = new SimpleHashtable(c, a);
+  add: function(d){
+    this._ht.put(d,true)
+  },
 
-  this.add = function(d){
-    b.put(d,true)
-  };
+  values: function(){
+    return this._ht.keys();
+  },
 
-  this.addAll = function(d){
-    var e=d.length;
-    while(e--){
-      b.put(d[e],true)
-    }
-  };
+  remove: function(d){
+    return this._ht.remove(d) ? d : null
+  },
 
-  this.values = function(){
-    return b.keys();
-  };
+  contains: function(d){
+    return this._ht.containsKey(d)
+  },
 
-  this.remove = function(d){
-    return b.remove(d) ? d : null
-  };
+  clear: function(){
+    this._ht.clear();
+  },
 
-  this.contains = function(d){
-    return b.containsKey(d)
-  };
+  size: function(){
+    return this._ht.size();
+  },
 
-  this.clear = function(){
-    b.clear();
-  };
-
-  this.size = function(){
-    return b.size();
-  };
-
-  this.isEmpty = function(){
-    return this.size() == 0;
-  };
-
-  this.clone = function(){
-    var d = new HashSet(c,a);
-    d.addAll(b.keys());
+  clone: function(){
+    var d = new HashSet();
+    d._ht = this._ht.clone();
     return d
-  };
+  },
   
-  this.intersection = function(d){
-    var h = new HashSet(c,a);
-    var e = d.values(), f=e.length, g;
-    while(f--){
-      g=e[f];
-      if(b.containsKey(g)){
-        h.add(g)
-      }
-    }
-    return h
-  };
-
-  this.union = function(d){
-    var g = this.clone();
-    var e=d.values(),f=e.length,h;
-    while(f--){
-      h=e[f];
-      if(!b.containsKey(h)){
-        g.add(h)
-      }
-    }
-    return g
-  };
-  
-  this.isSubsetOf = function(d){
-    var e = b.keys();
-    var f = e.length;
-    while(f--){
-      if(!d.contains(e[f])){
-        return false
-      }
-    }
-    return true
-  };
-
-  this.each = function(f){
-    var e = b.keys();
+  each: function(f){
+    var e = this._ht.keys();
     var i = e.length;
     while (i--){
       f(e[i]);
     }
-  };
-};
+  }
+});
