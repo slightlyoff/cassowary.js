@@ -621,10 +621,10 @@ c.SimplexSolver = c.inherit({
           var ratio = Number.MAX_VALUE;
           var r;
           var terms = expr.terms();
-          terms.each(function(v, c) {
-            if (c > 0.0 && v.isPivotable) {
+          terms.each(function(v, cd) {
+            if (cd > 0.0 && v.isPivotable) {
               var zc = zRow.coefficientFor(v);
-              r = zc / c;
+              r = zc / cd;
               if (r < ratio || (c.approx(r, ratio) && v.hashCode() < entryVar.hashCode())) {
                 entryVar = v;
                 ratio = r;
