@@ -57,7 +57,8 @@ if (this.arguments) {
 }
 
 load('simple-hashtable.js');
-load('jshashset-pretty.js');
+load('simple-hashset.js');
+// load('jshashset-pretty.js');
 load('Error.js')
 load('SymbolicWeight.js')
 load('Strength.js')
