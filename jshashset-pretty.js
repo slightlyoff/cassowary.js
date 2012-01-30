@@ -20,40 +20,30 @@ HashSet = c.inherit({
     this._ht = new SimpleHashtable();
   },
 
-  add: function(d){
-    this._ht.put(d,true)
+  add: function(d) {
+    this._ht.put(d, true);
   },
 
-  values: function(){
+  values: function() {
     return this._ht.keys();
   },
 
-  remove: function(d){
+  remove: function(d) {
     return this._ht.remove(d) ? d : null
   },
 
-  contains: function(d){
-    return this._ht.containsKey(d)
-  },
-
-  clear: function(){
+  clear: function() {
     this._ht.clear();
   },
 
-  size: function(){
+  size: function() {
     return this._ht.size();
   },
 
-  clone: function(){
-    var d = new HashSet();
-    d._ht = this._ht.clone();
-    return d
-  },
-  
-  each: function(f){
+  each: function(f) {
     var e = this._ht.keys();
     var i = e.length;
-    while (i--){
+    while (i--) {
       f(e[i]);
     }
   }
