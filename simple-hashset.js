@@ -7,17 +7,14 @@
 "use strict";
 
 scope.HashSet = c.inherit({
+
   initialize: function() {
     this.storage = [];
   },
 
   add: function(item) {
-    var s = this.storage;
-    var io = s.indexOf(item);
-    if (s.indexOf(item) == -1) {
-      s.push(item);
-    }
-    return this;
+    var s = this.storage, io = s.indexOf(item);
+    if (s.indexOf(item) == -1) { s.push(item); }
   },
 
   values: function() {
@@ -27,17 +24,22 @@ scope.HashSet = c.inherit({
   },
 
   remove: function(item) {
-    var s = this.storage;
-    var io = s.indexOf(item);
+    var io = this.storage.indexOf(item);
     if (io == -1) { return null; }
-    return s.splice(io, 1)[0];
+    return this.storage.splice(io, 1)[0];
   },
 
-  clear: function() { this.storage.length = 0; },
+  clear: function() {
+    this.storage.length = 0;
+  },
 
-  size: function() { return this.storage.length; },
+  size: function() {
+    return this.storage.length;
+  },
 
-  each: function(func) { this.storage.forEach(func); }
+  each: function(func) {
+    this.storage.forEach(func);
+  }
 });
 
 })(this);
