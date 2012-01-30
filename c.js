@@ -76,12 +76,12 @@ scope.c = {
   },
 
   debugprint: function(s /*String*/) {
-    if (!CL.verbose) return;
+    if (!c.verbose) return;
     console.log(s);
   },
 
   traceprint: function(s /*String*/) {
-    if (!CL.verbose) return;
+    if (!c.verbose) return;
     console.log(s);
   },
 
@@ -170,13 +170,13 @@ scope.c = {
   hashToString: function(h) {
     // FIXME: why isn't this implemented as a toString on SimpleHashtable?
     var answer = "";
-    CL.Assert(h instanceof SimpleHashtable);
+    c.Assert(h instanceof SimpleHashtable);
     h.each( function(k,v) {
       answer += k + " => ";
       if (v instanceof SimpleHashtable) {
-        answer += CL.hashToString(v);
+        answer += c.hashToString(v);
       } else if (v instanceof HashSet) {
-        answer += CL.setToString(v);
+        answer += c.setToString(v);
       } else {
         answer += v + "\n";
       }
@@ -187,7 +187,7 @@ scope.c = {
   setToString: function(s) {
     // FIXME: why isn't this implemented as a toString on HashSet?
     if (!s) return;
-    CL.Assert(s instanceof HashSet);
+    c.Assert(s instanceof HashSet);
     var answer = s.size() + " {";
     var first = true;
     s.each(function(e) {
