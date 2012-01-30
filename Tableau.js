@@ -75,11 +75,14 @@ c.Tableau = c.inherit({
   // Convenience function to insert a variable into
   // the set of rows stored at _columns[param_var],
   // creating a new set if needed
-  insertColVar: function(param_var /*ClAbstractVariable*/, rowvar /*ClAbstractVariable*/) {
-    var rowset = /* Set */this._columns.get(param_var);
-    if (!rowset) 
-      this._columns.put(param_var, rowset = new HashSet());
+  insertColVar: function(param_var /*Variable*/, rowvar /*Variable*/) {
+    var rowset = /* Set */ this._columns.get(param_var);
+    if (!rowset) {
+      rowset = new HashSet();
+      this._columns.put(param_var, rowset);
+    }
     rowset.add(rowvar);
+
     /*
     print("rowvar =" + rowvar);
     print("rowset = " + c.setToString(rowset));
