@@ -5,6 +5,8 @@
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 (function(c){
+  "use strict";
+
   c.Error = c.inherit({
     description: function() {
       return "(c.Error) An error has occured in CL";
@@ -59,4 +61,4 @@
       return "(c.TooDifficult) The constraints are too difficult to solve";
     },
   });
-})(CL);
+})(c);

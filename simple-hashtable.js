@@ -208,4 +208,4 @@ scope.SimpleHashtable = c.inherit({
   }
 });
 
-})(this, CL);
+})(this, c);

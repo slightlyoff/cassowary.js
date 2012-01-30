@@ -8,16 +8,25 @@
 "use strict";
 
 // Global
-scope.c =
-scope.CL = {
+scope.c = {
+  //
+  // Configuration
+  //
   debug: false,
   trace: false,
   verbose: false,
   traceAdded: false,
   GC: false,
+
+  //
+  // Constants
+  //
   GEQ: 1,
   LEQ: 2,
 
+  //
+  // Utility methods
+  //
   inherit: function(ctor, parent, props) {
     var al = arguments.length;
     // Data-only extension
@@ -109,6 +118,7 @@ scope.CL = {
   },
 
   Times: function(e1,e2) {
+    // FIXME: re-order based on hotness
     if (e1 instanceof c.LinearExpression &&
         e2 instanceof c.LinearExpression) {
       return e1.times(e2);
@@ -158,6 +168,7 @@ scope.CL = {
   },
 
   hashToString: function(h) {
+    // FIXME: why isn't this implemented as a toString on SimpleHashtable?
     var answer = "";
     CL.Assert(h instanceof SimpleHashtable);
     h.each( function(k,v) {
@@ -174,6 +185,7 @@ scope.CL = {
   },
 
   setToString: function(s) {
+    // FIXME: why isn't this implemented as a toString on HashSet?
     if (!s) return;
     CL.Assert(s instanceof HashSet);
     var answer = s.size() + " {";

@@ -8,6 +8,7 @@
 // package EDU.Washington.grad.gjb.cassowary;
 
 (function(c) {
+"use strict";
 
 c.LinearExpression = c.inherit({
   /* FIELDS:
@@ -15,7 +16,7 @@ c.LinearExpression = c.inherit({
      private SimpleHashtable _terms
  */
   initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
-    if (CL.GC) print("new c.LinearExpression");
+    if (c.GC) print("new c.LinearExpression");
     this.constant = constant || 0;
     this._terms = new SimpleHashtable();
 
@@ -27,13 +28,13 @@ c.LinearExpression = c.inherit({
   },
 
   initializeFromHash: function(constant /*ClDouble*/, terms /*SimpleHashtable*/) {
-    if(CL.verbose) {
+    if(c.verbose) {
       console.log("*******************************");
       console.log("clone c.initializeFromHash");
       console.log("*******************************");
     }
 
-    if (CL.GC) print("clone c.LinearExpression");
+    if (c.GC) print("clone c.LinearExpression");
     this.constant = constant;
     this._terms = terms.clone();
     return this;
@@ -49,7 +50,7 @@ c.LinearExpression = c.inherit({
   },
 
   clone: function() {
-    if(CL.verbose) {
+    if(c.verbose) {
       console.log("*******************************");
       console.log("clone c.LinearExpression");
       console.log("*******************************");
@@ -94,7 +95,7 @@ c.LinearExpression = c.inherit({
 
   divide: function(x) {
     if (typeof(x) == 'number') {
-      if (CL.approx(x, 0.0)) {
+      if (c.approx(x, 0.0)) {
         throw new c.NonlinearExpression();
       }
       return this.times(1.0 / x);
@@ -107,7 +108,7 @@ c.LinearExpression = c.inherit({
   },
 
   divFrom: function(expr) {
-    if (!this.isConstant() || CL.approx(this.constant, 0.0)) {
+    if (!this.isConstant() || c.approx(this.constant, 0.0)) {
         throw new c.NonlinearExpression();
     }
     return x.divide(this.constant);
@@ -131,13 +132,13 @@ c.LinearExpression = c.inherit({
     return this;
   },
 
-  addVariable: function(v /*c.AbstractVariable*/, c /*double*/, subject, solver) {
-    c = c || 1.0;
-    if (CL.trace) CL.fnenterprint("CLE: addVariable:" + v + ", " + c);
-    coeff = this._terms.get(v);
+  addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
+    cd = cd || 1.0;
+    if (c.trace) c.fnenterprint("CLE: addVariable:" + v + ", " + cd);
+    var coeff = this._terms.get(v);
     if (coeff) {
-      new_coefficient = coeff + c;
-      if (CL.approx(new_coefficient, 0.0)) {
+      var new_coefficient = coeff + cd;
+      if (c.approx(new_coefficient, 0.0)) {
         if (solver) {
           solver.noteRemovedVariable(v, subject);
         }
@@ -146,8 +147,8 @@ c.LinearExpression = c.inherit({
         this._terms.put(v, new_coefficient);
       }
     } else {
-      if (!CL.approx(c, 0.0)) {
-        this._terms.put(v, c);
+      if (!c.approx(cd, 0.0)) {
+        this._terms.put(v, cd);
         if (solver) {
           solver.noteAddedVariable(v, subject);
         }
@@ -174,15 +175,15 @@ c.LinearExpression = c.inherit({
   
   substituteOut: function(outvar /*c.AbstractVariable*/, expr /*c.LinearExpression*/, subject /*c.AbstractVariable*/, solver /*ClTableau*/) {
     var that = this;
-    if (CL.trace) CL.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
-    if (CL.trace) CL.traceprint("this = " + this);
+    if (c.trace) c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
+    if (c.trace) c.traceprint("this = " + this);
     var multiplier = this._terms.remove(outvar);
     this.constant += (multiplier * expr.constant);
     expr.terms().each(function(clv, coeff) {
       var old_coeff = that._terms.get(clv);
       if (old_coeff) {
         var newCoeff = old_coeff + multiplier * coeff;
-        if (CL.approx(newCoeff, 0.0)) {
+        if (c.approx(newCoeff, 0.0)) {
           solver.noteRemovedVariable(clv, subject);
           that._terms.remove(clv);
         } else {
@@ -193,7 +194,7 @@ c.LinearExpression = c.inherit({
         solver.noteAddedVariable(clv, subject);
       }
     });
-    if (CL.trace) CL.traceprint("Now this is " + this);
+    if (c.trace) c.traceprint("Now this is " + this);
   },
 
   changeSubject: function(old_subject /*c.AbstractVariable*/, new_subject /*c.AbstractVariable*/) {
@@ -201,7 +202,7 @@ c.LinearExpression = c.inherit({
   },
 
   newSubject: function(subject /*c.AbstractVariable*/) {
-    if (CL.trace) CL.fnenterprint("newSubject:" + subject);
+    if (c.trace) c.fnenterprint("newSubject:" + subject);
     
     var reciprocal = 1.0 / this._terms.remove(subject);
     this.multiplyMe(-reciprocal);
@@ -223,7 +224,7 @@ c.LinearExpression = c.inherit({
   toString: function() {
     var bstr = ''; // answer
     var needsplus = false;
-    if (!CL.approx(this.constant, 0.0) || this.isConstant()) {
+    if (!c.approx(this.constant, 0.0) || this.isConstant()) {
       bstr += this.constant;
       if (this.isConstant()) {
         return bstr;
@@ -255,5 +256,4 @@ c.LinearExpression = c.inherit({
   },
 });
 
-})(CL);
-
+})(c);

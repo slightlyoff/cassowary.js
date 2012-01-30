@@ -29,8 +29,8 @@ c.Tests = c.inherit({
     var solver = new c.SimplexSolver();
     solver.addStay(x);
     solver.addStay(y);
-    fOkResult = fOkResult && CL.approx(x, 5);
-    fOkResult = fOkResult && CL.approx(y, 10);
+    fOkResult = fOkResult && c.approx(x, 5);
+    fOkResult = fOkResult && c.approx(y, 10);
     print("x == " + x.value());
     print("y == " + y.value());
     return (fOkResult);
@@ -42,26 +42,26 @@ c.Tests = c.inherit({
     var solver = new c.SimplexSolver();
     var cbl = new c.LinearEquation(x, 100, c.Strength.weak);
     solver.addConstraint(cbl);
-    var c10 = new c.LinearInequality(x, CL.LEQ, 10.0);
-    var c20 = new c.LinearInequality(x, CL.LEQ, 20.0);
+    var c10 = new c.LinearInequality(x, c.LEQ, 10.0);
+    var c20 = new c.LinearInequality(x, c.LEQ, 20.0);
     solver.addConstraint(c10).addConstraint(c20);
-    fOkResult = fOkResult && CL.approx(x, 10.0);
+    fOkResult = fOkResult && c.approx(x, 10.0);
     print("x == " + x.value());
     solver.removeConstraint(c10);
-    fOkResult = fOkResult && CL.approx(x, 20.0);
+    fOkResult = fOkResult && c.approx(x, 20.0);
     print("x == " + x.value());
     solver.removeConstraint(c20);
-    fOkResult = fOkResult && CL.approx(x, 100.0);
+    fOkResult = fOkResult && c.approx(x, 100.0);
     print("x == " + x.value());
-    var c10again = new c.LinearInequality(x, CL.LEQ, 10.0);
+    var c10again = new c.LinearInequality(x, c.LEQ, 10.0);
     solver.addConstraint(c10).addConstraint(c10again);
-    fOkResult = fOkResult && CL.approx(x, 10.0);
+    fOkResult = fOkResult && c.approx(x, 10.0);
     print("x == " + x.value());
     solver.removeConstraint(c10);
-    fOkResult = fOkResult && CL.approx(x, 10.0);
+    fOkResult = fOkResult && c.approx(x, 10.0);
     print("x == " + x.value());
     solver.removeConstraint(c10again);
-    fOkResult = fOkResult && CL.approx(x, 100.0);
+    fOkResult = fOkResult && c.approx(x, 100.0);
     print("x == " + x.value());
     return (fOkResult);
   },
@@ -72,23 +72,23 @@ c.Tests = c.inherit({
     var y = new c.Variable("y");
     var solver = new c.SimplexSolver();
     solver.addConstraint(new c.LinearEquation(x, 100.0, c.Strength.weak)).addConstraint(new c.LinearEquation(y, 120.0, c.Strength.strong));
-    var c10 = new c.LinearInequality(x, CL.LEQ, 10.0);
-    var c20 = new c.LinearInequality(x, CL.LEQ, 20.0);
+    var c10 = new c.LinearInequality(x, c.LEQ, 10.0);
+    var c20 = new c.LinearInequality(x, c.LEQ, 20.0);
     solver.addConstraint(c10).addConstraint(c20);
-    fOkResult = fOkResult && CL.approx(x, 10.0) && CL.approx(y, 120.0);
+    fOkResult = fOkResult && c.approx(x, 10.0) && c.approx(y, 120.0);
     print("x == " + x.value() + ", y == " + y.value());
     solver.removeConstraint(c10);
-    fOkResult = fOkResult && CL.approx(x, 20.0) && CL.approx(y, 120.0);
+    fOkResult = fOkResult && c.approx(x, 20.0) && c.approx(y, 120.0);
     print("x == " + x.value() + ", y == " + y.value());
-    var cxy = new c.LinearEquation(CL.Times(2.0, x), y);
+    var cxy = new c.LinearEquation(c.Times(2.0, x), y);
     solver.addConstraint(cxy);
-    fOkResult = fOkResult && CL.approx(x, 20.0) && CL.approx(y, 40.0);
+    fOkResult = fOkResult && c.approx(x, 20.0) && c.approx(y, 40.0);
     print("x == " + x.value() + ", y == " + y.value());
     solver.removeConstraint(c20);
-    fOkResult = fOkResult && CL.approx(x, 60.0) && CL.approx(y, 120.0);
+    fOkResult = fOkResult && c.approx(x, 60.0) && c.approx(y, 120.0);
     print("x == " + x.value() + ", y == " + y.value());
     solver.removeConstraint(cxy);
-    fOkResult = fOkResult && CL.approx(x, 100.0) && CL.approx(y, 120.0);
+    fOkResult = fOkResult && c.approx(x, 100.0) && c.approx(y, 120.0);
     print("x == " + x.value() + ", y == " + y.value());
     return (fOkResult);
   },
@@ -98,8 +98,8 @@ c.Tests = c.inherit({
     var x = new c.Variable("x");
     var y = new c.Variable("y");
     var solver = new c.SimplexSolver();
-    solver.addConstraint(new c.LinearInequality(x, CL.LEQ, y)).addConstraint(new c.LinearEquation(y, CL.Plus(x, 3.0))).addConstraint(new c.LinearEquation(x, 10.0, c.Strength.weak)).addConstraint(new c.LinearEquation(y, 10.0, c.Strength.weak));
-    fOkResult = fOkResult && (CL.approx(x, 10.0) && CL.approx(y, 13.0) || CL.approx(x, 7.0) && CL.approx(y, 10.0));
+    solver.addConstraint(new c.LinearInequality(x, c.LEQ, y)).addConstraint(new c.LinearEquation(y, c.Plus(x, 3.0))).addConstraint(new c.LinearEquation(x, 10.0, c.Strength.weak)).addConstraint(new c.LinearEquation(y, 10.0, c.Strength.weak));
+    fOkResult = fOkResult && (c.approx(x, 10.0) && c.approx(y, 13.0) || c.approx(x, 7.0) && c.approx(y, 10.0));
     print("x == " + x.value() + ", y == " + y.value());
     return (fOkResult);
   },
@@ -120,7 +120,7 @@ c.Tests = c.inherit({
     try {
       var x = new c.Variable("x");
       var solver = new c.SimplexSolver();
-      solver.addConstraint(new c.LinearInequality(x, CL.GEQ, 10.0)).addConstraint(new c.LinearInequality(x, CL.LEQ, 5.0));
+      solver.addConstraint(new c.LinearInequality(x, c.GEQ, 10.0)).addConstraint(new c.LinearInequality(x, c.LEQ, 5.0));
       return false;
     }
     catch (err /*ExCLRequiredFailure*/){
@@ -141,16 +141,16 @@ c.Tests = c.inherit({
       solver.suggestValue(x, 10).suggestValue(y, 20).resolve();
       print("x = " + x.value() + "; y = " + y.value());
       print("w = " + w.value() + "; h = " + h.value());
-      fOkResult = fOkResult && CL.approx(x, 10) && CL.approx(y, 20) && CL.approx(w, 0) && CL.approx(h, 0);
+      fOkResult = fOkResult && c.approx(x, 10) && c.approx(y, 20) && c.approx(w, 0) && c.approx(h, 0);
       solver.addEditVar(w).addEditVar(h).beginEdit();
       solver.suggestValue(w, 30).suggestValue(h, 40).endEdit();
       print("x = " + x.value() + "; y = " + y.value());
       print("w = " + w.value() + "; h = " + h.value());
-      fOkResult = fOkResult && CL.approx(x, 10) && CL.approx(y, 20) && CL.approx(w, 30) && CL.approx(h, 40);
+      fOkResult = fOkResult && c.approx(x, 10) && c.approx(y, 20) && c.approx(w, 30) && c.approx(h, 40);
       solver.suggestValue(x, 50).suggestValue(y, 60).endEdit();
       print("x = " + x.value() + "; y = " + y.value());
       print("w = " + w.value() + "; h = " + h.value());
-      fOkResult = fOkResult && CL.approx(x, 50) && CL.approx(y, 60) && CL.approx(w, 30) && CL.approx(h, 40);
+      fOkResult = fOkResult && c.approx(x, 50) && c.approx(y, 60) && c.approx(w, 30) && c.approx(h, 40);
       return (fOkResult);
     }
     catch (err /*ExCLRequiredFailure*/){
@@ -165,7 +165,7 @@ c.Tests = c.inherit({
       var y = new c.Variable("y");
       var z = new c.Variable("z");
       var solver = new c.SimplexSolver();
-      solver.addConstraint(new c.LinearInequality(w, CL.GEQ, 10.0)).addConstraint(new c.LinearInequality(x, CL.GEQ, w)).addConstraint(new c.LinearInequality(y, CL.GEQ, x)).addConstraint(new c.LinearInequality(z, CL.GEQ, y)).addConstraint(new c.LinearInequality(z, CL.GEQ, 8.0)).addConstraint(new c.LinearInequality(z, CL.LEQ, 4.0));
+      solver.addConstraint(new c.LinearInequality(w, c.GEQ, 10.0)).addConstraint(new c.LinearInequality(x, c.GEQ, w)).addConstraint(new c.LinearInequality(y, c.GEQ, x)).addConstraint(new c.LinearInequality(z, c.GEQ, y)).addConstraint(new c.LinearInequality(z, c.GEQ, 8.0)).addConstraint(new c.LinearInequality(z, c.LEQ, 4.0));
       return false;
     }
     catch (err /*ExCLRequiredFailure*/){
@@ -204,7 +204,7 @@ c.Tests = c.inherit({
       {
         coeff = this.UniformRandomDiscretized() * 10 - 5;
         var iclv = this.RandomInRange(0, nVars);
-        expr.addExpression(CL.Times(rgpclv[iclv], coeff));
+        expr.addExpression(c.Times(rgpclv[iclv], coeff));
       }
       if (this.UniformRandomDiscretized() < ineqProb) {
         rgpcns[j] = new c.LinearInequality(expr);
@@ -332,7 +332,7 @@ c.Tests = c.inherit({
       {
         coeff = this.GrainedUniformRandom() * 10 - 5;
         var iclv = this.RandomInRange(0, nVars);
-        expr.addExpression(CL.Times(rgpclv[iclv], coeff));
+        expr.addExpression(c.Times(rgpclv[iclv], coeff));
       }
       if (this.UniformRandomDiscretized() < ineqProb) {
         rgpcns[j] = new c.LinearInequality(expr);
@@ -454,55 +454,55 @@ c.Tests = c.inherit({
       fResult = this.simple1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\njustStay1:");
       fResult = this.justStay1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\naddDelete1:");
       fResult = this.addDelete1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\naddDelete2:");
       fResult = this.addDelete2();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\ncasso1:");
       fResult = this.casso1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\ninconsistent1:");
       fResult = this.inconsistent1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\ninconsistent2:");
       fResult = this.inconsistent2();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\ninconsistent3:");
       fResult = this.inconsistent3();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
 
       print("\n\n\nmultiedit:");
       fResult = this.multiedit();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
     }
 
     print("\n\n\naddDel:");
@@ -519,7 +519,7 @@ c.Tests = c.inherit({
       fResult = this.addDel(cns, cns, resolves);
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
-      if (CL.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
     }
     this.addDelSolvers(cns, resolves, solvers, testNum);
   },

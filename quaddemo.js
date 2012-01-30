@@ -5,6 +5,7 @@
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 DraggableBox = c.inherit({
+
   initialize: function(x, y, w, h) {
     this.width = w || 15;
     this.height = h || 15;
@@ -15,6 +16,7 @@ DraggableBox = c.inherit({
     }
     this.cvt();
   },
+
   cvt: function() {
     this.sx = Math.floor(this.center.Xvalue());
     this.sy = Math.floor(this.center.Yvalue());
@@ -64,7 +66,9 @@ DraggableBox = c.inherit({
     return "<" + this.sx + "," + this.sy + ">";
   },
 });
+
 var QuadDemo = c.inherit({
+
   initialize: function() {
     this.canvas = document.getElementById('c');
     this.cwidth = this.canvas.width;

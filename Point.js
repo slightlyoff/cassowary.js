@@ -5,6 +5,7 @@
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 (function(c) {
+"use strict";
 
 c.Point = c.inherit({
   initialize: function(x, y, suffix) {
@@ -57,4 +58,4 @@ c.Point = c.inherit({
   },
 });
 
-})(CL);
+})(c);

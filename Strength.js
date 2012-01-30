@@ -38,4 +38,4 @@ c.Strength.medium = new c.Strength("medium", 0.0, 1.0, 0.0);
 /* public static final  */
 c.Strength.weak = new c.Strength("weak", 0.0, 0.0, 1.0);
 
-})(CL);
+})(c);

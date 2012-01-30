@@ -5,6 +5,7 @@
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 (function(c) {
+"use strict";
 
 c.LinearConstraint = c.inherit({
   extends: c.Constraint,
@@ -28,21 +29,21 @@ c.LinearInequality = c.inherit({
         a3 instanceof c.AbstractVariable) {
       var cle = a1, op = a2, clv = a3, strength = a4, weight = a5;
       c.LinearConstraint.call(this, cle.clone(), strength, weight);
-      if (op == CL.LEQ) {
+      if (op == c.LEQ) {
         this.expression.multiplyMe(-1);
         this.expression.addVariable(clv);
-      } else if (op == CL.GEQ) {
+      } else if (op == c.GEQ) {
         this.expression.addVariable(clv, -1);
       } else {
         throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
       }
     } else if (a1 instanceof c.LinearExpression) {
       return c.LinearConstraint.call(this, a1, a2, a3);
-    } else if (a2 == CL.GEQ) {
+    } else if (a2 == c.GEQ) {
       c.LinearConstraint.call(this, new c.LinearExpression(a3), a4, a5);
       this.expression.multiplyMe(-1.0);
       this.expression.addVariable(a1);
-    } else if (a2 == CL.LEQ) {
+    } else if (a2 == c.LEQ) {
       c.LinearConstraint.call(this, new c.LinearExpression(a3), a4, a5);
       this.expression.addVariable(a1,-1.0);
     } else {
@@ -100,7 +101,7 @@ c.LinearEquation = c.inherit({
     } else {
       throw "Bad initializer to ClLinearEquation";
     }
-    CL.Assert(this.strength instanceof c.Strength, "_strength not set");
+    c.Assert(this.strength instanceof c.Strength, "_strength not set");
   },
 
   toString: function() {
@@ -108,4 +109,4 @@ c.LinearEquation = c.inherit({
   },
 });
 
-})(CL);
+})(c);

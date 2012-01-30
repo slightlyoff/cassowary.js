@@ -836,4 +836,4 @@ c.SimplexSolver = c.inherit({
     cnset.add(aVar);
   },
 });
-})(CL);
+})(c);

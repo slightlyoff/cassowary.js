@@ -5,6 +5,7 @@
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 (function(c) {
+"use strict";
 
 c.EditInfo = c.inherit({
   /* FIELDS:
@@ -34,4 +35,4 @@ c.EditInfo = c.inherit({
   }
 });
 
-})(CL);
+})(c);

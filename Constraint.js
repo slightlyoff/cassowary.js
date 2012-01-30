@@ -12,6 +12,7 @@
 
 
 (function(c) {
+"use strict";
 
 var count = 1;
 
@@ -98,4 +99,4 @@ c.StayConstraint = c.inherit({
   },
 });
 
-})(CL);
+})(c);

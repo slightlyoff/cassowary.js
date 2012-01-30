@@ -4,42 +4,41 @@
 //
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
-(function(c) {
+(function(scope, c) {
+"use strict";
 
-Timer = c.inherit(
-  function() {
+scope.Timer = c.inherit({
+  initialize: function() {
     this._timerIsRunning = false;
     this._elapsedMs = 0;
   },
-  null,
-  {
-    Start: function() {
-      this._timerIsRunning = true;
-      this._startReading = new Date();
-    },
 
-    Stop: function() {
-      this._timerIsRunning = false;
-      this._elapsedMs += (new Date()) - this._startReading;
-    },
+  Start: function() {
+    this._timerIsRunning = true;
+    this._startReading = new Date();
+  },
 
-    Reset: function() {
-      this._timerIsRunning = false;
-      this._elapsedMs = 0;
-    }, 
+  Stop: function() {
+    this._timerIsRunning = false;
+    this._elapsedMs += (new Date()) - this._startReading;
+  },
 
-    IsRunning : function() {
-      return this._timerIsRunning;
-    },
+  Reset: function() {
+    this._timerIsRunning = false;
+    this._elapsedMs = 0;
+  }, 
 
-    ElapsedTime : function() {
-      if (!this._timerIsRunning) {
-        return this._elapsedMs/1000;
-      } else {
-        return (this._elapsedMs+(new Date()-this._startReading))/1000;
-      }
-    },
-  }
-);
+  IsRunning : function() {
+    return this._timerIsRunning;
+  },
 
-})(CL);
+  ElapsedTime : function() {
+    if (!this._timerIsRunning) {
+      return this._elapsedMs/1000;
+    } else {
+      return (this._elapsedMs+(new Date()-this._startReading))/1000;
+    }
+  },
+});
+
+})(this, c);

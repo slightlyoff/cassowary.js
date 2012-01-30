@@ -5,6 +5,7 @@
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 (function(c) {
+"use strict";
 
 var inc = (function(c){
   return function() { return c++; };
@@ -121,4 +122,4 @@ c.SlackVariable = c.inherit({
   },
 });
 
-})(CL);
+})(c);
