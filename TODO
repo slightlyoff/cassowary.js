@@ -1,6 +1,9 @@
+- Port the quads demo to use worker-hosted solver
 - Update the Hashtable impl to use the built in Maps from harmony if available. Benchmark.
 - Write perf tests, get them running under JSPerf harness
-- Get solver loading/running in a worker
-	- Port the quads demo to use worker-hosted solver
+	- Port from C++ version:
+		http://cassowary.cvs.sourceforge.net/viewvc/cassowary/cassowary/c%2B%2B/ClTests.cc?revision=1.55&content-type=text%2Fplain
 - Increase complexity of demo to actually stress the solver in modern browser/hardware configs
+	- Output some performance info.
 - Define a JSON format for constraint loading
+	
