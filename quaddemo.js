@@ -297,26 +297,26 @@ var QuadDemo = c.inherit({
   },
 
   initEvents: function() {
-    var that = this;
+    var mouseupHandler = function(ev) {
+      this.mouseup(ev);
+      document.removeEventListener('mouseup', mouseupHandler);
+    }.bind(this);
+
     this.canvas.addEventListener('mousedown', 
-                                 function(ev) { that.mousedown(ev) },
-                                 false);
-    this.canvas.addEventListener('mouseup', 
-                                 function(ev) { that.mouseup(ev) },
-                                 false);
-    this.canvas.addEventListener('mousemove', 
-                                 function(ev) { that.mousemove(ev) },
-                                 false);
-    this.canvas.addEventListener('touchstart', 
-                                 function(ev) { that.touchstart(ev) },
-                                 false);
-    this.canvas.addEventListener('touchend', 
-                                 function(ev) { that.touchend(ev) },
-                                 false);
-    this.canvas.addEventListener('touchmove', 
-                                 function(ev) { that.touchmove(ev) },
-                                 false);
+      function(ev) {
+       this.mousedown(ev);                                   
+       document.addEventListener('mouseup', mouseupHandler);                                   
+      }.bind(this),
+      false
+    );
+    ['mousemove', 'touchstart', 'touchend', 'touchmove'].forEach(
+      function(evt) {
+        this.canvas.addEventListener(evt, this.mousemove.bind(this));
+      },
+      this
+    );
   },
+  
   
   draw: function() {
     var g = this.g;
