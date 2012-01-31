@@ -6,4 +6,4 @@
 - Increase complexity of demo to actually stress the solver in modern browser/hardware configs
 	- Output some performance info.
 - Define a JSON format for constraint loading
-	
+- Document API (after improving/fixing it)	
