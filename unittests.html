@@ -36,7 +36,7 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
       print = function(s) { printLog.push(s); }
     </script>
 
-    <script src="c.js"></script>
+    <script src="src/c.js"></script>
 
     <script>
       // Configuration
@@ -45,22 +45,22 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
       // c.trace = true;
     </script>
     
-    <script src="simple-hashtable.js"></script>
-    <script src="simple-hashset.js"></script>
-    <script src="Error.js"></script>
-    <script src="SymbolicWeight.js"></script>
-    <script src="Strength.js"></script>
-    <script src="Variable.js"></script>
-    <script src="Point.js"></script>
-    <script src="LinearExpression.js"></script>
-    <script src="Constraint.js"></script>
-    <script src="LinearConstraint.js"></script>
-    <script src="EditInfo.js"></script>
-    <script src="Tableau.js"></script>
-    <script src="SimplexSolver.js"></script>
+    <script src="src/simple-hashtable.js"></script>
+    <script src="src/simple-hashset.js"></script>
+    <script src="src/Error.js"></script>
+    <script src="src/SymbolicWeight.js"></script>
+    <script src="src/Strength.js"></script>
+    <script src="src/Variable.js"></script>
+    <script src="src/Point.js"></script>
+    <script src="src/LinearExpression.js"></script>
+    <script src="src/Constraint.js"></script>
+    <script src="src/LinearConstraint.js"></script>
+    <script src="src/EditInfo.js"></script>
+    <script src="src/Tableau.js"></script>
+    <script src="src/SimplexSolver.js"></script>
     
-    <script src="Timer.js"></script>
-    <script src="Tests.js"></script>
+    <script src="src/Timer.js"></script>
+    <script src="src/Tests.js"></script>
     <script>
       window.addEventListener("load", function() {
         append(el("h2", "In-page test results:"));
@@ -71,7 +71,7 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
     <script>
       (function() {
         // Load tests in a Worker to verify that they run there as well:
-        var worker = new Worker("WorkerTests.js");
+        var worker = new Worker("src/WorkerTests.js");
 
         worker.onmessage = function(e) {
           var d = e.data;

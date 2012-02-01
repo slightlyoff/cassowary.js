@@ -42,7 +42,7 @@
 
 })(this);
 
-load('c.js')
+load('src/c.js')
 
 // Command-line argument processing
 if (this.arguments) {
@@ -56,19 +56,19 @@ if (this.arguments) {
   });
 }
 
-load('simple-hashtable.js');
-load('simple-hashset.js');
-load('Error.js')
-load('SymbolicWeight.js')
-load('Strength.js')
-load('Variable.js')
-load('Point.js')
-load('LinearExpression.js')
-load('Constraint.js')
-load('LinearConstraint.js')
-load('EditInfo.js')
-load('Tableau.js')
-load('SimplexSolver.js')
+load('src/simple-hashtable.js');
+load('src/simple-hashset.js');
+load('src/Error.js')
+load('src/SymbolicWeight.js')
+load('src/Strength.js')
+load('src/Variable.js')
+load('src/Point.js')
+load('src/LinearExpression.js')
+load('src/Constraint.js')
+load('src/LinearConstraint.js')
+load('src/EditInfo.js')
+load('src/Tableau.js')
+load('src/SimplexSolver.js')
 
-load('Timer.js')
-load('Tests.js')
+load('src/Timer.js')
+load('src/Tests.js')
