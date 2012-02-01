@@ -92,6 +92,7 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
         // Start the tests
         window.addEventListener("load", function() {
           append(el("h2", "Test results from WebWorker:"));
+          // TODO(slightlyoff): pass c.* config to the worker in the init message.
           worker.postMessage(["init"]);
         });
       })();
