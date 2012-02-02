@@ -25,7 +25,8 @@ check out a copy of V8 and building the latest debugging shell:
 Then invoke the command-line test runner with:
 
 ```
-obelisk:cassowary-js-refactor slightlyoff$ /path/to/v8/d8 --harmony run-cl-tests.js
+obelisk:cassowary-js-refactor slightlyoff$ cd tests
+obelisk:tests slightlyoff$ /path/to/v8/d8 --harmony run-cl-tests.js
 ...
 done adding 63 constraints [500 attempted, 0 exceptions]
 time = 0.021
@@ -55,7 +56,7 @@ If you would like to avoid building V8 but have Java installed, a copy of Rhino
 `rhino.sh` from a unix-like shell:
 
 ```
-obelisk:cassowary-js-refactor slightlyoff$ ./rhino.sh 
+obelisk:tests slightlyoff$ ./rhino.sh 
 ...
 done adding 36 constraints [500 attempted, 0 exceptions]
 time = 0.105
