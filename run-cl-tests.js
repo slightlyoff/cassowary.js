@@ -56,19 +56,19 @@ if (this.arguments) {
   });
 }
 
-load('src/simple-hashtable.js');
-load('src/simple-hashset.js');
-load('src/Error.js')
-load('src/SymbolicWeight.js')
-load('src/Strength.js')
-load('src/Variable.js')
-load('src/Point.js')
-load('src/LinearExpression.js')
-load('src/Constraint.js')
-load('src/LinearConstraint.js')
-load('src/EditInfo.js')
-load('src/Tableau.js')
-load('src/SimplexSolver.js')
+load('../src/simple-hashtable.js');
+load('../src/simple-hashset.js');
+load('../src/Error.js')
+load('../src/SymbolicWeight.js')
+load('../src/Strength.js')
+load('../src/Variable.js')
+load('../src/Point.js')
+load('../src/LinearExpression.js')
+load('../src/Constraint.js')
+load('../src/LinearConstraint.js')
+load('../src/EditInfo.js')
+load('../src/Tableau.js')
+load('../src/SimplexSolver.js')
 
-load('src/Timer.js')
-load('src/Tests.js')
+load('../src/Timer.js')
+load('../src/Tests.js')
