@@ -4,6 +4,8 @@
 //
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
+"use strict";
+
 c1 = new c.LinearEquation(ex);
 print(c1);
 
