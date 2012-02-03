@@ -1366,7 +1366,7 @@ tests = doh;
 			var testUrl = "";
 			var dohBase = "";
 
-			for(var x=0; x<scriptArgs.length; x++){
+			for(var x=0; x < scriptArgs.length; x++){
 				if(scriptArgs[x].indexOf("=") > 0){
 					var tp = scriptArgs[x].split("=");
 					if(tp[0] == "dohBase"){
@@ -1377,13 +1377,21 @@ tests = doh;
 							dohBase += "/";
 						}
 					}
-					if(tp[0] == "testUrl") {
+					if(tp[0] == "testUrl" || tp[0] == "load") {
 						testUrl = tp[1];
 					}
 				}
 			}
 
-			load(dohBase + "_rhinoRunner.js");
+      doh.debug = print;
+      doh.error = print;
+      var oldReport = doh._report;
+      doh._report = function(){
+        oldReport.apply(doh, arguments);
+        if(this._failureCount > 0 || this._errorCount > 0){
+          quit(1);
+        }
+      }
 
 			if(testUrl.length){
 				load(testUrl);
