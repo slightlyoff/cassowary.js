@@ -2,12 +2,11 @@
 (function(/* Array? */scriptArgs) {
 
 //here's the definition of doh.runner...which really defines global doh
-var d= function(doh) {
+var d = function(doh) {
 
 //
 // Utility Functions and Classes
 //
-
 doh.selfTest = false;
 
 doh.global = this;
@@ -564,58 +563,6 @@ doh.register = doh.add = function(groupOrNs, testOrNull, type){
 	this.registerTest(groupOrNs, testOrNull, type);
 };
 
-doh.registerDocTests = function(module){
-	// no-op for when Dojo isn't loaded into the page
-	this.debug("registerDocTests() requires dojo to be loaded into the environment. Skipping doctest set for module:", module);
-};
-/*
-(function(){
-	if(typeof dojo != "undefined"){
-		try{
-			dojo.require("dojox.testing.DocTest");
-		}catch(e){
-			// if the DocTest module isn't available (e.g., the build we're
-			// running from doesn't include it), stub it out and log the error
-			console.debug(e);
-
-			doh.registerDocTests = function(){}
-			return;
-		}
-		doh.registerDocTests = function(module){
-			//	summary:
-			//		Get all the doctests from the given module and register each of them
-			//		as a single test case here.
-			//
-			
-			var docTest = new dojox.testing.DocTest();
-			var docTests = docTest.getTests(module);
-			var len = docTests.length;
-			var tests = [];
-			for (var i=0; i<len; i++){
-				var test = docTests[i];
-				// Extract comment on first line and add to test name.
-				var comment = "";
-				if (test.commands.length && test.commands[0].indexOf("//")!=-1) {
-					var parts = test.commands[0].split("//");
-					comment = ", "+parts[parts.length-1]; // Get all after the last //, so we dont get trapped by http:// or alikes :-).
-				}
-				tests.push({
-					runTest: (function(test){
-						return function(t){
-							var r = docTest.runTest(test.commands, test.expectedResult);
-							t.assertTrue(r.success);
-						}
-					})(test),
-					name:"Line "+test.line+comment
-				}
-				);
-			}
-			this.register("DocTests: "+module, tests);
-		}
-	}
-})();
-*/
-
 //
 // Assertions and In-Test Utilities
 //
@@ -763,13 +710,7 @@ doh._objPropEq = function(expected, actual){
 }
 
 doh._isArray = function(it){
-	return (it && it instanceof Array || typeof it == "array" ||
-		(
-			!!doh.global["dojo"] &&
-			doh.global["dojo"]["NodeList"] !== undefined &&
-			it instanceof doh.global["dojo"]["NodeList"]
-		)
-	);
+	return (it && it instanceof Array || typeof it == "array");
 }
 
 //
@@ -1311,59 +1252,57 @@ doh.run = function(){
 //Statistics functions to handle computing performance metrics.
 //Taken from dojox.math
 //	basic statistics
-doh.standardDeviation = function(/* Number[] */a){
+doh.standardDeviation = function(/* Number[] */a) {
 	//	summary:
 	//		Returns the standard deviation of the passed arguments.
 	return Math.sqrt(this.variance(a));	//	Number
 };
 
-doh.variance = function(/* Number[] */a){
+doh.variance = function(/* Number[] */a) {
 	//	summary:
 	//		Find the variance in the passed array of numbers.
 	var mean=0, squares=0;
-	dojo.forEach(a, function(item){
-		mean+=item;
-		squares+=Math.pow(item,2);
+	a.forEach(function(item) {
+		mean += item;
+		squares += Math.pow(item,2);
 	});
-	return (squares/a.length)-Math.pow(mean/a.length, 2);	//	Number
+	return (squares/a.length) - Math.pow(mean/a.length, 2);	//	Number
 };
 
-doh.mean = function(/* Number[] */a){
+doh.mean = function(/* Number[] */a) {
 	//	summary:
 	//		Returns the mean value in the passed array.
 	var t=0;
-	dojo.forEach(a, function(v){
-		t += v;
-	});
+	a.forEach(function(v) { t += v; });
 	return t / Math.max(a.length, 1);	//	Number
 };
 
-doh.min = function(/* Number[] */a){
+doh.min = function(/* Number[] */a) {
 	//	summary:
 	//		Returns the min value in the passed array.
 	return Math.min.apply(null, a);		//	Number
 };
 
-doh.max = function(/* Number[] */a){
+doh.max = function(/* Number[] */a) {
 	//	summary:
 	//		Returns the max value in the passed array.
 	return Math.max.apply(null, a);		//	Number
 },
 
-doh.median= function(/* Number[] */a){
+doh.median= function(/* Number[] */a) {
 	//	summary:
 	//		Returns the value closest to the middle from a sorted version of the passed array.
 	return a.slice(0).sort()[Math.ceil(a.length/2)-1];	//	Number
 },
 
-doh.mode = function(/* Number[] */a){
+doh.mode = function(/* Number[] */a) {
 	//	summary:
 	//		Returns the mode from the passed array (number that appears the most often).
 	//		This is not the most efficient method, since it requires a double scan, but
 	//		is ensures accuracy.
 	var o = {}, r = 0, m = Number.MIN_VALUE;
-	dojo.forEach(a, function(v){
-		(o[v]!==undefined)?o[v]++:o[v]=1;
+	a.forEach(function(v) {
+		(o[v]!==undefined) ? o[v]++ : o[v]=1;
 	});
 
 	//	we did the lookup map because we need the number that appears the most.
@@ -1375,7 +1314,7 @@ doh.mode = function(/* Number[] */a){
 	return r;	//	Number
 };
 
-doh.average = function(/* Number [] */ a){
+doh.average = function(/* Number [] */ a) {
 	var i;
 	var s = 0;
 	for(i = 0; i < a.length; i++){
@@ -1386,15 +1325,15 @@ doh.average = function(/* Number [] */ a){
 
 tests = doh;
 
-(function(){
+(function() {
 	// scope protection
 	var x;
-	try{
-		if(typeof load == "function"){
+	try {
+		if(typeof load == "function") {
 			throw new Error();
-		}else if(typeof define == "function" && define.vendor!="dojotoolkit.org"){
+		} else if(typeof define == "function" && define.vendor!="dojotoolkit.org") {
 			// using a real AMD loader; it will load runnerFile
-		}else if(this["document"]){
+		} else if(this["document"]) {
 			// if we survived all of that, we're probably in a browser but
 			// don't have Dojo handy and/or are using an AMD loader.
 			// Load _browserRunner.js using a document.write() call.
@@ -1412,20 +1351,19 @@ tests = doh;
 					}
 				}
 			}
-			if(runnerFile){
+			if(runnerFile) {
 				document.write("<scri"+"pt src='" + runnerFile.substr(0, runnerFile.length - 9)
 					+ "_browserRunner.js' type='text/javascript'></scr"+"ipt>");
 			}
 		}
-	}catch(e){
+	} catch(e) {
 		print("\n"+doh._line);
 		print("The Dojo Unit Test Harness, $Rev: 24146 $");
 		print("Copyright (c) 2011, The Dojo Foundation, All Rights Reserved");
 		print(doh._line, "\n");
 
-		try{
+		try {
 			var testUrl = "";
-			var testModule = "dojo.tests.module";
 			var dohBase = "";
 
 			for(var x=0; x<scriptArgs.length; x++){
@@ -1435,15 +1373,12 @@ tests = doh;
 						dohBase = tp[1];
 						//Convert slashes to unix style and make sure properly ended.
 						dohBase = dohBase.replace(/\\/g, "/");
-						if(dohBase.charAt(dohBase.length - 1) != "/"){
+						if(dohBase.charAt(dohBase.length - 1) != "/") {
 							dohBase += "/";
 						}
 					}
-					if(tp[0] == "testUrl"){
+					if(tp[0] == "testUrl") {
 						testUrl = tp[1];
-					}
-					if(tp[0] == "testModule"){
-						testModule = tp[1];
 					}
 				}
 			}
@@ -1453,10 +1388,7 @@ tests = doh;
 			if(testUrl.length){
 				load(testUrl);
 			}
-			if(testModule.length){
-				dojo.forEach(testModule.split(","), dojo.require, dojo);
-			}
-		}catch(e){
+		} catch(e) {
 			print("An exception occurred: " + e);
 		}
 
@@ -1470,18 +1402,15 @@ return doh;
 
 // this is guaranteed in the global scope, not matter what kind of eval is thrown at us
 // define global doh
-if(typeof doh == "undefined"){
+if(typeof doh == "undefined") {
 	doh = {};
 }
-if(typeof define == "undefined" || define.vendor=="dojotoolkit.org"){
+if(typeof define == "undefined" || define.vendor=="dojotoolkit.org") {
 	// using dojo 1.x loader or no dojo on the page
-	if(typeof dojo !== "undefined"){
-		dojo.provide("doh.runner");
-	}
 	d(doh);
 }else{
 	// using an AMD loader
-	doh.runnerFactory= d;
+	doh.runnerFactory = d;
 }
 
 }).call(null, typeof arguments=="undefined" ? [] : Array.prototype.slice.call(arguments));

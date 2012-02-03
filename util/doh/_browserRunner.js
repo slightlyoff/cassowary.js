@@ -4,24 +4,25 @@
 
 //here's the definition of doh/_browserRunner
 
-var d= function(doh) {
-	try{
+var d = function(doh) {
+	try {
 		var topdog = (window.parent == window) || !Boolean(window.parent.doh);
-	}catch(e){
+	} catch(e) {
 		//can't access window.parent.doh, then consider ourselves as topdog
-		topdog=true;
+		topdog = true;
 	}
-	if(topdog){
+
+	if (topdog) {
 		// we're the top-dog window.
 
 		// borrowed from Dojo, etc.
-		var byId = function(id){
+		var byId = function(id) {
 			return document.getElementById(id);
 		};
 
 		var _addOnEvt = function(	type,		// string
 									refOrName,	// function or string
-									scope){		// object, defaults is window
+									scope) {		// object, defaults is window
 
 			if(!scope){ scope = window; }
 
@@ -31,31 +32,27 @@ var d= function(doh) {
 			}
 			var enclosedFunc = function(){ return funcRef.apply(scope, arguments); };
 
-			if((window["dojo"])&&(type == "load")){
-				dojo.addOnLoad(enclosedFunc);
-			}else{
-				if(window["attachEvent"]){
-					window.attachEvent("on"+type, enclosedFunc);
-				}else if(window["addEventListener"]){
-					window.addEventListener(type, enclosedFunc, false);
-				}else if(document["addEventListener"]){
-					document.addEventListener(type, enclosedFunc, false);
-				}
+      if(window["attachEvent"]) {
+        window.attachEvent("on"+type, enclosedFunc);
+      } else if(window["addEventListener"]) {
+        window.addEventListener(type, enclosedFunc, false);
+      } else if(document["addEventListener"]) {
+        document.addEventListener(type, enclosedFunc, false);
 			}
 		};
 
 		//
 		// Over-ride or implement base runner.js-provided methods
 		//
-		var escapeXml = function(str){
+		var escapeXml = function(str) {
 			//summary:
 			//		Adds escape sequences for special characters in XML: &<>"'
 			//		Optionally skips escapes for single quotes
 			return str.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;"); // string
 		};
 
-		var formatTime = function(n){
-			switch(true){
+		var formatTime = function(n) {
+			switch(true) {
 				case n<1000: //<1s
 					return n+"ms";
 				case n<60000: //<1m
@@ -68,9 +65,9 @@ var d= function(doh) {
 		};
 		
 		var _logBacklog = [], _loggedMsgLen = 0;
-		var sendToLogPane = function(args, skip){
+		var sendToLogPane = function(args, skip) {
 			var msg = "";
-			for(var x=0; x<args.length; x++){
+			for (var x=0; x<args.length; x++) {
 				msg += " "+args[x];
 			}
 
@@ -80,10 +77,10 @@ var d= function(doh) {
 			msg = msg.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
 				.replace(" ", "&nbsp;")
 				.replace("\n", "<br>&nbsp;");
-			if(!byId("logBody")){
+			if(!byId("logBody")) {
 				_logBacklog.push(msg);
 				return;
-			}else if(_logBacklog.length && !skip){
+			} else if(_logBacklog.length && !skip) {
 				var tm;
 				while((tm=_logBacklog.shift())){
 					sendToLogPane(tm, true);
@@ -97,11 +94,11 @@ var d= function(doh) {
 			_loggedMsgLen++;
 		}
 
-		var findTarget = function(n){
-			while(n && !n.getAttribute('_target')){
-				n=n.parentNode;
-				if(!n.getAttribute){
-					n=null;
+		var findTarget = function(n) {
+			while(n && !n.getAttribute('_target')) {
+				n = n.parentNode;
+				if(!n.getAttribute) {
+					n = null;
 				}
 			}
 			return n;
@@ -111,49 +108,19 @@ var d= function(doh) {
 			//console.log(e);
 			
 			var node = findTarget(e?e.target:window.event.srcElement);
-			if(!node){
+			if(!node) {
 				return;
 			}
 			var _t = Number(node.getAttribute('_target'));
 			var lb = byId("logBody");
-			if(_t>=lb.childNodes.length){
+			if(_t>=lb.childNodes.length) {
 				return;
 			}
 			var t = lb.childNodes[_t];
 			t.scrollIntoView();
-			if(window.dojo){
-				//t.parentNode.parentNode is <div class="tabBody">, only it has a explicitly set background-color,
-				//all children of it are transparent
-				var bgColor = dojo.style(t.parentNode.parentNode,'backgroundColor');
-				//node.parentNode is the tr which has background-color set explicitly
-				var hicolor = dojo.style(node.parentNode,'backgroundColor');
-				var unhilight = dojo.animateProperty({
-					node: t,
-					duration: 500,
-					properties:
-					{
-						backgroundColor: { start:hicolor, end: bgColor }
-					},
-					onEnd: function(){
-						t.style.backgroundColor="";
-					}
-				});
-				var hilight = dojo.animateProperty({
-					node: t,
-					duration: 500,
-					properties:
-					{
-						backgroundColor: { start:bgColor, end: hicolor }
-					},
-					onEnd: function(){
-						unhilight.play();
-					}
-				});
-				hilight.play();
-			}
 		};
 
-		doh._jumpToSuite = function(e){
+		doh._jumpToSuite = function(e) {
 			var node = findTarget(e ? e.target : window.event.srcElement);
 			if(!node){
 				return;
@@ -223,24 +190,13 @@ var d= function(doh) {
 				var plotResults = null;
 				var standby;
 				if(doh.perfTestResults){
-					if(window.dojo){
-						//If we have dojo and here are perf tests results,
-						//well, we'll use the dojo charting functions
-						dojo.require("dojox.charting.Chart2D");
-						dojo.require("dojox.charting.DataChart");
-						dojo.require("dojox.charting.plot2d.Scatter");
-						dojo.require("dojox.charting.plot2d.Lines");
-						dojo.require("dojo.data.ItemFileReadStore");
-						plotResults = doh._dojoPlotPerfResults;
-					}else{
-						plotResults = doh._asciiPlotPerfResults;
-					}
-					try{
+          plotResults = doh._asciiPlotPerfResults;
+					try {
 						var g;
 						var pBody = byId("perfTestsBody");
 						var chartsToRender = [];
 
-						if(doh.perfTestResults){
+						if(doh.perfTestResults) {
 							doh.showPerfTestsPage();
 						}
 						for(g in doh.perfTestResults){
