@@ -153,7 +153,7 @@ c.HashTable = c.inherit({
   },
 
   clone: function() {
-    var n = new SimpleHashtable();
+    var n = new c.HashTable();
     if (this._size) {
       n._size = this._size;
       n._keyList = this._keyList.slice();
