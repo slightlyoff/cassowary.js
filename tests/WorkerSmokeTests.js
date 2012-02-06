@@ -57,8 +57,7 @@ importScripts('../src/LinearConstraint.js');
 importScripts('../src/EditInfo.js');
 importScripts('../src/Tableau.js');
 importScripts('../src/SimplexSolver.js');
-
-importScripts('Timer.js');
+importScripts('../src/Timer.js');
 
 this.onmessage = function(m) {
   if (m.data[0] == "init") {
