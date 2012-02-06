@@ -112,6 +112,7 @@ var QuadDemo = c.inherit({
     cleq = new c.LinearEquation(mp[0].X(), cle);
 
     solver.addConstraint(cleq);
+
     cle = new c.LinearExpression(db[0].Y());
     cle = (cle.plus(db[1].Y())).divide(2);
     cleq = new c.LinearEquation(mp[0].Y(), cle);
@@ -134,6 +135,7 @@ var QuadDemo = c.inherit({
     cleq = new c.LinearEquation(mp[2].X(), cle);
 
     solver.addConstraint(cleq);
+
     cle = new c.LinearExpression(db[2].Y());
     cle = (cle.plus(db[3].Y())).divide(2);
     cleq = new c.LinearEquation(mp[2].Y(), cle);
@@ -145,32 +147,32 @@ var QuadDemo = c.inherit({
     cleq = new c.LinearEquation(mp[3].X(), cle);
 
     solver.addConstraint(cleq);
+
     cle = new c.LinearExpression(db[3].Y());
     cle = (cle.plus(db[0].Y())).divide(2);
     cleq = new c.LinearEquation(mp[3].Y(), cle);
 
     solver.addConstraint(cleq);
+
+    cle = c.Plus(db[0].X(), 20);
+
+    solver.addConstraint(new c.LinearInequality(cle, c.LEQ, db[2].X()))
+          .addConstraint(new c.LinearInequality(cle, c.LEQ, db[3].X()));
     
+    cle = c.Plus(db[1].X(), 20);
 
-    cle = c.Plus(db[0].X(),20);
-    solver
-      .addConstraint(new c.LinearInequality(cle,c.LEQ,db[2].X()))
-      .addConstraint(new c.LinearInequality(cle,c.LEQ,db[3].X()));
-    
-    cle = c.Plus(db[1].X(),20);
-    solver
-      .addConstraint(new c.LinearInequality(cle,c.LEQ,db[2].X()))
-      .addConstraint(new c.LinearInequality(cle,c.LEQ,db[3].X()));
+    solver.addConstraint(new c.LinearInequality(cle, c.LEQ, db[2].X()))
+          .addConstraint(new c.LinearInequality(cle, c.LEQ, db[3].X()));
 
-    cle = c.Plus(db[0].Y(),20);
-    solver
-      .addConstraint(new c.LinearInequality(cle,c.LEQ,db[1].Y()))
-      .addConstraint(new c.LinearInequality(cle,c.LEQ,db[2].Y()));
+    cle = c.Plus(db[0].Y(), 20);
 
-    cle = c.Plus(db[3].Y(),20);
-    solver
-      .addConstraint(new c.LinearInequality(cle,c.LEQ,db[1].Y()))
-      .addConstraint(new c.LinearInequality(cle,c.LEQ,db[2].Y()));
+    solver.addConstraint(new c.LinearInequality(cle, c.LEQ, db[1].Y()))
+          .addConstraint(new c.LinearInequality(cle, c.LEQ, db[2].Y()));
+
+    cle = c.Plus(db[3].Y(), 20);
+
+    solver.addConstraint(new c.LinearInequality(cle, c.LEQ, db[1].Y()))
+          .addConstraint(new c.LinearInequality(cle, c.LEQ, db[2].Y()));
 
     // Add constraints to keep points inside window
     solver.addConstraint(new c.LinearInequality(db[0].X(), c.GEQ, 10));
@@ -204,7 +206,7 @@ var QuadDemo = c.inherit({
     // console.log('mousedown canvasoffset='+this.canvas.offsetLeft+','+this.canvas.offsetTop);
     // console.log('mousedown clientx,y='+ev.clientX+','+ev.clientY);
     // console.log('mousedown pagex,y='+ev.pageX+','+ev.pageY);
-    //
+
     for ( var a = 0; a < this.db.length; a++ ) {
       if ( this.db[a].Contains(x, y) ) {
         this.dbDragging = a;
@@ -215,14 +217,10 @@ var QuadDemo = c.inherit({
 
     if ( this.dbDragging != -1 ) {
       this.draw();
-//      try {
-        this.solver
-          .addEditVar(this.db[this.dbDragging].X())
-          .addEditVar(this.db[this.dbDragging].Y())
-          .beginEdit();
-//      } catch (ex) {
-//        console.log("mouseDown exception = " + ex);
-//      }
+      this.solver
+        .addEditVar(this.db[this.dbDragging].X())
+        .addEditVar(this.db[this.dbDragging].Y())
+        .beginEdit();
     }
     return true;
   },
@@ -230,12 +228,8 @@ var QuadDemo = c.inherit({
 
   mouseup: function(ev) {
     if (this.dbDragging != -1 ) {
-//      try {
-        this.dbDragging = -1;
-        this.solver.endEdit();
-//      } catch (ex) {
-//        console.log("mouseup exception = " + ex);
-//      }
+      this.dbDragging = -1;
+      this.solver.endEdit();
     }
     this.draw();
     return true;
@@ -245,18 +239,10 @@ var QuadDemo = c.inherit({
     var x = ev.pageX - this.canvas.offsetLeft;
     var y = ev.pageY - this.canvas.offsetTop;
     if ( this.dbDragging != -1 ) {
-
-//      try {
-
       this.solver
         .suggestValue(this.db[this.dbDragging].X(),x)
         .suggestValue(this.db[this.dbDragging].Y(),y)
         .resolve();
-
-//      } catch (ex) {
-//        console.log("mousemove: ex = " + ex);
-//      }
-
       this.draw();
     }
     return true;
@@ -276,20 +262,10 @@ var QuadDemo = c.inherit({
   },
 
   touchend: function(ev) {
-    if (false) {
-      document.write("touchend ev = " + ev + "  ");
-      document.write(ev.pageX + "," + ev.pageY);
-      document.write("<br/>");
-    }
     this.mouseup(ev);
   },
 
   touchmove: function(ev) {
-    if (false) {
-      document.write("touchmove ev = " + ev + "  ");
-      document.write(ev.pageX + "," + ev.pageY);
-      document.write("<br/>");
-    }
     this.mousemove(ev.touches.item(0));
     if (this.dbDragging != -1) {
       ev.preventDefault();

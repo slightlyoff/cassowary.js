@@ -7,3 +7,4 @@
 	- Output some performance info.
 - Define a JSON format for constraint loading
 - Document API (after improving/fixing it)	
+- Expose Cassowary as a NodeJS module
