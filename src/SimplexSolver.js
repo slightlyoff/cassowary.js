@@ -11,35 +11,19 @@ var tp = t.prototype;
 c.SimplexSolver = c.inherit({
   extends: c.Tableau, 
   initialize: function(){
-    /* FIELDS:
-        var _stayMinusErrorVars //Vector
-        var _stayPlusErrorVars //Vector
-        var _errorVars //SimpleHashtable
-        var _markerVars //SimpleHashtable
-        var _objective //c.ObjectiveVariable
-        var _editVarMap //SimpleHashtable
-        var _slackCounter //long
-        var _artificialCounter //long
-        var _dummyCounter //long
-        var _resolve_pair //Vector
-        var _epsilon //double
-        var _fOptimizeAutomatically //boolean
-        var _fNeedsSolving //boolean
-        var _stkCedcns //Stack
-    */
 
     c.Tableau.call(this);
     this._stayMinusErrorVars = [];
     this._stayPlusErrorVars = [];
 
-    this._errorVars = new SimpleHashtable(); // cn -> Set of clv
+    this._errorVars = new c.HashTable(); // cn -> Set of clv
 
-    this._markerVars = new SimpleHashtable(); // cn -> Set of clv
+    this._markerVars = new c.HashTable(); // cn -> Set of clv
 
     this._resolve_pair = [0, 0]; 
     this._objective = new c.ObjectiveVariable("Z");
 
-    this._editVarMap = new SimpleHashtable(); // clv -> c.EditInfo
+    this._editVarMap = new c.HashTable(); // clv -> c.EditInfo
 
     this._slackCounter = 0;
     this._artificialCounter = 0;
@@ -48,7 +32,7 @@ c.SimplexSolver = c.inherit({
     this._fOptimizeAutomatically = true;
     this._fNeedsSolving = false;
 
-    this._rows = new SimpleHashtable(); // clv -> expression
+    this._rows = new c.HashTable(); // clv -> expression
 
     this._rows.put(this._objective, new c.LinearExpression());
     this._stkCedcns = []; // Stack

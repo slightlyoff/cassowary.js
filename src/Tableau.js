@@ -10,16 +10,16 @@
 c.Tableau = c.inherit({
   initialize: function() {
     /* FIELDS:
-        var _columns // SimpleHashtable of vars -> set of vars
-        var _rows // SimpleHashtable of vars -> expr
+        var _columns // c.HashTable of vars -> set of vars
+        var _rows // c.HashTable of vars -> expr
         var _infeasibleRows //Set of vars
         var _externalRows //Set of vars
         var _externalParametricVars //Set of vars
    */
 
-    this._columns = new SimpleHashtable(); // values are sets
+    this._columns = new c.HashTable(); // values are sets
 
-    this._rows = new SimpleHashtable(); // values are ClLinearExpressions
+    this._rows = new c.HashTable(); // values are ClLinearExpressions
 
     this._infeasibleRows = new HashSet();
     this._externalRows = new HashSet();

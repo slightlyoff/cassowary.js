@@ -13,12 +13,12 @@
 c.LinearExpression = c.inherit({
   /* FIELDS:
      private ClDouble constant
-     private SimpleHashtable _terms
+     private Hashtable _terms
   */
   initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
     if (c.GC) print("new c.LinearExpression");
     this.constant = constant || 0;
-    this._terms = new SimpleHashtable();
+    this._terms = new c.HashTable();
 
     if (clv instanceof c.AbstractVariable) {
       this._terms.put(clv, value || 1);
@@ -27,7 +27,7 @@ c.LinearExpression = c.inherit({
     }
   },
 
-  initializeFromHash: function(constant /*ClDouble*/, terms /*SimpleHashtable*/) {
+  initializeFromHash: function(constant /*ClDouble*/, terms /*c.Hashtable*/) {
     if(c.verbose) {
       console.log("*******************************");
       console.log("clone c.initializeFromHash");

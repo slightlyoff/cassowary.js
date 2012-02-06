@@ -48,12 +48,9 @@ var copyOwn = function(src, dest) {
   }
 }
 
-/* Global */
-c.HashTable = 
-scope.SimpleHashtable = c.inherit({
+c.HashTable = c.inherit({
 
   initialize: function() {
-
     this._size = 0;
     this._store = {};
     this._keyStrMap = {};

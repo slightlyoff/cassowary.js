@@ -168,14 +168,14 @@ scope.c = {
   },
 
   hashToString: function(h) {
-    // FIXME: why isn't this implemented as a toString on SimpleHashtable?
+    // FIXME: why isn't this implemented as a toString on c.HashTable?
     var answer = "";
-    c.Assert(h instanceof SimpleHashtable);
+    c.Assert(h instanceof c.HashTable);
     h.each( function(k,v) {
       answer += k + " => ";
-      if (v instanceof SimpleHashtable) {
+      if (v instanceof c.HashTable) {
         answer += c.hashToString(v);
-      } else if (v instanceof HashSet) {
+      } else if (v instanceof c.HashSet) {
         answer += c.setToString(v);
       } else {
         answer += v + "\n";
