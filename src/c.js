@@ -42,62 +42,55 @@ scope.c = {
   //
   // Utility methods
   //
-  inherit: function(ctor, parent, props) {
-    var al = arguments.length;
-    // Data-only extension
-    if (al == 1) {
-      props = ctor;
-      ctor = null;
-      parent = null
+  inherit: function(props) {
+    var ctor = null;
+    var parent = null
 
-      if (props["extends"]) {
-        parent = props["extends"];
-        delete props["extends"];
-      }
-
-      if (props["initialize"]) {
-        ctor = props["initialize"];
-        delete props["initialize"];
-      }
+    if (props["extends"]) {
+      parent = props["extends"];
+      delete props["extends"];
     }
 
-    // No ctor specified
-    if (al == 2) {
-      props = parent;
-      parent = ctor;
-      ctor = null;
+    if (props["initialize"]) {
+      ctor = props["initialize"];
+      delete props["initialize"];
     }
 
-    // Default
-    var dprops = {};
     var realCtor = ctor || function() {};
+
     /* 
     // NOTE: would happily do this except it's 2x slower. Boo!
     props.__proto__ = parent ? parent.prototype : Object.prototype;
     realCtor.prototype = props;
     */
-    for (var x in props) {
-      if (props.hasOwnProperty(x)) {
-        dprops[x] = {
-          value: props[x],
-          enumerable: false,
-          writable: true,
-          configrable: true,
-        }
+
+    var rp = realCtor.prototype = Object.create(
+      ((parent) ? parent.prototype : Object.prototype)
+    );
+
+    Object.getOwnPropertyNames(props).forEach(function(x) {
+      var pd = Object.getOwnPropertyDescriptor(props, x);
+      if ( (typeof pd["get"] == "function") ||
+           (typeof pd["set"] == "function") ) {
+        Object.defineProperty(rp, x, pd);
+      } else if (typeof pd["value"] == "function") {
+        pd.writable = true;
+        pd.configurable = true;
+        pd.enumerable = false;
+        Object.defineProperty(rp, x, pd);
+      } else {
+        rp[x] = props[x];
       }
-    }
-    realCtor.prototype = Object.create(((parent) ? parent.prototype : Object.prototype), dprops);
+    });
     return realCtor;
   },
 
   debugprint: function(s /*String*/) {
-    if (!c.verbose) return;
-    console.log(s);
+    if (c.verbose) console.log(s);
   },
 
   traceprint: function(s /*String*/) {
-    if (!c.verbose) return;
-    console.log(s);
+    if (c.verbose) console.log(s);
   },
 
   fnenterprint: function(s /*String*/) { console.log("* " + s); },

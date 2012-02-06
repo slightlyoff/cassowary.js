@@ -16,47 +16,46 @@
     }
   });
 
-  c.ConstraintNotFound = c.inherit(c.Error, {
+  c.ConstraintNotFound = c.inherit({
+    extends: c.Error,
     description: function() {
       return "(c.ConstraintNotFound) Tried to remove a constraint never added to the tableu";
     },
   });
 
-  c.InternalError = c.inherit(
-    function(s /*String*/) {
+  c.InternalError = c.inherit({
+    extends: c.Error,
+    initialize: function(s /*String*/) {
       description_ = s;
     },
-    c.Error,
-    {
-      description: function() {
-        return "(c.InternalError) " + description_;
-      },
-    }
-  );
+    description: function() {
+      return "(c.InternalError) " + description_;
+    },
+  });
 
-  c.NonlinearExpression = c.inherit(c.Error,
-    {
-      description: function() {
-        return "(c.NonlinearExpression) The resulting expression would be nonlinear";
-      },
-    }
-  );
+  c.NonlinearExpression = c.inherit({
+    extends: c.Error,
+    description: function() {
+      return "(c.NonlinearExpression) The resulting expression would be nonlinear";
+    },
+  });
 
-  c.NotEnoughStays = c.inherit(c.Error,
-    {
-      description: function() {
-        return "(c.NotEnoughStays) There are not enough stays to give specific values to every variable";
-      },
-    }
-  );
+  c.NotEnoughStays = c.inherit({
+    extends: c.Error,
+    description: function() {
+      return "(c.NotEnoughStays) There are not enough stays to give specific values to every variable";
+    },
+  });
 
-  c.RequiredFailure = c.inherit(c.Error, {
+  c.RequiredFailure = c.inherit({
+    extends: c.Error,
     description: function() {
       return "(c.RequiredFailure) A required constraint cannot be satisfied";
     },
   });
 
-  c.TooDifficult = c.inherit(c.Error, {
+  c.TooDifficult = c.inherit({
+    extends: c.Error,
     description: function() {
       return "(c.TooDifficult) The constraints are too difficult to solve";
     },

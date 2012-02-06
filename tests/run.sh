@@ -3,9 +3,11 @@
 DOH='../util/doh/runner.js'
 RUNNER=''
 
+# FIXME(slightlyoff): Add option parsing to support explicit runtime selection.
+
 if [ -x `which d8` ]
 then
-  RUNNER=d8 
+  RUNNER='d8 --harmony'
 else
   RUNNER='java -classpath ../util/js.jar org.mozilla.javascript.tools.shell.Main'
 fi
