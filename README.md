@@ -13,6 +13,34 @@ web workers and to improve the performance of the code by a large constant
 factor. This version is already 8x faster than the original at running the
 built-in test suite under V8 (5x faster under Rhino).
 
+Constraint Solver? Say What?
+============================
+
+Constraint solvers are iterative algorithms that work towards ever more ideal
+solutions, often using some variant of Dantzig's [simplex
+method](http://en.wikipedia.org/wiki/Simplex_algorithm). They are primarialy of
+interest in situations where it's possible to easily set up a set of rules
+which you would like a solution to adhere to, but when it is very difficult to
+consider all of the possible solutions yourself.
+
+Cassowary and other hierarchial constraint toolkits add a unique mechanism for
+deciding between sets of rules that might conflict in determining which of a
+set of possible solutions are "better". By allowing constraint authors to
+specify *weights* for the constraints, the toolkit can decide in terms of
+*stronger* constraints over weaker ones, allowing for more optimal solutions.
+These sorts of situations arise *all the time* in UI programming; e.g.: "I'd
+like this to be it's natural width, but only if that's smaller than 600px, and
+never let it get smaller than 200px". Constraint solvers offer a way out of the
+primordial mess of nasty conditionals and brittle invalidations.
+
+If all of this sounds like it's either deeply esoteric or painfully academic,
+you might start by boning up on what optimizers like this do and what they're
+good for. I recommend John W. Chinneck's ["Practical Optimization: A Gentle
+Introduction"](http://www.sce.carleton.ca/faculty/chinneck/po.html) and the
+Cassowary paper that got me into all of this: ["Constraint Cascading Style
+Sheets for the
+Web"](http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.101.4819)
+
 Getting Started
 ===============
 
@@ -88,31 +116,3 @@ API
 ===
 
 TODO(slightlyoff)
-
-Constraint Solver? Say What?
-============================
-
-Constraint solvers are iterative algorithms that work towards ever more ideal
-solutions, often using some variant of Dantzig's [simplex
-method](http://en.wikipedia.org/wiki/Simplex_algorithm). They are primarialy of
-interest in situations where it's possible to easily set up a set of rules
-which you would like a solution to adhere to, but when it is very difficult to
-consider all of the possible solutions yourself.
-
-Cassowary and other hierarchial constraint toolkits add a unique mechanism for
-deciding between sets of rules that might conflict in determining which of a
-set of possible solutions are "better". By allowing constraint authors to
-specify *weights* for the constraints, the toolkit can decide in terms of
-*stronger* constraints over weaker ones, allowing for more optimal solutions.
-These sorts of situations arise *all the time* in UI programming; e.g.: "I'd
-like this to be it's natural width, but only if that's smaller than 600px, and
-never let it get smaller than 200px". Constraint solvers offer a way out of the
-primordial mess of nasty conditionals and brittle invalidations.
-
-If all of this sounds like it's either deeply esoteric or painfully academic,
-you might start by boning up on what optimizers like this do and what they're
-good for. I recommend John W. Chinneck's ["Practical Optimization: A Gentle
-Introduction"](http://www.sce.carleton.ca/faculty/chinneck/po.html) and the
-Cassowary paper that got me into all of this: ["Constraint Cascading Style
-Sheets for the
-Web"](http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.101.4819)
