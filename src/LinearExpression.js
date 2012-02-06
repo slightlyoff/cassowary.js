@@ -172,7 +172,10 @@ c.LinearExpression = c.inherit({
     return null;
   },
   
-  substituteOut: function(outvar /*c.AbstractVariable*/, expr /*c.LinearExpression*/, subject /*c.AbstractVariable*/, solver /*ClTableau*/) {
+  substituteOut: function(outvar /*c.AbstractVariable*/,
+                          expr /*c.LinearExpression*/,
+                          subject /*c.AbstractVariable*/,
+                          solver /*ClTableau*/) {
     if (c.trace) {
       c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
       c.traceprint("this = " + this);
@@ -197,7 +200,8 @@ c.LinearExpression = c.inherit({
     if (c.trace) c.traceprint("Now this is " + this);
   },
 
-  changeSubject: function(old_subject /*c.AbstractVariable*/, new_subject /*c.AbstractVariable*/) {
+  changeSubject: function(old_subject /*c.AbstractVariable*/,
+                          new_subject /*c.AbstractVariable*/) {
     this._terms.put(old_subject, this.newSubject(new_subject));
   },
 

@@ -50,8 +50,8 @@
  *      - entries()
  *      - containsKey()
  *      - containsValue()
- *
- *  "keys()" is also un-used but retained for symmetry with "values()"
+ *      - keys()
+ *      - values()
  *
  *  Additions:
  *
@@ -117,23 +117,8 @@ scope.SimpleHashtable = c.inherit({
     this._size = 0;
     this._store = {};
     this._keyStrMap = {};
-    // this._keyList = [];
+    this._keyList = [];
   }, 
-
-  // FIXME(slightlyoff):
-  //    do invalidation logic and caching as necessary for keys/values to
-  //    prevent re-creating them if we already have the answer!
-  keys: function() {
-    var r = [];
-    this.each(function(key){ r.push(key); });
-    return r;
-  },
-
-  values: function() {
-    var r = [];
-    this.each(function(key, value){ r.push(value); });
-    return r;
-  },
 
   remove: function(key) {
     key = keyCode(key);
@@ -169,8 +154,7 @@ scope.SimpleHashtable = c.inherit({
     if (this._store.hasOwnProperty(hash)) {
       return callback.call(scope||null, hash, value);
     }
- },
-
+  },
 
   escapingEach: function(callback, scope) {
     if (!this._size) { return; }
