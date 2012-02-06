@@ -43,25 +43,25 @@
   global.print = function(s) { console.log(s); }
 })(this);
 
-importScripts('c.js');
-importScripts('HashTable.js');
-importScripts('HashSet.js');
-importScripts('Error.js');
-importScripts('SymbolicWeight.js');
-importScripts('Strength.js');
-importScripts('Variable.js');
-importScripts('Point.js');
-importScripts('LinearExpression.js');
-importScripts('Constraint.js');
-importScripts('LinearConstraint.js');
-importScripts('EditInfo.js');
-importScripts('Tableau.js');
-importScripts('SimplexSolver.js');
+importScripts('../src/c.js');
+importScripts('../src/HashTable.js');
+importScripts('../src/HashSet.js');
+importScripts('../src/Error.js');
+importScripts('../src/SymbolicWeight.js');
+importScripts('../src/Strength.js');
+importScripts('../src/Variable.js');
+importScripts('../src/Point.js');
+importScripts('../src/LinearExpression.js');
+importScripts('../src/Constraint.js');
+importScripts('../src/LinearConstraint.js');
+importScripts('../src/EditInfo.js');
+importScripts('../src/Tableau.js');
+importScripts('../src/SimplexSolver.js');
 
 importScripts('Timer.js');
 
 this.onmessage = function(m) {
   if (m.data[0] == "init") {
-    importScripts('Tests.js');
+    importScripts('SmokeTests.js');
   }
 };

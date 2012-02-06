@@ -10,7 +10,7 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
 -->
   <head>
-    <title>Cassowary Javascript Unittests</title>
+    <title>Cassowary Javascript Smoke Tests</title>
 
     <script>
       // Utility code to log results to the page.
@@ -60,7 +60,7 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
     <script src="../src/SimplexSolver.js"></script>
     
     <script src="../src/Timer.js"></script>
-    <script src="../src/Tests.js"></script>
+    <script src="SmokeTests.js"></script>
     <script>
       window.addEventListener("load", function() {
         append(el("h2", "In-page test results:"));
@@ -71,7 +71,7 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
     <script>
       (function() {
         // Load tests in a Worker to verify that they run there as well:
-        var worker = new Worker("../src/WorkerTests.js");
+        var worker = new Worker("WorkerSmokeTests.js");
 
         worker.onmessage = function(e) {
           var d = e.data;
@@ -99,6 +99,6 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
     </script>
   </head>
   <body>
-    <h1>Cassowary Javascript Unittests</h1>
+    <h1>Cassowary Javascript Smoke Tests</h1>
   </body>
 </html>
