@@ -1,3 +1,4 @@
+- Fix licensing headers, cleanup namespace usage, move new hash* impls into c.*
 - Port the quads demo to use worker-hosted solver
 - Update the Hashtable impl to use the built in Maps from harmony if available. Benchmark.
 - Write perf tests, get them running under JSPerf harness
