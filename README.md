@@ -1,5 +1,5 @@
 Cassowary JS
-------------
+============
 
 This is an updated version of [Greg Badros's
 port](http://www.badros.com/greg/cassowary/js/quaddemo.html "JS Quad Demo") of
@@ -14,7 +14,7 @@ factor. This version is already 8x faster than the original at running the
 built-in test suite under V8 (5x faster under Rhino).
 
 Constraint Solver? Say What?
-============================
+----------------------------
 
 Constraint solvers are iterative algorithms that work towards ever more ideal
 solutions, often using some variant of Dantzig's [simplex
@@ -42,7 +42,7 @@ Sheets for the
 Web"](http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.101.4819)
 
 Getting Started
-===============
+---------------
 
 To run the tests, check out this repository and point your thorougly modern
 browser at `unittests.html` or `quaddemo.html`. To run from the command line,
@@ -86,16 +86,21 @@ If you would like to avoid building V8 but have Java installed, a copy of Rhino
 your path and attempt to fall back to using Rhino to run the tests.
 
 Supported Runtimes
-==================
+------------------
 
-This is an unapolgetically modern reinterpretation, optimized for size,
-complexity, and speed. And litle else. No, it won't work on IE < 10. Or
-old-skool Firefox. The idioms in use are tracking dev-channel Chrome and as
-soon as ES.next features become available there, this port will begin to use
-them. You have been warned.
+This refactoring currently runs in:
+
+  * Chrome (and Chrome Frame), Firefox 9+, Opera 11+, Safari 5+, IE 9+
+  * Command-line V8 (d8 shell) and Rhino
+
+This is an unapolgetically modern reinterpretation optimized for size, low
+complexity, and speed. And litle else. No, it will not work on old versions of
+IE. Get [Chrome Frame](http://google.com/chromeframe) ;-) The idioms in use are
+tracking dev-channel Chrome and as soon as ES.next features become available
+there, this port will begin to use them. You have been warned.
 
 Configuration
-=============
+-------------
 
 ```
 // Log general debugging information
@@ -113,6 +118,6 @@ c.GC = [ false || true ]; // default false
 TODO(slightlyoff): show how to set configuration information through command line and in the tests.
 
 API
-===
+---
 
 TODO(slightlyoff)
