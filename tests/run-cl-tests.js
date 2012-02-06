@@ -56,8 +56,8 @@ if (this.arguments) {
   });
 }
 
-load('../src/simple-hashtable.js');
-load('../src/simple-hashset.js');
+load('../src/HashTable.js');
+load('../src/HashSet.js');
 load('../src/Error.js')
 load('../src/SymbolicWeight.js')
 load('../src/Strength.js')

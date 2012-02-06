@@ -44,8 +44,8 @@
 })(this);
 
 importScripts('c.js');
-importScripts('simple-hashtable.js');
-importScripts('simple-hashset.js');
+importScripts('HashTable.js');
+importScripts('HashSet.js');
 importScripts('Error.js');
 importScripts('SymbolicWeight.js');
 importScripts('Strength.js');
