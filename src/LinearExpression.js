@@ -14,7 +14,7 @@ c.LinearExpression = c.inherit({
   /* FIELDS:
      private ClDouble constant
      private SimpleHashtable _terms
- */
+  */
   initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
     if (c.GC) print("new c.LinearExpression");
     this.constant = constant || 0;
@@ -125,10 +125,9 @@ c.LinearExpression = c.inherit({
     }
     this.constant += (n * expr.constant);
     n = n || 1;
-    var that = this;
     expr.terms().each(function(clv, coeff) {
-      that.addVariable(clv, coeff*n, subject, solver);
-    });
+      this.addVariable(clv, coeff*n, subject, solver);
+    }, this);
     return this;
   },
 
@@ -174,26 +173,27 @@ c.LinearExpression = c.inherit({
   },
   
   substituteOut: function(outvar /*c.AbstractVariable*/, expr /*c.LinearExpression*/, subject /*c.AbstractVariable*/, solver /*ClTableau*/) {
-    var that = this;
-    if (c.trace) c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
-    if (c.trace) c.traceprint("this = " + this);
+    if (c.trace) {
+      c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
+      c.traceprint("this = " + this);
+    }
     var multiplier = this._terms.remove(outvar);
     this.constant += (multiplier * expr.constant);
     expr.terms().each(function(clv, coeff) {
-      var old_coeff = that._terms.get(clv);
+      var old_coeff = this._terms.get(clv);
       if (old_coeff) {
         var newCoeff = old_coeff + multiplier * coeff;
         if (c.approx(newCoeff, 0.0)) {
           solver.noteRemovedVariable(clv, subject);
-          that._terms.remove(clv);
+          this._terms.remove(clv);
         } else {
-          that._terms.put(clv, newCoeff);
+          this._terms.put(clv, newCoeff);
         }
       } else {
-        that._terms.put(clv, multiplier * coeff);
+        this._terms.put(clv, multiplier * coeff);
         solver.noteAddedVariable(clv, subject);
       }
-    });
+    }, this);
     if (c.trace) c.traceprint("Now this is " + this);
   },
 
