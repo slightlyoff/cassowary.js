@@ -21,19 +21,19 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
     <h3>By <a href="http://www.badros.com/greg">Greg J. Badros</a></h3>
     <p><em>Refactored and optimized by 
       <a href="http://infrequently.org">Alex Russell</a></em></p>
-    <p>The below is a new (as of May 2011) all-javascript implementation of the bounded
-    quadrilateral demonstration that was first released as part of the
+    <p>
+      Below is a new (as of May 2011) all-javascript implementation of the bounded
+      quadrilateral demonstration that was first released as part of the
       <a href="http://www.cs.washington.edu/research/constraints/cassowary/">Cassowary
-      constraint solving toolkit</a>.  In addition to Javascript,
-      there are also C++, Java, and Smalltalk implementations, and the
-      C++ implementation is wrapped for use with Guile Scheme (see
-      also <a href="http://scwm.sourceforge.net/">Scwm</a>) and
-      Python. See
-      the <a href="http://www.cs.washington.edu/research/constraints/cassowary/cassowary-tr.pdf">full
-      paper on the Cassowary algorithm by Alan Borning and Greg
-      Badros</a>.</p>
+      constraint solving toolkit</a>. Implementations exist in many other
+      lanuages (C++, Java, Smalltalk) with wrappers for others (Guile Scheme,
+      Python). See the <a
+      href="http://www.cs.washington.edu/research/constraints/cassowary/cassowary-tr.pdf">full
+      paper on the Cassowary algorithm by Alan Borning and Greg Badros</a>.
+    </p>
     
-    <p>In this demo, dozens of declarative constraints are used to
+    <p>
+      In this demo, dozens of declarative constraints are used to
       represent an arbitrary quadrilateral, the midpoints of the four
       vertices, and the fact that the end points need to stay in the
       bounding rectangle of the canvas.  Mouse/touch gestures on any
@@ -41,10 +41,13 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
       point, and the entire constraint system is incrementally
       re-solved as you drag the control point.  You will see real-time
       evidence that the "interior" quadrilateral is always a
-      parallelogram.</p>
+      parallelogram.
+    </p>
 
-    <p>Tested on Chrome 11 on Windows, Firefox 4.0.1 on Windows,
-    Safari on an iPad 2.  See the <a href="quaddemo.js">source to the demo</a> (in <a href="http://cassowary.cvs.sourceforge.net/viewvc/cassowary/cassowary/js/quaddemo.js?view=markup">CVS</a>).</p>
+    <p>
+      Tested on Chrome, Firefox 9+, Opera 11+, IE 9, Safari 5+, and Safari on
+      an iPad 2.  See the <a href="quaddemo.js">source to the demo</a>.
+    </p>
       
     <p id="append"></p>
     <canvas id="c" width="800" height="600" style="background-color: lightgray"></canvas>
