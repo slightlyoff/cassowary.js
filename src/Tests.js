@@ -4,6 +4,9 @@
 //
 // Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
 
+(function(c){
+"use strict";
+
 c.Tests = c.inherit({
 
   InitializeRandoms: function() {
@@ -44,7 +47,8 @@ c.Tests = c.inherit({
     solver.addConstraint(cbl);
     var c10 = new c.LinearInequality(x, c.LEQ, 10.0);
     var c20 = new c.LinearInequality(x, c.LEQ, 20.0);
-    solver.addConstraint(c10).addConstraint(c20);
+    solver.addConstraint(c10)
+          .addConstraint(c20);
     fOkResult = fOkResult && c.approx(x, 10.0);
     print("x == " + x.value());
     solver.removeConstraint(c10);
@@ -54,7 +58,8 @@ c.Tests = c.inherit({
     fOkResult = fOkResult && c.approx(x, 100.0);
     print("x == " + x.value());
     var c10again = new c.LinearInequality(x, c.LEQ, 10.0);
-    solver.addConstraint(c10).addConstraint(c10again);
+    solver.addConstraint(c10)
+          .addConstraint(c10again);
     fOkResult = fOkResult && c.approx(x, 10.0);
     print("x == " + x.value());
     solver.removeConstraint(c10);
@@ -71,10 +76,12 @@ c.Tests = c.inherit({
     var x = new c.Variable("x");
     var y = new c.Variable("y");
     var solver = new c.SimplexSolver();
-    solver.addConstraint(new c.LinearEquation(x, 100.0, c.Strength.weak)).addConstraint(new c.LinearEquation(y, 120.0, c.Strength.strong));
+    solver.addConstraint(new c.LinearEquation(x, 100.0, c.Strength.weak))
+          .addConstraint(new c.LinearEquation(y, 120.0, c.Strength.strong));
     var c10 = new c.LinearInequality(x, c.LEQ, 10.0);
     var c20 = new c.LinearInequality(x, c.LEQ, 20.0);
-    solver.addConstraint(c10).addConstraint(c20);
+    solver.addConstraint(c10)
+          .addConstraint(c20);
     fOkResult = fOkResult && c.approx(x, 10.0) && c.approx(y, 120.0);
     print("x == " + x.value() + ", y == " + y.value());
     solver.removeConstraint(c10);
@@ -98,11 +105,15 @@ c.Tests = c.inherit({
     var x = new c.Variable("x");
     var y = new c.Variable("y");
     var solver = new c.SimplexSolver();
-    solver.addConstraint(new c.LinearInequality(x, c.LEQ, y)).addConstraint(new c.LinearEquation(y, c.Plus(x, 3.0))).addConstraint(new c.LinearEquation(x, 10.0, c.Strength.weak)).addConstraint(new c.LinearEquation(y, 10.0, c.Strength.weak));
+    solver.addConstraint(new c.LinearInequality(x, c.LEQ, y))
+          .addConstraint(new c.LinearEquation(y, c.Plus(x, 3.0)))
+          .addConstraint(new c.LinearEquation(x, 10.0, c.Strength.weak))
+          .addConstraint(new c.LinearEquation(y, 10.0, c.Strength.weak));
     fOkResult = fOkResult && (c.approx(x, 10.0) && c.approx(y, 13.0) || c.approx(x, 7.0) && c.approx(y, 10.0));
     print("x == " + x.value() + ", y == " + y.value());
     return (fOkResult);
   },
+
   inconsistent1: function() {
     try {
       var x = new c.Variable("x");
@@ -116,18 +127,20 @@ c.Tests = c.inherit({
       return (true);
     }
   },
+
   inconsistent2: function() {
     try {
       var x = new c.Variable("x");
       var solver = new c.SimplexSolver();
-      solver.addConstraint(new c.LinearInequality(x, c.GEQ, 10.0)).addConstraint(new c.LinearInequality(x, c.LEQ, 5.0));
+      solver.addConstraint(new c.LinearInequality(x, c.GEQ, 10.0))
+            .addConstraint(new c.LinearInequality(x, c.LEQ, 5.0));
       return false;
-    }
-    catch (err /*ExCLRequiredFailure*/){
+    } catch (err /*ExCLRequiredFailure*/) {
       print("Success -- got the exception");
       return (true);
     }
   },
+
   multiedit: function() {
     try {
       var fOkResult = true;
@@ -152,12 +165,12 @@ c.Tests = c.inherit({
       print("w = " + w.value() + "; h = " + h.value());
       fOkResult = fOkResult && c.approx(x, 50) && c.approx(y, 60) && c.approx(w, 30) && c.approx(h, 40);
       return (fOkResult);
-    }
-    catch (err /*ExCLRequiredFailure*/){
+    } catch (err /*ExCLRequiredFailure*/) {
       print("Success -- got the exception");
       return (true);
     }
   },
+
   inconsistent3: function() {
     try {
       var w = new c.Variable("w");
@@ -165,10 +178,14 @@ c.Tests = c.inherit({
       var y = new c.Variable("y");
       var z = new c.Variable("z");
       var solver = new c.SimplexSolver();
-      solver.addConstraint(new c.LinearInequality(w, c.GEQ, 10.0)).addConstraint(new c.LinearInequality(x, c.GEQ, w)).addConstraint(new c.LinearInequality(y, c.GEQ, x)).addConstraint(new c.LinearInequality(z, c.GEQ, y)).addConstraint(new c.LinearInequality(z, c.GEQ, 8.0)).addConstraint(new c.LinearInequality(z, c.LEQ, 4.0));
+      solver.addConstraint(new c.LinearInequality(w, c.GEQ, 10.0))
+            .addConstraint(new c.LinearInequality(x, c.GEQ, w))
+            .addConstraint(new c.LinearInequality(y, c.GEQ, x))
+            .addConstraint(new c.LinearInequality(z, c.GEQ, y))
+            .addConstraint(new c.LinearInequality(z, c.GEQ, 8.0))
+            .addConstraint(new c.LinearInequality(z, c.LEQ, 4.0));
       return false;
-    }
-    catch (err /*ExCLRequiredFailure*/){
+    } catch (err /*ExCLRequiredFailure*/) {
       print("Success -- got the exception");
       return true;
     }
@@ -183,8 +200,7 @@ c.Tests = c.inherit({
     var solver = new c.SimplexSolver();
     solver.setAutosolve(false);
     var rgpclv = new c.Variable[nVars];
-    for (var i = 0; i < nVars; i++)
-    {
+    for (var i = 0; i < nVars; i++) {
       rgpclv[i] = new c.Variable(i, "x");
       solver.addStay(rgpclv[i]);
     }
@@ -195,24 +211,21 @@ c.Tests = c.inherit({
     var k;
     var j;
     var coeff;
-    for (j = 0; j < nCnsMade; ++j)
-    {
+    for (j = 0; j < nCnsMade; ++j) {
       nvs = this.RandomInRange(1, maxVars);
       if (this.trace) this.traceprint("Using nvs = " + nvs);
       var expr = new c.LinearExpression(this.UniformRandomDiscretized() * 20.0 - 10.0);
-      for (k = 0; k < nvs; k++)
-      {
+      for (k = 0; k < nvs; k++) {
         coeff = this.UniformRandomDiscretized() * 10 - 5;
         var iclv = this.RandomInRange(0, nVars);
         expr.addExpression(c.Times(rgpclv[iclv], coeff));
       }
       if (this.UniformRandomDiscretized() < ineqProb) {
         rgpcns[j] = new c.LinearInequality(expr);
-      }
-      else {
+      } else {
         rgpcns[j] = new c.LinearEquation(expr);
       }
-      if (this.trace) this.traceprint("Constraint " + j + " is " + rgpcns[j]);
+      if (c.trace) c.traceprint("Constraint " + j + " is " + rgpcns[j]);
     }
     timer.Stop();
     print("done building data structures");
@@ -221,17 +234,14 @@ c.Tests = c.inherit({
     timer.Start();
     var cExceptions = 0;
     var cCns = 0;
-    for (j = 0; j < nCnsMade && cCns < nCns; j++)
-    {
+    for (j = 0; j < nCnsMade && cCns < nCns; j++) {
       try {
         solver.addConstraint(rgpcns[j]);
         rgpcnsAdded[cCns++] = rgpcns[j];
-        if (this.traceAdded) this.traceprint("Added cn: " + rgpcns[j]);
-      }
-      catch (err /*ExCLRequiredFailure*/){
+        if (c.traceAdded) c.traceprint("Added cn: " + rgpcns[j]);
+      } catch (err /*ExCLRequiredFailure*/) {
         cExceptions++;
-        if (this.trace) this.traceprint("got exception adding " + rgpcns[j]);
-        if (this.traceAdded) this.traceprint("got exception adding " + rgpcns[j]);
+        if (c.trace || c.traceAdded) c.traceprint("got exception adding " + rgpcns[j]);
         rgpcns[j] = null;
       }
     }
@@ -248,10 +258,11 @@ c.Tests = c.inherit({
     print("about to start resolves");
     timer.Reset();
     timer.Start();
-    solver.addConstraint(edit1).addConstraint(edit2);
+    solver.addConstraint(edit1)
+          .addConstraint(edit2);
     timer.Stop();
-    for (var m = 0; m < nResolves; m++)
-    {
+
+    for (var m = 0; m < nResolves; m++) {
       solver.resolvePair(rgpclv[e1Index].value() * 1.001, 
                          rgpclv[e2Index].value() * 1.001);
     }
@@ -263,8 +274,7 @@ c.Tests = c.inherit({
     print("time per Resolve = " + timer.ElapsedTime() / nResolves);
     timer.Reset();
     timer.Start();
-    for (j = 0; j < cCns; j++)
-    {
+    for (j = 0; j < cCns; j++) {
       solver.removeConstraint(rgpcnsAdded[j]);
     }
     timer.Stop();
@@ -295,6 +305,7 @@ c.Tests = c.inherit({
 
     var timer = new Timer();
     var tmAddvar, tmEditvar, tmResolvevar, tmEndEdit;
+    var tmAdd, tmEdit, tmResolve;
     var ineqProb = 0.12;
     var maxVars = 3;
     var nVars = nCns;
@@ -302,17 +313,14 @@ c.Tests = c.inherit({
     print("starting timing test. nCns = " + nCns + ", nSolvers = " + nSolvers + ", nResolves = " + nResolves);
     timer.Start();
     var rgsolvers = new Array(nSolvers+1);
-    for (var is = 0; is < nSolvers + 1; ++is)
-    {
+    for (var is = 0; is < nSolvers + 1; ++is) {
       rgsolvers[is] = new c.SimplexSolver();
       rgsolvers[is].setAutosolve(false);
     }
     var rgpclv = new Array(nVars+1);
-    for (var i = 0; i < nVars + 1; ++i)
-    {
+    for (var i = 0; i < nVars + 1; ++i) {
       rgpclv[i] = new c.Variable(i, "x");
-      for (var is = 0; is < nSolvers + 1; ++is)
-      {
+      for (var is = 0; is < nSolvers + 1; ++is) {
         rgsolvers[is].addStay(rgpclv[i]);
       }
     }
@@ -323,13 +331,11 @@ c.Tests = c.inherit({
     var k;
     var j;
     var coeff;
-    for (j = 0; j < nCnsMade; ++j)
-    {
+    for (j = 0; j < nCnsMade; ++j) {
       nvs = this.RandomInRange(1, maxVars);
       if (this.trace) this.traceprint("Using nvs = " + nvs);
       var expr = new c.LinearExpression(this.GrainedUniformRandom() * 20.0 - 10.0);
-      for (k = 0; k < nvs; k++)
-      {
+      for (k = 0; k < nvs; k++) {
         coeff = this.GrainedUniformRandom() * 10 - 5;
         var iclv = this.RandomInRange(0, nVars);
         expr.addExpression(c.Times(rgpclv[iclv], coeff));
@@ -344,21 +350,18 @@ c.Tests = c.inherit({
     timer.Stop();
     print("done building data structures");
     print("time = " + timer.ElapsedTime());
-    for (var is = 0; is < nSolvers; ++is)
-    {
+    for (var is = 0; is < nSolvers; ++is) {
       var cCns = 0;
       var cExceptions = 0;
       var solver = rgsolvers[nSolvers];
       cExceptions = 0;
-      for (j = 0; j < nCnsMade && cCns < nCns; j++)
-      {
+      for (j = 0; j < nCnsMade && cCns < nCns; j++) {
         try {
           if (null != rgpcns[j]) {
             solver.addConstraint(rgpcns[j]);
             ++cCns;
           }
-        }
-        catch (err /*ExCLRequiredFailure*/){
+        } catch (err /*ExCLRequiredFailure*/) {
           cExceptions++;
           rgpcns[j] = null;
         }
@@ -366,21 +369,18 @@ c.Tests = c.inherit({
     }
     timer.Reset();
     timer.Start();
-    for (var is = 0; is < nSolvers; ++is)
-    {
+    for (var is = 0; is < nSolvers; ++is) {
       var cCns = 0;
       var cExceptions = 0;
       var solver = rgsolvers[is];
       cExceptions = 0;
-      for (j = 0; j < nCnsMade && cCns < nCns; j++)
-      {
+      for (j = 0; j < nCnsMade && cCns < nCns; j++) {
         try {
           if (null != rgpcns[j]) {
             solver.addConstraint(rgpcns[j]);
             ++cCns;
           }
-        }
-        catch (err /*ExCLRequiredFailure*/){
+        } catch (err /*ExCLRequiredFailure*/) {
           cExceptions++;
           rgpcns[j] = null;
         }
@@ -407,9 +407,9 @@ c.Tests = c.inherit({
     timer.Reset();
     timer.Start();
     rgsolvers.forEach(function(solver) {
-      for (var m = 0; m < nResolves; m++)
-      {
-        solver.resolvePair(rgpclv[e1Index].value() * 1.001, rgpclv[e2Index].value() * 1.001);
+      for (var m = 0; m < nResolves; m++) {
+        solver.resolvePair(rgpclv[e1Index].value() * 1.001,
+                           rgpclv[e2Index].value() * 1.001);
       }
     });
     timer.Stop();
@@ -417,8 +417,7 @@ c.Tests = c.inherit({
     print("done resolves -- now ending edits");
     timer.Reset();
     timer.Start();
-    for (var is = 0; is < nSolvers; ++is)
-    {
+    for (var is = 0; is < nSolvers; ++is) {
       rgsolvers[is].removeConstraint(edit1).removeConstraint(edit2);
     }
     timer.Stop();
@@ -532,6 +531,7 @@ c.Tests.cRandom = 0;
 /* private static  */
 c.Tests.vRandom;
 
-clt = new c.Tests();
+var clt = new c.Tests();
 clt.main(new Array(1,100,10,50));
 //clt.main(new Array());
+})(c);
