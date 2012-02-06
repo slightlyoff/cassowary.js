@@ -6,7 +6,9 @@
 
 "use strict";
 
-c1 = new c.LinearEquation(ex);
+var ex = new c.LinearExpression();
+
+var c1 = new c.LinearEquation(ex);
 print(c1);
 
 var x = new c.Variable(167);
