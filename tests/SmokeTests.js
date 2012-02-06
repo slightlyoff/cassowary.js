@@ -7,7 +7,7 @@
 (function(c){
 "use strict";
 
-c.Tests = c.inherit({
+var SmokeTests = c.inherit({
 
   InitializeRandoms: function() {
   },
@@ -445,7 +445,6 @@ c.Tests = c.inherit({
   },
 
   main: function(args /*String[]*/) {
-    var clt = new c.Tests();
     var fAllOkResult = true;
     var fResult;
     if (true) {
@@ -524,14 +523,12 @@ c.Tests = c.inherit({
   },
 });
 
-/* private static  */
-c.Tests.iRandom = 0;
-/* private static  */
-c.Tests.cRandom = 0;
-/* private static  */
-c.Tests.vRandom;
+SmokeTests.iRandom = 0;
+SmokeTests.cRandom = 0;
+SmokeTests.vRandom;
 
-var clt = new c.Tests();
+var clt = new SmokeTests();
 clt.main(new Array(1,100,10,50));
+
 //clt.main(new Array());
 })(c);
