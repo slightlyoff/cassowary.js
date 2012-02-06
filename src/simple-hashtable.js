@@ -1,61 +1,35 @@
 /**
- * Copyright 2010 Tim Down.
- * Parts Copyright 2011 Alex Russell <slightlyoff@google.com>.
+ * Copyright 2011 Alex Russell <slightlyoff@google.com>.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Use of this source code is governed by the LGPL, which can be found in the
+ * COPYING.LGPL file.
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This is an API compatible re-implementation of the API of jshashtable needed
+ * by Cassowary. It includes nothing more than what Cassowary was using and
+ * contains no code from jshashset.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/**
- * jshashtable
+ * Features removed:
  *
- * jshashtable is a JavaScript implementation of a hash table. It creates a
- * single constructor function called Hashtable in the global scope.
+ *     - multiple values per key
+ *     - error tollerent hashing of any variety
+ *     - overly careful (or lazy) size counting, etc.
+ *     - Crockford's "class" pattern. We use the system from c.js.
+ *     - any attempt at back-compat with broken runtimes.
  *
- * Author: Tim Down <tim@timdown.co.uk>
- * Version: 2.1
- * Build date: 21 March 2010
- * Website: http://www.timdown.co.uk/jshashtable
+ * APIs removed, mostly for lack of use in Cassowary:
+ *     
+ *     - support for custom hashing and equality functions as keys to ctor
+ *     - isEmpty() -> check for !ht.size()
+ *     - putAll()
+ *     - entries()
+ *     - containsKey()
+ *     - containsValue()
+ *     - keys()
+ *     - values()
  *
+ * Additions:
  *
- *
- * Alex's notes on the simplified version:
- *
- *  This is a (mostly) API compatible version of jshashtable, but hopefully
- *  with all of the slow and busted removed. It's a first step to using a saner
- *  system in cassowary alltogether. Baby steps. Baby steps.
- *
- *  Features removed:
- *
- *      - multiple values per key
- *      - error tollerent hashing of any variety
- *      - overly careful (or lazy) size counting, etc.
- *      - Crockford's "class" pattern. We use the system from c.js.
- *      - any attempt at back-compat with broken runtimes.
- *
- *  APIs removed, mostly for lack of use in Cassowary:
- *      
- *      - support for custom hashing and equality functions as keys to ctor
- *      - isEmpty() -> check for !ht.size()
- *      - putAll()
- *      - entries()
- *      - containsKey()
- *      - containsValue()
- *      - keys()
- *      - values()
- *
- *  Additions:
- *
- *      - new "scope" parameter to each() and escapingEach()
+ *     - new "scope" parameter to each() and escapingEach()
  */
 
 (function(scope, c) {
@@ -75,6 +49,7 @@ var copyOwn = function(src, dest) {
 }
 
 /* Global */
+c.HashTable = 
 scope.SimpleHashtable = c.inherit({
 
   initialize: function() {

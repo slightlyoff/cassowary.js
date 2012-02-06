@@ -1,12 +1,16 @@
 /**
  * Copyright 2011, Alex Russell <slightlyoff@google.com>
- * API compatible re-implementation of jshashset.js, but to only use what
- * Cassowary needs, and constructed for speed.
+ *
+ * Use of this source code is governed by the LGPL, which can be found in the
+ * COPYING.LGPL file.
+ *
+ * API compatible re-implementation of jshashset.js, including only what
+ * Cassowary needs. Built for speed, not comfort.
  */
-(function(scope) {
+(function(scope, c) {
 "use strict";
 
-scope.HashSet = c.inherit({
+c.HashSet = scope.HashSet = c.inherit({
 
   initialize: function() {
     this.storage = [];
@@ -42,4 +46,4 @@ scope.HashSet = c.inherit({
   }
 });
 
-})(this);
+})(this, c);
