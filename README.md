@@ -28,7 +28,7 @@ Then invoke the command-line test runner with:
 
 ```
 obelisk:cassowary-js-refactor slightlyoff$ cd tests
-obelisk:tests slightlyoff$ d8 --harmony run-cl-tests.js
+obelisk:tests slightlyoff$ ./run.sh
 ...
 done adding 63 constraints [500 attempted, 0 exceptions]
 time = 0.021
@@ -39,23 +39,23 @@ about to start resolves
 done resolves -- now ending edits
 total time = 0.325
 
-  number of constraints: 		100
-  number of solvers: 			10
-  numbers of resolves: 			50
-  tests: 				1
-  time to add (ms): 			23
-  time to edit (ms): 			5
-  time to resolve (ms): 		62
-  time to edit (ms): 			2
-  add time per solver (ms): 		0.023
-  edit time per solver (ms): 		0.25
-  resolve time per resolve (ms): 	0.124
-  time to end edits per solver (ms): 	0.1
+  number of constraints:             100
+  number of solvers:                  10
+  numbers of resolves:                50
+  tests:                               1
+  time to add (ms):                   23
+  time to edit (ms):                   5
+  time to resolve (ms):               62
+  time to edit (ms):                   2
+  add time per solver (ms):        0.023
+  edit time per solver (ms):        0.25
+  resolve time per resolve (ms):   0.124
+  time to end edits per solver (ms): 0.1
 ```
 
 If you would like to avoid building V8 but have Java installed, a copy of Rhino
-(`js.jar`) is included in this repo. To run the tests under it, simply invoke
-`rhino.sh` from a unix-like shell:
+(`js.jar`) is included in this repo. `run.sh` should detect that `d8` is not in
+your path and attempt to fall back to using Rhino to run the tests:
 
 ```
 obelisk:tests slightlyoff$ ./rhino.sh 
@@ -67,28 +67,28 @@ about to start resolves
 done resolves -- now ending edits
 total time = 1.445
 
-  number of constraints: 		100
-  number of solvers: 			10
-  numbers of resolves: 			50
-  tests: 				1
-  time to add (ms): 			106
-  time to edit (ms): 			19
-  time to resolve (ms): 		290
-  time to edit (ms): 			10
-  add time per solver (ms): 		0.106
-  edit time per solver (ms): 		0.95
-  resolve time per resolve (ms): 	0.58
-  time to end edits per solver (ms): 	0.5
+  number of constraints:             100
+  number of solvers:                  10
+  numbers of resolves:                50
+  tests:                               1
+  time to add (ms):                  106
+  time to edit (ms):                  19
+  time to resolve (ms):              290
+  time to edit (ms):                  10
+  add time per solver (ms):        0.106
+  edit time per solver (ms):        0.95
+  resolve time per resolve (ms):    0.58
+  time to end edits per solver (ms): 0.5
 ```
 
 Supported Runtimes
 ==================
 
-This is an unapolgetically modern re-interpretation of the original code,
-optimized for size, complexity, and speed. And litle else. No, it won't work on
-IE < 10. Or old-skool FireFox. The idioms in use are tracking dev-channel
-Chrome and as soon as ES.next features become available there, this port will
-begin to use them. You have been warned.
+This is an unapolgetically modern reinterpretation, optimized for size,
+complexity, and speed. And litle else. No, it won't work on IE < 10. Or
+old-skool Firefox. The idioms in use are tracking dev-channel Chrome and as
+soon as ES.next features become available there, this port will begin to use
+them. You have been warned.
 
 Configuration
 =============
@@ -106,7 +106,7 @@ c.traceAdded = [ false || true ]; // default false
 c.GC = [ false || true ]; // default false
 ```
 
-TODO(slightlyoff): show how to set configuration information through command line and in the tetests.
+TODO(slightlyoff): show how to set configuration information through command line and in the tests.
 
 API
 ===
