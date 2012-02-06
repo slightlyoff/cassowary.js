@@ -32,7 +32,7 @@
  *     - new "scope" parameter to each() and escapingEach()
  */
 
-(function(scope, c) {
+(function(c) {
 "use strict";
 
 var keyCode = function(key) {
@@ -164,4 +164,4 @@ c.HashTable = c.inherit({
   }
 });
 
-})(this, c);
+})(c);

@@ -21,9 +21,9 @@ c.Tableau = c.inherit({
 
     this._rows = new c.HashTable(); // values are ClLinearExpressions
 
-    this._infeasibleRows = new HashSet();
-    this._externalRows = new HashSet();
-    this._externalParametricVars = new HashSet();
+    this._infeasibleRows = new c.HashSet();
+    this._externalRows = new c.HashSet();
+    this._externalParametricVars = new c.HashSet();
   },
 
   noteRemovedVariable: function(v /*ClAbstractVariable*/, subject /*ClAbstractVariable*/) {
@@ -78,7 +78,7 @@ c.Tableau = c.inherit({
   insertColVar: function(param_var /*Variable*/, rowvar /*Variable*/) {
     var rowset = /* Set */ this._columns.get(param_var);
     if (!rowset) {
-      rowset = new HashSet();
+      rowset = new c.HashSet();
       this._columns.put(param_var, rowset);
     }
     rowset.add(rowvar);

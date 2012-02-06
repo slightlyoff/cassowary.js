@@ -185,9 +185,9 @@ scope.c = {
   },
 
   setToString: function(s) {
-    // FIXME: why isn't this implemented as a toString on HashSet?
+    // FIXME: why isn't this implemented as a toString on c.HashSet?
     if (!s) return;
-    c.Assert(s instanceof HashSet);
+    c.Assert(s instanceof c.HashSet);
     var answer = s.size() + " {";
     var first = true;
     s.each(function(e) {

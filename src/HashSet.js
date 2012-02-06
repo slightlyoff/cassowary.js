@@ -7,10 +7,10 @@
  * API compatible re-implementation of jshashset.js, including only what
  * Cassowary needs. Built for speed, not comfort.
  */
-(function(scope, c) {
+(function(c) {
 "use strict";
 
-c.HashSet = scope.HashSet = c.inherit({
+c.HashSet = c.inherit({
 
   initialize: function() {
     this.storage = [];
@@ -46,4 +46,4 @@ c.HashSet = scope.HashSet = c.inherit({
   }
 });
 
-})(this, c);
+})(c);
