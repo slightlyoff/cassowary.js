@@ -55,31 +55,7 @@ total time = 0.325
 
 If you would like to avoid building V8 but have Java installed, a copy of Rhino
 (`js.jar`) is included in this repo. `run.sh` should detect that `d8` is not in
-your path and attempt to fall back to using Rhino to run the tests:
-
-```
-obelisk:tests slightlyoff$ ./rhino.sh 
-...
-done adding 36 constraints [500 attempted, 0 exceptions]
-time = 0.105
-Editing vars with indices 46, 48
-about to start resolves
-done resolves -- now ending edits
-total time = 1.445
-
-  number of constraints:             100
-  number of solvers:                  10
-  numbers of resolves:                50
-  tests:                               1
-  time to add (ms):                  106
-  time to edit (ms):                  19
-  time to resolve (ms):              290
-  time to edit (ms):                  10
-  add time per solver (ms):        0.106
-  edit time per solver (ms):        0.95
-  resolve time per resolve (ms):    0.58
-  time to end edits per solver (ms): 0.5
-```
+your path and attempt to fall back to using Rhino to run the tests.
 
 Supported Runtimes
 ==================
