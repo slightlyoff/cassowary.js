@@ -7,14 +7,17 @@
 
 "use strict";
 
+this.onerror = function(e) {
+  postMessage(["log", ["ERROR", e]]);
+};
 
 (function(global) {
 
 	// A minimal, batching console
   var logTimer = null;
-  var /*it's*/logLog = [];
+  var /* it's */ logLog = [];
   var sendLogs = function() {
-    global.postMessage(["logs", logLog]);
+    postMessage(["logs", logLog]);
     logLog.length = 0;
   };
 
@@ -30,17 +33,17 @@
     }
 	};
 
-  if (!global.console) {
-    // Intentionally define console in the global namespace
+  if (navigator.appName == "Opera") {
+    global.print = function(s) { postMessage(["log", [s]]); };
+  } else {
     var slice = Array.prototype.slice;
     global.console = {
-      log:    function() { log(0, slice.call(arguments, 0)); },
+      log:    function() { log(false, slice.call(arguments, 0)); },
       error:  function() { log("ERROR", slice.call(arguments, 0)); },
       warn:   function() { log("WARN", slice.call(arguments, 0)); }
     };
+    global.print = function(s) { console.log(s); }
   }
-
-  global.print = function(s) { console.log(s); }
 })(this);
 
 importScripts('../src/c.js');
@@ -61,6 +64,13 @@ importScripts('../src/Timer.js');
 
 this.onmessage = function(m) {
   if (m.data[0] == "init") {
+    if (navigator.appName == "Opera") {
+      print("Unable to capture console.log(), only errors will display.");
+      print("Importing Smoke tests");
+    }
     importScripts('SmokeTests.js');
+    if (navigator.appName == "Opera") {
+      print("Smoke Tests Finished!");
+    }
   }
 };

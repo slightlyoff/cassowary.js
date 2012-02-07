@@ -66,13 +66,13 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
         append(el("h2", "In-page test results:"));
         append(el("pre", printLog.join("\n")));
         printLog.length = 0;
-      });
+      }, false);
     </script>
     <script>
-      (function() {
+      (function(scope) {
         // Load tests in a Worker to verify that they run there as well:
-        var worker = new Worker("WorkerSmokeTests.js");
-
+        worker = new Worker("WorkerSmokeTests.js");
+        
         worker.onmessage = function(e) {
           var d = e.data;
           var type = d[0];
@@ -87,7 +87,8 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
             dualLog(d.slice(1));
           }
           if (type == "logs") { d.slice(1).forEach(dualLog); }
-        }
+        };
+
 
         // Start the tests
         window.addEventListener("load", function() {
@@ -95,7 +96,7 @@ Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
           // TODO(slightlyoff): pass c.* config to the worker in the init message.
           worker.postMessage(["init"]);
         });
-      })();
+      })(this);
     </script>
   </head>
   <body>
