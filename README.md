@@ -46,11 +46,29 @@ Getting Started
 
 To run the tests, check out this repository and point your thorougly modern
 browser at `unittests.html` or `quaddemo.html`. To run from the command line,
-check out a copy of V8 and building the latest debugging shell:
+first, see if they already run without any extra work (they should on a Mac or
+Linux with recent Java):
+
+```
+obelisk:cassowary-js-refactor slightlyoff$ cd tests
+obelisk:tests slightlyoff$ ./run.sh
+...
+```
+
+If you get an error like: 
+
+```
+obelisk:tests slightlyoff$ ./run.sh 
+FAILED: No JavaScript Runtime Found! Please install Java or the V8 Shell (d8) and add them to your $PATH
+```
+
+Check out a copy of V8 and building the latest debugging shell:
 
 `scons snapshot=on console=readline objectprint=on d8`
 
-Now add the directory with the `d8` executable to your PATH for running the unit tests.
+This make take a while and yes, it requires Scons (which implies a Python
+dependency) and a sane C++ compiler in your PATH. Now add the directory with
+the `d8` executable to your PATH for running the unit tests.
 
 Then invoke the command-line test runner with:
 
@@ -83,7 +101,9 @@ total time = 0.325
 
 If you would like to avoid building V8 but have Java installed, a copy of Rhino
 (`js.jar`) is included in this repo. `run.sh` should detect that `d8` is not in
-your path and attempt to fall back to using Rhino to run the tests.
+your path and attempt to fall back to using Rhino to run the tests. If it's not
+working out of the box, check to ensure that Java is installed and in your
+PATH.
 
 Supported Runtimes
 ------------------
