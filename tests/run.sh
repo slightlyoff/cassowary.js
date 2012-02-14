@@ -14,6 +14,7 @@ elif [ -x $JSCPATH ]
 then
   RUNNER=$JSCPATH
 elif [ -x `which java` ]
+then
   RUNNER='java -classpath ../util/js.jar org.mozilla.javascript.tools.shell.Main'
 else
   echo "FAILED: No JavaScript Runtime Found! Please install Java or the V8 Shell (d8) and add them to your \$PATH"
