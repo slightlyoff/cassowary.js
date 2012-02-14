@@ -198,7 +198,7 @@ var SmokeTests = c.inherit({
     print("starting timing test. nCns = " + nCns + ", nVars = " + nVars + ", nResolves = " + nResolves);
     timer.Start();
     var solver = new c.SimplexSolver();
-    solver.setAutosolve(false);
+    solver.autoSolve = false;
     var rgpclv = new c.Variable[nVars];
     for (var i = 0; i < nVars; i++) {
       rgpclv[i] = new c.Variable(i, "x");
@@ -315,7 +315,7 @@ var SmokeTests = c.inherit({
     var rgsolvers = new Array(nSolvers+1);
     for (var is = 0; is < nSolvers + 1; ++is) {
       rgsolvers[is] = new c.SimplexSolver();
-      rgsolvers[is].setAutosolve(false);
+      rgsolvers[is].autoSolve = false;
     }
     var rgpclv = new Array(nVars+1);
     for (var i = 0; i < nVars + 1; ++i) {

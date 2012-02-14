@@ -29,7 +29,7 @@ c.SimplexSolver = c.inherit({
     this._artificialCounter = 0;
     this._dummyCounter = 0;
     this._epsilon = 1e-8;
-    this._fOptimizeAutomatically = true;
+    this.autoSolve = true;
     this._fNeedsSolving = false;
 
     this._rows = new c.HashTable(); // clv -> expression
@@ -89,7 +89,7 @@ c.SimplexSolver = c.inherit({
       this._editVarMap.put(cn.variable,
                            new c.EditInfo(cn, clvEplus, clvEminus, prevEConstant, i));
     }
-    if (this._fOptimizeAutomatically) {
+    if (this.autoSolve) {
       this.optimize(this._objective);
       this.setExternalVariables();
     }
@@ -305,7 +305,7 @@ c.SimplexSolver = c.inherit({
       this._errorVars.remove(eVars);
     }
     marker = null;
-    if (this._fOptimizeAutomatically) {
+    if (this.autoSolve) {
       this.optimize(this._objective);
       this.setExternalVariables();
     }
@@ -358,15 +358,6 @@ c.SimplexSolver = c.inherit({
     cei.prevEditConstant = x;
     this.deltaEditConstant(delta, clvEditPlus, clvEditMinus);
     return this;
-  },
-
-  setAutosolve: function(f /*boolean*/) {
-    this._fOptimizeAutomatically = f;
-    return this;
-  },
-
-  FIsAutosolving: function() {
-    return this._fOptimizeAutomatically;
   },
 
   solve: function() {
