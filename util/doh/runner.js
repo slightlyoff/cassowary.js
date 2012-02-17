@@ -72,28 +72,16 @@ doh.extend = function(/*Object*/ constructor, /*Object...*/ props){
 	return constructor; // Object
 }
 
-
 doh._line = "------------------------------------------------------------";
-
-/*
-doh._delegate = function(obj, props){
-	// boodman-crockford delegation
-	function TMP(){};
-	TMP.prototype = obj;
-	var tmp = new TMP();
-	if(props){
-		dojo.lang.mixin(tmp, props);
-	}
-	return tmp;
-}
-*/
 
 doh.debug = function(){
 	// summary:
 	//		takes any number of arguments and sends them to whatever debugging
 	//		or logging facility is available in this environment
 
-	// YOUR TEST RUNNER NEEDS TO IMPLEMENT THIS
+  var a = Array.prototype.slice.call(arguments, 0);
+  a.unshift("|");
+  print(a.join(" "));
 }
 
 doh.error = function(){
@@ -103,6 +91,9 @@ doh.error = function(){
 	//		as an Error object and show additional information - such as stack trace
 
 	// YOUR TEST RUNNER NEEDS TO IMPLEMENT THIS
+  var a = Array.prototype.slice.call(arguments, 0);
+  a.unshift("ERROR:");
+  print(a.join(" "));
 }
 
 doh._AssertFailure = function(msg, hint){
@@ -122,195 +113,6 @@ doh._AssertFailure.prototype = new Error();
 doh._AssertFailure.prototype.constructor = doh._AssertFailure;
 doh._AssertFailure.prototype.name = "doh._AssertFailure";
 
-doh.Deferred = function(canceller){
-	this.chain = [];
-	this.id = this._nextId();
-	this.fired = -1;
-	this.paused = 0;
-	this.results = [null, null];
-	this.canceller = canceller;
-	this.silentlyCancelled = false;
-};
-
-doh.extend(doh.Deferred, {
-	getTestErrback: function(cb, scope){
-		// summary: Replaces outer getTextCallback's in nested situations to avoid multiple callback(true)'s
-		var _this = this;
-		return function(){
-			try{
-				cb.apply(scope||doh.global||_this, arguments);
-			}catch(e){
-				_this.errback(e);
-			}
-		};
-	},
-
-	getTestCallback: function(cb, scope){
-		var _this = this;
-		return function(){
-			try{
-				cb.apply(scope||doh.global||_this, arguments);
-			}catch(e){
-				_this.errback(e);
-				return;
-			}
-			_this.callback(true);
-		};
-	},
-
-	getFunctionFromArgs: function(){
-		var a = arguments;
-		if((a[0])&&(!a[1])){
-			if(typeof a[0] == "function"){
-				return a[0];
-			}else if(typeof a[0] == "string"){
-				return doh.global[a[0]];
-			}
-		}else if((a[0])&&(a[1])){
-			return doh.hitch(a[0], a[1]);
-		}
-		return null;
-	},
-
-	makeCalled: function() {
-		var deferred = new doh.Deferred();
-		deferred.callback();
-		return deferred;
-	},
-
-	_nextId: (function(){
-		var n = 1;
-		return function(){ return n++; };
-	})(),
-
-	cancel: function(){
-		if(this.fired == -1){
-			if (this.canceller){
-				this.canceller(this);
-			}else{
-				this.silentlyCancelled = true;
-			}
-			if(this.fired == -1){
-				this.errback(new Error("Deferred(unfired)"));
-			}
-		}else if(this.fired == 0 && this.results[0] && this.results[0].cancel){
-			this.results[0].cancel();
-		}
-	},
-			
-
-	_pause: function(){
-		this.paused++;
-	},
-
-	_unpause: function(){
-		this.paused--;
-		if ((this.paused == 0) && (this.fired >= 0)) {
-			this._fire();
-		}
-	},
-
-	_continue: function(res){
-		this._resback(res);
-		this._unpause();
-	},
-
-	_resback: function(res){
-		this.fired = ((res instanceof Error) ? 1 : 0);
-		this.results[this.fired] = res;
-		this._fire();
-	},
-
-	_check: function(){
-		if(this.fired != -1){
-			if(!this.silentlyCancelled){
-				throw new Error("already called!");
-			}
-			this.silentlyCancelled = false;
-			return;
-		}
-	},
-
-	callback: function(res){
-		this._check();
-		this._resback(res);
-	},
-
-	errback: function(res){
-		this._check();
-		if(!(res instanceof Error)){
-			res = new Error(res);
-		}
-		this._resback(res);
-	},
-
-	addBoth: function(cb, cbfn){
-		var enclosed = this.getFunctionFromArgs(cb, cbfn);
-		if(arguments.length > 2){
-			enclosed = doh.hitch(null, enclosed, arguments, 2);
-		}
-		return this.addCallbacks(enclosed, enclosed);
-	},
-
-	addCallback: function(cb, cbfn){
-		var enclosed = this.getFunctionFromArgs(cb, cbfn);
-		if(arguments.length > 2){
-			enclosed = doh.hitch(null, enclosed, arguments, 2);
-		}
-		return this.addCallbacks(enclosed, null);
-	},
-
-	addErrback: function(cb, cbfn){
-		var enclosed = this.getFunctionFromArgs(cb, cbfn);
-		if(arguments.length > 2){
-			enclosed = doh.hitch(null, enclosed, arguments, 2);
-		}
-		return this.addCallbacks(null, enclosed);
-	},
-
-	addCallbacks: function(cb, eb){
-		this.chain.push([cb, eb]);
-		if(this.fired >= 0){
-			this._fire();
-		}
-		return this;
-	},
-
-	_fire: function(){
-		var chain = this.chain;
-		var fired = this.fired;
-		var res = this.results[fired];
-		var self = this;
-		var cb = null;
-		while(chain.length > 0 && this.paused == 0){
-			// Array
-			var pair = chain.shift();
-			var f = pair[fired];
-			if(f == null){
-				continue;
-			}
-			try {
-				res = f(res);
-				fired = ((res instanceof Error) ? 1 : 0);
-				if(res && res.addCallback){
-					cb = function(res){
-						self._continue(res);
-					};
-					this._pause();
-				}
-			}catch(err){
-				fired = 1;
-				res = err;
-			}
-		}
-		this.fired = fired;
-		this.results[fired] = res;
-		if((cb)&&(this.paused)){
-			res.addBoth(cb);
-		}
-	}
-});
-
 //
 // State Keeping and Reporting
 //
@@ -321,7 +123,6 @@ doh._errorCount = 0;
 doh._failureCount = 0;
 doh._currentGroup = null;
 doh._currentTest = null;
-doh._paused = true;
 
 doh._init = function(){
 	this._currentGroup = null;
@@ -438,43 +239,6 @@ doh._getTestObj = function(group, test, type){
 		}
 		// FIXME: try harder to get the test name here
 	}
-
-	//Augment the test with some specific options to make it identifiable as a
-	//particular type of test so it can be executed properly.
-	if(type === "perf" || tObj.testType === "perf"){
-		tObj.testType = "perf";
-
-		//Build an object on the root DOH class to contain all the test results.
-		//Cache it on the test object for quick lookup later for results storage.
-		if(!doh.perfTestResults){
-			doh.perfTestResults = {};
-			doh.perfTestResults[group] = {};
-		}
-		if(!doh.perfTestResults[group]){
-			doh.perfTestResults[group] = {};
-		}
-		if(!doh.perfTestResults[group][tObj.name]){
-			doh.perfTestResults[group][tObj.name] = {};
-		}
-		tObj.results = doh.perfTestResults[group][tObj.name];
-		
-		//If it's not set, then set the trial duration
-		//default to 100ms.
-		if(!("trialDuration" in tObj)){
-			tObj.trialDuration = 100;
-		}
-		
-		//If it's not set, then set the delay between trial runs to 100ms
-		//default to 100ms to allow for GC and to make IE happy.
-		if(!("trialDelay" in tObj)){
-			tObj.trialDelay = 100;
-		}
-
-		//If it's not set, then set number of times a trial is run to 10.
-		if(!("trialIterations" in tObj)){
-			tObj.trialIterations = 10;
-		}
-	}
 	return tObj;
 }
 
@@ -571,7 +335,9 @@ doh.t = doh.assertTrue = function(/*Object*/ condition, /*String?*/ hint){
 	// summary:
 	//		is the passed item "truthy"?
 	if(arguments.length < 1){
-		throw new doh._AssertFailure("assertTrue failed because it was not passed at least 1 argument");
+		throw new doh._AssertFailure(
+      "assertTrue failed because it was not passed at least 1 argument"
+    );
 	}
 	if(!eval(condition)){
 		throw new doh._AssertFailure("assertTrue('" + condition + "') failed", hint);
@@ -582,14 +348,21 @@ doh.f = doh.assertFalse = function(/*Object*/ condition, /*String?*/ hint){
 	// summary:
 	//		is the passed item "falsey"?
 	if(arguments.length < 1){
-		throw new doh._AssertFailure("assertFalse failed because it was not passed at least 1 argument");
+		throw new doh._AssertFailure(
+      "assertFalse failed because it was not passed at least 1 argument"
+    );
 	}
+
 	if(eval(condition)){
 		throw new doh._AssertFailure("assertFalse('" + condition + "') failed", hint);
 	}
 }
 
-doh.e = doh.assertError = function(/*Error object*/expectedError, /*Object*/scope, /*String*/functionName, /*Array*/args, /*String?*/ hint){
+doh.e = doh.assertError = function(/*Error object*/expectedError, 
+                                   /*Object*/scope, 
+                                   /*String*/functionName, 
+                                   /*Array*/args, 
+                                   /*String?*/ hint){
 	//	summary:
 	//		Test for a certain error to be thrown by the given function.
 	//	example:
@@ -601,10 +374,18 @@ doh.e = doh.assertError = function(/*Error object*/expectedError, /*Object*/scop
 		if(e instanceof expectedError){
 			return true;
 		}else{
-			throw new doh._AssertFailure("assertError() failed:\n\texpected error\n\t\t"+expectedError+"\n\tbut got\n\t\t"+e+"\n\n", hint);
+			throw new doh._AssertFailure(
+        "assertError() failed:\n\texpected error\n\t\t" + 
+          expectedError + "\n\tbut got\n\t\t" + e +"\n\n",
+        hint
+      );
 		}
 	}
-	throw new doh._AssertFailure("assertError() failed:\n\texpected error\n\t\t"+expectedError+"\n\tbut no error caught\n\n", hint);
+	throw new doh._AssertFailure(
+    "assertError() failed:\n\texpected error\n\t\t" +
+      expectedError+"\n\tbut no error caught\n\n",
+    hint
+  );
 }
 
 
@@ -643,14 +424,22 @@ doh.isNot = doh.assertNotEqual = function(/*Object*/ notExpected, /*Object*/ act
 
 	// Compare undefined always with three equal signs, because undefined==null
 	// is true, but undefined===null is false.
-	if((notExpected === undefined)&&(actual === undefined)){
-        throw new doh._AssertFailure("assertNotEqual() failed: not expected |"+notExpected+"| but got |"+actual+"|", hint);
+	if(
+    (notExpected === undefined) &&
+    (actual === undefined)
+  ){
+    throw new doh._AssertFailure(
+      "assertNotEqual() failed: not expected |"+notExpected+"| but got |"+actual+"|",
+      hint
+    );
 	}
 	if(arguments.length < 2){
-		throw doh._AssertFailure("assertEqual failed because it was not passed 2 arguments");
+		throw doh._AssertFailure(
+      "assertEqual failed because it was not passed 2 arguments"
+    );
 	}
 	if((notExpected === actual)||(notExpected == actual)){
-        throw new doh._AssertFailure("assertNotEqual() failed: not expected |"+notExpected+"| but got |"+actual+"|", hint);
+    throw new doh._AssertFailure("assertNotEqual() failed: not expected |"+notExpected+"| but got |"+actual+"|", hint);
 	}
 	if(	(this._isArray(notExpected) && this._isArray(actual))&&
 		(this._arrayEq(notExpected, actual)) ){
@@ -666,8 +455,8 @@ doh.isNot = doh.assertNotEqual = function(/*Object*/ notExpected, /*Object*/ act
 			}
 		}
 		if(isequal){
-        throw new doh._AssertFailure("assertNotEqual() failed: not expected |"+notExpected+"| but got |"+actual+"|", hint);
-	}
+      throw new doh._AssertFailure("assertNotEqual() failed: not expected |"+notExpected+"| but got |"+actual+"|", hint);
+    }
 	}
     return true;
 }
@@ -686,13 +475,16 @@ doh._objPropEq = function(expected, actual){
 	if(expected === null && actual === null){
 		return true;
 	}
+
 	// If only one is null, they aren't equal.
 	if(expected === null || actual === null){
 		return false;
 	}
+
 	if(expected instanceof Date){
 		return actual instanceof Date && expected.getTime()==actual.getTime();
 	}
+
 	var x;
 	// Make sure ALL THE SAME properties are in both objects!
 	for(x in actual){ // Lets check "actual" here, expected is checked below.
@@ -706,6 +498,7 @@ doh._objPropEq = function(expected, actual){
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -745,384 +538,46 @@ doh._handleFailure = function(groupName, fixture, e){
 		this.debug("\tERROR IN:\n\t\t", fixture.runTest);
 	}
 
-	if(e.rhinoException){
+	if (e.rhinoException) {
 		e.rhinoException.printStackTrace();
-	}else if(e.javaException){
+	} else if(e.javaException) {
 		e.javaException.printStackTrace();
 	}
 }
 
-try{
-	setTimeout(function(){}, 0);
-}catch(e){
-	setTimeout = function(func){
-		return func();
-	}
-}
-
-doh._runPerfFixture = function(/*String*/groupName, /*Object*/fixture){
-	//	summary:
-	//		This function handles how to execute a 'performance' test
-	//		which is different from a straight UT style test.  These
-	//		will often do numerous iterations of the same operation and
-	//		gather execution statistics about it, like max, min, average,
-	//		etc.  It makes use of the already in place DOH deferred test
-	//		handling since it is a good idea to put a pause inbetween each
-	//		iteration to allow for GC cleanup and the like.
-	//
-	//	groupName:
-	//		The test group that contains this performance test.
-	//	fixture:
-	//		The performance test fixture.
-	var tg = this._groups[groupName];
-	fixture.startTime = new Date();
-
-	//Perf tests always need to act in an async manner as there is a
-	//number of iterations to flow through.
-	var def = new doh.Deferred();
-	tg.inFlight++;
-	def.groupName = groupName;
-	def.fixture = fixture;
-
-	def.addErrback(function(err){
-		doh._handleFailure(groupName, fixture, err);
-	});
-
-	//Set up the finalizer.
-	var retEnd = function(){
-		if(fixture["tearDown"]){ fixture.tearDown(doh); }
-		tg.inFlight--;
-		if((!tg.inFlight)&&(tg.iterated)){
-			doh._groupFinished(groupName, !tg.failures);
-		}
-		doh._testFinished(groupName, fixture, def.results[0]);
-		if(doh._paused){
-			doh.run();
-		}
-	};
-
-	//Since these can take who knows how long, we don't want to timeout
-	//unless explicitly set
-	var timer;
-	var to = fixture.timeout;
-	if(to > 0) {
-		timer = setTimeout(function(){
-			// ret.cancel();
-			// retEnd();
-			def.errback(new Error("test timeout in "+fixture.name.toString()));
-		}, to);
-	}
-	
-	//Set up the end calls to the test into the deferred we'll return.
-	def.addBoth(function(arg){
-		if(timer){
-			clearTimeout(timer);
-		}
-		retEnd();
-	});
-
-	//Okay, now set up the timing loop for the actual test.
-	//This is down as an async type test where there is a delay
-	//between each execution to allow for GC time, etc, so the GC
-	//has less impact on the tests.
-	var res = fixture.results;
-	res.trials = [];
-
-	//Try to figure out how many calls are needed to hit a particular threshold.
-	var itrDef = doh._calcTrialIterations(groupName, fixture);
-	itrDef.addErrback(function(err){
-		fixture.endTime = new Date();
-		def.errback(err);
-	});
-
-	//Blah, since tests can be deferred, the actual run has to be deferred until after
-	//we know how many iterations to run.  This is just plain ugly.
-	itrDef.addCallback(function(iterations){
-		if(iterations){
-			var countdown = fixture.trialIterations;
-			doh.debug("TIMING TEST: [" + fixture.name +
-					  "]\n\t\tITERATIONS PER TRIAL: " +
-					  iterations + "\n\tTRIALS: " +
-					  countdown);
-
-			//Figure out how many times we want to run our 'trial'.
-			//Where each trial consists of 'iterations' of the test.
-
-			var trialRunner = function() {
-				//Set up our function to execute a block of tests
-				var start = new Date();
-				var tTimer = new doh.Deferred();
-				var tCountdown = iterations;
-
-				var tState = {
-					countdown: iterations
-				};
-				var testRunner = function(state){
-					while(state){
-						try{
-							state.countdown--;
-							if(state.countdown){
-								var ret = fixture.runTest(doh);
-								if(ret && ret.addCallback){
-									// Deferreds have to be handled async,
-									// otherwise we just keep looping.
-									var atState = {
-										countdown: state.countdown
-									};
-									ret.addCallback(function(){
-										testRunner(atState);
-									});
-									ret.addErrback(function(err) {
-										doh._handleFailure(groupName, fixture, err);
-										fixture.endTime = new Date();
-										def.errback(err);
-									});
-									state = null;
-								}
-							}else{
-								tTimer.callback(new Date());
-								state = null;
-							}
-						}catch(err){
-							fixture.endTime = new Date();
-							tTimer.errback(err);
-						}
-					}
-				};
-				tTimer.addCallback(function(end){
-					//Figure out the results and try to factor out function call costs.
-					var tResults = {
-						trial: (fixture.trialIterations - countdown),
-						testIterations: iterations,
-						executionTime: (end.getTime() - start.getTime()),
-						average: (end.getTime() - start.getTime())/iterations
-					};
-					res.trials.push(tResults);
-					doh.debug("\n\t\tTRIAL #: " +
-							  tResults.trial + "\n\tTIME: " +
-							  tResults.executionTime + "ms.\n\tAVG TEST TIME: " +
-							  (tResults.executionTime/tResults.testIterations) + "ms.");
-
-					//Okay, have we run all the trials yet?
-					countdown--;
-					if(countdown){
-						setTimeout(trialRunner, fixture.trialDelay);
-					}else{
-						//Okay, we're done, lets compute some final performance results.
-						var t = res.trials;
-
-
-
-						//We're done.
-						fixture.endTime = new Date();
-						def.callback(true);
-					}
-				});
-				tTimer.addErrback(function(err){
-					fixture.endTime = new Date();
-					def.errback(err);
-				});
-				testRunner(tState);
-			};
-			trialRunner();
-		}
-	});
-
-	//Set for a pause, returned the deferred.
-	if(def.fired < 0){
-		doh.pause();
-	}
-	return def;
-};
-
-doh._calcTrialIterations =  function(/*String*/ groupName, /*Object*/ fixture){
-	//	summary:
-	//		This function determines the rough number of iterations to
-	//		use to reach a particular MS threshold.  This returns a deferred
-	//		since tests can theoretically by async.  Async tests aren't going to
-	//		give great perf #s, though.
-	//		The callback is passed the # of iterations to hit the requested
-	//		threshold.
-	//
-	//	fixture:
-	//		The test fixture we want to calculate iterations for.
-	var def = new doh.Deferred();
-	var calibrate = function () {
-		var testFunc = doh.hitch(fixture, fixture.runTest);
-
-		//Set the initial state.  We have to do this as a loop instead
-		//of a recursive function.  Otherwise, it blows the call stack
-		//on some browsers.
-		var iState = {
-			start: new Date(),
-			curIter: 0,
-			iterations: 5
-		};
-		var handleIteration = function(state){
-			while(state){
-				if(state.curIter < state.iterations){
-					try{
-						var ret = testFunc(doh);
-						if(ret && ret.addCallback){
-							var aState = {
-								start: state.start,
-								curIter: state.curIter + 1,
-								iterations: state.iterations
-							};
-							ret.addCallback(function(){
-								handleIteration(aState);
-							});
-							ret.addErrback(function(err) {
-								fixture.endTime = new Date();
-								def.errback(err);
-							});
-							state = null;
-						}else{
-							state.curIter++;
-						}
-					}catch(err){
-						fixture.endTime = new Date();
-						def.errback(err);
-						return;
-					}
-				}else{
-					var end = new Date();
-					var totalTime = (end.getTime() - state.start.getTime());
-					if(totalTime < fixture.trialDuration){
-						var nState = {
-							iterations: state.iterations * 2,
-							curIter: 0
-						}
-						state = null;
-						setTimeout(function(){
-							nState.start = new Date();
-							handleIteration(nState);
-						}, 50);
-					}else{
-						var itrs = state.iterations;
-						setTimeout(function(){def.callback(itrs)}, 50);
-						state = null;
-					}
-				}
-			}
-		};
-		handleIteration(iState);
-	};
-	setTimeout(calibrate, 10);
-	return def;
-};
-
-doh._runRegFixture = function(/*String*/groupName, /*Object*/fixture){
-	//	summary:
-	//		Function to run a generic doh test.  These are not
-	//		specialized tests, like performance groups and such.
-	//
-	//	groupName:
-	//		The groupName of the test.
-	//	fixture:
-	//		The test fixture to execute.
-	var tg = this._groups[groupName];
-	fixture.startTime = new Date();
-	var ret = fixture.runTest(this);
-	fixture.endTime = new Date();
-	// if we get a deferred back from the test runner, we know we're
-	// gonna wait for an async result. It's up to the test code to trap
-	// errors and give us an errback or callback.
-	if(ret && ret.addCallback){
-		tg.inFlight++;
-		ret.groupName = groupName;
-		ret.fixture = fixture;
-
-		ret.addErrback(function(err){
-			doh._handleFailure(groupName, fixture, err);
-		});
-
-		var retEnd = function(){
-			if(fixture["tearDown"]){ fixture.tearDown(doh); }
-			tg.inFlight--;
-			if((!tg.inFlight)&&(tg.iterated)){
-				doh._groupFinished(groupName, !tg.failures);
-			}
-			doh._testFinished(groupName, fixture, ret.results[0]);
-			if(doh._paused){
-				doh.run();
-			}
-		}
-
-		var timeoutFunction = function(){
-			fixture.endTime = new Date();
-			ret.errback(new Error("test timeout in "+fixture.name.toString()));
-		};
-
-		var timer = setTimeout(function(){ timeoutFunction(); }, fixture["timeout"]||1000);
-
-		ret.addBoth(function(arg){
-			timeoutFunction = function(){}; // in IE8, the clearTimeout does not always stop the timer, so clear the function as well
-			clearTimeout(timer);
-			fixture.endTime = new Date();
-			retEnd();
-		});
-		if(ret.fired < 0){
-			doh.pause();
-		}
-		return ret;
-	}
-};
-
 doh._runFixture = function(groupName, fixture){
 	var tg = this._groups[groupName];
 	this._testStarted(groupName, fixture);
-	var threw = false;
 	var err = null;
 	// run it, catching exceptions and reporting them
 	try{
+    doh.debug(fixture.name);
 		// let doh reference "this.group.thinger..." which can be set by
 		// another test or group-level setUp function
 		fixture.group = tg;
 		// only execute the parts of the fixture we've got
 
-		if(fixture["setUp"]){ fixture.setUp(this); }
+		if(fixture["setUp"]){
+      fixture.setUp(this);
+    }
 		if(fixture["runTest"]){  // should we error out of a fixture doesn't have a runTest?
-			if(fixture.testType === "perf"){
-				//Always async deferred, so return it.
-				return doh._runPerfFixture(groupName, fixture);
-			}else{
-				//May or may not by async.
-				var ret = doh._runRegFixture(groupName, fixture);
-				if(ret){
-					return ret;
-				}
-			}
+      fixture.startTime = new Date();
+      var ret = fixture.runTest(this);
+      fixture.endTime = new Date();
+      if(ret){
+        return ret;
+      }
 		}
-		if(fixture["tearDown"]){ fixture.tearDown(this); }
+		if(fixture["tearDown"]){
+      fixture.tearDown(this);
+    }
 	}catch(e){
-		threw = true;
+    this._handleFailure(groupName, fixture, e);
 		err = e;
 		if(!fixture.endTime){
 			fixture.endTime = new Date();
 		}
 	}
-	var d = new doh.Deferred();
-	setTimeout(this.hitch(this, function(){
-		if(threw){
-			this._handleFailure(groupName, fixture, err);
-		}
-		this._testFinished(groupName, fixture, !threw);
-
-		if((!tg.inFlight)&&(tg.iterated)){
-			doh._groupFinished(groupName, !tg.failures);
-		}else if(tg.inFlight > 0){
-			setTimeout(this.hitch(this, function(){
-				doh.runGroup(groupName); // , idx);
-			}), 100);
-			this._paused = true;
-		}
-		if(doh._paused){
-			doh.run();
-		}
-	}), 30);
-	doh.pause();
-	return d;
 }
 
 doh._testId = 0;
@@ -1130,20 +585,11 @@ doh.runGroup = function(/*String*/ groupName, /*Integer*/ idx){
 	// summary:
 	//		runs the specified test group
 
-	// the general structure of the algorithm is to run through the group's
-	// list of doh, checking before and after each of them to see if we're in
-	// a paused state. This can be caused by the test returning a deferred or
-	// the user hitting the pause button. In either case, we want to halt
-	// execution of the test until something external to us restarts it. This
-	// means we need to pickle off enough state to pick up where we left off.
-
-	// FIXME: need to make fixture execution async!!
-
 	var tg = this._groups[groupName];
 	if(tg.skip === true){ return; }
 	if(this._isArray(tg)){
 		if(idx<=tg.length){
-			if((!tg.inFlight)&&(tg.iterated == true)){
+			if(!tg.inFlight){
 				if(tg["tearDown"]){ tg.tearDown(this); }
 				doh._groupFinished(groupName, !tg.failures);
 				return;
@@ -1160,20 +606,7 @@ doh.runGroup = function(/*String*/ groupName, /*Integer*/ idx){
 			if(tg["setUp"]){ tg.setUp(this); }
 		}
 		for(var y=(idx||0); y<tg.length; y++){
-			if(this._paused){
-				this._currentTest = y;
-				// this.debug("PAUSED at:", tg[y].name, this._currentGroup, this._currentTest);
-				return;
-			}
 			doh._runFixture(groupName, tg[y]);
-			if(this._paused){
-				this._currentTest = y+1;
-				if(this._currentTest == tg.length){
-					tg.iterated = true;
-				}
-				// this.debug("PAUSED at:", tg[y].name, this._currentGroup, this._currentTest);
-				return;
-			}
 		}
 		tg.iterated = true;
 		if(!tg.inFlight){
@@ -1190,10 +623,6 @@ doh._report = function(){
 	//		a private method to be implemented/replaced by the "locally
 	//		appropriate" test runner
 
-	// this.debug("ERROR:");
-	// this.debug("\tNO REPORTING OUTPUT AVAILABLE.");
-	// this.debug("\tIMPLEMENT doh._report() IN YOUR TEST RUNNER");
-
 	this.debug(this._line);
 	this.debug("| TEST SUMMARY:");
 	this.debug(this._line);
@@ -1202,36 +631,26 @@ doh._report = function(){
 	this.debug("\t", this._failureCount, "failures");
 }
 
-doh.togglePaused = function(){
-	this[(this._paused) ? "run" : "pause"]();
-}
-
-doh.pause = function(){
-	// summary:
-	//		halt test run. Can be resumed.
-	this._paused = true;
-}
-
 doh.run = function(){
 	// summary:
 	//		begins or resumes the test process.
 	// this.debug("STARTING");
-	this._paused = false;
 	var cg = this._currentGroup;
 	var ct = this._currentTest;
 	var found = false;
 	if(!cg){
-		this._init(); // we weren't paused
+		this._init();
 		found = true;
 	}
 	this._currentGroup = null;
 	this._currentTest = null;
 
 	for(var x in this._groups){
-		if(
-			( (!found)&&(x == cg) )||( found )
-		){
-			if(this._paused){ return; }
+		if( (
+          (!found) && (x == cg)
+        )||
+        ( found )
+      ){
 			this._currentGroup = x;
 			if(!found){
 				found = true;
@@ -1239,91 +658,13 @@ doh.run = function(){
 			}else{
 				this.runGroup(x);
 			}
-			if(this._paused){ return; }
 		}
 	}
 	this._currentGroup = null;
 	this._currentTest = null;
-	this._paused = false;
 	this._onEnd();
 	this._report();
-}
-
-//Statistics functions to handle computing performance metrics.
-//Taken from dojox.math
-//	basic statistics
-doh.standardDeviation = function(/* Number[] */a) {
-	//	summary:
-	//		Returns the standard deviation of the passed arguments.
-	return Math.sqrt(this.variance(a));	//	Number
 };
-
-doh.variance = function(/* Number[] */a) {
-	//	summary:
-	//		Find the variance in the passed array of numbers.
-	var mean=0, squares=0;
-	a.forEach(function(item) {
-		mean += item;
-		squares += Math.pow(item,2);
-	});
-	return (squares/a.length) - Math.pow(mean/a.length, 2);	//	Number
-};
-
-doh.mean = function(/* Number[] */a) {
-	//	summary:
-	//		Returns the mean value in the passed array.
-	var t=0;
-	a.forEach(function(v) { t += v; });
-	return t / Math.max(a.length, 1);	//	Number
-};
-
-doh.min = function(/* Number[] */a) {
-	//	summary:
-	//		Returns the min value in the passed array.
-	return Math.min.apply(null, a);		//	Number
-};
-
-doh.max = function(/* Number[] */a) {
-	//	summary:
-	//		Returns the max value in the passed array.
-	return Math.max.apply(null, a);		//	Number
-},
-
-doh.median= function(/* Number[] */a) {
-	//	summary:
-	//		Returns the value closest to the middle from a sorted version of the passed array.
-	return a.slice(0).sort()[Math.ceil(a.length/2)-1];	//	Number
-},
-
-doh.mode = function(/* Number[] */a) {
-	//	summary:
-	//		Returns the mode from the passed array (number that appears the most often).
-	//		This is not the most efficient method, since it requires a double scan, but
-	//		is ensures accuracy.
-	var o = {}, r = 0, m = Number.MIN_VALUE;
-	a.forEach(function(v) {
-		(o[v]!==undefined) ? o[v]++ : o[v]=1;
-	});
-
-	//	we did the lookup map because we need the number that appears the most.
-	for(var p in o){
-		if(m < o[p]){
-			m = o[p], r = p;
-		}
-	}
-	return r;	//	Number
-};
-
-doh.average = function(/* Number [] */ a) {
-	var i;
-	var s = 0;
-	for(i = 0; i < a.length; i++){
-		s += a[i];
-	}
-	return s/a.length;
-}
-
-tests = doh;
 
 (function() {
 	// scope protection
@@ -1383,8 +724,6 @@ tests = doh;
 				}
 			}
 
-      doh.debug = print;
-      doh.error = print;
       var oldReport = doh._report;
       doh._report = function(){
         oldReport.apply(doh, arguments);

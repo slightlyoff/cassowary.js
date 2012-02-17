@@ -121,7 +121,7 @@ c.LinearExpression = c.inherit({
   addExpression: function(expr /*c.LinearExpression*/, n /*double*/, subject /*c.AbstractVariable*/, solver /*ClTableau*/) {
     if (expr instanceof c.AbstractVariable) {
       expr = new c.LinearExpression(expr);
-      print("addExpression: Had to cast a var to an expression");
+      if(c.trace) print("addExpression: Had to cast a var to an expression");
     }
     this.constant += (n * expr.constant);
     n = n || 1;

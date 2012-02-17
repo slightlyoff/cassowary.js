@@ -6,18 +6,25 @@
 
 "use strict";
 
-var ex = new c.LinearExpression();
+doh.add("c.LinearConstraint", [
+  // FIXME(slightlyoff): these tests are STUPID. FIXME>
 
-var c1 = new c.LinearEquation(ex);
-print(c1);
+  function equationFromExpression(t) {
+    var ex = new c.LinearExpression();
+    var c1 = new c.LinearEquation(ex);
+  },
 
-var x = new c.Variable(167);
-var y = new c.Variable(2);
-var cly = new c.LinearExpression(y);
-cly.addExpression(x);
+  function expressionFromVars(t) {
+    var x = new c.Variable(167);
+    var y = new c.Variable(2);
+    var cly = new c.LinearExpression(y);
+    cly.addExpression(x);
+  },
 
-var x = new c.Variable(167);
-var y = new c.Variable(2);
-var cly = new c.LinearExpression(y);
-var eq = new c.LinearEquation(x, cly);
-print(eq);
+  function equationFromExpressionAndVar(t) {
+    var x = new c.Variable(167);
+    var y = new c.Variable(2);
+    var cly = new c.LinearExpression(y);
+    var eq = new c.LinearEquation(x, cly);
+  },
+]);

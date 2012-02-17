@@ -14,7 +14,15 @@ load("../src/Tableau.js");
 load("../src/SimplexSolver.js");
 load("../src/Timer.js");
 
+/*
+c.debug = false;
+c.trace = false;
+c.traceAdded = false;
+c.verbose = false;
+*/
+
 load("LinearConstraint-test.js");
+/*
 load("LinearExpression-test.js");
 load("Point-test.js");
 load("SimplexSolver-test.js");
@@ -22,3 +30,4 @@ load("Strength-test.js");
 load("SymbolicWeight-test.js");
 load("Tableau-test.js");
 load("Variable-test.js");
+*/
