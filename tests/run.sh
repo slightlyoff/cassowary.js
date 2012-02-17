@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Use of this source code is governed by the LGPL, which can be found in the
+# COPYING.LGPL file.
+#
+# Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
+
 DOH='../util/doh/runner.js'
 JSCPATH='/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Resources/jsc'
 D8PATH=`which d8`

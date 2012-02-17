@@ -1,3 +1,8 @@
+// Use of this source code is governed by the LGPL, which can be found in the
+// COPYING.LGPL file.
+//
+// Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
+
 load("../src/c.js");
 load("../src/HashTable.js");
 load("../src/HashSet.js");
@@ -22,7 +27,6 @@ c.verbose = false;
 */
 
 load("LinearConstraint-test.js");
-/*
 load("LinearExpression-test.js");
 load("Point-test.js");
 load("SimplexSolver-test.js");
@@ -30,4 +34,3 @@ load("Strength-test.js");
 load("SymbolicWeight-test.js");
 load("Tableau-test.js");
 load("Variable-test.js");
-*/

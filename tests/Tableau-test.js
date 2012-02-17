@@ -2,7 +2,13 @@
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.
 //
-// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
+// Parts Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
 
-t = new c.Tableau();
-print(t);
+"use strict";
+
+doh.add("c.Tableau", [
+  function ctor(t) {
+    new c.Tableau();
+  },
+  // FIXME(slightlyoff): MOAR TESTS
+]);

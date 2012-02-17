@@ -2,31 +2,39 @@
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.
 //
-// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
+// Parts Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
 
-x = new c.Variable("x",167);
-y = new c.Variable("y",2);
+"use strict";
 
-e = new c.LinearExpression(x, 2, 3);
-print('e='+e);
+doh.add("c.LinearExpression", [
+  function threeVarCtor(t) {
+    var x = new c.Variable("x", 167);
+    var e = new c.LinearExpression(x, 2, 3);
+    t.is(e, "3 + 2*[x:167]");
+  },
 
-e0 = new c.LinearExpression(4);
-print('e0='+e0);
+  function oneParamCtor(t) {
+    t.is(new c.LinearExpression(4), "4");
+  },
 
-e1 = c.Plus(4,2);
-print('e1='+e1);
+  function plus(t) {
+    var x = new c.Variable("x", 167);
+    t.is(c.Plus(4,2), "6");
+    t.is(c.Plus(x,2), "2 + 1*[x:167]");
+    t.is(c.Plus(3,x), "3 + 1*[x:167]");
+  },
 
-e2 = c.Plus(x,2);
-print('e2='+e2);
+  function times(t) {
+    var x = new c.Variable("x", 167);
+    t.is(c.Times(x,3), "3*[x:167]");
+    t.is(c.Times(7,x), "7*[x:167]");
+  },
 
-e3 = c.Plus(3,x);
-print('e3='+e3);
+  function complex(t) {
+    var x = new c.Variable("x", 167);
+    var y = new c.Variable("y", 2);
+    var ex = c.Plus(4, c.Plus(c.Times(x,3), c.Times(2,y)));
+    t.is(ex, "4 + 3*[x:167] + 2*[y:2]");
+  },
+]);
 
-e4 = c.Times(x,3);
-print('e4='+e4);
-
-e5 = c.Times(7,x);
-print('e5='+e5);
-
-ex = c.Plus(4, c.Plus(c.Times(x,3), c.Times(2,y)));
-print('ex='+ex);

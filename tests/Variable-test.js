@@ -2,17 +2,27 @@
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.
 //
-// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
+// Parts Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
 
-/* TEST */
+"use strict";
 
-c.Variable._map = [];
-x = new c.Variable("x");
-y = new c.Variable("y", 2);
-print ((c.Variable._map)['x'])
+doh.add("c.Variable", [
+  function ctor(t) {
+    c.Variable._map = [];
+    var x = new c.Variable("x");
+    var y = new c.Variable("y", 2);
+    t.is((c.Variable._map)['x'], "[x:0]");
+    t.is((c.Variable._map)['y'], "[y:2]");
+  },
 
-d = new c.DummyVariable("foo");
-print(d);
+  function dummy(t) {
+    var d = new c.DummyVariable("foo");
+    t.is(d, "[foo:dummy]");
+  },
 
-o = new c.ObjectiveVariable("obj");
-print(o);
+  function objective(t) {
+    var o = new c.ObjectiveVariable("obj");
+    t.is(o, "[obj:obj]");
+  },
+  // FIXME(slightlyoff): MOAR TESTS
+]);
