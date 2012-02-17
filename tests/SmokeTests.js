@@ -11,7 +11,7 @@ var SmokeTests = c.inherit({
 
   InitializeRandoms: function() {
   },
-
+  
   simple1: function() {
     var fOkResult = true;
     var x = new c.Variable(167);
@@ -36,6 +36,134 @@ var SmokeTests = c.inherit({
     fOkResult = fOkResult && c.approx(y, 10);
     print("x == " + x.value());
     print("y == " + y.value());
+    return (fOkResult);
+  },
+  
+  'var >= num': function() {
+    // x >= 100
+    var fOkResult = true;
+    var x = new c.Variable(10);
+    var solver = new c.SimplexSolver();
+    var ieq = new c.LinearInequality(x, c.GEQ, 100);
+    solver.addConstraint(ieq);    
+    fOkResult = (x.value() == 100);
+    print("x == " + x.value());
+    return (fOkResult);
+  },
+  
+  'num == var': function() {
+    // 100 == var
+    var fOkResult = true;
+    var x = new c.Variable(10);
+    var solver = new c.SimplexSolver();
+    var eq = new c.LinearEquation(100, x);
+    solver.addConstraint(eq);    
+    fOkResult = (x.value() == 100);
+    print("x == " + x.value());
+    return (fOkResult);
+  },
+  
+  'num <= var': function() {
+    // x >= 100
+    var fOkResult = true;
+    var x = new c.Variable(10);
+    var solver = new c.SimplexSolver();
+    var ieq = new c.LinearInequality(100, c.LEQ, x);
+    solver.addConstraint(ieq);    
+    fOkResult = (x.value() == 100);
+    print("x == " + x.value());
+    return (fOkResult);
+  },
+  
+
+  'exp >= num': function() {
+    // stay width
+    // right >= 100
+    var fOkResult = true;
+    var x = new c.Variable(10);
+    var width = new c.Variable(10);
+    var right = new c.LinearExpression(x).plus(width);
+    var solver = new c.SimplexSolver();
+    var ieq = new c.LinearInequality(right, c.GEQ, 100);
+    solver.addStay(width)
+    solver.addConstraint(ieq);    
+    fOkResult = (x.value() == 90);
+    print("x == " + x.value());
+    print("width == " + width.value());
+    return (fOkResult);
+  },
+  
+  'num <= exp': function() {
+    // stay width
+    // 100 <= right
+    var fOkResult = true;
+    var x = new c.Variable(10);
+    var width = new c.Variable(10);
+    var right = new c.LinearExpression(x).plus(width);
+    var solver = new c.SimplexSolver();
+    var ieq = new c.LinearInequality(100, c.LEQ, right);
+    solver.addStay(width)
+    solver.addConstraint(ieq);    
+    fOkResult = (x.value() == 90);
+    print("x == " + x.value());
+    print("width == " + width.value());
+    return (fOkResult);
+  },
+  
+  'exp == var': function() {
+    // stay width, rightMin
+    // right >= rightMin
+    var fOkResult = true;
+    var x = new c.Variable(10);
+    var width = new c.Variable(10);
+    var rightMin = new c.Variable(100);
+    var right = new c.LinearExpression(x).plus(width);
+    var solver = new c.SimplexSolver();
+    var eq = new c.LinearEquation(right, rightMin);
+    solver.addStay(width)
+    solver.addStay(rightMin)
+    solver.addConstraint(eq);    
+    fOkResult = (x.value() == 90);
+    print("x == " + x.value());
+    print("width == " + width.value());
+    return (fOkResult);
+  },
+  
+  'exp >= var': function() {
+    // stay width, rightMin
+    // right >= rightMin
+    var fOkResult = true;
+    var x = new c.Variable(10);
+    var width = new c.Variable(10);
+    var rightMin = new c.Variable(100);
+    var right = new c.LinearExpression(x).plus(width);
+    var solver = new c.SimplexSolver();
+    var ieq = new c.LinearInequality(right, c.GEQ, rightMin);
+    solver.addStay(width)
+    solver.addStay(rightMin)
+    solver.addConstraint(ieq);    
+    fOkResult = (x.value() == 90);
+    print("x == " + x.value());
+    print("width == " + width.value());
+    return (fOkResult);
+  },
+  
+  'var <= exp': function() {
+    // stay width
+    // right >= rightMin
+    var fOkResult = true;
+    var x = new c.Variable(10);
+    var width = new c.Variable(10);
+    var rightMin = new c.Variable(100);
+    var right = new c.LinearExpression(x).plus(width);
+    var solver = new c.SimplexSolver();
+    var ieq = new c.LinearInequality(rightMin, c.LEQ, right);
+    solver.addStay(width)
+    solver.addStay(rightMin)
+    solver.addConstraint(ieq);    
+    fOkResult = (x.value() == 90);
+    print("x == " + x.value());
+    print("width == " + width.value());
     return (fOkResult);
   },
 
@@ -447,19 +575,67 @@ var SmokeTests = c.inherit({
   main: function(args /*String[]*/) {
     var fAllOkResult = true;
     var fResult;
-    if (true) {
+    if (true) {            
       print("simple1:");
       fResult = this.simple1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
       if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
-
+      
       print("\n\n\njustStay1:");
       fResult = this.justStay1();
       fAllOkResult = fResult;
       if (!fResult) print("Failed!");
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());      
+      
+      print("\n\n\nvar >= num:");
+      fResult = this["var >= num"]();
+      fAllOkResult = fResult;
+      if (!fResult) print("Failed!");
       if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
-
+      
+      print("\n\n\nnum == var:");
+      fResult = this["num == var"]();
+      fAllOkResult = fResult;
+      if (!fResult) print("Failed!");
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      
+      print("\n\n\nnum <= var:");
+      fResult = this["num <= var"]();
+      fAllOkResult = fResult;
+      if (!fResult) print("Failed!");
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      
+      print("\n\n\nexp >= num:");
+      fResult = this["exp >= num"]();
+      fAllOkResult = fResult;
+      if (!fResult) print("Failed!");
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+                  
+      print("\n\n\nnum <= exp:");
+      fResult = this["num <= exp"]();
+      fAllOkResult = fResult;
+      if (!fResult) print("Failed!");
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      
+      print("\n\n\nexp == var:");
+      fResult = this["exp == var"]();
+      fAllOkResult = fResult;
+      if (!fResult) print("Failed!");
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      
+      print("\n\n\nexp >= var:");
+      fResult = this["exp >= var"]();
+      fAllOkResult = fResult;
+      if (!fResult) print("Failed!");
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+      
+      print("\n\n\nvar <= exp:");
+      fResult = this["var <= exp"]();
+      fAllOkResult = fResult;
+      if (!fResult) print("Failed!");
+      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
+            
       print("\n\n\naddDelete1:");
       fResult = this.addDelete1();
       fAllOkResult = fResult;
