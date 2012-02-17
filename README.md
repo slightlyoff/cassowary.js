@@ -111,7 +111,7 @@ Supported Runtimes
 This refactoring currently runs in:
 
   * Chrome (and Chrome Frame), Firefox 9+, Opera 11+, Safari 5+, IE 9+
-  * Command-line V8 (d8 shell) and Rhino
+  * Command-line V8 (d8 shell), JSC (built into OS X), and Rhino (Java)
 
 This is an unapolgetically modern reinterpretation optimized for size, low
 complexity, and speed. And litle else. No, it will not work on old versions of
