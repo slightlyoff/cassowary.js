@@ -1,0 +1,3 @@
+[submodule "util/ometa-js"]
+	path = util/ometa-js
+	url = git://github.com/slightlyoff/ometa-js.git
