@@ -44,21 +44,29 @@ Web"](http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.101.4819)
 Getting Started
 ---------------
 
+This repo pulls in other Git repositories through ["submodules"](http://help.github.com/submodules/), so after cloning the repo, issue the following commands:
+
+```
+$ git submodule init
+$ git submodule update
+...
+```
+
 To run the tests, check out this repository and point your thorougly modern
 browser at `unittests.html` or `quaddemo.html`. To run from the command line,
 first, see if they already run without any extra work (they should on a Mac or
 Linux with recent Java):
 
 ```
-obelisk:cassowary-js-refactor slightlyoff$ cd tests
-obelisk:tests slightlyoff$ ./run.sh
+$ cd tests
+$ ./run.sh
 ...
 ```
 
 If you get an error like: 
 
 ```
-obelisk:tests slightlyoff$ ./run.sh 
+$ ./run.sh 
 FAILED: No JavaScript Runtime Found! Please install Java or the V8 Shell (d8) and add them to your $PATH
 ```
 
@@ -70,11 +78,11 @@ This make take a while and yes, it requires Scons (which implies a Python
 dependency) and a sane C++ compiler in your PATH. Now add the directory with
 the `d8` executable to your PATH for running the unit tests.
 
-Then invoke the command-line test runner with:
+Then invoke the command-line test runner from inside the test directory:
 
 ```
-obelisk:cassowary-js-refactor slightlyoff$ cd tests
-obelisk:tests slightlyoff$ ./run.sh
+$ cd tests
+$ ./run.sh
 ...
 done adding 63 constraints [500 attempted, 0 exceptions]
 time = 0.021
@@ -110,8 +118,15 @@ Supported Runtimes
 
 This refactoring currently runs in:
 
-  * Chrome (and Chrome Frame), Firefox 9+, Opera 11+, Safari 5+, IE 9+
-  * Command-line V8 (d8 shell), JSC (built into OS X), and Rhino (Java)
+  * Chrome (and Chrome Frame)
+  * Firefox 9+
+  * Opera 11+
+  * Safari 5+
+  * IE 9+
+  * Command-line:
+    * V8 (d8 shell)
+    * JSC (built into OS X)
+    * Rhino (Java) js.jar included in checkout
 
 This is an unapolgetically modern reinterpretation optimized for size, low
 complexity, and speed. And litle else. No, it will not work on old versions of
