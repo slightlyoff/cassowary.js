@@ -21,14 +21,14 @@ var SmokeTests = c.inherit({
     timer.Start();
     var solver = new c.SimplexSolver();
     solver.autoSolve = false;
-    var rgpclv = new c.Variable[nVars];
+    var rgpclv = [];
     for (var i = 0; i < nVars; i++) {
       rgpclv[i] = new c.Variable(i, "x");
       solver.addStay(rgpclv[i]);
     }
     var nCnsMade = nCns * 2;
-    var rgpcns = new ClConstraint[nCnsMade];
-    var rgpcnsAdded = new ClConstraint[nCns];
+    var rgpcns = new c.Constraint(nCnsMade);
+    var rgpcnsAdded = new c.Constraint(nCns);
     var nvs = 0;
     var k;
     var j;
@@ -266,23 +266,15 @@ var SmokeTests = c.inherit({
     return true;
   },
 
-  main: function(args /*String[]*/) {
-    var fAllOkResult = true;
+  main: function(testNum, cns, solvers, resolves) {
     var fResult;
+    testNum  =  testNum || 1;
+    cns      =      cns || 900;
+    resolves = resolves || 100;
+    solvers  =  solvers || 10;
 
-    print("addDel:");
-    var testNum = 1;
-    var cns = 900;
-    var resolves = 100;
-    var solvers = 10;
-
-    if (args.length > 0) testNum = args[0];
-    if (args.length > 1) cns = args[1];
-    if (args.length > 2) solvers = args[2];
-    if (args.length > 3) resolves = args[3];
     if (false) {
       fResult = this.addDel(cns, cns, resolves);
-      fAllOkResult = fResult;
       if (!fResult) print("Failed!");
       if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
     }
@@ -294,8 +286,7 @@ SmokeTests.iRandom = 0;
 SmokeTests.cRandom = 0;
 SmokeTests.vRandom;
 
-var clt = new SmokeTests();
-clt.main(new Array(1,100,10,50));
+(new SmokeTests()).main(1, 100, 10, 50);
 
 //clt.main(new Array());
 })(c);
