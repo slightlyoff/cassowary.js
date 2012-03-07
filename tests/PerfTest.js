@@ -7,16 +7,12 @@
 (function(c){
 "use strict";
 
-var SmokeTests = c.inherit({
+var PerfTest = c.inherit({
 
-  InitializeRandoms: function() {
-  },
-  
   addDel: function(nCns /*int*/, nVars /*int*/, nResolves /*int*/) {
     var timer = new Timer();
     var ineqProb = 0.12;
     var maxVars = 3;
-    this.InitializeRandoms();
     print("starting timing test. nCns = " + nCns + ", nVars = " + nVars + ", nResolves = " + nResolves);
     timer.Start();
     var solver = new c.SimplexSolver();
@@ -131,7 +127,6 @@ var SmokeTests = c.inherit({
     var ineqProb = 0.12;
     var maxVars = 3;
     var nVars = nCns;
-    this.InitializeRandoms();
     print("starting timing test. nCns = " + nCns + ", nSolvers = " + nSolvers + ", nResolves = " + nResolves);
     timer.Start();
     var rgsolvers = new Array(nSolvers+1);
@@ -282,11 +277,7 @@ var SmokeTests = c.inherit({
   },
 });
 
-SmokeTests.iRandom = 0;
-SmokeTests.cRandom = 0;
-SmokeTests.vRandom;
-
-(new SmokeTests()).main(1, 100, 10, 50);
+(new PerfTest()).main(1, 100, 10, 50);
 
 //clt.main(new Array());
 })(c);
