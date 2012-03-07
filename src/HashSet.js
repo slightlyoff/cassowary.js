@@ -41,8 +41,8 @@ c.HashSet = c.inherit({
     return this.storage.length;
   },
 
-  each: function(func) {
-    this.storage.forEach(func);
+  each: function(func, scope) {
+    this.storage.forEach(func, scope);
   }
 });
 
