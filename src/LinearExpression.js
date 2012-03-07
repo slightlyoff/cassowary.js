@@ -118,7 +118,11 @@ c.LinearExpression = c.inherit({
     return expr.minus(this);
   },
 
-  addExpression: function(expr /*c.LinearExpression*/, n /*double*/, subject /*c.AbstractVariable*/, solver /*ClTableau*/) {
+  addExpression: function(expr /*c.LinearExpression*/,
+                          n /*double*/,
+                          subject /*c.AbstractVariable*/,
+                          solver /*c.Tableau*/) {
+
     if (expr instanceof c.AbstractVariable) {
       expr = new c.LinearExpression(expr);
       if(c.trace) print("addExpression: Had to cast a var to an expression");
