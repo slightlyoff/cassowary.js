@@ -9,7 +9,7 @@ COPYING.LGPL file.
 Parts Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
 -->
   <head>
-    <title>Cassowary Javascript Smoke Tests</title>
+    <title>Cassowary Javascript Tests</title>
 
     <script>
       // Utility code to log results to the page.
@@ -59,7 +59,7 @@ Parts Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
     <script src="../src/SimplexSolver.js"></script>
     
     <script src="../src/Timer.js"></script>
-    <script src="SmokeTests.js"></script>
+    <script src="PerfTest.js"></script>
     <script>
       window.addEventListener("load", function() {
         append(el("h2", "In-page test results:"));
@@ -70,7 +70,7 @@ Parts Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
     <script>
       (function(scope) {
         // Load tests in a Worker to verify that they run there as well:
-        worker = new Worker("WorkerSmokeTests.js");
+        worker = new Worker("WorkerPerfTest.js");
         
         worker.onmessage = function(e) {
           var d = e.data;
