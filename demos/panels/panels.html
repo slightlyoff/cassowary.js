@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <!--
+    Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
+    Use of this source code is governed by the LGPL, which can be found in the
+    COPYING.LGPL file.
+  -->
+
+  <head>
+    <title>Bork Bork Bork!</title>
+
+    <!-- GCF -->
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <style type="text/css">
+      /* We're an app, so lay ourselves out like one. Just the basics, ma'am. */
+      html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
+        color: #222;
+        background-color: #D9E7FF;
+      }
+
+      body {
+        min-width: 778px;
+        overflow-y: hidden;
+      }
+
+      * {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+
+      /*
+        We're trying to look like IRC Cloud for this demo, so borrow their
+        toolbar styling
+      */
+      ::-webkit-scrollbar {
+        width: 14px;
+        height: 10px;
+      }
+
+      ::-webkit-scrollbar-track-piece {
+        background-color: #f5f5f5;
+        background-clip: padding-box;
+        -webkit-background-clip: padding-box;
+        border: 3px solid #fff;
+        border-radius: 6px;
+        -webkit-border-radius: 6px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #527dff;
+        background-clip: padding-box;
+        -webkit-background-clip: padding-box;
+        border: 3px solid #fff;
+        border-radius: 6px;
+        -webkit-border-radius: 6px;
+      }
+    </style>
+
+    <script defer src="../../src/c.js"></script>
+    <script defer src="../../src/HashTable.js"></script>
+    <script defer src="../../src/HashSet.js"></script>
+    <script defer src="../../src/Error.js"></script>
+    <script defer src="../../src/SymbolicWeight.js"></script>
+    <script defer src="../../src/Strength.js"></script>
+    <script defer src="../../src/Variable.js"></script>
+    <script defer src="../../src/Point.js"></script>
+    <script defer src="../../src/LinearExpression.js"></script>
+    <script defer src="../../src/Constraint.js"></script>
+    <script defer src="../../src/LinearConstraint.js"></script>
+    <script defer src="../../src/EditInfo.js"></script>
+    <script defer src="../../src/Tableau.js"></script>
+    <script defer src="../../src/SimplexSolver.js"></script>
+    <script defer src="../../src/Timer.js"></script>
+
+    <script defer src="domutil.js"></script>
+    <script defer src="panels.js"></script>
+
+    <!--
+      Notes:
+        - I'm using invented tag names in order to make it clear what I'm
+          trying to say and for no other reason. Scripts give them meaning. So be
+          it.
+        - Constraints are expressed in terms of relationships defined in
+          data-layout attributes on panels. The element instances themselves
+          maintain the set of constraints that are sent to the solver and
+          update their CSS in response to variable changes in the engine.
+        - Global environment properties for use in expressions:
+            document.
+              width
+              height
+              left
+              right
+              top
+              bottom
+              contentWidth
+              contentHeight
+              contentLeft
+              contentRight
+              contentTop
+              contentBottom
+
+        - Addressable panel properties for use in expressions:
+            width
+            height
+            left
+            right
+            top
+            bottom
+            contentWidth
+            contentHeight
+            contentLeft
+            contentRight
+            contentTop
+            contentBottom
+
+      minimize:
+        width, height of everything
+      subject to:
+        mh.width = 300;  // weak
+        mh.width <= 500; // strong
+        mh.width >= 100; // string
+    -->
+  </head>
+  <body>
+    <!-- Masthead -->
+    <script type="layout">
+      #mh {
+        width = 300;
+        left = #cList.right;
+        top = document.top;
+        left = 0;
+      }
+      
+      #cList {
+      }
+    </script>
+    <x-panel id="mh">
+    </x-panel>
+
+    <!-- Channel list -->
+    <x-panel id="cList">
+    </x-panel>
+
+  </body>
+</html>
