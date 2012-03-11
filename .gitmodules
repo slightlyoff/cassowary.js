@@ -1,3 +1,6 @@
 [submodule "util/ometa-js"]
 	path = util/ometa-js
 	url = git://github.com/slightlyoff/ometa-js.git
+[submodule "util/mutation-summary"]
+	path = util/mutation-summary
+	url = https://code.google.com/p/mutation-summary/
