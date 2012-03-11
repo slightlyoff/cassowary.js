@@ -12,12 +12,12 @@ RUNNER=''
 
 # FIXME(slightlyoff): Add option parsing to support explicit runtime selection.
 
-if [ -x $D8PATH ]
-then
-  RUNNER='d8 --harmony'
-elif [ -x $JSCPATH ]
+if [ -x $JSCPATH ]
 then
   RUNNER=$JSCPATH
+elif [ -x $D8PATH ]
+then
+  RUNNER='d8 --harmony'
 elif [ -x `which java` ]
 then
   RUNNER='java -classpath ../util/js.jar org.mozilla.javascript.tools.shell.Main'
