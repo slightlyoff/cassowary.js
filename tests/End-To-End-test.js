@@ -260,7 +260,9 @@ doh.add("End-To-End", [
   function inconsistent1(t) {
     var solver = new c.SimplexSolver();
     var x = new c.Variable("x");
+    // x = 10
     solver.addConstraint(new c.LinearEquation(x, 10.0));
+    // x = 5
     t.e(c.RequiredFailure, solver, "addConstraint", [
       new c.LinearEquation(x, 5.0)
     ]);
@@ -295,8 +297,11 @@ doh.add("End-To-End", [
     var solver = new c.SimplexSolver();
     var x = new c.Variable("x");
     var y = new c.Variable("y");
+    // x = 10
     solver.addConstraint(new c.LinearEquation(x, 10.0));
+    // x = y
     solver.addConstraint(new c.LinearEquation(x, y));
+    // y = 5. Should fail.
     t.e(c.RequiredFailure, solver, "addConstraint", [
       new c.LinearEquation(y, 5.0)
     ]);
