@@ -7,27 +7,26 @@
 
 DOH='../util/doh/runner.js'
 JSCPATH='/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Resources/jsc'
-D8PATH=`which d8`
+D8PATH=$(type -P d8)
+JPATH=$(type -P java)
 RUNNER=''
 
 # FIXME(slightlyoff): Add option parsing to support explicit runtime selection.
 
-if [ -x $JSCPATH ]
-then
-  RUNNER=$JSCPATH
-elif [ -x $D8PATH ]
-then
-  RUNNER='d8 --harmony'
-elif [ -x `which java` ]
-then
-  RUNNER='java -classpath ../util/js.jar org.mozilla.javascript.tools.shell.Main'
+if   [ $D8PATH ]  && [ -x $D8PATH ]; then
+  RUNNER='d8 --harmony';
+elif [ $JSCPATH ] && [ -x $JSCPATH ]; then
+  RUNNER=$JSCPATH;
+elif [ $JPATH ]   && [ -x $JPATH ]; then
+  RUNNER='$JPATH -classpath ../util/js.jar org.mozilla.javascript.tools.shell.Main';
 else
   echo "FAILED: No JavaScript Runtime Found! Please install Java or the V8 Shell (d8) and add them to your \$PATH"
   exit 1;
 fi
 
-echo ""
 echo "===================================================================="
+echo "= Using runtime: $RUNNER"
+echo "=-------------------------------------------------------------------"
 echo "= Unit Tests"
 echo "===================================================================="
 echo ""
