@@ -19,7 +19,7 @@ c.Tableau = c.inherit({
 
     this._columns = new c.HashTable(); // values are sets
 
-    this._rows = new c.HashTable(); // values are ClLinearExpressions
+    this._rows = new c.HashTable(); // values are c.LinearExpressions
 
     this._infeasibleRows = new c.HashSet();
     this._externalRows = new c.HashSet();
@@ -90,7 +90,7 @@ c.Tableau = c.inherit({
     */
   },
 
-  addRow: function(aVar /*ClAbstractVariable*/, expr /*ClLinearExpression*/) {
+  addRow: function(aVar /*ClAbstractVariable*/, expr /*c.LinearExpression*/) {
     var that = this;
     if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
     // print("addRow: " + aVar + " (key), " + expr + " (value)");
@@ -117,7 +117,7 @@ c.Tableau = c.inherit({
     var rows = /* Set */ this._columns.remove(aVar);
     if (rows) {
       rows.each(function(clv) {
-        var expr = /* ClLinearExpression */that._rows.get(clv);
+        var expr = /* c.LinearExpression */that._rows.get(clv);
         expr.terms().remove(aVar);
       });
     } else {
@@ -132,7 +132,7 @@ c.Tableau = c.inherit({
   removeRow: function(aVar /*ClAbstractVariable*/) {
     var that = this;
     if (c.trace) c.fnenterprint("removeRow:" + aVar);
-    var expr = /* ClLinearExpression */this._rows.get(aVar);
+    var expr = /* c.LinearExpression */this._rows.get(aVar);
     c.Assert(expr != null);
     expr.terms().each(function(clv, coeff) {
       var varset = that._columns.get(clv);
@@ -150,13 +150,13 @@ c.Tableau = c.inherit({
     return expr;
   },
 
-  substituteOut: function(oldVar /*ClAbstractVariable*/, expr /*ClLinearExpression*/) {
+  substituteOut: function(oldVar /*ClAbstractVariable*/, expr /*c.LinearExpression*/) {
     var that = this;
     if (c.trace) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
     if (c.trace) c.traceprint(this.toString());
     var varset = /* Set */this._columns.get(oldVar);
     varset.each(function(v) {
-      var row = /* ClLinearExpression */that._rows.get(v);
+      var row = /* c.LinearExpression */that._rows.get(v);
       row.substituteOut(oldVar, expr, v, that);
       if (v.isRestricted && row.constant < 0.0) {
         that._infeasibleRows.add(v);
@@ -182,7 +182,7 @@ c.Tableau = c.inherit({
   },
 
   rowExpression: function(v /*ClAbstractVariable*/) {
-    return /* ClLinearExpression */this._rows.get(v);
+    return /* c.LinearExpression */this._rows.get(v);
   },
 });
 

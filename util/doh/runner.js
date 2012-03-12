@@ -290,9 +290,6 @@ doh.registerUrl = function(	/*String*/ group,
 	// this._urls.push(url);
 }
 
-doh.registerString = function(group, str, type){
-}
-
 // FIXME: remove the doh.add alias SRTL.
 doh.register = doh.add = function(groupOrNs, testOrNull, type){
 	// summary:
@@ -670,33 +667,7 @@ doh.run = function(){
 	// scope protection
 	var x;
 	try {
-		if(typeof load == "function") {
-			throw new Error();
-		} else if(typeof define == "function" && define.vendor!="dojotoolkit.org") {
-			// using a real AMD loader; it will load runnerFile
-		} else if(this["document"]) {
-			// if we survived all of that, we're probably in a browser but
-			// don't have Dojo handy and/or are using an AMD loader.
-			// Load _browserRunner.js using a document.write() call.
-
-			// find runner.js, load _browserRunner relative to it
-			var scripts = document.getElementsByTagName("script"), runnerFile;
-			for(x=0; x<scripts.length; x++){
-				var s = scripts[x].src;
-				if(s){
-					if(!runnerFile && s.substr(s.length - 9) == "runner.js"){
-						runnerFile = s;
-					}else if(s.substr(s.length - 17) == "_browserRunner.js"){
-						runnerFile = null;
-						break;
-					}
-				}
-			}
-			if(runnerFile) {
-				document.write("<scri"+"pt src='" + runnerFile.substr(0, runnerFile.length - 9)
-					+ "_browserRunner.js' type='text/javascript'></scr"+"ipt>");
-			}
-		}
+		if(!this["document"]) { throw "No browser environment!"; }
 	} catch(e) {
 		print("\n"+doh._line);
 		print("The Dojo Unit Test Harness, $Rev: 24146 $");

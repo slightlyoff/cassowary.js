@@ -46,31 +46,31 @@ this.onerror = function(e) {
   }
 })(this);
 
-importScripts('../src/c.js');
-importScripts('../src/HashTable.js');
-importScripts('../src/HashSet.js');
-importScripts('../src/Error.js');
-importScripts('../src/SymbolicWeight.js');
-importScripts('../src/Strength.js');
-importScripts('../src/Variable.js');
-importScripts('../src/Point.js');
-importScripts('../src/LinearExpression.js');
-importScripts('../src/Constraint.js');
-importScripts('../src/LinearConstraint.js');
-importScripts('../src/EditInfo.js');
-importScripts('../src/Tableau.js');
-importScripts('../src/SimplexSolver.js');
-importScripts('../src/Timer.js');
+importScripts("../src/c.js");
+importScripts("../src/HashTable.js");
+importScripts("../src/HashSet.js");
+importScripts("../src/Error.js");
+importScripts("../src/SymbolicWeight.js");
+importScripts("../src/Strength.js");
+importScripts("../src/Variable.js");
+importScripts("../src/Point.js");
+importScripts("../src/LinearExpression.js");
+importScripts("../src/Constraint.js");
+importScripts("../src/LinearConstraint.js");
+importScripts("../src/EditInfo.js");
+importScripts("../src/Tableau.js");
+importScripts("../src/SimplexSolver.js");
+importScripts("../src/Timer.js");
 
 this.onmessage = function(m) {
   if (m.data[0] == "init") {
     if (navigator.appName == "Opera") {
       print("Unable to capture console.log(), only errors will display.");
-      print("Importing Smoke tests");
+      print("Importing Perf test");
     }
-    importScripts('SmokeTests.js');
+    importScripts("PerfTest.js");
     if (navigator.appName == "Opera") {
-      print("Smoke Tests Finished!");
+      print("Perf Tests Finished!");
     }
   }
 };

@@ -22,6 +22,11 @@ try {
   });
 }
 
+var inBrowser = (typeof scope["HTMLBodyElement"] == "function");
+var getTagname = function(ctor) {
+  return "div";
+};
+
 // Global
 scope.c = {
   //
@@ -82,6 +87,39 @@ scope.c = {
         rp[x] = props[x];
       }
     });
+
+    // If we're in a browser, we want to support "subclassing" HTML elements.
+    // This needs some magic and we rely on a wrapped constructor hack to make
+    // it happen.
+    if (inBrowser) {
+      if (parent && parent.prototype instanceof scope.HTMLElement) {
+        var intermediateCtor = realCtor;
+        var tn = getTagname(parent);
+        var upgrade = function(el) {
+          el.__proto__ = rp;
+          intermediateCtor.apply(el, arguments);
+          if (rp["created"]) { el.created(); }
+          if (rp["decorate"]) { el.decorate(); }
+          // We hack the constructor to always return an element with it's
+          // prototype wired to ours. Boo.
+          return el;
+        };
+        var upgradePd = {
+          writable: true,
+          configurable: true,
+          enumerable: false,
+          value: upgrade,
+        };
+        Object.defineProperty(rp, "upgrade", upgradePd);
+        realCtor = function() {
+          return this.upgrade(
+            scope.document.createElement(tn)
+          );
+        }
+        realCtor.prototype = rp;
+      }
+    }
+
     return realCtor;
   },
 
