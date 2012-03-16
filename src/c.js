@@ -106,7 +106,7 @@ scope.c = {
   },
 
   extend: function(obj, props) {
-    return this.own(props, function(x) {
+    this.own(props, function(x) {
       var pd = Object.getOwnPropertyDescriptor(props, x);
       if ( (typeof pd["get"] == "function") ||
            (typeof pd["set"] == "function") ) {
@@ -120,6 +120,7 @@ scope.c = {
         obj[x] = props[x];
       }
     });
+    return obj;
   },
 
   own: function(obj, cb, context) {
