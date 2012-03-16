@@ -29,6 +29,7 @@
         overflow-y: hidden;
       }
 
+      /* Ensure that we are always in a layout mode that doesn't suck eggs */
       * {
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
@@ -61,26 +62,92 @@
         border-radius: 6px;
         -webkit-border-radius: 6px;
       }
+
+      /* Base styling for all panel elements */
+      .panel {
+        /* Turn off system constraint layouts for panels */
+        position:   absolute;
+        margin:     none;
+        padding:    none;
+        border:     none;
+      }
     </style>
 
-    <script defer src="../../src/c.js"></script>
-    <script defer src="../../src/HashTable.js"></script>
-    <script defer src="../../src/HashSet.js"></script>
-    <script defer src="../../src/Error.js"></script>
-    <script defer src="../../src/SymbolicWeight.js"></script>
-    <script defer src="../../src/Strength.js"></script>
-    <script defer src="../../src/Variable.js"></script>
-    <script defer src="../../src/Point.js"></script>
-    <script defer src="../../src/LinearExpression.js"></script>
-    <script defer src="../../src/Constraint.js"></script>
-    <script defer src="../../src/LinearConstraint.js"></script>
-    <script defer src="../../src/EditInfo.js"></script>
-    <script defer src="../../src/Tableau.js"></script>
-    <script defer src="../../src/SimplexSolver.js"></script>
-    <script defer src="../../src/Timer.js"></script>
+    <script defer="defer" src="../../src/c.js"></script>
+    <script defer="defer" src="../../src/HashTable.js"></script>
+    <script defer="defer" src="../../src/HashSet.js"></script>
+    <script defer="defer" src="../../src/Error.js"></script>
+    <script defer="defer" src="../../src/SymbolicWeight.js"></script>
+    <script defer="defer" src="../../src/Strength.js"></script>
+    <script defer="defer" src="../../src/Variable.js"></script>
+    <script defer="defer" src="../../src/Point.js"></script>
+    <script defer="defer" src="../../src/LinearExpression.js"></script>
+    <script defer="defer" src="../../src/Constraint.js"></script>
+    <script defer="defer" src="../../src/LinearConstraint.js"></script>
+    <script defer="defer" src="../../src/EditInfo.js"></script>
+    <script defer="defer" src="../../src/Tableau.js"></script>
+    <script defer="defer" src="../../src/SimplexSolver.js"></script>
+    <script defer="defer" src="../../src/Timer.js"></script>
 
-    <script defer src="domutil.js"></script>
-    <script defer src="panels.js"></script>
+    <script defer="defer" src="domutil.js"></script>
+    <script defer="defer" src="panels.js"></script>
+
+    <script>
+      // Ctrl-R testing. The VERY BEST kind ;-)
+      window.addEventListener("load", function() {
+        "use strict";
+
+        // Create a panel, add it to the document.
+        var p = new Panel();
+        document.body.appendChild(p);
+
+        // Subclass Panel and ensure that we're actually an element type.
+        var SubPanel = c.inherit({
+          extends: Panel,
+          initialize: function() {
+            Panel.ctor.call(this); // HACK!!!
+          },
+        });
+
+        var sp = new SubPanel();
+        document.body.appendChild(sp);
+        sp.style.outline = "1px solid black";
+        sp.style.width = "100%";
+        sp.style.height = "100%";
+
+        p.style.outline = "1px solid blue";
+        p.style.width = "100%";
+        p.style.height = "100%";
+
+        p.constraints.push(
+          new c.LinearEquation(p.vars.left, 100),
+          new c.LinearEquation(p.vars.top, 100),
+          new c.LinearInequality(p.vars.width,   c.GEQ, 100),
+          new c.LinearInequality(p.vars.height,  c.GEQ, 100)
+        );
+
+        sp.constraints.push(
+          new c.LinearInequality(sp.vars.width,  c.GEQ, 100),
+          new c.LinearInequality(sp.vars.height, c.GEQ, 100),
+          new c.LinearInequality(sp.vars.left,   c.GEQ, p.vars.right),
+          new c.LinearInequality(sp.vars.top,    c.GEQ, p.vars.bottom)
+        );
+
+        // Ensure that the panels know they're attached. We won't have to do
+        // this manually in the near future.
+        p.attach();
+        sp.attach();
+
+        // Add something to the global solver to kick off a resolution
+        var x = new c.Variable(167);
+        var y = new c.Variable(2);
+        var eq = new c.LinearEquation(x, new c.LinearExpression(y));
+        document.solver.addConstraint(eq);
+
+        // Did we get notified? Check the console.
+
+      });
+    </script>
 
     <!--
       Notes:
@@ -129,8 +196,7 @@
     -->
   </head>
   <body>
-    <!-- Masthead -->
-    <script type="layout">
+    <script type="constraint-layout">
       #mh {
         width = 300;
         left = #cList.right;
@@ -141,6 +207,8 @@
       #cList {
       }
     </script>
+
+    <!-- Masthead -->
     <x-panel id="mh">
     </x-panel>
 
