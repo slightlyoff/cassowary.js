@@ -61,7 +61,9 @@ scope.c = {
       delete props["initialize"];
     }
 
-    var realCtor = ctor || function() {};
+    var realCtor = ctor || function() {
+      console.log("If you do no bring a jacket, one will be provided for you");
+    };
 
     /* 
     // NOTE: would happily do this except it's 2x slower. Boo!
@@ -80,6 +82,7 @@ scope.c = {
     // it happen.
     if (inBrowser) {
       if (parent && parent.prototype instanceof scope.HTMLElement) {
+        console.log("Creating HTMLElement subclass");
         var intermediateCtor = realCtor;
         var tn = getTagname(parent);
         var upgrade = function(el) {
@@ -91,7 +94,9 @@ scope.c = {
           // prototype wired to ours. Boo.
           return el;
         };
-        this.extend(rp, { upgrade: upgrade });
+        this.extend(rp, {
+          upgrade: upgrade,
+        });
 
         realCtor = function() {
           return this.upgrade(
@@ -99,6 +104,7 @@ scope.c = {
           );
         }
         realCtor.prototype = rp;
+        this.extend(realCtor, { ctor: intermediateCtor, }); // HACK!!!
       }
     }
 
