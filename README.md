@@ -7,11 +7,10 @@ the [Cassowary hierarchial constraint
 toolkit](http://www.cs.washington.edu/research/constraints/cassowary/) to
 [JavaScript](http://cassowary.cvs.sourceforge.net/viewvc/cassowary/cassowary/js/).
 
-This fork removes any external library dependencies and improves the overall
-code style. Work is underway to make the solving core suitable for use inside
-web workers and to improve the performance of the code by a large constant
-factor. This version is already 8x faster than the original at running the
-built-in test suite under V8 (5x faster under Rhino).
+This fork dramatically improves the performance of the original mechanical
+translation (8x under V8, 5x under Rhino), removing external library
+dependencies while improving hackability. The solver core can now be used
+inside web workers and many modern browsers.
 
 Constraint Solver? Say What?
 ----------------------------
