@@ -82,7 +82,7 @@ scope.c = {
     // it happen.
     if (inBrowser) {
       if (parent && parent.prototype instanceof scope.HTMLElement) {
-        console.log("Creating HTMLElement subclass");
+        // console.log("Creating HTMLElement subclass");
         var intermediateCtor = realCtor;
         var tn = getTagname(parent);
         var upgrade = function(el) {
