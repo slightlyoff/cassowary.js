@@ -173,33 +173,17 @@ scope.c = {
     return e1.minus(e2);
   },
 
-  Times: function(e1,e2) {
-    // FIXME: re-order based on hotness
-    if (e1 instanceof c.LinearExpression &&
-        e2 instanceof c.LinearExpression) {
-      return e1.times(e2);
-    } else if (e1 instanceof c.LinearExpression &&
-               e2 instanceof c.Variable) {
-      return e1.times(new c.LinearExpression(e2));
-    } else if (e1 instanceof c.Variable &&
-               e2 instanceof c.LinearExpression) {
-      return (new c.LinearExpression(e1)).times(e2);
-    } else if (e1 instanceof c.LinearExpression &&
-               typeof(e2) == 'number') {
-      return e1.times(new c.LinearExpression(e2));
-    } else if (typeof(e1) == 'number' &&
-               e2 instanceof c.LinearExpression) {
-      return (new c.LinearExpression(e1)).times(e2);
-    } else if (typeof(e1) == 'number' &&
-               e2 instanceof c.Variable) {
-      return (new c.LinearExpression(e2, e1));
-    } else if (e1 instanceof c.Variable &&
-               typeof(e2) == 'number') {
-      return (new c.LinearExpression(e1, e2));
-    } else if (e1 instanceof c.Variable &&
-               e2 instanceof c.LinearExpression) {
-      return (new c.LinearExpression(e2, n));
+  Times: function(e1, e2) {
+
+    if (typeof e1 == "number" || e1 instanceof c.Variable) {
+      e1 = new c.LinearExpression(e1);
     }
+
+    if (typeof e2 == "number" || e2 instanceof c.Variable) {
+      e2 = new c.LinearExpression(e2);
+    }
+
+    return e1.times(e2);
   },
 
   Divide: function(e1 /*c.LinearExpression*/, e2 /*c.LinearExpression*/) {
