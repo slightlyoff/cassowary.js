@@ -111,7 +111,7 @@ scope.c = {
       if ( (typeof pd["get"] == "function") ||
            (typeof pd["set"] == "function") ) {
         Object.defineProperty(obj, x, pd);
-      } else if (typeof pd["value"] == "function") {
+      } else if (typeof pd["value"] == "function" ||x.charAt(0) === "_") {
         pd.writable = true;
         pd.configurable = true;
         pd.enumerable = false;
