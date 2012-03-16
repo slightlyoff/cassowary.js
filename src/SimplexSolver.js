@@ -110,16 +110,12 @@ c.SimplexSolver = c.inherit({
 
   addEditVar: function(v /*c.Variable*/, strength /*c.Strength*/) {
     if (c.trace) c.fnenterprint("addEditVar: " + v + " @ " + strength);
-    strength = strength || c.Strength.strong;
-    var cnEdit = new c.EditConstraint(v, strength);
-    return this.addConstraint(cnEdit);
+    return this.addConstraint(
+        new c.EditConstraint(v, strength || c.Strength.strong));
   },
 
   removeEditVar: function(v /*c.Variable*/) {
-    var cei = /* c.EditInfo */this._editVarMap.get(v);
-    var cn = cei.constraint;
-    this.removeConstraint(cn);
-    return this;
+    return this.removeConstraint(this._editVarMap.get(v).constraint);
   },
 
   beginEdit: function() {
