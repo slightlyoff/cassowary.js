@@ -1,12 +1,11 @@
 /**
- * Copyright 2011 Alex Russell <slightlyoff@google.com>.
+ * Copyright 2012 Alex Russell <slightlyoff@google.com>.
  *
  * Use of this source code is governed by the LGPL, which can be found in the
  * COPYING.LGPL file.
  *
- * This is an API compatible re-implementation of the API of jshashtable needed
- * by Cassowary. It includes nothing more than what Cassowary was using and
- * contains no code from jshashset.
+ * This is an API compatible re-implementation of a the subset of jshashtable
+ * which Cassowary actually uses.
  *
  * Features removed:
  *
@@ -30,6 +29,9 @@
  * Additions:
  *
  *     - new "scope" parameter to each() and escapingEach()
+ *
+ * FIXME(slightlyoff):
+ *      - Use Map as the backing storage if it is available.
  */
 
 (function(c) {
@@ -37,8 +39,6 @@
 
 var keyCode = function(key) {
   var kc = (typeof key.hashCode == "function") ? key.hashCode() : key.toString();
-  // var kc = key.toString();
-  // console.log("keyCode:", key, kc);
   return kc;
 };
 
@@ -46,7 +46,10 @@ var copyOwn = function(src, dest) {
   for (var x in src) {
     if (src.hasOwnProperty(x)) { dest[x] = src[x]; }
   }
-}
+};
+
+// For escapingEach
+var defaultContext = {};
 
 c.HashTable = c.inherit({
 
@@ -132,8 +135,8 @@ c.HashTable = c.inherit({
     if (!this._size) { return; }
 
     var that = this;
-    var context = {};
-    var kl = this._keyList.slice();
+    var context = defaultContext;
+    var kl = this._keyList;
     for (var x = 0; x < kl.length; x++) {
       (function(v) {
         if (that._store.hasOwnProperty(v)) {
