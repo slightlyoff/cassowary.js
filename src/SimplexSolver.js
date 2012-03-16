@@ -108,14 +108,14 @@ c.SimplexSolver = c.inherit({
     }
   },
 
-  addEditVar: function(v /*ClVariable*/, strength /*c.Strength*/) {
+  addEditVar: function(v /*c.Variable*/, strength /*c.Strength*/) {
     if (c.trace) c.fnenterprint("addEditVar: " + v + " @ " + strength);
     strength = strength || c.Strength.strong;
     var cnEdit = new c.EditConstraint(v, strength);
     return this.addConstraint(cnEdit);
   },
 
-  removeEditVar: function(v /*ClVariable*/) {
+  removeEditVar: function(v /*c.Variable*/) {
     var cei = /* c.EditInfo */this._editVarMap.get(v);
     var cn = cei.constraint;
     this.removeConstraint(cn);
@@ -160,14 +160,9 @@ c.SimplexSolver = c.inherit({
 
   addPointStays: function(listOfPoints /*Vector*/) {
     if (c.trace) c.fnenterprint("addPointStays" + listOfPoints);
-
-    var weight = 1.0;
-    var multiplier = 2.0;
-
-    for (var i = 0; i < listOfPoints.length; i++) {
-      this.addPointStay(/* c.Point */listOfPoints[i], weight);
-      weight *= multiplier;
-    }
+    listOfPoints.forEach(function(p, idx) {
+      this.addPointStay(p, Math.pow(2, idx));
+    }, this);
     return this;
   },
 
@@ -184,7 +179,7 @@ c.SimplexSolver = c.inherit({
     return this;
   },
 
-  addStay: function(v /*ClVariable*/, strength /*c.Strength*/, weight /*double*/) {
+  addStay: function(v /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
     var cn = new c.StayConstraint(v,
                                   strength || c.Strength.weak,
                                   weight || 1.0);
@@ -241,7 +236,11 @@ c.SimplexSolver = c.inherit({
           if (c.trace) c.traceprint("Marker " + marker + "'s coefficient in " + expr + " is " + coeff);
           if (coeff < 0.0) {
             var r = -expr.constant / coeff;
-            if (exitVar == null || r < minRatio || (c.approx(r, minRatio) && v.hashCode() < exitVar.hashCode())) {
+            if (
+              exitVar == null ||
+              r < minRatio    ||
+              (c.approx(r, minRatio) && v.hashCode() < exitVar.hashCode())
+            ) {
               minRatio = r;
               exitVar = v;
             }
@@ -265,8 +264,7 @@ c.SimplexSolver = c.inherit({
       if (exitVar == null) {
         if (col.size() == 0) {
           this.removeColumn(marker);
-        }
-        else {
+        } else {
           col.escapingEach(function(v) {
             if (v != this._objective) {
               exitVar = v;
@@ -288,6 +286,7 @@ c.SimplexSolver = c.inherit({
         if (v != marker) { this.removeColumn(v); }
       }, this);
     }
+
     if (cn.isStayConstraint) {
       if (eVars != null) {
         for (var i = 0; i < this._stayPlusErrorVars.length; i++) {
@@ -295,23 +294,23 @@ c.SimplexSolver = c.inherit({
           eVars.remove(this._stayMinusErrorVars[i]);
         }
       }
-    }
-    else if (cn.isEditConstraint) {
+    } else if (cn.isEditConstraint) {
       c.Assert(eVars != null, "eVars != null");
-      var cnEdit = /* c.EditConstraint */cn;
-      var clv = cnEdit.variable;
-      var cei = this._editVarMap.get(clv);
+      var cei = this._editVarMap.get(cn.variable);
       var clvEditMinus = cei.clvEditMinus;
       this.removeColumn(clvEditMinus);
-      this._editVarMap.remove(clv);
+      this._editVarMap.remove(cn.variable);
     }
+
     if (eVars != null) {
       this._errorVars.remove(eVars);
     }
+
     if (this.autoSolve) {
       this.optimize(this._objective);
       this.setExternalVariables();
     }
+
     return this;
   },
 
@@ -344,7 +343,7 @@ c.SimplexSolver = c.inherit({
     this.resetStayConstants();
   },
 
-  suggestValue: function(v /*ClVariable*/, x /*double*/) {
+  suggestValue: function(v /*c.Variable*/, x /*double*/) {
     if (c.trace) c.fnenterprint("suggestValue(" + v + ", " + x + ")");
     var cei = this._editVarMap.get(v);
     if (cei == null) {
@@ -370,37 +369,39 @@ c.SimplexSolver = c.inherit({
     return this;
   },
 
-  setEditedValue: function(v /*ClVariable*/, n /*double*/) {
+  setEditedValue: function(v /*c.Variable*/, n /*double*/) {
     if (!this.FContainsVariable(v)) {
       v.change_value(n);
       return this;
     }
+
     if (!c.approx(n, v.value())) {
       this.addEditVar(v);
       this.beginEdit();
+
       try {
         this.suggestValue(v, n);
-      }
-      catch (e /*ExCLError*/){
+      } catch (e /*c.Error*/) {
         throw new c.InternalError("Error in setEditedValue");
       }
+
       this.endEdit();
     }
     return this;
   },
 
-  FContainsVariable: function(v /*ClVariable*/) {
+  FContainsVariable: function(v /*c.Variable*/) {
     return this.columnsHasKey(v) || (this.rowExpression(v) != null);
   },
 
-  addVar: function(v /*ClVariable*/) {
+  addVar: function(v /*c.Variable*/) {
     if (!this.FContainsVariable(v)) {
       try {
         this.addStay(v);
-      }
-      catch (e /*ExCLRequiredFailure*/){
+      } catch (e /*c.RequiredFailure*/){
         throw new c.InternalError("Error in addVar -- required failure is impossible");
       }
+
       if (c.trace) {
         c.traceprint("added initial stay on " + v);
       }
