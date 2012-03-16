@@ -22,7 +22,7 @@ c.LinearExpression = c.inherit({
 
     if (clv instanceof c.AbstractVariable) {
       this._terms.put(clv, value || 1);
-    } else if (typeof(clv) == 'number') {
+    } else if (typeof clv == 'number') {
       this.constant = clv;
     }
   },
@@ -62,14 +62,13 @@ c.LinearExpression = c.inherit({
   },
 
   times: function(x) {
-    if (typeof(x) == 'number') {
+    if (typeof x == 'number') {
       return (this.clone()).multiplyMe(x);
     } else {
       if (this.isConstant()) {
-        expr = x;
-        return expr.times(this.constant);
-      } else if (expr.isConstant()) {
-        return this.times(expr.constant);
+        return x.times(this.constant);
+      } else if (x.isConstant()) {
+        return this.times(x.constant);
       } else {
         throw new c.NonlinearExpression();
       }
@@ -94,13 +93,13 @@ c.LinearExpression = c.inherit({
 
 
   divide: function(x) {
-    if (typeof(x) == 'number') {
+    if (typeof x == 'number') {
       if (c.approx(x, 0.0)) {
         throw new c.NonlinearExpression();
       }
       return this.times(1.0 / x);
     } else if (x instanceof c.LinearExpression) {
-      if (!x.isConstant) {
+      if (!x.isConstant()) {
         throw new c.NonlinearExpression();
       }
       return this.times(1.0 / x.constant);
