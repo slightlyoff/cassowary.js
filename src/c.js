@@ -24,6 +24,7 @@ try {
 
 var inBrowser = (typeof scope["HTMLBodyElement"] == "function");
 var getTagname = function(ctor) {
+  // FIXME(slightlyoff): need a lookup table!
   return "div";
 };
 var epsilon = 1.0e-8;
@@ -147,7 +148,7 @@ scope.c = {
 
   Assert: function(f /*boolean*/, description /*String*/) {
     if (!f) {
-      throw new c.InternalError("Assertion failed:" + description);
+      throw new c.InternalError("Assertion failed: " + description);
     }
   },
 
@@ -165,7 +166,6 @@ scope.c = {
     if (!(e1 instanceof c.LinearExpression)) {
       e1 = new c.LinearExpression(e1);
     }
-
     if (!(e2 instanceof c.LinearExpression)) {
       e2 = new c.LinearExpression(e2);
     }
@@ -174,11 +174,9 @@ scope.c = {
   },
 
   Times: function(e1, e2) {
-
     if (typeof e1 == "number" || e1 instanceof c.Variable) {
       e1 = new c.LinearExpression(e1);
     }
-
     if (typeof e2 == "number" || e2 instanceof c.Variable) {
       e2 = new c.LinearExpression(e2);
     }
