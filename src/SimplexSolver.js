@@ -797,6 +797,11 @@ c.SimplexSolver = c.inherit({
       v.change_value(expr.constant);
     }, this);
     this._fNeedsSolving = false;
+    this.onsolved();
+  },
+
+  onsolved: function() {
+    // Lifecycle stub. Here for dirty, dirty monkey patching.
   },
 
   insertErrorVar: function(cn /*c.Constraint*/, aVar /*c.AbstractVariable*/) {
