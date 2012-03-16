@@ -26,6 +26,7 @@ var inBrowser = (typeof scope["HTMLBodyElement"] == "function");
 var getTagname = function(ctor) {
   return "div";
 };
+var epsilon = 1.0e-8;
 
 // Global
 scope.c = {
@@ -61,9 +62,7 @@ scope.c = {
       delete props["initialize"];
     }
 
-    var realCtor = ctor || function() {
-      console.log("If you do no bring a jacket, one will be provided for you");
-    };
+    var realCtor = ctor || function() { };
 
     /* 
     // NOTE: would happily do this except it's 2x slower. Boo!
@@ -208,20 +207,15 @@ scope.c = {
   },
 
   approx: function(a /*double*/, b /*double*/) {
-    if (a instanceof c.Variable) {
-      a = a.value();
-    }
-    if (b instanceof c.Variable) {
-      b = b.value();
-    }
-    var epsilon = 1.0e-8;
+    if (a instanceof c.Variable) { a = a.value(); }
+    if (b instanceof c.Variable) { b = b.value(); }
     if (a == 0.0) {
       return (Math.abs(b) < epsilon);
-    } else if (b == 0.0) {
-      return (Math.abs(a) < epsilon);
-    } else {
-      return (Math.abs(a - b) < Math.abs(a) * epsilon);
     }
+    if (b == 0.0) {
+      return (Math.abs(a) < epsilon);
+    }
+    return (Math.abs(a - b) < Math.abs(a) * epsilon);
   },
 
   hashToString: function(h) {
