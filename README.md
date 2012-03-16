@@ -52,10 +52,9 @@ $ git submodule update
 ...
 ```
 
-To run the tests, check out this repository and point your thorougly modern
-browser at `unittests.html` or `quaddemo.html`. To run from the command line,
-first, see if they already run without any extra work (they should on a Mac or
-Linux with recent Java):
+To run the tests, point your thorougly modern browser at `tests/unittests.html`
+or `demos/quad/quaddemo.html`. To run from the command line, first, see if they
+already run without any extra work (they should on most Mac or Linux boxes):
 
 ```
 $ cd tests
