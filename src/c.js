@@ -73,20 +73,7 @@ scope.c = {
       ((parent) ? parent.prototype : Object.prototype)
     );
 
-    Object.getOwnPropertyNames(props).forEach(function(x) {
-      var pd = Object.getOwnPropertyDescriptor(props, x);
-      if ( (typeof pd["get"] == "function") ||
-           (typeof pd["set"] == "function") ) {
-        Object.defineProperty(rp, x, pd);
-      } else if (typeof pd["value"] == "function") {
-        pd.writable = true;
-        pd.configurable = true;
-        pd.enumerable = false;
-        Object.defineProperty(rp, x, pd);
-      } else {
-        rp[x] = props[x];
-      }
-    });
+    this.extend(rp, props);
 
     // If we're in a browser, we want to support "subclassing" HTML elements.
     // This needs some magic and we rely on a wrapped constructor hack to make
@@ -104,13 +91,8 @@ scope.c = {
           // prototype wired to ours. Boo.
           return el;
         };
-        var upgradePd = {
-          writable: true,
-          configurable: true,
-          enumerable: false,
-          value: upgrade,
-        };
-        Object.defineProperty(rp, "upgrade", upgradePd);
+        this.extend(rp, { upgrade: upgrade });
+
         realCtor = function() {
           return this.upgrade(
             scope.document.createElement(tn)
@@ -121,6 +103,23 @@ scope.c = {
     }
 
     return realCtor;
+  },
+
+  extend: function(obj, props) {
+    Object.getOwnPropertyNames(props).forEach(function(x) {
+      var pd = Object.getOwnPropertyDescriptor(props, x);
+      if ( (typeof pd["get"] == "function") ||
+           (typeof pd["set"] == "function") ) {
+        Object.defineProperty(obj, x, pd);
+      } else if (typeof pd["value"] == "function") {
+        pd.writable = true;
+        pd.configurable = true;
+        pd.enumerable = false;
+        Object.defineProperty(obj, x, pd);
+      } else {
+        obj[x] = props[x];
+      }
+    });
   },
 
   debugprint: function(s /*String*/) {
