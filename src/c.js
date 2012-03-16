@@ -106,7 +106,7 @@ scope.c = {
   },
 
   extend: function(obj, props) {
-    Object.getOwnPropertyNames(props).forEach(function(x) {
+    return this.own(props, function(x) {
       var pd = Object.getOwnPropertyDescriptor(props, x);
       if ( (typeof pd["get"] == "function") ||
            (typeof pd["set"] == "function") ) {
@@ -120,6 +120,11 @@ scope.c = {
         obj[x] = props[x];
       }
     });
+  },
+
+  own: function(obj, cb, context) {
+    Object.getOwnPropertyNames(obj).forEach(cb, context||scope);
+    return obj;
   },
 
   debugprint: function(s /*String*/) {
