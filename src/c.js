@@ -22,7 +22,7 @@ try {
   });
 }
 
-var inBrowser = (typeof scope["HTMLBodyElement"] == "function");
+var inBrowser = (typeof scope["HTMLElement"] != "undefined");
 var getTagname = function(ctor) {
   // FIXME(slightlyoff): need a lookup table!
   return "div";
@@ -82,7 +82,6 @@ scope.c = {
     // it happen.
     if (inBrowser) {
       if (parent && parent.prototype instanceof scope.HTMLElement) {
-        // console.log("Creating HTMLElement subclass");
         var intermediateCtor = realCtor;
         var tn = getTagname(parent);
         var upgrade = function(el) {
@@ -94,12 +93,10 @@ scope.c = {
           // prototype wired to ours. Boo.
           return el;
         };
-        this.extend(rp, {
-          upgrade: upgrade,
-        });
+        this.extend(rp, { upgrade: upgrade, });
 
         realCtor = function() {
-          return this.upgrade(
+          return upgrade(
             scope.document.createElement(tn)
           );
         }

@@ -70,12 +70,8 @@
         margin:     none;
         padding:    none;
         border:     none;
-      }
 
-      .ugly {
-        border: 1em solid blue;
-        width: 30%;
-        height: 30%;
+        box-shadow: 2px 8px 6px 0px rgba(133, 133, 133, 1);
       }
     </style>
 
@@ -108,9 +104,6 @@
         // Create a panel, add it to the document.
         var p = new Panel();
 
-        // Ugly by default so we can see the system working
-        p.classList.add("ugly");
-
         document.body.appendChild(p);
 
 
@@ -119,7 +112,6 @@
           extends: Panel,
           initialize: function() {
             Panel.ctor.call(this); // HACK!!!
-            this.classList.add("ugly");
           },
         });
 

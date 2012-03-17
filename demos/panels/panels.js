@@ -8,6 +8,7 @@
 //        most of this lifecycle driving behavior. Probably means over-riding
 //        appendChild/removeChild for it, etc.
 //      * min* and max* properties
+//      * Make panels draggable to show edit vars at work
 
 
 // Create a global solver
@@ -17,15 +18,16 @@ var s = document.solver = c.extend(new c.SimplexSolver(), {
 
     // When we have a solution, dispatch an event.
     var e = document.createEvent("UIEvents");
-    e.initUIEvent("solved", false, false, window);
+    e.initUIEvent("solved", false, false, window, true);
     document.dispatchEvent(e);
   },
 });
 
 var _idCounter = 0;
 var _vendedIds = [];
+
 var uniqueId = function(p) {
-  if (p && typeof p["id"] != "undefined") {
+  if (p && p.id) {
     return p.id;
   } else {
     var tid = "Panel_" + _idCounter++;
@@ -128,7 +130,7 @@ scope.Panel = c.inherit({
     this.panels.forEach(function(n) {
       if (n instanceof Panel) {
         var e = document.createEvent("UIEvents");
-        e.initUIEvent("attach", false, false, window);
+        e.initUIEvent("attach", false, false, window, true);
         if (n.onattach) { n.onattach(e); } // DOM 0
         n.dispatchEvent(e);                // DOM 2+
       }
@@ -151,7 +153,7 @@ scope.Panel = c.inherit({
 
     this.panels.forEach(function(n) {
       var e = document.createEvent("UIEvents");
-      e.initUIEvent("detach", false, false, window);
+      e.initUIEvent("detach", false, false, window, true);
       if (n.ondetach) { n.ondetach(e); } // DOM 0
       n.dispatchEvent(e);                // DOM 2+
     });
