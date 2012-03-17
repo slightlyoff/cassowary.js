@@ -36,6 +36,10 @@ var uniqueId = function(p) {
   }
 };
 
+var panelOrVariable = function(arg) {
+  return (arg instanceof Panel) ? arg.vars.bottom : arg;
+}
+
 // Global
 scope.Panel = c.inherit({
   extends: HTMLDivElement,
@@ -199,6 +203,50 @@ scope.Panel = c.inherit({
   _initStyles: function() {
     this.classList.add("panel");
   },
+
+  // Some layout helpers
+  set above: function(arg) {
+    this.constraints.push(
+      new c.LinearEquation(this.vars.bottom, panelOrVariable(arg))
+    );
+  },
+
+  set below: function(panelOrVar) {
+    this.constraints.push(
+      new c.LinearEquation(this.vars.top, panelOrVariable(arg))
+    );
+  },
+
+  set leftOf: function(panelOrVar) {
+    this.constraints.push(
+      new c.LinearEquation(this.vars.right, panelOrVariable(arg))
+    );
+  },
+
+  set rightOf: function(panelOrVar) {
+    this.constraints.push(
+      new c.LinearEquation(this.vars.left, panelOrVariable(arg))
+    );
+  },
+
+  set top: function() {
+  },
+
+  set left: function() {
+  },
+
+  set right: function() {
+  },
+
+  set bottom: function() {
+  },
+
+  set box: function(box) {
+    if (box.left) this.left = box.left;
+    if (box.right) this.right = box.right;
+    if (box.top) this.top = box.top;
+    if (box.bottom) this.bottom = box.bottom;
+  }
 });
 
 })(this);
