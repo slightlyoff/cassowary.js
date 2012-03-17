@@ -71,6 +71,12 @@
         padding:    none;
         border:     none;
       }
+
+      .ugly {
+        border: 1em solid blue;
+        width: 30%;
+        height: 30%;
+      }
     </style>
 
     <script defer="defer" src="../../src/c.js"></script>
@@ -101,53 +107,54 @@
 
         // Create a panel, add it to the document.
         var p = new Panel();
+
+        // Ugly by default so we can see the system working
+        p.classList.add("ugly");
+
         document.body.appendChild(p);
+
 
         // Subclass Panel and ensure that we're actually an element type.
         var SubPanel = c.inherit({
           extends: Panel,
           initialize: function() {
             Panel.ctor.call(this); // HACK!!!
+            this.classList.add("ugly");
           },
         });
 
         var sp = new SubPanel();
         document.body.appendChild(sp);
-        sp.style.outline = "1px solid black";
-        sp.style.width = "100%";
-        sp.style.height = "100%";
-
-        p.style.outline = "1px solid blue";
-        p.style.width = "100%";
-        p.style.height = "100%";
-
-        p.constraints.push(
-          new c.LinearEquation(p.vars.left, 100),
-          new c.LinearEquation(p.vars.top, 100),
-          new c.LinearInequality(p.vars.width,   c.GEQ, 100),
-          new c.LinearInequality(p.vars.height,  c.GEQ, 100)
-        );
-
-        sp.constraints.push(
-          new c.LinearInequality(sp.vars.width,  c.GEQ, 100),
-          new c.LinearInequality(sp.vars.height, c.GEQ, 100),
-          new c.LinearInequality(sp.vars.left,   c.GEQ, p.vars.right),
-          new c.LinearInequality(sp.vars.top,    c.GEQ, p.vars.bottom)
-        );
 
         // Ensure that the panels know they're attached. We won't have to do
         // this manually in the near future.
+
         p.attach();
         sp.attach();
 
-        // Add something to the global solver to kick off a resolution
-        var x = new c.Variable(167);
-        var y = new c.Variable(2);
-        var eq = new c.LinearEquation(x, new c.LinearExpression(y));
-        document.solver.addConstraint(eq);
+        p.left = 200;
+        p.top = 150;
+        p.width = 100;
+        p.height = 100;
 
-        // Did we get notified? Check the console.
+        window.p = p;
 
+        sp.width = 140;
+        sp.height = 100;
+
+        sp.rightOf = p;
+
+        sp.above = p;
+
+        var sp2 = new SubPanel();
+        sp2.innerHTML = "Howdy, y'all!";
+        sp2.style.outline = "1px solid black";
+        document.body.appendChild(sp2);
+        sp2.attach();
+
+        sp2.box = { width: 100, height: 50 };
+        sp2.leftOf = [ sp, p ];
+        sp2.below = [ p, sp ];
       });
     </script>
 
@@ -160,17 +167,6 @@
           data-layout attributes on panels. The element instances themselves
           maintain the set of constraints that are sent to the solver and
           update their CSS in response to variable changes in the engine.
-        - Global environment properties for use in expressions:
-            document.
-              width height left right top bottom
-              contentWidth contentHeight contentLeft
-              contentRight contentTop contentBottom
-      minimize:
-        width, height of everything
-      subject to:
-        mh.width = 300;  // weak
-        mh.width <= 500; // strong
-        mh.width >= 100; // string
     -->
   </head>
   <body>
@@ -178,7 +174,6 @@
       NOTE:
         Nothing in the body currently has any effect. See above for what's
         currently working.
-    -->
     <script type="constraint-layout">
       #mh {
         width = 300;
@@ -191,13 +186,12 @@
       }
     </script>
 
-    <!-- Masthead -->
     <x-panel id="mh">
     </x-panel>
 
-    <!-- Channel list -->
     <x-panel id="cList">
     </x-panel>
+    -->
 
   </body>
 </html>

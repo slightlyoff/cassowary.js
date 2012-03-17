@@ -43,7 +43,12 @@ c.HashSet = c.inherit({
 
   each: function(func, scope) {
     this.storage.forEach(func, scope);
-  }
+  },
+
+  escapingEach: function(func, scope) {
+    // FIXME(slightlyoff): actually escape!
+    this.storage.forEach(func, scope);
+  },
 });
 
 })(c);

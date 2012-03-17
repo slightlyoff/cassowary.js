@@ -7,6 +7,7 @@
 //      * Set up document.body as some sort of "Root panel" on which to hang
 //        most of this lifecycle driving behavior. Probably means over-riding
 //        appendChild/removeChild for it, etc.
+//      * min* and max* properties
 
 
 // Create a global solver
@@ -36,9 +37,39 @@ var uniqueId = function(p) {
   }
 };
 
-var panelOrVariable = function(arg) {
-  return (arg instanceof Panel) ? arg.vars.bottom : arg;
-}
+var toArray = function(a) {
+  return Array.isArray(a) ? a : Array.prototype.slice.call(arguments);
+};
+
+var listSetter = function(l, name, own, relativeTo, oper) {
+  var ln = "_" + name;
+  this.remove.apply(this, this[ln]);
+  this[ln] = toArray(l).map(function(v) {
+    return new c.LinearInequality(this.vars[own],
+                                  oper,
+                                  this._panelOrVariable(v, relativeTo));
+  }, this);
+  this.add.apply(this, this[ln]);
+};
+
+var valueSetter = function(item, varOrValue, oper) {
+  var slot = "_" + item;
+  this.remove(this[slot]);
+  // FIXME(slightlyoff): what's the strength of these?
+  if (oper && oper != "=") {
+    if (oper == ">=") oper = c.GEQ;
+    if (oper == "<=") oper = c.LEQ;
+    this[slot] = new c.LinearInequality(this.vars[item], oper, varOrValue);
+  } else {
+    this[slot] = new c.LinearEquation(this.vars[item], varOrValue);
+  }
+  this.add(this[slot]);
+};
+
+var valueGetter = function(item) {
+  if(!this["_" + item]) return; // undefined
+  return this.vars[item].value();
+};
 
 // Global
 scope.Panel = c.inherit({
@@ -51,9 +82,21 @@ scope.Panel = c.inherit({
   initialize: function(props) {
     // Instance data property defaults.
     c.extend(this, {
+      // Storage slots for our various relationship constraints
+      _left: null,
+      _right: null,
+      _top: null,
+      _bottom: null,
+
+      _leftOf: [],
+      _rightOf: [],
+      _above: [],
+      _below: [],
       constraints: [],
+
       vars: {},
-      panels: [],
+      panels: [], // Children
+
       _attached: false,
       // 'cause DOM events are fucking brain-dead
       _updateStyles: this._updateStyles.bind(this),
@@ -92,8 +135,8 @@ scope.Panel = c.inherit({
     });
 
     // We add our constraints to the solver ONLY when we're 
-    this.constraints.forEach(function(c) {
-      document.solver.addConstraint(c);
+    this.constraints.forEach(function(cns) {
+      document.solver.addConstraint(cns);
     });
 
     // FIXME(slightlyoff):
@@ -200,53 +243,89 @@ scope.Panel = c.inherit({
     }, this);
   },
 
-  _initStyles: function() {
-    this.classList.add("panel");
+  _initStyles: function() { this.classList.add("panel"); },
+
+  _panelOrVariable: function(arg, position) {
+    return (arg instanceof Panel) ? arg.vars[position]: arg;
+  },
+
+  add: function(/* c1, c2, ... */) {
+    Array.prototype.slice.call(arguments).forEach(function(cns) {
+      if (!cns) return;
+      // FIXME(slightlyoff): should we try to prevent double-adding?
+      this.constraints.push(cns);
+      if (this._attached) {
+        // FIXME(slightlyoff):
+        //    when we turn off auto-solving, update this to mark us unsolved.
+        document.solver.addConstraint(cns);
+      }
+    }, this);
+    return this;
+  },
+
+  remove: function(constraints) {
+    Array.prototype.slice.call(arguments).forEach(function(cns) {
+      if (!cns) return;
+      var ci = this.constraints.indexOf(cns);
+      if (ci >= 0) {
+        this.constraints.splice(ci, 1);
+        if (this._attached) {
+          // FIXME(slightlyoff):
+          //    when we turn off auto-solving, update this to mark us unsolved.
+          document.solver.removeConstraint(cns);
+        }
+      }
+    }, this);
+    return this;
+  },
+
+  replace: function(old, replacement) {
+    this.remove(old);
+    this.add(replacement);
+    return this;
   },
 
   // Some layout helpers
-  set above: function(arg) {
-    this.constraints.push(
-      new c.LinearEquation(this.vars.bottom, panelOrVariable(arg))
-    );
+  set above(l)   { listSetter.call(this, l, "above",   "bottom", "top",    c.LEQ); },
+  set below(l)   { listSetter.call(this, l, "below",   "top",    "bottom", c.GEQ); },
+  set leftOf(l)  { listSetter.call(this, l, "leftOf",  "right",  "left",   c.LEQ); },
+  set rightOf(l) { listSetter.call(this, l, "rightOf", "left",   "right",  c.GEQ); },
+
+  get above()    { return this._above; },
+  get below()    { return this._below; },
+  get leftOf()   { return this._leftOf; },
+  get rightOf()  { return this._rightOf; },
+
+  // FIXME(slightlyoff):
+  //    need to add max* and min* versions of all of the below
+
+  set top(v)    { valueSetter.call(this, "top", v);    }, 
+  set bottom(v) { valueSetter.call(this, "bottom", v); },
+  set left(v)   { valueSetter.call(this, "left", v);   },
+  set right(v)  { valueSetter.call(this, "right", v);  },
+
+  get top()     { return valueGetter.call(this, "top"); }, 
+  get bottom()  { return valueGetter.call(this, "bottom"); },
+  get left()    { return valueGetter.call(this, "left"); },
+  get right()   { return valueGetter.call(this, "right"); },
+
+  set width(v)  { valueSetter.call(this, "width", v); },
+  set height(v) { valueSetter.call(this, "height", v); },
+
+  get width()   { return valueGetter.call(this, "width"); },
+  get height()  { return valueGetter.call(this, "width"); },
+
+  set box(b) {
+    [ "left", "right", "top", "bottom", "width", "height" ].
+      forEach(
+          function(prop) { if (b[prop]) this[prop] = b[prop]; },
+          this
+      );
   },
 
-  set below: function(panelOrVar) {
-    this.constraints.push(
-      new c.LinearEquation(this.vars.top, panelOrVariable(arg))
-    );
+  centerIn: function(panel) {
+    // TODO(slightlyoff)
   },
-
-  set leftOf: function(panelOrVar) {
-    this.constraints.push(
-      new c.LinearEquation(this.vars.right, panelOrVariable(arg))
-    );
-  },
-
-  set rightOf: function(panelOrVar) {
-    this.constraints.push(
-      new c.LinearEquation(this.vars.left, panelOrVariable(arg))
-    );
-  },
-
-  set top: function() {
-  },
-
-  set left: function() {
-  },
-
-  set right: function() {
-  },
-
-  set bottom: function() {
-  },
-
-  set box: function(box) {
-    if (box.left) this.left = box.left;
-    if (box.right) this.right = box.right;
-    if (box.top) this.top = box.top;
-    if (box.bottom) this.bottom = box.bottom;
-  }
 });
 
 })(this);
