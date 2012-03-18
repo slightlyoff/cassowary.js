@@ -170,7 +170,7 @@ c.LinearExpression = c.inherit({
     } 
     
     this._terms.each(function(clv, c) {
-      if (clv.isPivotable()) return clv;
+      if (clv.isPivotable) return clv;
     });
     return null;
   },
