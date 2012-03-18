@@ -25,8 +25,13 @@
       }
 
       body {
+        /*
         min-width: 778px;
+        */
         overflow-y: hidden;
+        overflow-x: hidden;
+        position: absolute;
+        font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
       }
 
       /* Ensure that we are always in a layout mode that doesn't suck eggs */
@@ -71,7 +76,29 @@
         padding:    none;
         border:     none;
 
-        box-shadow: 2px 8px 6px 0px rgba(133, 133, 133, 1);
+        box-shadow: inset 0px 0px 6px rgba(133, 133, 133, 1);
+        /* FIXME(slightlyoff): need to make the panel constraints savy to padding */
+        padding: 10px;
+      }
+
+      .debugShadow {
+        position:   absolute;
+        margin:     none;
+        padding:    1em;
+        border:     none;
+        overflow:   hidden;
+        background: rgba(159,196,84, 0.5);
+        width:      0px;
+        height:     0px;
+        left:       0px;
+        top:        0px;
+        z-index:    100;
+        outline:    1px solid blue;
+        pointer-events: none;
+        font:       normal 95%/1 "Consolas", "Courier New", "Courier", monospace;
+        text-align: right;
+        color:      black;
+        opacity:    0.5;
       }
     </style>
 
@@ -89,23 +116,27 @@
     <script defer="defer" src="../../src/EditInfo.js"></script>
     <script defer="defer" src="../../src/Tableau.js"></script>
     <script defer="defer" src="../../src/SimplexSolver.js"></script>
+    <!--
     <script defer="defer" src="../../src/Timer.js"></script>
+    -->
 
     <script defer="defer" src="domutil.js"></script>
     <script defer="defer" src="panels.js"></script>
 
-    <script>
+    <script defer="defer">
       //
       // Ctrl-R testing. The VERY BEST kind ;-)
       // 
       window.addEventListener("load", function() {
         "use strict";
 
+        var root = document.rootPanel;
+        root.debug = true;
+
         // Create a panel, add it to the document.
         var p = new Panel();
 
-        document.body.appendChild(p);
-
+        root.appendChild(p);
 
         // Subclass Panel and ensure that we're actually an element type.
         var SubPanel = c.inherit({
@@ -116,13 +147,7 @@
         });
 
         var sp = new SubPanel();
-        document.body.appendChild(sp);
-
-        // Ensure that the panels know they're attached. We won't have to do
-        // this manually in the near future.
-
-        p.attach();
-        sp.attach();
+        root.appendChild(sp);
 
         p.left = 200;
         p.top = 150;
@@ -141,12 +166,20 @@
         var sp2 = new SubPanel();
         sp2.innerHTML = "Howdy, y'all!";
         sp2.style.outline = "1px solid black";
-        document.body.appendChild(sp2);
-        sp2.attach();
+        root.appendChild(sp2);
 
         sp2.box = { width: 100, height: 50 };
         sp2.leftOf = [ sp, p ];
         sp2.below = [ p, sp ];
+
+        var p3 = new Panel();
+        root.appendChild(p3);
+
+        p3.width = 300;
+        p3.top = root.v.top;
+        p3.right = root.v.right;
+        p3.height = root.v.height;
+        p3.innerHTML = "howdy!";
       });
     </script>
 
@@ -160,8 +193,6 @@
           maintain the set of constraints that are sent to the solver and
           update their CSS in response to variable changes in the engine.
     -->
-  </head>
-  <body>
     <!--
       NOTE:
         Nothing in the body currently has any effect. See above for what's
@@ -185,5 +216,7 @@
     </x-panel>
     -->
 
+  </head>
+  <body>
   </body>
 </html>

@@ -129,7 +129,7 @@ c.LinearExpression = c.inherit({
     this.constant += (n * expr.constant);
     n = n || 1;
     expr.terms().each(function(clv, coeff) {
-      this.addVariable(clv, coeff*n, subject, solver);
+      this.addVariable(clv, coeff * n, subject, solver);
     }, this);
     return this;
   },

@@ -24,6 +24,14 @@ doh.add("c.LinearExpression", [
     t.is(c.Plus(3,x), "3 + 1*[x:167]");
   },
 
+  function plus_solve(t) {
+    var s = new c.SimplexSolver();
+    var x = new c.Variable("x", 167);
+    t.is(c.Plus(4,2), "6");
+    t.is(c.Plus(x,2), "2 + 1*[x:167]");
+    t.is(c.Plus(3,x), "3 + 1*[x:167]");
+  },
+
   function times(t) {
     var x = new c.Variable("x", 167);
     t.is(c.Times(x,3), "3*[x:167]");

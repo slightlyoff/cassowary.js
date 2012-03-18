@@ -9,19 +9,28 @@
 //        appendChild/removeChild for it, etc.
 //      * min* and max* properties
 //      * Make panels draggable to show edit vars at work
+//      * Fix the hierarchy methods on the DOM prototypes so the whole thing
+//        doesn't suck giant donkey balls to work with.
 
+// requestAnimationFrame shimming.
+// FIXME(slightlyoff): move to domutil.js?
+var rAF = window.requestAnimationFrame       || 
+          window.webkitRequestAnimationFrame || 
+          window.mozRequestAnimationFrame    || 
+          window.oRequestAnimationFrame      || 
+          window.msRequestAnimationFrame     || 
+          function(callback) {
+            window.setTimeout(callback, 1000 / 60);
+          };
+
+var fireSolved = function() {
+  var e = document.createEvent("UIEvents");
+  e.initUIEvent("solved", false, false, window, true);
+  document.dispatchEvent(e);
+};
 
 // Create a global solver
-var s = document.solver = c.extend(new c.SimplexSolver(), {
-  onsolved: function() {
-    // console.log("Solved:", s);
-
-    // When we have a solution, dispatch an event.
-    var e = document.createEvent("UIEvents");
-    e.initUIEvent("solved", false, false, window, true);
-    document.dispatchEvent(e);
-  },
-});
+var s = document.solver = c.extend(new c.SimplexSolver(), { onsolved: fireSolved });
 
 var _idCounter = 0;
 var _vendedIds = [];
@@ -47,7 +56,7 @@ var listSetter = function(l, name, own, relativeTo, oper) {
   var ln = "_" + name;
   this.remove.apply(this, this[ln]);
   this[ln] = toArray(l).map(function(v) {
-    return new c.LinearInequality(this.vars[own],
+    return new c.LinearInequality(this.v[own],
                                   oper,
                                   this._panelOrVariable(v, relativeTo));
   }, this);
@@ -61,16 +70,27 @@ var valueSetter = function(item, varOrValue, oper) {
   if (oper && oper != "=") {
     if (oper == ">=") oper = c.GEQ;
     if (oper == "<=") oper = c.LEQ;
-    this[slot] = new c.LinearInequality(this.vars[item], oper, varOrValue);
+    this[slot] = new c.LinearInequality(this.v[item], oper, varOrValue);
   } else {
-    this[slot] = new c.LinearEquation(this.vars[item], varOrValue);
+    this[slot] = new c.LinearEquation(this.v[item], varOrValue);
   }
   this.add(this[slot]);
 };
 
 var valueGetter = function(item) {
   if(!this["_" + item]) return; // undefined
-  return this.vars[item].value();
+  return this.v[item].value();
+};
+
+var eq  = function(a1, a2) { return new c.LinearEquation(a1, a2); };
+var neq = function(a1, a2, a3) { return new c.LinearInequality(a1, a2, a3); };
+var geq = function(a1, a2) { return new c.LinearInequality(a1, c.GEQ, a2); };
+var leq = function(a1, a2) { return new c.LinearInequality(a1, c.LEQ, a2); };
+var stay = function(constraint, strength, weight) { 
+  return new c.StayConstraint(v, strength || c.Strength.weak, weight || 1.0);
+};
+var strongStay = function(constraint, strength, weight) { 
+  return new c.StayConstraint(v, c.Strength.strong, weight || 1.0);
 };
 
 // Global
@@ -90,13 +110,15 @@ scope.Panel = c.inherit({
       _top: null,
       _bottom: null,
 
+      _debug: false,
+
       _leftOf: [],
       _rightOf: [],
       _above: [],
       _below: [],
       constraints: [],
 
-      vars: {},
+      v: {}, // Our variables
       panels: [], // Children
 
       _attached: false,
@@ -107,7 +129,46 @@ scope.Panel = c.inherit({
     this._setProperties(props);
     this.id = uniqueId(this);
     this._initConstraints();
+    this.debug = this._debug;
     this._initStyles();
+  },
+
+  get debug() {
+    return this._debug;
+  },
+
+  set debug(v) {
+    // console.log(this.id, "setting debug to:", v);
+    if (v) {
+      if (!this._debugShadow) {
+        var ds = this._debugShadow = document.createElement("div");
+        ds.id = "debug_shadow_for_" + this.id
+        ds.classList.add("debugShadow");
+        document.body.appendChild(ds);
+        this._updateDebugShadow();
+        // console.log("added debug shadow for", this.id);
+      }
+    } else {
+      if (this._debug && !this._debugShadow) {
+        // console.log("removed debug shadow for", this.id);
+        this._debugShadow.parent.removeChild(this._debugShadow);
+        this._debugShadow = null;
+      }
+    }
+    this._debug = v;
+  },
+
+  _updateDebugShadow: function() {
+    if (!this._debugShadow) { return; }
+    var s = this.id + " dimensions:<br>";
+    [
+      "width", "height", "left", "right", "top", "bottom"
+    ].forEach(function(name) {
+      var v = this.v[name].value() + "px";
+      this._debugShadow.style[name] = v;
+      s += name + ": " + v + "  <br>";
+    }, this);
+    this._debugShadow.innerHTML = s;
   },
 
   _setProperties: function(props) {
@@ -119,11 +180,7 @@ scope.Panel = c.inherit({
   //
 
   attach: function() {
-    if (this._attached ||
-        !this.parentNode // A tiny bit of sanity
-    ) {
-      return this;
-    }
+    if (this._attached) { return this; }
 
     this._attached = true;
 
@@ -175,6 +232,7 @@ scope.Panel = c.inherit({
         this.panels.push(n);
       }
       if (this._attached) {
+        // console.log("attaching:", n);
         n.attach();
       }
     }
@@ -196,13 +254,9 @@ scope.Panel = c.inherit({
   _initConstraints: function() {
     var Expr = c.LinearExpression;
     var Var = c.Variable;
-    var neq = function(a1, a2, a3) {
-      return new c.LinearInequality(a1, a2, a3);
-    };
-    var geq = function(a1, a2) {
-      return new c.LinearInequality(a1, c.GEQ, a2);
-    };
-    var v = this.vars = {};
+
+    var v = this.v = {};
+
     [ "width", "height", "left", "right", "top", "bottom",
       "contentWidth", "contentHeight",
       "contentLeft", "contentRight",
@@ -222,9 +276,9 @@ scope.Panel = c.inherit({
       geq(v.height,        v.contentHeight),
 
       // Bottom is at least top + height
-      geq(v.bottom,         c.Plus(v.top, v.height)),
+      eq(v.bottom, c.Plus(v.top, v.height)),
       // Right is at least left + width
-      geq(v.right,          c.Plus(v.left, v.width))
+      eq(v.right,  c.Plus(v.left, v.width))
     );
   },
 
@@ -234,21 +288,20 @@ scope.Panel = c.inherit({
     //  accordingly.
     //
     // console.log("Updating styles for Panel:", this.id);
-    //
-    [
-      "width", "height",
+
+    [ "width", "height",
       "left", "right",
       "top", "bottom"
-    ].forEach(function(n) {
-      // console.log("setting", n, "to", this.vars[n].value());
-      this.style[n] = this.vars[n].value() + "px";
+    ].forEach(function(name) {
+      this.style[name] = this.v[name].value() + "px";
     }, this);
+    if (this._debugShadow) { this._updateDebugShadow(); }
   },
 
   _initStyles: function() { this.classList.add("panel"); },
 
   _panelOrVariable: function(arg, position) {
-    return (arg instanceof Panel) ? arg.vars[position]: arg;
+    return (arg instanceof Panel) ? arg.v[position]: arg;
   },
 
   add: function(/* c1, c2, ... */) {
@@ -265,7 +318,9 @@ scope.Panel = c.inherit({
     return this;
   },
 
-  remove: function(constraints) {
+  remove: function(/* c1, c2, ... */) {
+    var al = arguments.length;
+    if (!al) { return; }
     Array.prototype.slice.call(arguments).forEach(function(cns) {
       if (!cns) return;
       var ci = this.constraints.indexOf(cns);
@@ -328,6 +383,104 @@ scope.Panel = c.inherit({
   centerIn: function(panel) {
     // TODO(slightlyoff)
   },
+
 });
+
+// We sould only ever have one of these per document, so enforce it losely and
+// make sure that we set one up by default.
+scope.RootPanel = c.inherit({
+  extends: Panel,
+  initialize: function() {
+    if (document.rootPanel) { 
+      throw "Attempting to create multiple roots on the same document!";
+    }
+
+    Panel.ctor.call(this);
+
+    /*
+    this.constraints = [
+      strongStay(
+    ];
+
+    this.top = 0;
+    this.left = 0;
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    */
+    // this.bottom = window.innerHeight;
+    // this.right = window.innerWidth;
+
+    var inFlight = [];
+
+    // Propigate viewport size changes.
+    window.addEventListener("resize", function() {
+      // Measurement should be cheap here.
+      inFlight.push(function() {
+        var iw = window.innerWidth;
+        var ih = window.innerHeight;
+        // console.log(iw, "x", ih);
+
+        // Time resolution
+        console.time("resolve");
+
+        var s = document.solver;
+        var v = this.v;
+        s.autoSolve = false;
+
+        s.addEditVar(v.width)
+         .addEditVar(v.height)
+         .addEditVar(v.right)
+         .addEditVar(v.bottom).beginEdit();
+        s.beginEdit();
+
+        s.suggestValue(v.width, iw);
+        s.suggestValue(v.right, iw);
+        s.suggestValue(v.height, ih);
+        s.suggestValue(v.bottom, ih);
+
+        s.resolve();
+        s.autoSolve = true; // FIXME(slightlyoff): should we really do this?
+
+        console.timeEnd("resolve");
+
+        if (iw != this.v.width.value()) {
+          // ZOMGWTFBBQ?
+          console.log("width: suggested:", iw, "got:", this.v.width.value());
+          console.log("height: suggested:", ih, "got:", this.v.height.value());
+          console.log("right: suggested:", iw, "got:", this.v.right.value());
+          console.log("bottom: suggested:", ih, "got:", this.v.bottom.value());
+        }
+      }.bind(this));
+
+      rAF(function() {
+        if(inFlight.length) { inFlight[inFlight.length-1](); }
+        inFlight.length = 0;
+      });
+    }.bind(this));
+  },
+
+  _updateStyles: function() {
+    // No-op for main styles since we're the thing that's the root of
+    // measuremement in the first place.
+    this._updateDebugShadow();
+  },
+});
+
+// Install a root panel by default
+var installRoot = function() {
+  if (!document.rootPanel && document.body) {
+    var rp = document.body;
+    rp.id = "rootPanel";
+    scope.RootPanel.prototype.upgrade(rp);
+    document.rootPanel = rp;
+    rp.attach();
+    fireSolved();
+    rp._updateStyles();
+  }
+};
+if (document.readyState != "complete") {
+  window.addEventListener("load", installRoot, false);
+}
+installRoot();
 
 })(this);
