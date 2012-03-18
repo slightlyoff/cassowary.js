@@ -82,16 +82,27 @@ var valueGetter = function(item) {
   return this.v[item].value();
 };
 
-var eq  = function(a1, a2) { return new c.LinearEquation(a1, a2); };
+var weak = c.Strength.weak;
+var medium = c.Strength.medium;
+var strong = c.Strength.strong;
+var required = c.Strength.required;
+
+var eq  = function(a1, a2)     { return new c.LinearEquation(a1, a2); };
 var neq = function(a1, a2, a3) { return new c.LinearInequality(a1, a2, a3); };
-var geq = function(a1, a2) { return new c.LinearInequality(a1, c.GEQ, a2); };
-var leq = function(a1, a2) { return new c.LinearInequality(a1, c.LEQ, a2); };
-var stay = function(constraint, strength, weight) { 
-  return new c.StayConstraint(v, strength || c.Strength.weak, weight || 1.0);
+var geq = function(a1, a2) 	   { return new c.LinearInequality(a1, c.GEQ, a2); };
+var leq = function(a1, a2) 	   { return new c.LinearInequality(a1, c.LEQ, a2); };
+
+var stay = function(v, strength, weight) { 
+  return new c.StayConstraint(v, strength || weak, weight || 1.0);
 };
-var strongStay = function(constraint, strength, weight) { 
-  return new c.StayConstraint(v, c.Strength.strong, weight || 1.0);
+var strongStay =   function(v, w) { return stay(v, strong, w); };
+var requiredStay = function(v, w) { return stay(v, required, w); }
+
+var edit = function(v, strength, weight) { 
+  return new c.EditConstraint(v, strength || weak, weight || 1.0);
 };
+var strongEdit =   function(v, w) { return edit(v, strong, w); };
+var requiredEdit = function(v, w) { return edit(v, required, w); }
 
 // Global
 scope.Panel = c.inherit({
@@ -257,11 +268,15 @@ scope.Panel = c.inherit({
 
     var v = this.v = {};
 
-    [ "width", "height", "left", "right", "top", "bottom",
+    [ "width", "height",
+      "left", "right",
+      "top", "bottom",
       "contentWidth", "contentHeight",
       "contentLeft", "contentRight",
       "contentTop", "contentBottom"
-    ].forEach(function(name) { v[name] = new Var(this.id + "_" + name); }, this);
+    ].forEach(function(name) {
+      v[name] = new Var(this.id + "_" + name);
+    }, this);
 
     // Sanity
     this.constraints.push(
@@ -290,8 +305,8 @@ scope.Panel = c.inherit({
     // console.log("Updating styles for Panel:", this.id);
 
     [ "width", "height",
-      "left", "right",
-      "top", "bottom"
+      "left", // "right",
+      "top" //, "bottom"
     ].forEach(function(name) {
       this.style[name] = this.v[name].value() + "px";
     }, this);
@@ -374,10 +389,9 @@ scope.Panel = c.inherit({
 
   set box(b) {
     [ "left", "right", "top", "bottom", "width", "height" ].
-      forEach(
-          function(prop) { if (b[prop]) this[prop] = b[prop]; },
-          this
-      );
+      forEach(function(prop) {
+        if (b[prop]) this[prop] = b[prop];
+      }, this);
   },
 
   centerIn: function(panel) {
@@ -397,18 +411,30 @@ scope.RootPanel = c.inherit({
 
     Panel.ctor.call(this);
 
-    /*
-    this.constraints = [
-      strongStay(
-    ];
+    // At this point, we won't be attached but will have had our constraints
+    // initialized. We clobber them and add our own.
+    this.constraints = [ ];
 
-    this.top = 0;
-    this.left = 0;
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-    */
-    // this.bottom = window.innerHeight;
-    // this.right = window.innerWidth;
+    var iw = window.innerWidth;
+    var ih = window.innerHeight;
+
+
+    this.constraints.push(
+      requiredStay(this.v.top),
+      requiredStay(this.v.left),
+      requiredEdit(this.v.height),
+      requiredEdit(this.v.width),
+       eq(this.v.top,           0),
+       eq(this.v.left,          0),
+      geq(this.v.width,         0),
+      geq(this.v.height,        0),
+      geq(this.v.contentWidth,  0),
+      geq(this.v.contentHeight, 0),
+       eq(this.v.bottom, c.Plus(this.v.top, this.v.height)),
+       // Right is at least left + width
+       eq(this.v.right,  c.Plus(this.v.left, this.v.width))
+    );
+    console.log(this.constraints);
 
     var inFlight = [];
 
@@ -478,9 +504,11 @@ var installRoot = function() {
     rp._updateStyles();
   }
 };
+
 if (document.readyState != "complete") {
   window.addEventListener("load", installRoot, false);
 }
+
 installRoot();
 
 })(this);

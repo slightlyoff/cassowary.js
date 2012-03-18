@@ -20,6 +20,9 @@ doh.add("c.Strength", [
     t.f(c.Strength.medium.isRequired());
     t.f(c.Strength.weak.isRequired());
   },
+
+  function isSane(t) {
+  },
   // FIXME(slightlyoff): MOAR TESTS
 ]);
 
