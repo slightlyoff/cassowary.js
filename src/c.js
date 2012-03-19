@@ -230,7 +230,12 @@ scope.c = {
     });
     answer += "}\n";
     return answer;
-  }       
+  },
+
+  _inc: (function(count){
+    return function() { return count++; };
+  })(0),
+
 };
 
 })(this);

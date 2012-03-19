@@ -418,12 +418,11 @@ scope.RootPanel = c.inherit({
     var iw = window.innerWidth;
     var ih = window.innerHeight;
 
-
     this.constraints.push(
       requiredStay(this.v.top),
       requiredStay(this.v.left),
-      requiredEdit(this.v.height),
-      requiredEdit(this.v.width),
+      // requiredStay(this.v.height),
+      // requiredStay(this.v.width),
        eq(this.v.top,           0),
        eq(this.v.left,          0),
       geq(this.v.width,         0),
@@ -434,7 +433,7 @@ scope.RootPanel = c.inherit({
        // Right is at least left + width
        eq(this.v.right,  c.Plus(this.v.left, this.v.width))
     );
-    console.log(this.constraints);
+    // console.log(this.constraints);
 
     var inFlight = [];
 
@@ -450,19 +449,19 @@ scope.RootPanel = c.inherit({
         console.time("resolve");
 
         var s = document.solver;
-        var v = this.v;
         s.autoSolve = false;
 
-        s.addEditVar(v.width)
-         .addEditVar(v.height)
-         .addEditVar(v.right)
-         .addEditVar(v.bottom).beginEdit();
-        s.beginEdit();
+        var v = this.v;
 
+        s.addEditVar(v.width)
+         .addEditVar(v.top)
+         .addEditVar(v.left)
+         .addEditVar(v.height).beginEdit();
+
+        s.suggestValue(v.top, 0);
+        s.suggestValue(v.left, 0);
         s.suggestValue(v.width, iw);
-        s.suggestValue(v.right, iw);
         s.suggestValue(v.height, ih);
-        s.suggestValue(v.bottom, ih);
 
         s.resolve();
         s.autoSolve = true; // FIXME(slightlyoff): should we really do this?
