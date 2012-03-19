@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <!--
-    Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
+    Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     Use of this source code is governed by the LGPL, which can be found in the
     COPYING.LGPL file.
   -->
@@ -25,10 +25,16 @@
       }
 
       body {
+        /*
         min-width: 778px;
+        */
         overflow-y: hidden;
+        overflow-x: hidden;
+        position: absolute;
+        font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
       }
 
+      /* Ensure that we are always in a layout mode that doesn't suck eggs */
       * {
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
@@ -61,26 +67,122 @@
         border-radius: 6px;
         -webkit-border-radius: 6px;
       }
+
+      /* Base styling for all panel elements */
+      .panel {
+        /* Turn off system constraint layouts for panels */
+        position:   absolute;
+        margin:     none;
+        padding:    none;
+        border:     none;
+
+        box-shadow: inset 0px 0px 6px rgba(133, 133, 133, 1);
+        /* FIXME(slightlyoff): need to make the panel constraints savy to padding */
+        padding: 10px;
+      }
+
+      .debugShadow {
+        position:   absolute;
+        margin:     none;
+        padding:    1em;
+        border:     none;
+        overflow:   hidden;
+        background: rgba(159,196,84, 0.5);
+        width:      0px;
+        height:     0px;
+        left:       0px;
+        top:        0px;
+        z-index:    100;
+        outline:    1px solid blue;
+        pointer-events: none;
+        font:       normal 95%/1 "Consolas", "Courier New", "Courier", monospace;
+        text-align: right;
+        color:      black;
+        opacity:    0.5;
+      }
     </style>
 
-    <script defer src="../../src/c.js"></script>
-    <script defer src="../../src/HashTable.js"></script>
-    <script defer src="../../src/HashSet.js"></script>
-    <script defer src="../../src/Error.js"></script>
-    <script defer src="../../src/SymbolicWeight.js"></script>
-    <script defer src="../../src/Strength.js"></script>
-    <script defer src="../../src/Variable.js"></script>
-    <script defer src="../../src/Point.js"></script>
-    <script defer src="../../src/LinearExpression.js"></script>
-    <script defer src="../../src/Constraint.js"></script>
-    <script defer src="../../src/LinearConstraint.js"></script>
-    <script defer src="../../src/EditInfo.js"></script>
-    <script defer src="../../src/Tableau.js"></script>
-    <script defer src="../../src/SimplexSolver.js"></script>
-    <script defer src="../../src/Timer.js"></script>
+    <script defer="defer" src="../../src/c.js"></script>
+    <script defer="defer" src="../../src/HashTable.js"></script>
+    <script defer="defer" src="../../src/HashSet.js"></script>
+    <script defer="defer" src="../../src/Error.js"></script>
+    <script defer="defer" src="../../src/SymbolicWeight.js"></script>
+    <script defer="defer" src="../../src/Strength.js"></script>
+    <script defer="defer" src="../../src/Variable.js"></script>
+    <script defer="defer" src="../../src/Point.js"></script>
+    <script defer="defer" src="../../src/LinearExpression.js"></script>
+    <script defer="defer" src="../../src/Constraint.js"></script>
+    <script defer="defer" src="../../src/LinearConstraint.js"></script>
+    <script defer="defer" src="../../src/EditInfo.js"></script>
+    <script defer="defer" src="../../src/Tableau.js"></script>
+    <script defer="defer" src="../../src/SimplexSolver.js"></script>
+    <!--
+    <script defer="defer" src="../../src/Timer.js"></script>
+    -->
 
-    <script defer src="domutil.js"></script>
-    <script defer src="panels.js"></script>
+    <script defer="defer" src="domutil.js"></script>
+    <script defer="defer" src="panels.js"></script>
+
+    <script defer="defer">
+      //
+      // Ctrl-R testing. The VERY BEST kind ;-)
+      // 
+      window.addEventListener("load", function() {
+        "use strict";
+
+        var root = document.rootPanel;
+        root.debug = true;
+
+        // Create a panel, add it to the document.
+        var p = new Panel();
+
+        root.appendChild(p);
+
+        // Subclass Panel and ensure that we're actually an element type.
+        var SubPanel = c.inherit({
+          extends: Panel,
+          initialize: function() {
+            Panel.ctor.call(this); // HACK!!!
+          },
+        });
+
+        var sp = new SubPanel();
+        root.appendChild(sp);
+
+        p.left = 200;
+        p.top = 150;
+        p.width = 100;
+        p.height = 100;
+
+        window.p = p;
+
+        sp.width = 140;
+        sp.height = 100;
+
+        sp.rightOf = p;
+
+        sp.above = p;
+
+        var sp2 = new SubPanel();
+        sp2.innerHTML = "Howdy, y'all!";
+        sp2.style.outline = "1px solid black";
+        root.appendChild(sp2);
+
+        sp2.box = { width: 100, height: 50 };
+        sp2.leftOf = [ sp, p ];
+        sp2.below = [ p, sp ];
+
+        var p3 = new Panel();
+        root.appendChild(p3);
+
+        p3.width = 300;
+        p3.height = 500;
+        p3.top = root.v.top;
+        p3.right = root.v.right;
+        // p3.height = root.v.height;
+        p3.innerHTML = "howdy!";
+      });
+    </script>
 
     <!--
       Notes:
@@ -91,46 +193,12 @@
           data-layout attributes on panels. The element instances themselves
           maintain the set of constraints that are sent to the solver and
           update their CSS in response to variable changes in the engine.
-        - Global environment properties for use in expressions:
-            document.
-              width
-              height
-              left
-              right
-              top
-              bottom
-              contentWidth
-              contentHeight
-              contentLeft
-              contentRight
-              contentTop
-              contentBottom
-
-        - Addressable panel properties for use in expressions:
-            width
-            height
-            left
-            right
-            top
-            bottom
-            contentWidth
-            contentHeight
-            contentLeft
-            contentRight
-            contentTop
-            contentBottom
-
-      minimize:
-        width, height of everything
-      subject to:
-        mh.width = 300;  // weak
-        mh.width <= 500; // strong
-        mh.width >= 100; // string
     -->
-  </head>
-  <body>
-    <!-- Masthead -->
-    <script type="layout">
+    <!--
+      NOTE:
+        Nothing in the body currently has any effect. See above for what's
+        currently working.
+    <script type="constraint-layout">
       #mh {
         width = 300;
         left = #cList.right;
@@ -141,12 +209,15 @@
       #cList {
       }
     </script>
+
     <x-panel id="mh">
     </x-panel>
 
-    <!-- Channel list -->
     <x-panel id="cList">
     </x-panel>
+    -->
 
+  </head>
+  <body>
   </body>
 </html>

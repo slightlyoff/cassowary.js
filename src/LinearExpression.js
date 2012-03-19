@@ -2,7 +2,7 @@
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.
 //
-// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
+// Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
 
 // FILE: EDU.Washington.grad.gjb.cassowary
 // package EDU.Washington.grad.gjb.cassowary;
@@ -22,7 +22,7 @@ c.LinearExpression = c.inherit({
 
     if (clv instanceof c.AbstractVariable) {
       this._terms.put(clv, value || 1);
-    } else if (typeof(clv) == 'number') {
+    } else if (typeof clv == 'number') {
       this.constant = clv;
     }
   },
@@ -62,14 +62,13 @@ c.LinearExpression = c.inherit({
   },
 
   times: function(x) {
-    if (typeof(x) == 'number') {
+    if (typeof x == 'number') {
       return (this.clone()).multiplyMe(x);
     } else {
       if (this.isConstant()) {
-        expr = x;
-        return expr.times(this.constant);
-      } else if (expr.isConstant()) {
-        return this.times(expr.constant);
+        return x.times(this.constant);
+      } else if (x.isConstant()) {
+        return this.times(x.constant);
       } else {
         throw new c.NonlinearExpression();
       }
@@ -94,13 +93,13 @@ c.LinearExpression = c.inherit({
 
 
   divide: function(x) {
-    if (typeof(x) == 'number') {
+    if (typeof x == 'number') {
       if (c.approx(x, 0.0)) {
         throw new c.NonlinearExpression();
       }
       return this.times(1.0 / x);
     } else if (x instanceof c.LinearExpression) {
-      if (!x.isConstant) {
+      if (!x.isConstant()) {
         throw new c.NonlinearExpression();
       }
       return this.times(1.0 / x.constant);
@@ -130,7 +129,7 @@ c.LinearExpression = c.inherit({
     this.constant += (n * expr.constant);
     n = n || 1;
     expr.terms().each(function(clv, coeff) {
-      this.addVariable(clv, coeff*n, subject, solver);
+      this.addVariable(clv, coeff * n, subject, solver);
     }, this);
     return this;
   },
@@ -171,7 +170,7 @@ c.LinearExpression = c.inherit({
     } 
     
     this._terms.each(function(clv, c) {
-      if (clv.isPivotable()) return clv;
+      if (clv.isPivotable) return clv;
     });
     return null;
   },

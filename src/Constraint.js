@@ -2,28 +2,14 @@
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.
 //
-// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
-
-// FILE: EDU.Washington.grad.gjb.cassowary
-// package EDU.Washington.grad.gjb.cassowary;
-// Has ClConstraint <- ClEditOrStayConstraint
-// and     ClEditConstraint, ClStayConstraint
-// Linear constraints are in ClLinearConstraint.js
-
+// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
 
 (function(c) {
 "use strict";
 
-var count = 1;
-
 c.Constraint = c.inherit({
-
   initialize: function(strength /*c.Strength*/, weight /*double*/) {
-    /* FIELDS:
-      var _attachedObject
-      var _times_added
-    */
-    this.hash_code = count++;
+    this.hash_code = c._inc();
     this.strength = strength || c.Strength.required;
     this.weight = weight || 1.0;
     this._times_added = 0;

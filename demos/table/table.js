@@ -1,4 +1,4 @@
-// Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
+// Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 //
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.

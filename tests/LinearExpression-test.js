@@ -2,7 +2,7 @@
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.
 //
-// Parts Copyright (C) 2012, Alex Rusell (slightlyoff@chromium.org)
+// Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
 "use strict";
 
@@ -18,6 +18,14 @@ doh.add("c.LinearExpression", [
   },
 
   function plus(t) {
+    var x = new c.Variable("x", 167);
+    t.is(c.Plus(4,2), "6");
+    t.is(c.Plus(x,2), "2 + 1*[x:167]");
+    t.is(c.Plus(3,x), "3 + 1*[x:167]");
+  },
+
+  function plus_solve(t) {
+    var s = new c.SimplexSolver();
     var x = new c.Variable("x", 167);
     t.is(c.Plus(4,2), "6");
     t.is(c.Plus(x,2), "2 + 1*[x:167]");

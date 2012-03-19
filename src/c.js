@@ -2,7 +2,7 @@
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.
 //
-// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
+// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
 
 (function(scope){
 "use strict";
@@ -22,10 +22,12 @@ try {
   });
 }
 
-var inBrowser = (typeof scope["HTMLBodyElement"] == "function");
+var inBrowser = (typeof scope["HTMLElement"] != "undefined");
 var getTagname = function(ctor) {
+  // FIXME(slightlyoff): need a lookup table!
   return "div";
 };
+var epsilon = 1.0e-8;
 
 // Global
 scope.c = {
@@ -61,7 +63,7 @@ scope.c = {
       delete props["initialize"];
     }
 
-    var realCtor = ctor || function() {};
+    var realCtor = ctor || function() { };
 
     /* 
     // NOTE: would happily do this except it's 2x slower. Boo!
@@ -73,20 +75,7 @@ scope.c = {
       ((parent) ? parent.prototype : Object.prototype)
     );
 
-    Object.getOwnPropertyNames(props).forEach(function(x) {
-      var pd = Object.getOwnPropertyDescriptor(props, x);
-      if ( (typeof pd["get"] == "function") ||
-           (typeof pd["set"] == "function") ) {
-        Object.defineProperty(rp, x, pd);
-      } else if (typeof pd["value"] == "function") {
-        pd.writable = true;
-        pd.configurable = true;
-        pd.enumerable = false;
-        Object.defineProperty(rp, x, pd);
-      } else {
-        rp[x] = props[x];
-      }
-    });
+    this.extend(rp, props);
 
     // If we're in a browser, we want to support "subclassing" HTML elements.
     // This needs some magic and we rely on a wrapped constructor hack to make
@@ -104,23 +93,42 @@ scope.c = {
           // prototype wired to ours. Boo.
           return el;
         };
-        var upgradePd = {
-          writable: true,
-          configurable: true,
-          enumerable: false,
-          value: upgrade,
-        };
-        Object.defineProperty(rp, "upgrade", upgradePd);
+        this.extend(rp, { upgrade: upgrade, });
+
         realCtor = function() {
-          return this.upgrade(
+          return upgrade(
             scope.document.createElement(tn)
           );
         }
         realCtor.prototype = rp;
+        this.extend(realCtor, { ctor: intermediateCtor, }); // HACK!!!
       }
     }
 
     return realCtor;
+  },
+
+  extend: function(obj, props) {
+    this.own(props, function(x) {
+      var pd = Object.getOwnPropertyDescriptor(props, x);
+      if ( (typeof pd["get"] == "function") ||
+           (typeof pd["set"] == "function") ) {
+        Object.defineProperty(obj, x, pd);
+      } else if (typeof pd["value"] == "function" ||x.charAt(0) === "_") {
+        pd.writable = true;
+        pd.configurable = true;
+        pd.enumerable = false;
+        Object.defineProperty(obj, x, pd);
+      } else {
+        obj[x] = props[x];
+      }
+    });
+    return obj;
+  },
+
+  own: function(obj, cb, context) {
+    Object.getOwnPropertyNames(obj).forEach(cb, context||scope);
+    return obj;
   },
 
   debugprint: function(s /*String*/) {
@@ -137,7 +145,7 @@ scope.c = {
 
   Assert: function(f /*boolean*/, description /*String*/) {
     if (!f) {
-      throw new c.InternalError("Assertion failed:" + description);
+      throw new c.InternalError("Assertion failed: " + description);
     }
   },
 
@@ -155,7 +163,6 @@ scope.c = {
     if (!(e1 instanceof c.LinearExpression)) {
       e1 = new c.LinearExpression(e1);
     }
-
     if (!(e2 instanceof c.LinearExpression)) {
       e2 = new c.LinearExpression(e2);
     }
@@ -163,33 +170,15 @@ scope.c = {
     return e1.minus(e2);
   },
 
-  Times: function(e1,e2) {
-    // FIXME: re-order based on hotness
-    if (e1 instanceof c.LinearExpression &&
-        e2 instanceof c.LinearExpression) {
-      return e1.times(e2);
-    } else if (e1 instanceof c.LinearExpression &&
-               e2 instanceof c.Variable) {
-      return e1.times(new c.LinearExpression(e2));
-    } else if (e1 instanceof c.Variable &&
-               e2 instanceof c.LinearExpression) {
-      return (new c.LinearExpression(e1)).times(e2);
-    } else if (e1 instanceof c.LinearExpression &&
-               typeof(e2) == 'number') {
-      return e1.times(new c.LinearExpression(e2));
-    } else if (typeof(e1) == 'number' &&
-               e2 instanceof c.LinearExpression) {
-      return (new c.LinearExpression(e1)).times(e2);
-    } else if (typeof(e1) == 'number' &&
-               e2 instanceof c.Variable) {
-      return (new c.LinearExpression(e2, e1));
-    } else if (e1 instanceof c.Variable &&
-               typeof(e2) == 'number') {
-      return (new c.LinearExpression(e1, e2));
-    } else if (e1 instanceof c.Variable &&
-               e2 instanceof c.LinearExpression) {
-      return (new c.LinearExpression(e2, n));
+  Times: function(e1, e2) {
+    if (typeof e1 == "number" || e1 instanceof c.Variable) {
+      e1 = new c.LinearExpression(e1);
     }
+    if (typeof e2 == "number" || e2 instanceof c.Variable) {
+      e2 = new c.LinearExpression(e2);
+    }
+
+    return e1.times(e2);
   },
 
   Divide: function(e1 /*c.LinearExpression*/, e2 /*c.LinearExpression*/) {
@@ -197,20 +186,15 @@ scope.c = {
   },
 
   approx: function(a /*double*/, b /*double*/) {
-    if (a instanceof c.Variable) {
-      a = a.value();
-    }
-    if (b instanceof c.Variable) {
-      b = b.value();
-    }
-    var epsilon = 1.0e-8;
+    if (a instanceof c.Variable) { a = a.value(); }
+    if (b instanceof c.Variable) { b = b.value(); }
     if (a == 0.0) {
       return (Math.abs(b) < epsilon);
-    } else if (b == 0.0) {
-      return (Math.abs(a) < epsilon);
-    } else {
-      return (Math.abs(a - b) < Math.abs(a) * epsilon);
     }
+    if (b == 0.0) {
+      return (Math.abs(a) < epsilon);
+    }
+    return (Math.abs(a - b) < Math.abs(a) * epsilon);
   },
 
   hashToString: function(h) {
@@ -246,7 +230,12 @@ scope.c = {
     });
     answer += "}\n";
     return answer;
-  }       
+  },
+
+  _inc: (function(count){
+    return function() { return count++; };
+  })(0),
+
 };
 
 })(this);

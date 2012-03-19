@@ -2,39 +2,29 @@
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.
 //
-// Parts Copyright (C) 2011, Alex Rusell (slightlyoff@chromium.org)
+// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
 
 (function(c) {
 "use strict";
 
-var inc = (function(c){
-  return function() { return c++; };
-})(0);
-
 var av = 
 c.AbstractVariable = c.inherit({
-  initialize: function(a1,a2) {
-    this.hash_code = inc();
-    if (typeof(a1) == "string" || (a1 == null)) {
+  initialize: function(a1, a2) {
+    this.hash_code = c._inc();
+    var a1t = typeof a1;
+    if (a1t == "string" || a1t != "undefined") {
       this._name = a1 || "v" + this.hash_code;
     } else {
-      var varnumber = a1, prefix = a2;
-      this._name = prefix + varnumber;
+      this._name = a1 + a2;
     }
   },
 
-  hashCode: function() {
-    // return "[v:" + this.hash_code + "]";
-    return this.hash_code;
-  },
+  hashCode: function() { return this.hash_code; },
   
-  isDummy: false,
-  /*
-  isExternal: function() { throw "abstract isExternal"; },
-  isPivotable: function() { throw "abstract isPivotable"; },
-  isRestricted: function() { throw "abstract isRestricted"; },
-  */
-  isExternal: false, isPivotable: false, isRestricted: false,
+  isDummy:      false,
+  isExternal:   false,
+  isPivotable:  false,
+  isRestricted: false,
 
   toString: function() {
     return "ABSTRACT[" + this._name + "]";
@@ -44,15 +34,15 @@ c.AbstractVariable = c.inherit({
 c.Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, value) {
-    this.hash_code = inc();
+    this.hash_code = c._inc();
     this._name = "";
     this._value = 0.0;
-    if (typeof(name_or_val) == "string") {
+    if (typeof name_or_val == "string") {
       av.call(this, name_or_val);
       this._value = value || 0.0;
     } else {
       av.call(this);
-      if (typeof(name_or_val) == "number") {
+      if (typeof name_or_val == "number") {
         this._value = name_or_val;
       }
     }
