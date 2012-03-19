@@ -87,7 +87,9 @@ var medium = c.Strength.medium;
 var strong = c.Strength.strong;
 var required = c.Strength.required;
 
-var eq  = function(a1, a2)     { return new c.LinearEquation(a1, a2); };
+var eq  = function(a1, a2, strength) {
+  return new c.LinearEquation(a1, a2, strength);
+};
 var neq = function(a1, a2, a3) { return new c.LinearInequality(a1, a2, a3); };
 var geq = function(a1, a2) 	   { return new c.LinearInequality(a1, c.GEQ, a2); };
 var leq = function(a1, a2) 	   { return new c.LinearInequality(a1, c.LEQ, a2); };
@@ -95,23 +97,17 @@ var leq = function(a1, a2) 	   { return new c.LinearInequality(a1, c.LEQ, a2); }
 var stay = function(v, strength, weight) { 
   return new c.StayConstraint(v, strength || weak, weight || 1.0);
 };
+var weakStay =   function(v, w) { return stay(v, weak, w); };
 var strongStay =   function(v, w) { return stay(v, strong, w); };
 var requiredStay = function(v, w) { return stay(v, required, w); }
 
-var edit = function(v, strength, weight) { 
-  return new c.EditConstraint(v, strength || weak, weight || 1.0);
-};
-var strongEdit =   function(v, w) { return edit(v, strong, w); };
-var requiredEdit = function(v, w) { return edit(v, required, w); }
 
 // Global
 scope.Panel = c.inherit({
   extends: HTMLDivElement,
-
   //
   // Ctor
   //
-
   initialize: function(props) {
     // Instance data property defaults.
     c.extend(this, {
@@ -173,7 +169,7 @@ scope.Panel = c.inherit({
     if (!this._debugShadow) { return; }
     var s = this.id + " dimensions:<br>";
     [
-      "width", "height", "left", "right", "top", "bottom"
+      "width", "height", "left", "top" // , "right", "bottom"
     ].forEach(function(name) {
       var v = this.v[name].value() + "px";
       this._debugShadow.style[name] = v;
@@ -418,17 +414,16 @@ scope.RootPanel = c.inherit({
     var iw = window.innerWidth;
     var ih = window.innerHeight;
 
+    var widthEQ = eq(this.v.width, iw, required);
+    var heightEQ = eq(this.v.height, ih, required);
+
     this.constraints.push(
       requiredStay(this.v.top),
       requiredStay(this.v.left),
-      // requiredStay(this.v.height),
-      // requiredStay(this.v.width),
+      widthEQ,
+      heightEQ,
        eq(this.v.top,           0),
        eq(this.v.left,          0),
-      geq(this.v.width,         0),
-      geq(this.v.height,        0),
-      geq(this.v.contentWidth,  0),
-      geq(this.v.contentHeight, 0),
        eq(this.v.bottom, c.Plus(this.v.top, this.v.height)),
        // Right is at least left + width
        eq(this.v.right,  c.Plus(this.v.left, this.v.width))
@@ -451,17 +446,14 @@ scope.RootPanel = c.inherit({
         var s = document.solver;
         s.autoSolve = false;
 
-        var v = this.v;
+        s.removeConstraint(widthEQ);
+        s.removeConstraint(heightEQ);
 
-        s.addEditVar(v.width)
-         .addEditVar(v.top)
-         .addEditVar(v.left)
-         .addEditVar(v.height).beginEdit();
+        widthEQ = eq(this.v.width, iw, required);
+        heightEQ = eq(this.v.height, ih, required);
 
-        s.suggestValue(v.top, 0);
-        s.suggestValue(v.left, 0);
-        s.suggestValue(v.width, iw);
-        s.suggestValue(v.height, ih);
+        s.addConstraint(widthEQ);
+        s.addConstraint(heightEQ);
 
         s.resolve();
         s.autoSolve = true; // FIXME(slightlyoff): should we really do this?
