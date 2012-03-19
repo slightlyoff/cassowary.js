@@ -95,7 +95,7 @@
         z-index:    100;
         outline:    1px solid blue;
         pointer-events: none;
-        font:       normal 95%/1 "Consolas", "Courier New", "Courier", monospace;
+        font:       normal 85%/1 "Consolas", "Courier New", "Courier", monospace;
         text-align: right;
         color:      black;
         opacity:    0.5;
@@ -176,11 +176,13 @@
         root.appendChild(p3);
 
         p3.width = 300;
-        p3.height = 500;
         p3.top = root.v.top;
         p3.right = root.v.right;
-        // p3.height = root.v.height;
+        p3.height = root.v.height;
         p3.innerHTML = "howdy!";
+
+        // p3.debug = true;
+        // p3._debugShadow.style.textAlign = "left";
       });
     </script>
 
