@@ -156,9 +156,9 @@ scope.Panel = c.inherit({
         // console.log("added debug shadow for", this.id);
       }
     } else {
-      if (this._debug && !this._debugShadow) {
+      if (this._debugShadow) {
         // console.log("removed debug shadow for", this.id);
-        this._debugShadow.parent.removeChild(this._debugShadow);
+        this._debugShadow.parentNode.removeChild(this._debugShadow);
         this._debugShadow = null;
       }
     }
@@ -255,7 +255,7 @@ scope.Panel = c.inherit({
         this.panels.splice(i, 1);
       }
     }
-    return HTMLDivElement.prototype.appendChild.call(this, n);
+    return HTMLDivElement.prototype.removeChild.call(this, n);
   },
 
   _initConstraints: function() {
