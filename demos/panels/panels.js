@@ -479,7 +479,7 @@ scope.RootPanel = c.inherit({
     var ih = new c.Variable("window_innerHeight", window.innerHeight);
 
     var s = document.solver;
-    s.addEditVar(iw);
+    s.addEditVar(iw); // FIXME(slightlyoff): not sure I understand this
     s.addEditVar(ih);
 
     var widthEQ = eq(this.v.width, iw, required);
@@ -499,11 +499,8 @@ scope.RootPanel = c.inherit({
       eq(this.v.right,  c.Plus(this.v.left, this.v.width), required, 1000)
     );
 
-    var caclulating = false;
-
     // Propigate viewport size changes.
     var reCalc = function() {
-      if(caclulating) return;
       
       // Measurement should be cheap here.
       var iwv = window.innerWidth;
@@ -511,6 +508,12 @@ scope.RootPanel = c.inherit({
 
       // Time resolution
       // console.time("resolve");
+
+      // FIXME(slightlyoff):
+      //    This approach should work but doesn't. We leave the edit session
+      //    open instead.
+      // s.addEditVar(iw);
+      // s.addEditVar(ih);
 
       // s.beginEdit();
       s.suggestValue(iw, iwv)
@@ -527,8 +530,6 @@ scope.RootPanel = c.inherit({
         console.log("right: suggested:", iwv, "got:", this.v.right.value());
         console.log("bottom: suggested:", ihv, "got:", this.v.bottom.value());
       }
-
-      caclulating = false;
     }.bind(this);
 
     window.addEventListener("resize", reCalc, false);
