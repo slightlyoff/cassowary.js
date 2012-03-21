@@ -5,18 +5,7 @@
 //      * min* and max* properties need correctly weighted strengths.
 //      * Make panels draggable to show edit vars at work
 //      * Fix the hierarchy methods on the DOM prototypes so the whole thing
-//        doesn't suck giant donkey balls to work with.
-
-// requestAnimationFrame shimming.
-// FIXME(slightlyoff): move to domutil.js?
-var rAF = window.requestAnimationFrame       || 
-          window.webkitRequestAnimationFrame || 
-          window.mozRequestAnimationFrame    || 
-          window.oRequestAnimationFrame      || 
-          window.msRequestAnimationFrame     || 
-          function(callback) {
-            window.setTimeout(callback, 1000 / 60);
-          };
+//        doesn't suck to work with.
 
 var fireSolved = function() {
   var e = document.createEvent("UIEvents");
