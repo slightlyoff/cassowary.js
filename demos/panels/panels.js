@@ -140,6 +140,8 @@ scope.Panel = c.inherit({
     this._initStyles();
   },
 
+  tagName: "x-panel",
+
   get debug() {
     return this._debug;
   },
