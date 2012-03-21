@@ -87,12 +87,12 @@ var medium = c.Strength.medium;
 var strong = c.Strength.strong;
 var required = c.Strength.required;
 
-var eq  = function(a1, a2, strength) {
-  return new c.LinearEquation(a1, a2, strength);
+var eq  = function(a1, a2, strength, w) {
+  return new c.LinearEquation(a1, a2, strength || weak, w||0);
 };
 var neq = function(a1, a2, a3) { return new c.LinearInequality(a1, a2, a3); };
-var geq = function(a1, a2) 	   { return new c.LinearInequality(a1, c.GEQ, a2); };
-var leq = function(a1, a2) 	   { return new c.LinearInequality(a1, c.LEQ, a2); };
+var geq = function(a1, a2, str, w) { return new c.LinearInequality(a1, c.GEQ, a2, str, w); };
+var leq = function(a1, a2, str, w) { return new c.LinearInequality(a1, c.LEQ, a2, str, w); };
 
 var stay = function(v, strength, weight) { 
   return new c.StayConstraint(v, strength || weak, weight || 1.0);
@@ -175,6 +175,12 @@ scope.Panel = c.inherit({
       this._debugShadow.style[name] = v;
       s += name + ": " + v + "  <br>";
     }, this);
+
+    [ "right", "bottom" ].forEach(function(name) {
+      var v = this.v[name].value() + "px";
+      s += name + ": " + this.v[name].value() + "px  <br>";
+    }, this);
+
     this._debugShadow.innerHTML = s;
   },
 
@@ -264,12 +270,42 @@ scope.Panel = c.inherit({
 
     var v = this.v = {};
 
-    [ "width", "height",
+    [
+      "width", "height",
       "left", "right",
       "top", "bottom",
       "contentWidth", "contentHeight",
       "contentLeft", "contentRight",
-      "contentTop", "contentBottom"
+      "contentTop", "contentBottom",
+
+      // min
+      "minWidth",
+      "minHeight",
+      "minLeft",
+      "minRight",
+      "minTop",
+      "minBottom",
+      "minContentWidth",
+      "minContentHeight",
+      "minContentLeft",
+      "minContentRight",
+      "minContentTop",
+      "minContentBottom",
+
+      // max
+      "maxWidth",
+      "maxHeight",
+      "maxLeft",
+      "maxRight",
+      "maxTop",
+      "maxBottom",
+      "maxContentWidth",
+      "maxContentHeight",
+      "maxContentLeft",
+      "maxContentRight",
+      "maxContentTop",
+      "maxContentBottom"
+
     ].forEach(function(name) {
       v[name] = new Var(this.id + "_" + name);
     }, this);
@@ -282,9 +318,19 @@ scope.Panel = c.inherit({
       geq(v.contentWidth,  0),
       geq(v.contentHeight, 0),
 
+      geq(v.width,         v.minWidth, medium, 1000),
+      geq(v.height,        v.minWidth, medium, 1000),
+      geq(v.contentWidth,  v.minContetnWidth, medium, 1000),
+      geq(v.contentHeight, v.minContentHeight, medium, 1000),
+
+      leq(v.width,         v.maxWidth, medium, 10),
+      leq(v.height,        v.maxWidth, medium, 10),
+      leq(v.contentWidth,  v.maxContetnWidth, medium, 10),
+      leq(v.contentHeight, v.maxContentHeight, medium, 10),
+
       // Total width is bigger than content width.
-      geq(v.width,         v.contentWidth),
-      geq(v.height,        v.contentHeight),
+      geq(v.width,         v.contentWidth, medium, 10000),
+      geq(v.height,        v.contentHeight, medium, 10000),
 
       // Bottom is at least top + height
       eq(v.bottom, c.Plus(v.top, v.height)),
@@ -383,6 +429,22 @@ scope.Panel = c.inherit({
   get width()   { return valueGetter.call(this, "width"); },
   get height()  { return valueGetter.call(this, "width"); },
 
+  set minWidth(v)  {
+    console.log("setting minWidth of", this.id, "to", v);
+    valueSetter.call(this, "minWidth", v); },
+  set minHeight(v) { valueSetter.call(this, "minHeight", v); },
+
+  get minWidth()   { return valueGetter.call(this, "minWidth"); },
+  get minHeight()  { return valueGetter.call(this, "minWidth"); },
+
+  set maxWidth(v)  {
+    console.log("setting maxWidth of", this.id, "to", v);
+    valueSetter.call(this, "maxWidth", v); },
+  set maxHeight(v) { valueSetter.call(this, "maxHeight", v); },
+
+  get maxWidth()   { return valueGetter.call(this, "maxWidth"); },
+  get maxHeight()  { return valueGetter.call(this, "maxWidth"); },
+
   set box(b) {
     [ "left", "right", "top", "bottom", "width", "height" ].
       forEach(function(prop) {
@@ -407,73 +469,63 @@ scope.RootPanel = c.inherit({
 
     Panel.ctor.call(this);
 
-    // At this point, we won't be attached but will have had our constraints
-    // initialized. We clobber them and add our own.
-    this.constraints = [ ];
+    var iw = new c.Variable("window_innerWidth", window.innerWidth);
+    var ih = new c.Variable("window_innerHeight", window.innerHeight);
 
-    var iw = window.innerWidth;
-    var ih = window.innerHeight;
+    var s = document.solver;
+    s.addEditVar(iw);
+    s.addEditVar(ih);
 
     var widthEQ = eq(this.v.width, iw, required);
     var heightEQ = eq(this.v.height, ih, required);
 
+    // At this point, we won't be attached but will have had our constraints
+    // initialized. We clobber them and add our own.
+    this.constraints = [ ];
+
     this.constraints.push(
-      requiredStay(this.v.top),
-      requiredStay(this.v.left),
       widthEQ,
       heightEQ,
-       eq(this.v.top,           0),
-       eq(this.v.left,          0),
-       eq(this.v.bottom, c.Plus(this.v.top, this.v.height)),
-       // Right is at least left + width
-       eq(this.v.right,  c.Plus(this.v.left, this.v.width))
+      eq(this.v.top, 0, required, 1000),
+      eq(this.v.left, 0, required, 1000),
+      eq(this.v.bottom, c.Plus(this.v.top, this.v.height), required),
+      // Right is at least left + width
+      eq(this.v.right,  c.Plus(this.v.left, this.v.width), required)
     );
-    // console.log(this.constraints);
 
-    var inFlight = [];
+    var caclulating = false;
 
     // Propigate viewport size changes.
-    window.addEventListener("resize", function() {
+    var reCalc = function() {
+      if(caclulating) return;
+      
       // Measurement should be cheap here.
-      inFlight.push(function() {
-        var iw = window.innerWidth;
-        var ih = window.innerHeight;
-        // console.log(iw, "x", ih);
+      var iwv = window.innerWidth;
+      var ihv = window.innerHeight;
 
-        // Time resolution
-        console.time("resolve");
+      // Time resolution
+      console.time("resolve");
 
-        var s = document.solver;
-        s.autoSolve = false;
+      // s.beginEdit();
+      s.suggestValue(iw, iwv)
+       .suggestValue(ih, ihv);
+      s.resolve();
+      // s.endEdit();
 
-        s.removeConstraint(widthEQ);
-        s.removeConstraint(heightEQ);
+      console.timeEnd("resolve");
 
-        widthEQ = eq(this.v.width, iw, required);
-        heightEQ = eq(this.v.height, ih, required);
+      if (iwv != this.v.width.value()) {
+        // ZOMGWTFBBQ?
+        console.log("width: suggested:", iwv, "got:", this.v.width.value());
+        console.log("height: suggested:", ihv, "got:", this.v.height.value());
+        console.log("right: suggested:", iwv, "got:", this.v.right.value());
+        console.log("bottom: suggested:", ihv, "got:", this.v.bottom.value());
+      }
 
-        s.addConstraint(widthEQ);
-        s.addConstraint(heightEQ);
+      caclulating = false;
+    }.bind(this);
 
-        s.resolve();
-        s.autoSolve = true; // FIXME(slightlyoff): should we really do this?
-
-        console.timeEnd("resolve");
-
-        if (iw != this.v.width.value()) {
-          // ZOMGWTFBBQ?
-          console.log("width: suggested:", iw, "got:", this.v.width.value());
-          console.log("height: suggested:", ih, "got:", this.v.height.value());
-          console.log("right: suggested:", iw, "got:", this.v.right.value());
-          console.log("bottom: suggested:", ih, "got:", this.v.bottom.value());
-        }
-      }.bind(this));
-
-      rAF(function() {
-        if(inFlight.length) { inFlight[inFlight.length-1](); }
-        inFlight.length = 0;
-      });
-    }.bind(this));
+    window.addEventListener("resize", reCalc, false);
   },
 
   _updateStyles: function() {
