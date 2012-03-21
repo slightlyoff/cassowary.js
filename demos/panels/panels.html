@@ -144,6 +144,7 @@
           initialize: function() {
             Panel.ctor.call(this); // HACK!!!
           },
+          tagName: "x-subpanel",
         });
 
         var sp = window.sp = new SubPanel();
@@ -179,7 +180,7 @@
         p3.right = root.v.right;
         p3.height = root.v.height;
         p3.innerHTML = "howdy!";
-		p3.debug = true;
+        p3.debug = true;
 
         var p4 = window.p4 = new Panel();
         root.appendChild(p4);
@@ -191,7 +192,7 @@
         p4.minHeight = 10;
         p4.minWidth = 500;
         p4.maxWidth = 800;
-		p4.leftOf = p3;
+        p4.leftOf = p3;
         p4.debug = true;
 
 		// p4.above = sp;
