@@ -131,7 +131,7 @@
         "use strict";
 
         var root = document.rootPanel;
-        root.debug = true;
+        // root.debug = true;
 
         // Create a panel, add it to the document.
         var p = window.p = new Panel();
@@ -179,6 +179,7 @@
         p3.right = root.v.right;
         p3.height = root.v.height;
         p3.innerHTML = "howdy!";
+		p3.debug = true;
 
         var p4 = window.p4 = new Panel();
         root.appendChild(p4);
@@ -191,10 +192,10 @@
         p4.minWidth = 500;
         p4.maxWidth = 800;
 		p4.leftOf = p3;
+        p4.debug = true;
 
 		// p4.above = sp;
 		
-        // p3.debug = true;
         // p3._debugShadow.style.textAlign = "left";
       });
     </script>

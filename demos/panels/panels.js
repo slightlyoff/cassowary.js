@@ -2,12 +2,7 @@
 "use strict";
 
 // TODO(slightlyoff):
-//      * Turn off auto-solving and connect solving to document resize,
-//        microtask end, etc.
-//      * Set up document.body as some sort of "Root panel" on which to hang
-//        most of this lifecycle driving behavior. Probably means over-riding
-//        appendChild/removeChild for it, etc.
-//      * min* and max* properties
+//      * min* and max* properties need correctly weighted strengths.
 //      * Make panels draggable to show edit vars at work
 //      * Fix the hierarchy methods on the DOM prototypes so the whole thing
 //        doesn't suck giant donkey balls to work with.
@@ -68,6 +63,9 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
 var valueSetter = function(item, varOrValue, oper) {
   var slot = "_" + item;
   this.remove(this[slot]);
+  if (typeof varOrvalue == "string") {
+    varOrvalue = parseInt(varOrvalue, 10);
+  }
   // FIXME(slightlyoff): what's the strength of these?
   if (oper && oper != "=") {
     if (oper == ">=") oper = c.GEQ;
@@ -148,7 +146,7 @@ scope.Panel = c.inherit({
 
   set debug(v) {
     // console.log(this.id, "setting debug to:", v);
-    if (v) {
+    if (v && this._attached) {
       if (!this._debugShadow) {
         var ds = this._debugShadow = document.createElement("div");
         ds.id = "debug_shadow_for_" + this.id
@@ -169,6 +167,7 @@ scope.Panel = c.inherit({
 
   _updateDebugShadow: function() {
     if (!this._debugShadow) { return; }
+
     var s = this.id + " dimensions:<br>";
     [
       "width", "height", "left", "top" // , "right", "bottom"
@@ -213,6 +212,10 @@ scope.Panel = c.inherit({
       document.solver.addConstraint(cns);
     });
 
+    this.debug = this.debug;
+
+    this._updateStyles();
+
     // FIXME(slightlyoff):
     //  Connect to the solver's completion here and set style properties in
     //  response.
@@ -234,6 +237,8 @@ scope.Panel = c.inherit({
     this.constraints.forEach(function(c) {
       document.solver.removeConstraint(c);
     });
+
+    this.debug = this.debug;
 
     document.removeEventListener("solved", this._updateStyles, false);
     return this;
@@ -431,17 +436,13 @@ scope.Panel = c.inherit({
   get width()   { return valueGetter.call(this, "width"); },
   get height()  { return valueGetter.call(this, "width"); },
 
-  set minWidth(v)  {
-    console.log("setting minWidth of", this.id, "to", v);
-    valueSetter.call(this, "minWidth", v); },
+  set minWidth(v)  { valueSetter.call(this, "minWidth", v); },
   set minHeight(v) { valueSetter.call(this, "minHeight", v); },
 
   get minWidth()   { return valueGetter.call(this, "minWidth"); },
   get minHeight()  { return valueGetter.call(this, "minHeight"); },
 
-  set maxWidth(v)  {
-    console.log("setting maxWidth of", this.id, "to", v);
-    valueSetter.call(this, "maxWidth", v); },
+  set maxWidth(v)  { valueSetter.call(this, "maxWidth", v); },
   set maxHeight(v) { valueSetter.call(this, "maxHeight", v); },
 
   get maxWidth()   { return valueGetter.call(this, "maxWidth"); },
