@@ -257,7 +257,7 @@ scope.Panel = c.inherit({
       }
     }
 
-    return HTMLDivElement.prototype.appendChild.call(this, n);
+    return HTMLElement.prototype.appendChild.call(this, n);
   },
 
   removeChild: function(n) {
@@ -268,7 +268,8 @@ scope.Panel = c.inherit({
         this.panels.splice(i, 1);
       }
     }
-    return HTMLDivElement.prototype.removeChild.call(this, n);
+
+    return HTMLElement.prototype.removeChild.call(this, n);
   },
 
   _initConstraints: function() {
