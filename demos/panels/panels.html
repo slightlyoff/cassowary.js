@@ -173,8 +173,8 @@
         var p3 = window.p3 = new Panel();
         root.appendChild(p3);
 
-        p3.width = 300;
-        p3.minWidth = 100;
+        p3.maxWidth = 300;
+        p3.minWidth = 200;
         p3.top = root.v.top;
         p3.right = root.v.right;
         p3.height = root.v.height;
@@ -186,10 +186,13 @@
         // p4.right = root.v.right;
         p4.left = 30;
         p4.top = 30;
-        p4.height = 100;
+        p4.maxHeight = 100;
+        p4.minHeight = 10;
         p4.minWidth = 500;
         p4.maxWidth = 800;
 		p4.leftOf = p3;
+
+		// p4.above = sp;
 		
         // p3.debug = true;
         // p3._debugShadow.style.textAlign = "left";

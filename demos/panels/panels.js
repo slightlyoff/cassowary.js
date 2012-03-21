@@ -52,13 +52,15 @@ var toArray = function(a) {
   return Array.isArray(a) ? a : Array.prototype.slice.call(arguments);
 };
 
-var listSetter = function(l, name, own, relativeTo, oper) {
+var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
   var ln = "_" + name;
   this.remove.apply(this, this[ln]);
   this[ln] = toArray(l).map(function(v) {
     return new c.LinearInequality(this.v[own],
                                   oper,
-                                  this._panelOrVariable(v, relativeTo));
+                                  this._panelOrVariable(v, relativeTo),
+                                  strength||weak,
+                                  weight);
   }, this);
   this.add.apply(this, this[ln]);
 };
@@ -319,12 +321,12 @@ scope.Panel = c.inherit({
       geq(v.contentHeight, 0),
 
       geq(v.width,         v.minWidth, medium, 1000),
-      geq(v.height,        v.minWidth, medium, 1000),
+      geq(v.height,        v.minHeight, medium, 1000),
       geq(v.contentWidth,  v.minContetnWidth, medium, 1000),
       geq(v.contentHeight, v.minContentHeight, medium, 1000),
 
       leq(v.width,         v.maxWidth, medium, 10),
-      leq(v.height,        v.maxWidth, medium, 10),
+      leq(v.height,        v.maxHeight, medium, 10),
       leq(v.contentWidth,  v.maxContetnWidth, medium, 10),
       leq(v.contentHeight, v.maxContentHeight, medium, 10),
 
@@ -333,9 +335,9 @@ scope.Panel = c.inherit({
       geq(v.height,        v.contentHeight, medium, 10000),
 
       // Bottom is at least top + height
-      eq(v.bottom, c.Plus(v.top, v.height)),
+      eq(v.bottom, c.Plus(v.top, v.height), medium, 1),
       // Right is at least left + width
-      eq(v.right,  c.Plus(v.left, v.width))
+      eq(v.right,  c.Plus(v.left, v.width), medium, 1)
     );
   },
 
@@ -435,7 +437,7 @@ scope.Panel = c.inherit({
   set minHeight(v) { valueSetter.call(this, "minHeight", v); },
 
   get minWidth()   { return valueGetter.call(this, "minWidth"); },
-  get minHeight()  { return valueGetter.call(this, "minWidth"); },
+  get minHeight()  { return valueGetter.call(this, "minHeight"); },
 
   set maxWidth(v)  {
     console.log("setting maxWidth of", this.id, "to", v);
@@ -443,7 +445,7 @@ scope.Panel = c.inherit({
   set maxHeight(v) { valueSetter.call(this, "maxHeight", v); },
 
   get maxWidth()   { return valueGetter.call(this, "maxWidth"); },
-  get maxHeight()  { return valueGetter.call(this, "maxWidth"); },
+  get maxHeight()  { return valueGetter.call(this, "maxWHeight"); },
 
   set box(b) {
     [ "left", "right", "top", "bottom", "width", "height" ].
@@ -488,9 +490,9 @@ scope.RootPanel = c.inherit({
       heightEQ,
       eq(this.v.top, 0, required, 1000),
       eq(this.v.left, 0, required, 1000),
-      eq(this.v.bottom, c.Plus(this.v.top, this.v.height), required),
+      eq(this.v.bottom, c.Plus(this.v.top, this.v.height), required, 1000),
       // Right is at least left + width
-      eq(this.v.right,  c.Plus(this.v.left, this.v.width), required)
+      eq(this.v.right,  c.Plus(this.v.left, this.v.width), required, 1000)
     );
 
     var caclulating = false;
@@ -504,7 +506,7 @@ scope.RootPanel = c.inherit({
       var ihv = window.innerHeight;
 
       // Time resolution
-      console.time("resolve");
+      // console.time("resolve");
 
       // s.beginEdit();
       s.suggestValue(iw, iwv)
@@ -512,7 +514,7 @@ scope.RootPanel = c.inherit({
       s.resolve();
       // s.endEdit();
 
-      console.timeEnd("resolve");
+      // console.timeEnd("resolve");
 
       if (iwv != this.v.width.value()) {
         // ZOMGWTFBBQ?
