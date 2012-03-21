@@ -93,7 +93,6 @@ scope.c = {
         var intermediateCtor = realCtor;
         var tn = getTagName(rp);
         var upgrade = function(el) {
-          console.log("upgrading an instance of HTMLElement");
           el.__proto__ = rp;
           intermediateCtor.apply(el, arguments);
           if (rp["created"]) { el.created(); }
