@@ -23,9 +23,17 @@ try {
 }
 
 var inBrowser = (typeof scope["HTMLElement"] != "undefined");
-var getTagname = function(ctor) {
-  // FIXME(slightlyoff): need a lookup table!
-  return "div";
+
+var getTagName = function(proto) {
+  var tn = null;
+  while (proto && proto != Object.prototype) {
+    if (proto.tagName) {
+      tn = proto.tagName;
+      break;
+    }
+    proto = proto.prototype;
+  }
+  return tn || "div";
 };
 var epsilon = 1.0e-8;
 
@@ -83,19 +91,20 @@ scope.c = {
     if (inBrowser) {
       if (parent && parent.prototype instanceof scope.HTMLElement) {
         var intermediateCtor = realCtor;
-        var tn = getTagname(parent);
+        var tn = getTagName(rp);
         var upgrade = function(el) {
+          console.log("upgrading an instance of HTMLElement");
           el.__proto__ = rp;
           intermediateCtor.apply(el, arguments);
           if (rp["created"]) { el.created(); }
           if (rp["decorate"]) { el.decorate(); }
-          // We hack the constructor to always return an element with it's
-          // prototype wired to ours. Boo.
           return el;
         };
         this.extend(rp, { upgrade: upgrade, });
 
         realCtor = function() {
+          // We hack the constructor to always return an element with it's
+          // prototype wired to ours. Boo.
           return upgrade(
             scope.document.createElement(tn)
           );
