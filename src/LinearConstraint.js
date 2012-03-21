@@ -91,13 +91,11 @@ c.LinearInequality = c.inherit({
       return c.LinearConstraint.call(this, a1, a2, a3);    
     // >=
     } else if (a2 == c.GEQ) {
-      console.log(a1, "GEQ", a3, a4);
       c.LinearConstraint.call(this, new c.LinearExpression(a3), a4, a5);
       this.expression.multiplyMe(-1.0);
       this.expression.addVariable(a1);
     // <=
     } else if (a2 == c.LEQ) {
-      console.log(a1, "LEQ", a3, a4);
       c.LinearConstraint.call(this, new c.LinearExpression(a3), a4, a5);
       this.expression.addVariable(a1,-1.0);
     // error
