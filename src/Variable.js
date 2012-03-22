@@ -10,7 +10,9 @@
 var av = 
 c.AbstractVariable = c.inherit({
   initialize: function(a1, a2) {
+    this._name = "";
     this.hash_code = c._inc();
+
     var a1t = typeof a1;
     if (a1t == "string" || a1t != "undefined") {
       this._name = a1 || "v" + this.hash_code;
@@ -26,17 +28,17 @@ c.AbstractVariable = c.inherit({
   isPivotable:  false,
   isRestricted: false,
 
+  _value: "",
+  _prefix: "",
+
   toString: function() {
-    return "ABSTRACT[" + this._name + "]";
-  }
+    return this._prefix + "[" + this._name + ":" + this._value + "]";
+  },
 });
 
 c.Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, value) {
-    this.hash_code = c._inc();
-    this._name = "";
-    this._value = 0.0;
     if (typeof name_or_val == "string") {
       av.call(this, name_or_val);
       this._value = value || 0.0;
@@ -46,18 +48,11 @@ c.Variable = c.inherit({
         this._value = name_or_val;
       }
     }
-    if (c.Variable._map) {
-      c.Variable._map[this._name] = this;
-    }
+    // FIXME: gigantic memory leak?
+    var vm = c.Variable._map;
+    if (vm) { vm[this._name] = this; }
   },
-  isDummy:        false,
   isExternal:     true,
-  isPivotable:    false,
-  isRestricted:   false,
-
-  toString: function() {
-    return "[" + this._name + ":" + this._value + "]";
-  },
 
   // FIXME(slightlyoff)
   value: function() { return this._value; },
@@ -73,43 +68,32 @@ c.Variable._map = [];
 c.DummyVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
-    av.call(this, name_or_val, prefix);
+    av.call(this, name_or_val);
+    if (prefix) { this._prefix = prefix; }
   },
   isDummy:        true,
-  isPivotable:    false,
-  isExternal:     false,
   isRestricted:   true,
-  toString: function() { return "[" + this._name + ":dummy]"; },
+  _value:         "dummy",
 });
 
 c.ObjectiveVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
-    c.AbstractVariable.call(this, name_or_val, prefix);
+    av.call(this, name_or_val);
+    if (prefix) { this._prefix = prefix; }
   },
-  isDummy:        false,
-  isExternal:     false,
-  isPivotable:    false,
-  isRestricted:   false,
-
-  toString: function() {
-    return "[" + this._name + ":obj]";
-  },
+  _value:         "obj",
 });
 
 c.SlackVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
-    c.AbstractVariable.call(this, name_or_val, prefix);
+    av.call(this, name_or_val);
+    if (prefix) { this._prefix = prefix; }
   },
-  isDummy:        false,
-  isExternal:     false,
   isPivotable:    true,
   isRestricted:   true,
-
-  toString: function() {
-    return "[" + this._name + ":slack]";
-  },
+  _value:         "slack",
 });
 
 })(c);

@@ -2,7 +2,7 @@
 // Use of this source code is governed by the LGPL, which can be found in the
 // COPYING.LGPL file.
 //
-// Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
+// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
 
 (function(c) {
 "use strict";
@@ -100,7 +100,7 @@ c.LinearInequality = c.inherit({
       this.expression.addVariable(a1,-1.0);
     // error
     } else {
-      throw new ExCLInternalError("Invalid operator in ClLinearInequality constructor");
+      throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
     }
   },
 

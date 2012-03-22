@@ -82,9 +82,13 @@ doh.add("End-To-End", [
       // right >= 100
       var solver = new c.SimplexSolver();
 
+      // x = 10
       var x = new c.Variable(10);
+      // width = 10
       var width = new c.Variable(10);
+      // right = x + width
       var right = new c.LinearExpression(x).plus(width);
+      // right >= 100
       var ieq = new c.LinearInequality(right, c.GEQ, 100);
       solver.addStay(width)
       solver.addConstraint(ieq);    

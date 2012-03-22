@@ -1,4 +1,7 @@
-$$ = function(query, opt_contextElement) {
+(function(scope) {
+"use strict";
+
+scope.$$ = function(query, opt_contextElement) {
   if (!query)
     return [];
 
@@ -18,8 +21,20 @@ $$ = function(query, opt_contextElement) {
   return rv;
 }
 
-$$.counter_ = 0;
+scope.$$.counter_ = 0;
 
-$ = function(query, opt_contextElement) {
+scope.$ = function(query, opt_contextElement) {
   return $$(query, opt_contextElement)[0];
 }
+
+// requestAnimationFrame shimming.
+var rAF = window.requestAnimationFrame       || 
+          window.webkitRequestAnimationFrame || 
+          window.mozRequestAnimationFrame    || 
+          window.oRequestAnimationFrame      || 
+          window.msRequestAnimationFrame     || 
+          function(callback) {
+            window.setTimeout(callback, 1000 / 60);
+          };
+
+})(this);

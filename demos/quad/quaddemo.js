@@ -175,24 +175,14 @@ var QuadDemo = c.inherit({
           .addConstraint(new c.LinearInequality(cle, c.LEQ, db[2].Y()));
 
     // Add constraints to keep points inside window
-    solver.addConstraint(new c.LinearInequality(db[0].X(), c.GEQ, 10));
-    solver.addConstraint(new c.LinearInequality(db[0].Y(), c.GEQ, 10));
-    solver.addConstraint(new c.LinearInequality(db[1].X(), c.GEQ, 10));
-    solver.addConstraint(new c.LinearInequality(db[1].Y(), c.GEQ, 10));
-    solver.addConstraint(new c.LinearInequality(db[2].X(), c.GEQ, 10));
-    solver.addConstraint(new c.LinearInequality(db[2].Y(), c.GEQ, 10));
-    solver.addConstraint(new c.LinearInequality(db[3].X(), c.GEQ, 10));
-    solver.addConstraint(new c.LinearInequality(db[3].Y(), c.GEQ, 10));
-    
-    solver.addConstraint(new c.LinearInequality(db[0].X(), c.LEQ, this.cwidth - 10));
-    solver.addConstraint(new c.LinearInequality(db[0].Y(), c.LEQ, this.cheight - 10));
-    solver.addConstraint(new c.LinearInequality(db[1].X(), c.LEQ, this.cwidth - 10));
-    solver.addConstraint(new c.LinearInequality(db[1].Y(), c.LEQ, this.cheight - 10));
-    solver.addConstraint(new c.LinearInequality(db[2].X(), c.LEQ, this.cwidth - 10));
-    solver.addConstraint(new c.LinearInequality(db[2].Y(), c.LEQ, this.cheight - 10));
-    solver.addConstraint(new c.LinearInequality(db[3].X(), c.LEQ, this.cwidth - 10));
-    solver.addConstraint(new c.LinearInequality(db[3].Y(), c.LEQ, this.cheight - 10));
+    db.forEach(function(p) {
+      solver.addConstraint(new c.LinearInequality(p.X(), c.GEQ, 10));
+      solver.addConstraint(new c.LinearInequality(p.Y(), c.GEQ, 10));
 
+      solver.addConstraint(new c.LinearInequality(p.X(), c.LEQ, this.cwidth - 10));
+      solver.addConstraint(new c.LinearInequality(p.Y(), c.LEQ, this.cheight - 10));
+    }, this);
+    
     //  } catch (e) {
     //    print("EXCEPTION: e = " + e);
     //  }
@@ -240,8 +230,8 @@ var QuadDemo = c.inherit({
     var y = ev.pageY - this.canvas.offsetTop;
     if ( this.dbDragging != -1 ) {
       this.solver
-        .suggestValue(this.db[this.dbDragging].X(),x)
-        .suggestValue(this.db[this.dbDragging].Y(),y)
+        .suggestValue(this.db[this.dbDragging].X(), x)
+        .suggestValue(this.db[this.dbDragging].Y(), y)
         .resolve();
       this.draw();
     }
