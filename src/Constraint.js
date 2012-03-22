@@ -13,6 +13,7 @@ c.Constraint = c.inherit({
     this.strength = strength || c.Strength.required;
     this.weight = weight || 1.0;
     this._times_added = 0;
+    this._attachedObject = null;
   },
 
   hashCode: function() {

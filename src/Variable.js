@@ -26,9 +26,12 @@ c.AbstractVariable = c.inherit({
   isPivotable:  false,
   isRestricted: false,
 
+  _value: "",
+  _prefix: "",
+
   toString: function() {
-    return "ABSTRACT[" + this._name + "]";
-  }
+    return this._prefix + "[" + this._name + ":" + this._value + "]";
+  },
 });
 
 c.Variable = c.inherit({
@@ -50,14 +53,7 @@ c.Variable = c.inherit({
       c.Variable._map[this._name] = this;
     }
   },
-  isDummy:        false,
   isExternal:     true,
-  isPivotable:    false,
-  isRestricted:   false,
-
-  toString: function() {
-    return "[" + this._name + ":" + this._value + "]";
-  },
 
   // FIXME(slightlyoff)
   value: function() { return this._value; },
@@ -73,43 +69,32 @@ c.Variable._map = [];
 c.DummyVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
-    av.call(this, name_or_val, prefix);
+    av.call(this, name_or_val);
+    if (prefix) { this._prefix = prefix; }
   },
   isDummy:        true,
-  isPivotable:    false,
-  isExternal:     false,
   isRestricted:   true,
-  toString: function() { return "[" + this._name + ":dummy]"; },
+  _value:         "dummy",
 });
 
 c.ObjectiveVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
-    c.AbstractVariable.call(this, name_or_val, prefix);
+    av.call(this, name_or_val);
+    if (prefix) { this._prefix = prefix; }
   },
-  isDummy:        false,
-  isExternal:     false,
-  isPivotable:    false,
-  isRestricted:   false,
-
-  toString: function() {
-    return "[" + this._name + ":obj]";
-  },
+  _value:         "obj",
 });
 
 c.SlackVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
-    c.AbstractVariable.call(this, name_or_val, prefix);
+    av.call(this, name_or_val);
+    if (prefix) { this._prefix = prefix; }
   },
-  isDummy:        false,
-  isExternal:     false,
   isPivotable:    true,
   isRestricted:   true,
-
-  toString: function() {
-    return "[" + this._name + ":slack]";
-  },
+  _value:         "slack",
 });
 
 })(c);
