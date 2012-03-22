@@ -1,41 +1,60 @@
-Statistical profiling result from v8.log, (316 ticks, 9 unaccounted, 0 excluded).
-
- [Unknown]:
-   ticks  total  nonlib   name
-      9    2.8%
+Statistical profiling result from v8.log, (3559 ticks, 0 unaccounted, 0 excluded).
 
  [Shared libraries]:
    ticks  total  nonlib   name
+     41    1.2%    0.0%  /lib32/libc-2.11.1.so
+      1    0.0%    0.0%  f77d9000-f77da000
 
  [JavaScript]:
    ticks  total  nonlib   name
 
  [C++]:
    ticks  total  nonlib   name
-    277   87.7%   87.7%  v8::Shell::Load
-      5    1.6%    1.6%  v8::internal::StaticMarkingVisitor::VisitUnmarkedObjects
-      4    1.3%    1.3%  v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::ObjectContents)1, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)0>
-      3    0.9%    0.9%  v8::internal::MarkCompactCollector::MigrateObject
-      2    0.6%    0.6%  v8::internal::StoreBuffer::IteratePointersToNewSpace
-      2    0.6%    0.6%  v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::ObjectContents)1, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)0>
-      1    0.3%    0.3%  v8::internal::ZoneAllocator::New
-      1    0.3%    0.3%  v8::internal::ShortCircuitConsString
-      1    0.3%    0.3%  v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::ObjectContents)1, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)1>
-      1    0.3%    0.3%  v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::ObjectContents)0, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)0>
-      1    0.3%    0.3%  v8::internal::RelocInfo::Visit<v8::internal::StaticMarkingVisitor>
-      1    0.3%    0.3%  v8::internal::Parser::ParseUnaryExpression
-      1    0.3%    0.3%  v8::internal::MarkCompactCollector::SweepConservatively
-      1    0.3%    0.3%  v8::internal::JSObject::LookupInDescriptor
-      1    0.3%    0.3%  v8::internal::Heap::ScavengeObject
-      1    0.3%    0.3%  v8::internal::Heap::IterateAndMarkPointersToFromSpace
-      1    0.3%    0.3%  v8::internal::Heap::CollectGarbage
-      1    0.3%    0.3%  v8::internal::FlexibleBodyVisitor<v8::internal::NewSpaceScavenger, v8::internal::JSObject::BodyDescriptor, int>::VisitSpecialized<16>
-      1    0.3%    0.3%  v8::internal::FlexibleBodyVisitor<v8::internal::NewSpaceScavenger, v8::internal::FixedArray::BodyDescriptor, int>::Visit
-      1    0.3%    0.3%  _getmntinfo$INODE64
+   3351   94.2%   95.3%  v8::Shell::Load(v8::Arguments const&)
+     37    1.0%    1.1%  v8::internal::Heap::DoScavenge(v8::internal::ObjectVisitor*, unsigned char*)
+     20    0.6%    0.6%  v8::internal::StoreBuffer::IteratePointersToNewSpace(void (*)(v8::internal::HeapObject**, v8::internal::HeapObject*))
+     15    0.4%    0.4%  v8::internal::FlexibleBodyVisitor<v8::internal::NewSpaceScavenger, v8::internal::FixedArray::BodyDescriptor, int>::Visit(v8::internal::Map*, v8::internal::HeapObject*)
+     13    0.4%    0.4%  v8::internal::Heap::ScavengeObject(v8::internal::HeapObject**, v8::internal::HeapObject*)
+     12    0.3%    0.3%  void v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::ObjectContents)1, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)0>(v8::internal::Map*, v8::internal::HeapObject**, v8::internal::HeapObject*, int)
+      6    0.2%    0.2%  void v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::ObjectContents)1, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)0>(v8::internal::Map*, v8::internal::HeapObject**, v8::internal::HeapObject*, int)
+      6    0.2%    0.2%  v8::internal::MarkCompactCollector::SweepConservatively(v8::internal::PagedSpace*, v8::internal::Page*)
+      5    0.1%    0.1%  v8::internal::MarkCompactCollector::MigrateObject(unsigned char*, unsigned char*, int, v8::internal::AllocationSpace)
+      4    0.1%    0.1%  int v8::internal::FlexibleBodyVisitor<v8::internal::NewSpaceScavenger, v8::internal::JSObject::BodyDescriptor, int>::VisitSpecialized<28>(v8::internal::Map*, v8::internal::HeapObject*)
+      4    0.1%    0.1%  int v8::internal::FlexibleBodyVisitor<v8::internal::NewSpaceScavenger, v8::internal::JSObject::BodyDescriptor, int>::VisitSpecialized<12>(v8::internal::Map*, v8::internal::HeapObject*)
+      3    0.1%    0.1%  v8::internal::StoreBuffer::Compact()
+      3    0.1%    0.1%  v8::internal::StaticMarkingVisitor::VisitUnmarkedObjects(v8::internal::Heap*, v8::internal::Object**, v8::internal::Object**)
+      3    0.1%    0.1%  v8::internal::IncrementalMarking::PrepareForScavenge()
+      3    0.1%    0.1%  v8::internal::Heap::CopyBlock(unsigned char*, unsigned char*, int)
+      2    0.1%    0.1%  void v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::ObjectEvacuationStrategy<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::ObjectContents)1>::VisitSpecialized<24>(v8::internal::Map*, v8::internal::HeapObject**, v8::internal::HeapObject*)
+      2    0.1%    0.1%  void v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::ObjectContents)1, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)1>(v8::internal::Map*, v8::internal::HeapObject**, v8::internal::HeapObject*, int)
+      2    0.1%    0.1%  void v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::ObjectContents)0, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)1>(v8::internal::Map*, v8::internal::HeapObject**, v8::internal::HeapObject*, int)
+      2    0.1%    0.1%  int v8::internal::FlexibleBodyVisitor<v8::internal::NewSpaceScavenger, v8::internal::JSObject::BodyDescriptor, int>::VisitSpecialized<24>(v8::internal::Map*, v8::internal::HeapObject*)
+      2    0.1%    0.1%  int v8::internal::FlexibleBodyVisitor<v8::internal::NewSpaceScavenger, v8::internal::JSObject::BodyDescriptor, int>::VisitSpecialized<20>(v8::internal::Map*, v8::internal::HeapObject*)
+      2    0.1%    0.1%  int v8::internal::FlexibleBodyVisitor<v8::internal::NewSpaceScavenger, v8::internal::JSObject::BodyDescriptor, int>::VisitSpecialized<16>(v8::internal::Map*, v8::internal::HeapObject*)
+      1    0.0%    0.0%  void v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::ObjectContents)0, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)1>(v8::internal::Map*, v8::internal::HeapObject**, v8::internal::HeapObject*, int)
+      1    0.0%    0.0%  void v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::ObjectContents)0, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)1, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)0>(v8::internal::Map*, v8::internal::HeapObject**, v8::internal::HeapObject*, int)
+      1    0.0%    0.0%  void v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::EvacuateObject<(v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::ObjectContents)0, (v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::SizeRestriction)0>(v8::internal::Map*, v8::internal::HeapObject**, v8::internal::HeapObject*, int)
+      1    0.0%    0.0%  void v8::internal::FlexibleBodyVisitor<v8::internal::StaticMarkingVisitor, v8::internal::JSObject::BodyDescriptor, void>::VisitSpecialized<12>(v8::internal::Map*, v8::internal::HeapObject*)
+      1    0.0%    0.0%  v8::internal::String::ToCString(v8::internal::AllowNullsFlag, v8::internal::RobustnessFlag, int, int, int*)
+      1    0.0%    0.0%  v8::internal::StaticNewSpaceVisitor<v8::internal::NewSpaceScavenger>::VisitSeqAsciiString(v8::internal::Map*, v8::internal::HeapObject*)
+      1    0.0%    0.0%  v8::internal::ScavengingVisitor<(v8::internal::MarksHandling)0, (v8::internal::LoggingAndProfiling)0>::EvacuateFixedArray(v8::internal::Map*, v8::internal::HeapObject**, v8::internal::HeapObject*)
+      1    0.0%    0.0%  v8::internal::Parser::ParseVariableDeclarations(v8::internal::Parser::VariableDeclarationContext, v8::internal::Parser::VariableDeclarationProperties*, v8::internal::ZoneList<v8::internal::Handle<v8::internal::String> >*, v8::internal::Handle<v8::internal::String>*, bool*)
+      1    0.0%    0.0%  v8::internal::PagedSpace::AllocateRaw(int)
+      1    0.0%    0.0%  v8::internal::NewSpace::ResetAllocationInfo()
+      1    0.0%    0.0%  v8::internal::MemoryAllocator::AllocateChunk(int, v8::internal::Executability, v8::internal::Space*)
+      1    0.0%    0.0%  v8::internal::MarkCompactCollector::EvacuateNewSpace()
+      1    0.0%    0.0%  v8::internal::MarkCompactCollector::ClearNonLiveTransitions()
+      1    0.0%    0.0%  v8::internal::Map::CreateBackPointers()
+      1    0.0%    0.0%  v8::internal::KeyedStoreIC::GetStubKind(v8::internal::Handle<v8::internal::JSObject>, v8::internal::Handle<v8::internal::Object>, v8::internal::Handle<v8::internal::Object>)
+      1    0.0%    0.0%  v8::internal::IncrementalMarkingRootMarkingVisitor::VisitPointers(v8::internal::Object**, v8::internal::Object**)
+      1    0.0%    0.0%  v8::internal::HGoto::opcode() const
+      1    0.0%    0.0%  v8::internal::FlexibleBodyVisitor<v8::internal::StaticMarkingVisitor, v8::internal::FixedArray::BodyDescriptor, void>::Visit(v8::internal::Map*, v8::internal::HeapObject*)
+      1    0.0%    0.0%  v8::internal::Deoptimizer::TableEntryGenerator::GeneratePrologue()
+      1    0.0%    0.0%  v8::Shell::Print(v8::Arguments const&)
 
  [GC]:
    ticks  total  nonlib   name
-     35   11.1%
+    201    5.6%
 
  [Bottom up (heavy) profile]:
   Note: percentage shows a share of a particular caller in the total
@@ -43,221 +62,224 @@ Statistical profiling result from v8.log, (316 ticks, 9 unaccounted, 0 excluded)
   Callers occupying less than 2.0% are not shown.
 
    ticks parent  name
-    277   87.7%  v8::Shell::Load
-     57   20.6%    LazyCompile: *scope.SimpleHashtable.c.inherit.put simple-hashtable.js:88
-     19   33.3%      Function: ~c.Tableau.c.inherit.addRow Tableau.js:93
-     11   57.9%        Function: ~c.SimplexSolver.c.inherit.tryAddingDirectly SimplexSolver.js:498
-     11  100.0%          Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      8   72.7%            LazyCompile: c.Tests.c.inherit.addDelSolvers Tests.js:292
-      3   27.3%            Function: ~c.SimplexSolver.c.inherit.addStay SimplexSolver.js:202
-      6   31.6%        Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable SimplexSolver.js:466
-      6  100.0%          Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      4   66.7%            LazyCompile: c.Tests.c.inherit.addDelSolvers Tests.js:292
-      1   16.7%            LazyCompile: ~c.Tests.c.inherit.addDelSolvers Tests.js:292
-      1   16.7%            Function: ~<anonymous> Tests.js:402
-      2   10.5%        LazyCompile: *c.SimplexSolver.c.inherit.tryAddingDirectly SimplexSolver.js:498
-      2  100.0%          Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      2  100.0%            LazyCompile: c.Tests.c.inherit.addDelSolvers Tests.js:292
-     18   31.6%      Function: ~c.LinearExpression.c.inherit.addVariable LinearExpression.js:135
-     17   94.4%        Function: ~c.LinearExpression.c.inherit.addExpression LinearExpression.js:129
-     17  100.0%          Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-     17  100.0%            LazyCompile: *forEach native array.js:1039
-      1    5.6%        Function: ~<anonymous> SimplexSolver.js:659
-      1  100.0%          Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-      1  100.0%            LazyCompile: ~forEach native array.js:1039
-      5    8.8%      Function: ~c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      5  100.0%        Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      5  100.0%          LazyCompile: c.Tests.c.inherit.addDelSolvers Tests.js:292
-      5  100.0%            LazyCompile: ~c.Tests.c.inherit.main Tests.js:448
-      5    8.8%      Function: ~c.LinearExpression.c.inherit.initialize LinearExpression.js:18
-      3   60.0%        LazyCompile: ~scope.c.Times c.js:120
-      3  100.0%          LazyCompile: ~c.Tests.c.inherit.addDelSolvers Tests.js:292
-      3  100.0%            LazyCompile: ~c.Tests.c.inherit.main Tests.js:448
-      2   40.0%        Function: ~EditOrStayCtor Constraint.js:74
-      2  100.0%          Function: ~c.StayConstraint.c.inherit.initialize Constraint.js:93
-      2  100.0%            Function: ~c.SimplexSolver.c.inherit.addStay SimplexSolver.js:202
-      3    5.3%      Function: ~c.Tableau.c.inherit.insertColVar Tableau.js:78
-      3  100.0%        Function: ~c.Tableau.c.inherit.noteAddedVariable Tableau.js:36
-      2   66.7%          Function: ~c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      2  100.0%            Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      1   33.3%          LazyCompile: *c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      1  100.0%            Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      3    5.3%      Function: ~c.LinearExpression.c.inherit.multiplyMe LinearExpression.js:46
-      3  100.0%        Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-      2   66.7%          LazyCompile: *forEach native array.js:1039
-      2  100.0%            LazyCompile: *scope.SimpleHashtable.c.inherit.each simple-hashtable.js:157
-      1   33.3%          LazyCompile: ~forEach native array.js:1039
-      1  100.0%            LazyCompile: *scope.SimpleHashtable.c.inherit.each simple-hashtable.js:157
-      2    3.5%      Function: ~c.LinearExpression.c.inherit.substituteOut LinearExpression.js:182
-      2  100.0%        Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-      2  100.0%          LazyCompile: *forEach native array.js:1039
-      2  100.0%            LazyCompile: *scope.SimpleHashtable.c.inherit.each simple-hashtable.js:157
-     45   16.2%    LazyCompile: hasOwnProperty native v8natives.js:249
-     14   31.1%      LazyCompile: *scope.SimpleHashtable.c.inherit.get simple-hashtable.js:105
-      8   57.1%        LazyCompile: *c.SimplexSolver.c.inherit.resolveArray SimplexSolver.js:336
-      8  100.0%          Function: ~c.SimplexSolver.c.inherit.resolvePair SimplexSolver.js:347
-      8  100.0%            Function: ~<anonymous> Tests.js:409
-      5   35.7%        Function: ~c.Tableau.c.inherit.rowExpression Tableau.js:184
-      4   80.0%          Function: ~c.SimplexSolver.c.inherit.setExternalVariables._fNeedsSolving SimplexSolver.js:822
+   3351   94.2%  v8::Shell::Load(v8::Arguments const&)
+    891   26.6%    LazyCompile: *c.Tableau.c.inherit.addRow ../src/Tableau.js:93
+    599   67.2%      LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+    470   78.5%        Function: c.inherit.addDelSolvers PerfTest.js:120
+    470  100.0%          Function: ~c.inherit.main PerfTest.js:264
+    470  100.0%            LazyCompile: ~<anonymous> PerfTest.js:7
+    129   21.5%        LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+    129  100.0%          Function: c.inherit.addDelSolvers PerfTest.js:120
+    129  100.0%            Function: ~c.inherit.main PerfTest.js:264
+    281   31.5%      Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable ../src/SimplexSolver.js:440
+    165   58.7%        Function: ~c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+    164   99.4%          Function: c.inherit.addDelSolvers PerfTest.js:120
+    164  100.0%            Function: ~c.inherit.main PerfTest.js:264
+    116   41.3%        LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+    116  100.0%          Function: c.inherit.addDelSolvers PerfTest.js:120
+    116  100.0%            Function: ~c.inherit.main PerfTest.js:264
+    492   14.7%    LazyCompile: hasOwnProperty native v8natives.js:249
+    191   38.8%      LazyCompile: *c.HashTable.c.inherit.get ../src/HashTable.js:80
+    125   65.4%        LazyCompile: *c.SimplexSolver.c.inherit.resolveArray ../src/SimplexSolver.js:318
+    125  100.0%          LazyCompile: *c.SimplexSolver.c.inherit.resolvePair ../src/SimplexSolver.js:328
+    125  100.0%            Function: ~<anonymous> PerfTest.js:226
+     45   23.6%        LazyCompile: *c.SimplexSolver.c.inherit.resetStayConstants ../src/SimplexSolver.js:769
+     36   80.0%          Function: ~c.SimplexSolver.c.inherit.resolve ../src/SimplexSolver.js:334
+     36  100.0%            Function: ~c.SimplexSolver.c.inherit.resolveArray ../src/SimplexSolver.js:318
+      9   20.0%          Function: ~c.SimplexSolver.c.inherit.removeConstraintInternal ../src/SimplexSolver.js:191
+      9  100.0%            Function: ~c.SimplexSolver.c.inherit.removeConstraint ../src/SimplexSolver.js:185
+     10    5.2%        Function: c.LinearExpression.c.inherit.addVariable ../src/LinearExpression.js:137
+     10  100.0%          Function: ~c.LinearExpression.c.inherit.addExpression ../src/LinearExpression.js:131
+     10  100.0%            Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+      8    4.2%        Function: <anonymous> ../src/SimplexSolver.js:494
+      8  100.0%          Function: ~c.HashTable.c.inherit.escapingEach ../src/HashTable.js:141
+      8  100.0%            LazyCompile: *c.HashTable.c.inherit.escapingEach ../src/HashTable.js:134
+    111   22.6%      LazyCompile: *c.Tableau.c.inherit.rowExpression ../src/Tableau.js:184
+     91   82.0%        Function: c.SimplexSolver.c.inherit.setExternalVariables._fNeedsSolving ../src/SimplexSolver.js:790
+     91  100.0%          LazyCompile: *forEach native array.js:1039
+     69   75.8%            LazyCompile: *c.SimplexSolver.c.inherit.setExternalVariables ../src/SimplexSolver.js:780
+     22   24.2%            LazyCompile: *c.HashSet.c.inherit.each ../src/HashSet.js:44
+      6    5.4%        Function: c.SimplexSolver.c.inherit.optimize ../src/SimplexSolver.js:729
+      6  100.0%          LazyCompile: *forEach native array.js:1039
+      6  100.0%            LazyCompile: *c.HashSet.c.inherit.each ../src/HashSet.js:44
+      3    2.7%        LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+      3  100.0%          LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      3  100.0%            LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+      3    2.7%        Function: c.SimplexSolver.c.inherit.deltaEditConstant ../src/SimplexSolver.js:572
+      3  100.0%          LazyCompile: *forEach native array.js:1039
+      3  100.0%            LazyCompile: *c.SimplexSolver.c.inherit.deltaEditConstant ../src/SimplexSolver.js:546
+      3    2.7%        Function: <anonymous> ../src/SimplexSolver.js:629
+      3  100.0%          Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+      3  100.0%            LazyCompile: *forEach native array.js:1039
+     62   12.6%      Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+     61   98.4%        LazyCompile: *forEach native array.js:1039
+     61  100.0%          LazyCompile: *c.HashTable.c.inherit.each ../src/HashTable.js:117
+     24   39.3%            LazyCompile: *c.LinearExpression.c.inherit.addExpression ../src/LinearExpression.js:120
+     13   21.3%            LazyCompile: *c.Tableau.c.inherit.addRow ../src/Tableau.js:93
+     13   21.3%            LazyCompile: *c.LinearExpression.c.inherit.multiplyMe ../src/LinearExpression.js:43
+     11   18.0%            LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+     33    6.7%      LazyCompile: *c.HashTable.c.inherit.put ../src/HashTable.js:63
+     16   48.5%        Function: c.LinearExpression.c.inherit.addVariable ../src/LinearExpression.js:137
+     16  100.0%          Function: ~c.LinearExpression.c.inherit.addExpression ../src/LinearExpression.js:131
+     16  100.0%            Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+      8   24.2%        LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+      5   62.5%          LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      3   60.0%            LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+      2   40.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+      3   37.5%          Function: ~c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      3  100.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+      4   12.1%        Function: c.LinearExpression.c.inherit.multiplyMe ../src/LinearExpression.js:46
+      4  100.0%          Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
       4  100.0%            LazyCompile: *forEach native array.js:1039
-      1   20.0%          Function: ~c.SimplexSolver.c.inherit.optimize SimplexSolver.js:759
+      2    6.1%        Function: ~c.LinearExpression.c.inherit.substituteOut ../src/LinearExpression.js:188
+      2  100.0%          Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+      2  100.0%            LazyCompile: *forEach native array.js:1039
+      2    6.1%        Function: ~c.LinearExpression.c.inherit.multiplyMe ../src/LinearExpression.js:46
+      2  100.0%          Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+      2  100.0%            LazyCompile: *forEach native array.js:1039
+      1    3.0%        Function: ~c.Tableau.c.inherit.addRow ../src/Tableau.js:93
+      1  100.0%          Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable ../src/SimplexSolver.js:440
+      1  100.0%            Function: ~c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+     20    4.1%      Function: ~c.HashTable.c.inherit.escapingEach ../src/HashTable.js:141
+     17   85.0%        LazyCompile: *c.HashTable.c.inherit.escapingEach ../src/HashTable.js:134
+     13   76.5%          LazyCompile: *c.SimplexSolver.c.inherit.chooseSubject ../src/SimplexSolver.js:488
+     10   76.9%            LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      3   23.1%            LazyCompile: *c.SimplexSolver.c.inherit.tryAddingDirectly ../src/SimplexSolver.js:472
+      4   23.5%          Function: ~c.SimplexSolver.c.inherit.optimize ../src/SimplexSolver.js:696
+      2   50.0%            Function: ~c.SimplexSolver.c.inherit.solve ../src/SimplexSolver.js:360
+      2   50.0%            Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable ../src/SimplexSolver.js:440
+      3   15.0%        Function: ~c.HashTable.c.inherit.escapingEach ../src/HashTable.js:134
+      1   33.3%          LazyCompile: *c.SimplexSolver.c.inherit.chooseSubject ../src/SimplexSolver.js:488
+      1  100.0%            LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      1   33.3%          Function: ~c.SimplexSolver.c.inherit.optimize ../src/SimplexSolver.js:696
+      1  100.0%            Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable ../src/SimplexSolver.js:440
+      1   33.3%          Function: ~c.SimplexSolver.c.inherit.chooseSubject ../src/SimplexSolver.js:488
+      1  100.0%            LazyCompile: *c.SimplexSolver.c.inherit.tryAddingDirectly ../src/SimplexSolver.js:472
+     13    2.6%      LazyCompile: *c.LinearExpression.c.inherit.setVariable ../src/LinearExpression.js:162
+     13  100.0%        LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+     13  100.0%          LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      9   69.2%            LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+      4   30.8%            Function: c.inherit.addDelSolvers PerfTest.js:120
+     11    2.2%      LazyCompile: *c.Tableau.c.inherit.noteAddedVariable ../src/Tableau.js:36
+     11  100.0%        LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+     11  100.0%          LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+     11  100.0%            LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+     11    2.2%      LazyCompile: *c.Tableau.c.inherit.insertColVar ../src/Tableau.js:78
+     10   90.9%        Function: c.Tableau.c.inherit.addRow ../src/Tableau.js:99
+     10  100.0%          Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+     10  100.0%            LazyCompile: *forEach native array.js:1039
+      1    9.1%        Function: ~c.Tableau.c.inherit.addRow ../src/Tableau.js:99
+      1  100.0%          Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
       1  100.0%            LazyCompile: *forEach native array.js:1039
-      1    7.1%        Function: ~c.Tableau.c.inherit.insertColVar Tableau.js:78
-      1  100.0%          Function: ~c.Tableau.c.inherit.addRow Tableau.js:99
-      1  100.0%            Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-     11   24.4%      Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-     10   90.9%        LazyCompile: *forEach native array.js:1039
-     10  100.0%          LazyCompile: *scope.SimpleHashtable.c.inherit.each simple-hashtable.js:157
-      3   30.0%            LazyCompile: *c.LinearExpression.c.inherit.addExpression LinearExpression.js:121
-      2   20.0%            Function: ~c.LinearExpression.c.inherit.multiplyMe LinearExpression.js:43
-      2   20.0%            Function: ~c.LinearExpression.c.inherit.addExpression LinearExpression.js:121
-      1   10.0%            Function: ~c.Tableau.c.inherit.addRow Tableau.js:93
-      1   10.0%            Function: ~c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      1   10.0%            Function: ~c.LinearExpression.c.inherit.substituteOut LinearExpression.js:176
-      1    9.1%        LazyCompile: ~forEach native array.js:1039
-      1  100.0%          LazyCompile: *scope.SimpleHashtable.c.inherit.each simple-hashtable.js:157
-      1  100.0%            Function: ~c.Tableau.c.inherit.addRow Tableau.js:93
-      8   17.8%      Function: ~scope.SimpleHashtable.c.inherit.get simple-hashtable.js:105
-      2   25.0%        LazyCompile: *c.SimplexSolver.c.inherit.resolveArray SimplexSolver.js:336
-      2  100.0%          Function: ~c.SimplexSolver.c.inherit.resolvePair SimplexSolver.js:347
-      2  100.0%            Function: ~<anonymous> Tests.js:409
-      2   25.0%        Function: ~c.Tableau.c.inherit.rowExpression Tableau.js:184
-      1   50.0%          Function: ~c.SimplexSolver.c.inherit.setExternalVariables._fNeedsSolving SimplexSolver.js:822
+     10    2.0%      LazyCompile: *c.LinearExpression.c.inherit.coefficientFor ../src/LinearExpression.js:219
+      8   80.0%        Function: c.SimplexSolver.c.inherit.optimize ../src/SimplexSolver.js:729
+      8  100.0%          LazyCompile: *forEach native array.js:1039
+      8  100.0%            LazyCompile: *c.HashSet.c.inherit.each ../src/HashSet.js:44
+      2   20.0%        Function: ~c.SimplexSolver.c.inherit.deltaEditConstant ../src/SimplexSolver.js:572
+      2  100.0%          LazyCompile: *forEach native array.js:1039
+      2  100.0%            LazyCompile: *c.HashSet.c.inherit.each ../src/HashSet.js:44
+    440   13.1%    LazyCompile: *c.HashTable.c.inherit.put ../src/HashTable.js:63
+    320   72.7%      LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+    258   80.6%        LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+    221   85.7%          Function: c.inherit.addDelSolvers PerfTest.js:120
+    221  100.0%            Function: ~c.inherit.main PerfTest.js:264
+     37   14.3%          LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+     37  100.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+     62   19.4%        Function: ~c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+     62  100.0%          Function: c.inherit.addDelSolvers PerfTest.js:120
+     62  100.0%            Function: ~c.inherit.main PerfTest.js:264
+     85   19.3%      Function: c.LinearExpression.c.inherit.addVariable ../src/LinearExpression.js:137
+     84   98.8%        Function: ~c.LinearExpression.c.inherit.addExpression ../src/LinearExpression.js:131
+     84  100.0%          Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+     84  100.0%            LazyCompile: *forEach native array.js:1039
+     12    2.7%      Function: c.LinearExpression.c.inherit.multiplyMe ../src/LinearExpression.js:46
+     12  100.0%        Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+     12  100.0%          LazyCompile: *forEach native array.js:1039
+     12  100.0%            LazyCompile: *c.HashTable.c.inherit.each ../src/HashTable.js:117
+    161    4.8%    LazyCompile: *c.Tableau.c.inherit.noteAddedVariable ../src/Tableau.js:36
+    159   98.8%      LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+    159  100.0%        LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+    159  100.0%          LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+    159  100.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+    146    4.4%    LazyCompile: *c.LinearExpression.c.inherit.setVariable ../src/LinearExpression.js:162
+    143   97.9%      LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+    143  100.0%        LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+    134   93.7%          LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+    134  100.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+      9    6.3%          Function: c.inherit.addDelSolvers PerfTest.js:120
+      9  100.0%            Function: ~c.inherit.main PerfTest.js:264
+      3    2.1%      Function: ~c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+      3  100.0%        Function: ~c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      1   33.3%          Function: ~c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+      1  100.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+      1   33.3%          Function: ~<anonymous> PerfTest.js:219
       1  100.0%            LazyCompile: *forEach native array.js:1039
-      1   50.0%          Function: ~c.SimplexSolver.c.inherit.deltaEditConstant SimplexSolver.js:601
-      1  100.0%            LazyCompile: *forEach native array.js:1039
-      1   12.5%        Function: ~c.Tableau.c.inherit.insertColVar Tableau.js:78
-      1  100.0%          Function: ~c.Tableau.c.inherit.noteAddedVariable Tableau.js:36
-      1  100.0%            LazyCompile: *c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      1   12.5%        Function: ~c.Tableau.c.inherit.columnsHasKey Tableau.js:180
-      1  100.0%          Function: ~c.SimplexSolver.c.inherit.tryAddingDirectly SimplexSolver.js:498
-      1  100.0%            Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      1   12.5%        Function: ~c.LinearExpression.c.inherit.coefficientFor LinearExpression.js:212
-      1  100.0%          Function: ~c.SimplexSolver.c.inherit.deltaEditConstant SimplexSolver.js:601
-      1  100.0%            LazyCompile: *forEach native array.js:1039
-      1   12.5%        Function: ~c.LinearExpression.c.inherit.addVariable LinearExpression.js:135
-      1  100.0%          Function: ~c.LinearExpression.c.inherit.addExpression LinearExpression.js:129
-      1  100.0%            Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-      7   15.6%      LazyCompile: *scope.SimpleHashtable.c.inherit.put simple-hashtable.js:88
-      3   42.9%        Function: ~c.LinearExpression.c.inherit.setVariable LinearExpression.js:160
-      3  100.0%          Function: ~c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      3  100.0%            Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      1   14.3%        LazyCompile: *c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      1  100.0%          Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      1  100.0%            Function: ~c.SimplexSolver.c.inherit.addStay SimplexSolver.js:202
-      1   14.3%        Function: ~c.LinearExpression.c.inherit.multiplyMe LinearExpression.js:46
-      1  100.0%          Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-      1  100.0%            LazyCompile: *forEach native array.js:1039
-      1   14.3%        Function: ~c.LinearExpression.c.inherit.initialize LinearExpression.js:18
-      1  100.0%          Function: ~EditOrStayCtor Constraint.js:74
-      1  100.0%            Function: ~c.StayConstraint.c.inherit.initialize Constraint.js:93
-      1   14.3%        Function: ~c.LinearExpression.c.inherit.addVariable LinearExpression.js:135
-      1  100.0%          Function: ~c.LinearExpression.c.inherit.addExpression LinearExpression.js:129
-      1  100.0%            Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-      1    2.2%      LazyCompile: *c.SimplexSolver.c.inherit.resolve SimplexSolver.js:353
-      1  100.0%        Function: ~c.SimplexSolver.c.inherit.resolveArray SimplexSolver.js:336
-      1  100.0%          Function: ~c.SimplexSolver.c.inherit.resolvePair SimplexSolver.js:347
-      1  100.0%            Function: ~<anonymous> Tests.js:409
-      1    2.2%      LazyCompile: *c.SimplexSolver.c.inherit.resetStayConstants SimplexSolver.js:799
-      1  100.0%        Function: ~c.SimplexSolver.c.inherit.removeConstraintInternal SimplexSolver.js:213
-      1  100.0%          Function: ~c.SimplexSolver.c.inherit.removeConstraint SimplexSolver.js:207
-      1  100.0%            LazyCompile: c.Tests.c.inherit.addDelSolvers Tests.js:292
-      1    2.2%      Function: ~scope.SimpleHashtable.c.inherit.remove simple-hashtable.js:138
-      1  100.0%        Function: ~c.Tableau.c.inherit.removeColumn Tableau.js:119
-      1  100.0%          LazyCompile: *forEach native array.js:1039
-      1  100.0%            LazyCompile: *scope.HashSet.c.inherit.each simple-hashset.js:40
-      1    2.2%      Function: ~copyOwn simple-hashtable.js:71
-      1  100.0%        Function: ~scope.SimpleHashtable.c.inherit.clone simple-hashtable.js:199
-      1  100.0%          Function: ~c.LinearExpression.c.inherit.initializeFromHash LinearExpression.js:30
-      1  100.0%            Function: ~c.LinearExpression.c.inherit.clone LinearExpression.js:52
-      1    2.2%      Function: copyOwn simple-hashtable.js:71
-      1  100.0%        LazyCompile: *scope.SimpleHashtable.c.inherit.clone simple-hashtable.js:199
-      1  100.0%          Function: ~c.LinearExpression.c.inherit.initializeFromHash LinearExpression.js:30
-      1  100.0%            Function: ~c.LinearExpression.c.inherit.clone LinearExpression.js:52
-     20    7.2%    LazyCompile: MakeGenericError native messages.js:107
-     20  100.0%      LazyCompile: ~MakeReferenceError native messages.js:317
-     20  100.0%        LazyCompile: ~c.InternalError.c.inherit.description Error.js:26
-     20  100.0%          Function: ~c.SimplexSolver.c.inherit.optimize SimplexSolver.js:726
-     20  100.0%            Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable SimplexSolver.js:466
-      9    3.2%    Function: ~c.Tableau.c.inherit.rowExpression Tableau.js:184
-      6   66.7%      Function: ~c.SimplexSolver.c.inherit.setExternalVariables._fNeedsSolving SimplexSolver.js:822
-      6  100.0%        LazyCompile: *forEach native array.js:1039
-      6  100.0%          LazyCompile: *scope.HashSet.c.inherit.each simple-hashset.js:40
-      6  100.0%            Function: ~c.SimplexSolver.c.inherit.setExternalVariables SimplexSolver.js:811
-      2   22.2%      Function: ~c.SimplexSolver.c.inherit.resetStayConstants SimplexSolver.js:799
-      2  100.0%        Function: ~c.SimplexSolver.c.inherit.resolve SimplexSolver.js:353
-      2  100.0%          Function: ~c.SimplexSolver.c.inherit.resolveArray SimplexSolver.js:336
-      2  100.0%            Function: ~c.SimplexSolver.c.inherit.resolvePair SimplexSolver.js:347
-      1   11.1%      Function: ~<anonymous> SimplexSolver.js:659
-      1  100.0%        Function: ~scope.SimpleHashtable.c.inherit.each simple-hashtable.js:160
-      1  100.0%          LazyCompile: *forEach native array.js:1039
-      1  100.0%            LazyCompile: *scope.SimpleHashtable.c.inherit.each simple-hashtable.js:157
-      8    2.9%    Function: ~c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      8  100.0%      Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      3   37.5%        LazyCompile: c.Tests.c.inherit.addDelSolvers Tests.js:292
-      3  100.0%          LazyCompile: ~c.Tests.c.inherit.main Tests.js:448
-      3  100.0%            Script: Tests.js
-      3   37.5%        Function: ~c.SimplexSolver.c.inherit.addStay SimplexSolver.js:202
-      3  100.0%          LazyCompile: ~c.Tests.c.inherit.addDelSolvers Tests.js:292
-      3  100.0%            LazyCompile: ~c.Tests.c.inherit.main Tests.js:448
-      1   12.5%        LazyCompile: ~c.Tests.c.inherit.addDelete1 Tests.js:39
-      1  100.0%          LazyCompile: ~c.Tests.c.inherit.main Tests.js:448
-      1  100.0%            Script: Tests.js
-      1   12.5%        Function: ~<anonymous> Tests.js:402
-      1  100.0%          LazyCompile: *forEach native array.js:1039
-      1  100.0%            LazyCompile: c.Tests.c.inherit.addDelSolvers Tests.js:292
-      7    2.5%    LazyCompile: *forEach native array.js:1039
-      4   57.1%      LazyCompile: *scope.SimpleHashtable.c.inherit.each simple-hashtable.js:157
-      2   50.0%        LazyCompile: *c.SimplexSolver.c.inherit.resolveArray SimplexSolver.js:336
-      2  100.0%          Function: ~c.SimplexSolver.c.inherit.resolvePair SimplexSolver.js:347
-      2  100.0%            Function: ~<anonymous> Tests.js:409
-      2   50.0%        Function: ~c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      2  100.0%          Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      2  100.0%            LazyCompile: c.Tests.c.inherit.addDelSolvers Tests.js:292
-      3   42.9%      LazyCompile: *scope.HashSet.c.inherit.each simple-hashset.js:40
-      1   33.3%        Function: ~c.SimplexSolver.c.inherit.setExternalVariables SimplexSolver.js:811
-      1  100.0%          LazyCompile: *c.SimplexSolver.c.inherit.resolveArray SimplexSolver.js:336
-      1  100.0%            Function: ~c.SimplexSolver.c.inherit.resolvePair SimplexSolver.js:347
-      1   33.3%        Function: ~c.SimplexSolver.c.inherit.optimize SimplexSolver.js:726
-      1  100.0%          Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable SimplexSolver.js:466
-      1  100.0%            Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      1   33.3%        Function: ~c.SimplexSolver.c.inherit.deltaEditConstant SimplexSolver.js:573
-      1  100.0%          Function: ~c.SimplexSolver.c.inherit.suggestValue SimplexSolver.js:361
-      1  100.0%            Function: ~c.SimplexSolver.c.inherit.resolveArray SimplexSolver.js:339
-      7    2.5%    Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      3   42.9%      LazyCompile: c.Tests.c.inherit.addDelSolvers Tests.js:292
-      3  100.0%        LazyCompile: ~c.Tests.c.inherit.main Tests.js:448
-      3  100.0%          Script: Tests.js
-      3  100.0%            Script: run-cl-tests.js
-      3   42.9%      Function: ~c.SimplexSolver.c.inherit.addStay SimplexSolver.js:202
-      3  100.0%        LazyCompile: ~c.Tests.c.inherit.addDelSolvers Tests.js:292
-      3  100.0%          LazyCompile: ~c.Tests.c.inherit.main Tests.js:448
-      3  100.0%            Script: Tests.js
-      1   14.3%      LazyCompile: ~c.Tests.c.inherit.addDelete1 Tests.js:39
-      1  100.0%        LazyCompile: ~c.Tests.c.inherit.main Tests.js:448
-      1  100.0%          Script: Tests.js
-      1  100.0%            Script: run-cl-tests.js
-      7    2.5%    Function: copyOwn simple-hashtable.js:71
-      7  100.0%      LazyCompile: *scope.SimpleHashtable.c.inherit.clone simple-hashtable.js:199
-      7  100.0%        Function: ~c.LinearExpression.c.inherit.initializeFromHash LinearExpression.js:30
-      7  100.0%          Function: ~c.LinearExpression.c.inherit.clone LinearExpression.js:52
-      7  100.0%            Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable SimplexSolver.js:466
-      6    2.2%    LazyCompile: DefineOneShotAccessor native messages.js:745
-      5   83.3%      LazyCompile: <anonymous> native messages.js:1125
-      5  100.0%        LazyCompile: MakeGenericError native messages.js:107
-      5  100.0%          LazyCompile: ~MakeReferenceError native messages.js:317
-      5  100.0%            LazyCompile: ~c.InternalError.c.inherit.description Error.js:26
-      1   16.7%      LazyCompile: captureStackTrace native messages.js:1075
-      1  100.0%        LazyCompile: <anonymous> native messages.js:1125
-      1  100.0%          LazyCompile: MakeGenericError native messages.js:107
-      1  100.0%            LazyCompile: ~MakeReferenceError native messages.js:317
-      6    2.2%    LazyCompile: *c.SimplexSolver.c.inherit.insertErrorVar SimplexSolver.js:831
-      3   50.0%      LazyCompile: *c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      3  100.0%        Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      3  100.0%          Function: ~c.SimplexSolver.c.inherit.addStay SimplexSolver.js:202
-      3  100.0%            LazyCompile: ~c.Tests.c.inherit.addDelSolvers Tests.js:292
-      3   50.0%      Function: ~c.SimplexSolver.c.inherit.newExpression SimplexSolver.js:643
-      3  100.0%        Function: ~c.SimplexSolver.c.inherit.addConstraint SimplexSolver.js:76
-      3  100.0%          Function: ~c.SimplexSolver.c.inherit.addStay SimplexSolver.js:202
-      3  100.0%            LazyCompile: ~c.Tests.c.inherit.addDelSolvers Tests.js:292
+      1   33.3%          Function: c.inherit.addDelSolvers PerfTest.js:120
+      1  100.0%            Function: ~c.inherit.main PerfTest.js:264
+    134    4.0%    LazyCompile: *c.Tableau.c.inherit.insertColVar ../src/Tableau.js:78
+    126   94.0%      Function: c.Tableau.c.inherit.addRow ../src/Tableau.js:99
+    126  100.0%        Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+    126  100.0%          LazyCompile: *forEach native array.js:1039
+    126  100.0%            LazyCompile: *c.HashTable.c.inherit.each ../src/HashTable.js:117
+      8    6.0%      Function: ~c.Tableau.c.inherit.addRow ../src/Tableau.js:99
+      8  100.0%        Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+      7   87.5%          LazyCompile: *forEach native array.js:1039
+      7  100.0%            LazyCompile: *c.HashTable.c.inherit.each ../src/HashTable.js:117
+      1   12.5%          LazyCompile: ~forEach native array.js:1039
+      1  100.0%            LazyCompile: *c.HashTable.c.inherit.each ../src/HashTable.js:117
+     78    2.3%    LazyCompile: *c.SimplexSolver.c.inherit.insertErrorVar ../src/SimplexSolver.js:804
+     78  100.0%      LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+     78  100.0%        LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+     78  100.0%          LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+     78  100.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+     75    2.2%    LazyCompile: *forEach native array.js:1039
+     35   46.7%      LazyCompile: *c.HashTable.c.inherit.each ../src/HashTable.js:117
+     14   40.0%        LazyCompile: *c.Tableau.c.inherit.addRow ../src/Tableau.js:93
+      9   64.3%          Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable ../src/SimplexSolver.js:440
+      5   55.6%            Function: ~c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      4   44.4%            LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      5   35.7%          LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      3   60.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+      2   40.0%            LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+      7   20.0%        LazyCompile: *c.SimplexSolver.c.inherit.newExpression ../src/SimplexSolver.js:614
+      6   85.7%          LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      5   83.3%            Function: c.inherit.addDelSolvers PerfTest.js:120
+      1   16.7%            LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+      1   14.3%          Function: ~c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      1  100.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+      7   20.0%        LazyCompile: *c.LinearExpression.c.inherit.addExpression ../src/LinearExpression.js:120
+      6   85.7%          Function: <anonymous> ../src/SimplexSolver.js:629
+      6  100.0%            Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+      1   14.3%          Function: ~<anonymous> ../src/SimplexSolver.js:629
+      1  100.0%            Function: c.HashTable.c.inherit.each ../src/HashTable.js:120
+      6   17.1%        LazyCompile: *c.LinearExpression.c.inherit.multiplyMe ../src/LinearExpression.js:43
+      5   83.3%          LazyCompile: *c.LinearExpression.c.inherit.times ../src/LinearExpression.js:64
+      5  100.0%            LazyCompile: *c.LinearExpression.c.inherit.times ../src/LinearExpression.js:64
+      1   16.7%          LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      1  100.0%            LazyCompile: *c.SimplexSolver.c.inherit.addStay ../src/SimplexSolver.js:178
+      1    2.9%        LazyCompile: *c.SimplexSolver.c.inherit.resolveArray ../src/SimplexSolver.js:318
+      1  100.0%          LazyCompile: *c.SimplexSolver.c.inherit.resolvePair ../src/SimplexSolver.js:328
+      1  100.0%            Function: ~<anonymous> PerfTest.js:226
+     28   37.3%      LazyCompile: *c.HashSet.c.inherit.each ../src/HashSet.js:44
+     12   42.9%        Function: ~c.SimplexSolver.c.inherit.optimize ../src/SimplexSolver.js:696
+     12  100.0%          Function: ~c.SimplexSolver.c.inherit.addWithArtificialVariable ../src/SimplexSolver.js:440
+     10   83.3%            Function: ~c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      2   16.7%            LazyCompile: *c.SimplexSolver.c.inherit.addConstraint ../src/SimplexSolver.js:60
+      9   32.1%        Function: ~c.SimplexSolver.c.inherit.setExternalVariables ../src/SimplexSolver.js:780
+      7   77.8%          Function: ~c.SimplexSolver.c.inherit.solve ../src/SimplexSolver.js:360
+      7  100.0%            Function: c.inherit.addDelSolvers PerfTest.js:120
+      2   22.2%          Function: ~c.SimplexSolver.c.inherit.resolve ../src/SimplexSolver.js:334
+      2  100.0%            Function: ~c.SimplexSolver.c.inherit.resolveArray ../src/SimplexSolver.js:318
+      6   21.4%        Function: ~c.SimplexSolver.c.inherit.deltaEditConstant ../src/SimplexSolver.js:546
+      4   66.7%          LazyCompile: *c.SimplexSolver.c.inherit.suggestValue ../src/SimplexSolver.js:342
+      4  100.0%            Function: ~c.SimplexSolver.c.inherit.resolveArray ../src/SimplexSolver.js:320
+      2   33.3%          Function: ~c.SimplexSolver.c.inherit.suggestValue ../src/SimplexSolver.js:342
+      2  100.0%            Function: ~c.SimplexSolver.c.inherit.resolveArray ../src/SimplexSolver.js:320
+      1    3.6%        Function: ~c.Tableau.c.inherit.substituteOut ../src/Tableau.js:153
+      1  100.0%          Function: ~c.SimplexSolver.c.inherit.pivot ../src/SimplexSolver.js:755
+      1  100.0%            Function: ~c.SimplexSolver.c.inherit.removeConstraintInternal ../src/SimplexSolver.js:191
+     10   13.3%      LazyCompile: *c.SimplexSolver.c.inherit.setExternalVariables ../src/SimplexSolver.js:780
+     10  100.0%        LazyCompile: *c.SimplexSolver.c.inherit.resolveArray ../src/SimplexSolver.js:318
+     10  100.0%          LazyCompile: *c.SimplexSolver.c.inherit.resolvePair ../src/SimplexSolver.js:328
+     10  100.0%            Function: ~<anonymous> PerfTest.js:226
 
