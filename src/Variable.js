@@ -10,7 +10,9 @@
 var av = 
 c.AbstractVariable = c.inherit({
   initialize: function(a1, a2) {
+    this._name = "";
     this.hash_code = c._inc();
+
     var a1t = typeof a1;
     if (a1t == "string" || a1t != "undefined") {
       this._name = a1 || "v" + this.hash_code;
@@ -37,9 +39,6 @@ c.AbstractVariable = c.inherit({
 c.Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, value) {
-    this.hash_code = c._inc();
-    this._name = "";
-    this._value = 0.0;
     if (typeof name_or_val == "string") {
       av.call(this, name_or_val);
       this._value = value || 0.0;
@@ -49,9 +48,9 @@ c.Variable = c.inherit({
         this._value = name_or_val;
       }
     }
-    if (c.Variable._map) {
-      c.Variable._map[this._name] = this;
-    }
+    // FIXME: gigantic memory leak?
+    var vm = c.Variable._map;
+    if (vm) { vm[this._name] = this; }
   },
   isExternal:     true,
 
