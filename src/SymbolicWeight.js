@@ -5,10 +5,13 @@
 // Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
 
 (function(c) {
+"use strict";
 
 c.SymbolicWeight = c.inherit({
   initialize: function(w1, w2, w3) {
     this._values = new Array(w1, w2, w3);
+    this._dc = 0;
+    this.toDouble();
   },
 
   times: function(n) {
@@ -42,34 +45,15 @@ c.SymbolicWeight = c.inherit({
   },
 
   lessThan: function(c) {
-    for (i = 0; i < this._values.length; ++i) {
-      if (this._values[i] < c._values[i]) {
-        return true;
-      } else if (this._values[i] > c._values[i]) {
-        return false;
-      }
-    }
-    return false; // equal
+    return this._dc < c._dc;
   },
     
   lessThanOrEqual: function(c) {
-    for (i = 0; i < this._values.length; ++i) {
-      if (this._values[i] < c._values[i]) {
-        return true;
-      } else if (this._values[i] > c._values[i]) {
-        return false;
-      }
-    }
-    return true; // equal
+    return this._dc <= c._dc;
   },
 
   equal: function(c) {
-    for (i = 0; i < this._values.length; ++i) {
-      if (this._values[i] != c._values[i]) {
-        return false;
-      }
-    }
-    return true;
+    return this._dc == c._dc;
   },
 
   greaterThan: function(c) {
@@ -85,22 +69,18 @@ c.SymbolicWeight = c.inherit({
   },
 
   toDouble: function() {
-    sum  =  0;
-    factor = 1;
-    multiplier = 1000;
-    for (i = this._values.length - 1; i >= 0; --i) {
+    if (this._dc) { return this._dc; }
+    var sum =  0;
+    var factor = 1;
+    var multiplier = 1000;
+    for (var i = this._values.length - 1; i >= 0; --i) {
       sum += this._values[i] * factor;
       factor *= multiplier;
     }
-    return sum;
+    return this._dc = sum;
   },
 
-  toString: function() {
-    return '[' + this._values[0] + ','
-      + this._values[1] + ','
-      + this._values[2] + ']';
-  },
-
+  toString: function() { return '[' + this._values.join(',') + ']'; },
   cLevels: function() { return 3; }
 });
 
