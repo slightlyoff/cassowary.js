@@ -43,7 +43,7 @@ Web"](http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.101.4819)
 Getting Started
 ---------------
 
-This repo pulls in other Git repositories through ["submodules"](http://help.github.com/submodules/), so after cloning the repo, issue the following commands:
+This repo pulls in other Git repositories through [submodules](http://help.github.com/submodules/), so after cloning the repo, issue the following commands:
 
 ```
 $ git submodule init
