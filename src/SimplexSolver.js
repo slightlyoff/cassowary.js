@@ -35,8 +35,7 @@ c.SimplexSolver = c.inherit({
     this._rows = new c.HashTable(); // clv -> expression
 
     this._rows.put(this._objective, new c.LinearExpression());
-    this._stkCedcns = []; // Stack
-    this._stkCedcns.push(0);
+    this._stkCedcns = [0]; // Stack
     if (c.trace)
       c.traceprint("objective expr == " + this.rowExpression(this._objective));
   },
