@@ -169,7 +169,9 @@ scope.Panel = c.inherit({
       s += name + ": " + v + "  <br>";
     }, this);
 
-    [ "right", "bottom" ].forEach(function(name) {
+    [ "right", "bottom",
+      "preferredWidth",
+      "preferredHeight" ].forEach(function(name) {
       var v = this.v[name].value() + "px";
       s += name + ": " + this.v[name].value() + "px  <br>";
     }, this);
@@ -271,9 +273,14 @@ scope.Panel = c.inherit({
     var v = this.v = {};
 
     [
-      "width", "height",
-      "left", "right",
-      "top", "bottom",
+      "width",
+      "height",
+      "left",
+      "right",
+      "top",
+      "bottom",
+      "preferredWidth",
+      "preferredHeight",
       "contentWidth", "contentHeight",
       "contentLeft", "contentRight",
       "contentTop", "contentBottom",
@@ -318,12 +325,18 @@ scope.Panel = c.inherit({
       geq(v.contentWidth,  0),
       geq(v.contentHeight, 0),
 
-      geq(v.width,         v.minWidth, strong, 5),
-      geq(v.height,        v.minHeight, strong, 5),
+      leq(v.width,         v.preferredWidth, medium, 10),
+      leq(v.height,        v.preferredHeight, medium, 10),
+
+      geq(v.width,         v.minWidth, medium , 5),
+      geq(v.height,        v.minHeight, medium, 5),
       geq(v.contentWidth,  v.minContentWidth, medium, 3),
       geq(v.contentHeight, v.minContentHeight, medium, 3),
 
       /*
+      weakStay(v.preferredWidth, 2),
+      weakStay(v.preferredHeight, 2),
+
       weakStay(v.width, 1),
       weakStay(v.height, 1),
 
@@ -439,6 +452,12 @@ scope.Panel = c.inherit({
 
   get width()   { return valueGetter.call(this, "width"); },
   get height()  { return valueGetter.call(this, "width"); },
+
+  set preferredWidth(v)  { valueSetter.call(this, "preferredWidth", v); },
+  set preferredHeight(v) { valueSetter.call(this, "preferredHeight", v); },
+
+  get preferredWidth()   { return valueGetter.call(this, "preferredWidth"); },
+  get preferredHeight()  { return valueGetter.call(this, "preferredHeight"); },
 
   set minWidth(v)  { valueSetter.call(this, "minWidth", v); },
   set minHeight(v) { valueSetter.call(this, "minHeight", v); },
