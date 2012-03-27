@@ -434,7 +434,6 @@ doh.add("End-To-End", [
       iwStay,
       ihStay
     ].forEach(function(c) { 
-      print(c.strength);
       solver.addConstraint(c);
     });
 
@@ -444,8 +443,6 @@ doh.add("End-To-End", [
       // Measurement should be cheap here.
       var iwv = rand(MAX, MIN);
       var ihv = rand(MAX, MIN);
-      print("innerWidth: " + iwv);
-      print("innerHeight: " + ihv);
 
       solver.addEditVar(iw);
       solver.addEditVar(ih);
@@ -455,11 +452,6 @@ doh.add("End-To-End", [
             .suggestValue(ih, ihv);
       solver.resolve();
       solver.endEdit();
-
-      print("calculated right: " + v.right.value());
-      print("calculated bottom: " + v.bottom.value());
-      // console.log(iwv, ihv);
-      // console.log(v.top.value(), v.left.value(), v.bottom.value(), v.right.value());
 
       t.is(v.top.value(), 0);
       t.is(v.left.value(), 0);
