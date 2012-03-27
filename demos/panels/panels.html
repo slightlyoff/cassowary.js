@@ -12,95 +12,7 @@
     <!-- GCF -->
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-    <style type="text/css">
-      /* We're an app, so lay ourselves out like one. Just the basics, ma'am. */
-      html, body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
-        color: #222;
-        background-color: #D9E7FF;
-      }
-
-      body {
-        /*
-        min-width: 778px;
-        */
-        overflow-y: hidden;
-        overflow-x: hidden;
-        position: absolute;
-        font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
-      }
-
-      /* Ensure that we are always in a layout mode that doesn't suck eggs */
-      * {
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-      }
-
-      /*
-        We're trying to look like IRC Cloud for this demo, so borrow their
-        toolbar styling
-      */
-      ::-webkit-scrollbar {
-        width: 14px;
-        height: 10px;
-      }
-
-      ::-webkit-scrollbar-track-piece {
-        background-color: #f5f5f5;
-        background-clip: padding-box;
-        -webkit-background-clip: padding-box;
-        border: 3px solid #fff;
-        border-radius: 6px;
-        -webkit-border-radius: 6px;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background-color: #527dff;
-        background-clip: padding-box;
-        -webkit-background-clip: padding-box;
-        border: 3px solid #fff;
-        border-radius: 6px;
-        -webkit-border-radius: 6px;
-      }
-
-      /* Base styling for all panel elements */
-      .panel {
-        /* Turn off system constraint layouts for panels */
-        position:   absolute;
-        margin:     none;
-        padding:    none;
-        border:     none;
-
-        box-shadow: inset 0px 0px 6px rgba(133, 133, 133, 1);
-        /* FIXME(slightlyoff): need to make the panel constraints savy to padding */
-        padding: 10px;
-      }
-
-      .debugShadow {
-        position:   absolute;
-        margin:     none;
-        padding:    1em;
-        border:     none;
-        overflow:   hidden;
-        background: rgba(159,196,84, 0.5);
-        width:      0px;
-        height:     0px;
-        left:       0px;
-        top:        0px;
-        z-index:    100;
-        outline:    1px solid blue;
-        pointer-events: none;
-        font:       normal 85%/1 "Consolas", "Courier New", "Courier", monospace;
-        text-align: right;
-        color:      black;
-        opacity:    0.5;
-      }
-    </style>
+    <link href="panels.css" rel="stylesheet" type="text/css">
 
     <script defer="defer" src="../../src/c.js"></script>
     <script defer="defer" src="../../src/HashTable.js"></script>
@@ -116,9 +28,7 @@
     <script defer="defer" src="../../src/EditInfo.js"></script>
     <script defer="defer" src="../../src/Tableau.js"></script>
     <script defer="defer" src="../../src/SimplexSolver.js"></script>
-    <!--
     <script defer="defer" src="../../src/Timer.js"></script>
-    -->
 
     <script defer="defer" src="domutil.js"></script>
     <script defer="defer" src="panels.js"></script>
@@ -195,12 +105,11 @@
         p4.leftOf = p3;
         p4.debug = true;
 
-		// p4.above = sp;
+        // p4.above = sp;
 		
         // p3._debugShadow.style.textAlign = "left";
       });
     </script>
-
     <!--
       Notes:
         - I'm using invented tag names in order to make it clear what I'm
@@ -233,8 +142,38 @@
     <x-panel id="cList">
     </x-panel>
     -->
-
   </head>
   <body>
   </body>
+  <!-- Compat testing -->
+  <!--
+  <script src="../../src/c.js"></script>
+  <script src="../../tmp/mootools-core-1.3.2-server.js"></script>
+  <script src="../../tmp/jshashtable-2.1-pretty.js"></script>
+  <script src="../../tmp/jshashset-pretty.js"></script>
+  <script src="../../tmp/ExCLError.js"></script>
+  <script src="../../tmp/ClSymbolicWeight.js"></script>
+  <script src="../../tmp/ClStrength.js"></script>
+  <script src="../../tmp/ClVariable.js"></script>
+  <script src="../../tmp/ClPoint.js"></script>
+  <script src="../../tmp/ClLinearExpression.js"></script>
+  <script src="../../tmp/ClConstraint.js"></script>
+  <script src="../../tmp/ClLinearConstraint.js"></script>
+  <script src="../../tmp/ClEditInfo.js"></script>
+  <script src="../../tmp/ClTableau.js"></script>
+  <script src="../../tmp/ClSimplexSolver.js"></script>
+  <script src="../../tmp/CL.js"></script>
+  <script>
+    c.SimplexSolver = ClSimplexSolver;
+    c.LinearInequality = ClLinearInequality;
+    c.GEQ = CL.GEQ;
+    c.LEQ = CL.LEQ;
+    c.LinearEquation = ClLinearEquation;
+    c.Strength = ClStrength;
+    c.StayConstraint = ClStayConstraint;
+    c.LinearExpression = ClLinearExpression;
+    c.Variable = ClVariable;
+    c.Plus = CL.Plus;
+  </script>
+  -->
 </html>

@@ -87,6 +87,7 @@ var stay = function(v, strength, weight) {
   return new c.StayConstraint(v, strength || weak, weight || 1.0);
 };
 var weakStay =   function(v, w) { return stay(v, weak, w); };
+var mediumStay =   function(v, w) { return stay(v, medium, w); };
 var strongStay =   function(v, w) { return stay(v, strong, w); };
 var requiredStay = function(v, w) { return stay(v, required, w); }
 
@@ -317,24 +318,35 @@ scope.Panel = c.inherit({
       geq(v.contentWidth,  0),
       geq(v.contentHeight, 0),
 
-      geq(v.width,         v.minWidth, medium, 1000),
-      geq(v.height,        v.minHeight, medium, 1000),
-      geq(v.contentWidth,  v.minContetnWidth, medium, 1000),
-      geq(v.contentHeight, v.minContentHeight, medium, 1000),
+      geq(v.width,         v.minWidth, strong, 5),
+      geq(v.height,        v.minHeight, strong, 5),
+      geq(v.contentWidth,  v.minContentWidth, medium, 3),
+      geq(v.contentHeight, v.minContentHeight, medium, 3),
 
-      leq(v.width,         v.maxWidth, medium, 10),
-      leq(v.height,        v.maxHeight, medium, 10),
-      leq(v.contentWidth,  v.maxContetnWidth, medium, 10),
-      leq(v.contentHeight, v.maxContentHeight, medium, 10),
+      /*
+      weakStay(v.width, 1),
+      weakStay(v.height, 1),
+
+      strongStay(v.minWidth),
+      strongStay(v.minHeight),
+
+      mediumStay(v.maxWidth),
+      mediumStay(v.maxHeight),
+      */
+
+      leq(v.width,         v.maxWidth, medium, 3),
+      leq(v.height,        v.maxHeight, medium, 3),
+      leq(v.contentWidth,  v.maxContetnWidth, medium, 2),
+      leq(v.contentHeight, v.maxContentHeight, medium, 2),
 
       // Total width is bigger than content width.
-      geq(v.width,         v.contentWidth, medium, 10000),
-      geq(v.height,        v.contentHeight, medium, 10000),
+      geq(v.width,         v.contentWidth, medium, 1),
+      geq(v.height,        v.contentHeight, medium, 1),
 
       // Bottom is at least top + height
-      eq(v.bottom, c.Plus(v.top, v.height), medium, 1),
+      eq(v.bottom, c.Plus(v.top, v.height), medium, 10),
       // Right is at least left + width
-      eq(v.right,  c.Plus(v.left, v.width), medium, 1)
+      eq(v.right,  c.Plus(v.left, v.width), medium, 10)
     );
   },
 
@@ -399,10 +411,10 @@ scope.Panel = c.inherit({
   },
 
   // Some layout helpers
-  set above(l)   { listSetter.call(this, l, "above",   "bottom", "top",    c.LEQ); },
-  set below(l)   { listSetter.call(this, l, "below",   "top",    "bottom", c.GEQ); },
-  set leftOf(l)  { listSetter.call(this, l, "leftOf",  "right",  "left",   c.LEQ); },
-  set rightOf(l) { listSetter.call(this, l, "rightOf", "left",   "right",  c.GEQ); },
+  set above(l)   { listSetter.call(this, l, "above",   "bottom", "top",    c.LEQ, weak); },
+  set below(l)   { listSetter.call(this, l, "below",   "top",    "bottom", c.GEQ, weak); },
+  set leftOf(l)  { listSetter.call(this, l, "leftOf",  "right",  "left",   c.LEQ, weak); },
+  set rightOf(l) { listSetter.call(this, l, "rightOf", "left",   "right",  c.GEQ, weak); },
 
   get above()    { return this._above; },
   get below()    { return this._below; },
@@ -468,11 +480,9 @@ scope.RootPanel = c.inherit({
     var ih = new c.Variable("window_innerHeight", window.innerHeight);
 
     var s = document.solver;
-    s.addEditVar(iw); // FIXME(slightlyoff): not sure I understand this
-    s.addEditVar(ih);
 
-    var widthEQ = eq(this.v.width, iw, required);
-    var heightEQ = eq(this.v.height, ih, required);
+    var widthEQ = eq(this.v.width, iw, medium, 5);
+    var heightEQ = eq(this.v.height, ih, medium, 5);
 
     // At this point, we won't be attached but will have had our constraints
     // initialized. We clobber them and add our own.
@@ -481,11 +491,13 @@ scope.RootPanel = c.inherit({
     this.constraints.push(
       widthEQ,
       heightEQ,
-      eq(this.v.top, 0, required, 1000),
-      eq(this.v.left, 0, required, 1000),
-      eq(this.v.bottom, c.Plus(this.v.top, this.v.height), required, 1000),
+      eq(this.v.top, 0, medium),
+      eq(this.v.left, 0, medium),
+      eq(this.v.bottom, c.Plus(this.v.top, this.v.height), medium, 2),
       // Right is at least left + width
-      eq(this.v.right,  c.Plus(this.v.left, this.v.width), required, 1000)
+      eq(this.v.right,  c.Plus(this.v.left, this.v.width), medium, 2),
+      stay(this.v.right),
+      stay(this.v.bottom)
     );
 
     // Propigate viewport size changes.
@@ -498,20 +510,19 @@ scope.RootPanel = c.inherit({
       // Time resolution
       // console.time("resolve");
 
-      // FIXME(slightlyoff):
-      //    This approach should work but doesn't. We leave the edit session
-      //    open instead.
-      // s.addEditVar(iw);
-      // s.addEditVar(ih);
+      s.addEditVar(iw);
+      s.addEditVar(ih);
+      s.beginEdit();
 
-      // s.beginEdit();
       s.suggestValue(iw, iwv)
        .suggestValue(ih, ihv);
       s.resolve();
-      // s.endEdit();
+
+      s.endEdit();
 
       // console.timeEnd("resolve");
 
+      /*
       if (iwv != this.v.width.value()) {
         // ZOMGWTFBBQ?
         console.log("width: suggested:", iwv, "got:", this.v.width.value());
@@ -519,9 +530,17 @@ scope.RootPanel = c.inherit({
         console.log("right: suggested:", iwv, "got:", this.v.right.value());
         console.log("bottom: suggested:", ihv, "got:", this.v.bottom.value());
       }
+      */
     }.bind(this);
 
-    window.addEventListener("resize", reCalc, false);
+    reCalc();
+
+    var t2 = null;
+    window.addEventListener("resize", function() {
+      if (t2) { clearTimeout(t2); }
+      // Rate-limiting of resizes until I get to the bottom of flicker.
+      t2 = setTimeout(function() { reCalc(); }, 50);
+    }, false);
   },
 
   _updateStyles: function() {

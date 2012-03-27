@@ -1,0 +1,91 @@
+/* We're an app, so lay ourselves out like one. Just the basics, ma'am. */
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
+  color: #222;
+  background-color: #D9E7FF;
+}
+
+body {
+  /*
+  min-width: 778px;
+  */
+  overflow-y: hidden;
+  overflow-x: hidden;
+  position: absolute;
+  font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
+}
+
+/* Ensure that we are always in a layout mode that doesn't suck eggs */
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/*
+  We're trying to look like IRC Cloud for this demo, so borrow their
+  toolbar styling
+*/
+::-webkit-scrollbar {
+  width: 14px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track-piece {
+  background-color: #f5f5f5;
+  background-clip: padding-box;
+  -webkit-background-clip: padding-box;
+  border: 3px solid #fff;
+  border-radius: 6px;
+  -webkit-border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #527dff;
+  background-clip: padding-box;
+  -webkit-background-clip: padding-box;
+  border: 3px solid #fff;
+  border-radius: 6px;
+  -webkit-border-radius: 6px;
+}
+
+/* Base styling for all panel elements */
+.panel {
+  /* Turn off system constraint layouts for panels */
+  position:   absolute;
+  margin:     none;
+  padding:    none;
+  border:     none;
+
+  box-shadow: inset 0px 0px 6px rgba(133, 133, 133, 1);
+  /* FIXME(slightlyoff): need to make the panel constraints savy to padding */
+  padding: 10px;
+
+  -webkit-transition: all 300ms cubic-bezier(0.260, 0.860, 0.440, 0.985); 
+     -moz-transition: all 300ms cubic-bezier(0.260, 0.860, 0.440, 0.985); 
+       -o-transition: all 300ms cubic-bezier(0.260, 0.860, 0.440, 0.985); 
+}
+
+.debugShadow {
+  position:   absolute;
+  margin:     none;
+  padding:    1em;
+  border:     none;
+  overflow:   hidden;
+  background: rgba(159,196,84, 0.5);
+  width:      0px;
+  height:     0px;
+  left:       0px;
+  top:        0px;
+  z-index:    100;
+  outline:    1px solid blue;
+  pointer-events: none;
+  font:       normal 85%/1 "Consolas", "Courier New", "Courier", monospace;
+  text-align: right;
+  color:      black;
+  opacity:    0.5;
+}
