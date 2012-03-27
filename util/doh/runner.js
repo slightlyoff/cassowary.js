@@ -11,6 +11,8 @@ doh.selfTest = false;
 
 doh.global = this;
 
+doh.squelch = true;
+
 doh.hitch = function(/*Object*/thisObject, /*Function|String*/method /*, ...*/){
 	var args = [];
 	for(var x=2; x<arguments.length; x++){
@@ -534,12 +536,16 @@ doh._handleFailure = function(groupName, fixture, e){
 	}else{
 		this.debug("\tERROR IN:\n\t\t", fixture.runTest);
 	}
-
 	if (e.rhinoException) {
 		e.rhinoException.printStackTrace();
 	} else if(e.javaException) {
 		e.javaException.printStackTrace();
 	}
+
+  if (!doh.squelch) {
+    throw e;
+  }
+
 }
 
 doh._runFixture = function(groupName, fixture){

@@ -25,6 +25,7 @@ c.trace = false;
 c.traceAdded = false;
 c.verbose = false;
 */
+doh.squelch = false;
 
 load("LinearConstraint-test.js");
 load("LinearExpression-test.js");
@@ -35,3 +36,4 @@ load("SymbolicWeight-test.js");
 load("Tableau-test.js");
 load("Variable-test.js");
 load("End-To-End-test.js");
+
