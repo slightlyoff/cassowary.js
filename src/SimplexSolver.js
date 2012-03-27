@@ -7,6 +7,7 @@
 (function(c) {
 var t = c.Tableau;
 var tp = t.prototype;
+var epsilon = 1e-8;
 
 c.SimplexSolver = c.inherit({
   extends: c.Tableau, 
@@ -20,7 +21,7 @@ c.SimplexSolver = c.inherit({
 
     this._markerVars = new c.HashTable(); // cn -> Set of clv
 
-    this._resolve_pair = [0, 0]; 
+    // this._resolve_pair = [0, 0]; 
     this._objective = new c.ObjectiveVariable("Z");
 
     this._editVarMap = new c.HashTable(); // clv -> c.EditInfo
@@ -28,7 +29,6 @@ c.SimplexSolver = c.inherit({
     this._slackCounter = 0;
     this._artificialCounter = 0;
     this._dummyCounter = 0;
-    this._epsilon = 1e-8;
     this.autoSolve = true;
     this._fNeedsSolving = false;
 
@@ -314,20 +314,23 @@ c.SimplexSolver = c.inherit({
     throw new c.InternalError("reset not implemented");
   },
 
-  resolveArray: function(newEditConstants /*Vector*/) {
+  resolveArray: function(newEditConstants) {
     if (c.trace) c.fnenterprint("resolveArray" + newEditConstants);
+    var l = newEditConstants.length
     this._editVarMap.each(function(v, cei) {
       var i = cei.index;
-      if (i < newEditConstants.length) 
+      if (i < l) 
         this.suggestValue(v, newEditConstants[i]);
     }, this);
     this.resolve();
   },
 
   resolvePair: function(x /*double*/, y /*double*/) {
-    this._resolve_pair[0] = x;
-    this._resolve_pair[1] = y;
-    this.resolveArray(this._resolve_pair);
+    // this._resolve_pair[0] = x;
+    // this._resolve_pair[1] = y;
+    this.resolveArray([x, y]);
+    // this.suggestValue(this._editVarMap[0], x);
+    // this.suggestValue(this._editVarMap[1], y);
   },
 
   resolve: function() {
@@ -625,11 +628,16 @@ c.SimplexSolver = c.inherit({
     var eplus = new c.SlackVariable();
     var cnTerms = cnExpr.terms();
     // console.log(cnTerms.size());
+
     cnTerms.each(function(v, c) {
       var e = this.rowExpression(v);
-      if (e == null) expr.addVariable(v, c);
-      else expr.addExpression(e, c);
+      if (!e) {
+        expr.addVariable(v, c);
+      } else {
+        expr.addExpression(e, c);
+      }
     }, this);
+
     if (cn.isInequality) {
       if (c.trace) c.traceprint("Inequality, adding slack");
       ++this._slackCounter;
@@ -714,7 +722,7 @@ c.SimplexSolver = c.inherit({
         }
       }, this);
 
-      if (objectiveCoeff >= -this._epsilon) 
+      if (objectiveCoeff >= -epsilon) 
         return;
 
       if (c.trace) {
