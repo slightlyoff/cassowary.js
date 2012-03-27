@@ -347,6 +347,132 @@ doh.add("End-To-End", [
     t.t(c.approx(h, 40));
   },
 
+  function multiedit2(t) {
+    var x = new c.Variable("x");
+    var y = new c.Variable("y");
+    var w = new c.Variable("w");
+    var h = new c.Variable("h");
+    var solver = new c.SimplexSolver();
+    solver.addStay(x)
+          .addStay(y)
+          .addStay(w)
+          .addStay(h)
+          .addEditVar(x)
+          .addEditVar(y).beginEdit();
+    solver.suggestValue(x, 10)
+          .suggestValue(y, 20).resolve();
+    solver.endEdit();
+    t.t(c.approx(x, 10));
+    t.t(c.approx(y, 20));
+    t.t(c.approx(w, 0));
+    t.t(c.approx(h, 0));
+
+    solver.addEditVar(w)
+          .addEditVar(h).beginEdit();
+    solver.suggestValue(w, 30)
+          .suggestValue(h, 40).endEdit();
+    t.t(c.approx(x, 10));
+    t.t(c.approx(y, 20));
+    t.t(c.approx(w, 30));
+    t.t(c.approx(h, 40));
+
+    solver.addEditVar(x)
+          .addEditVar(y).beginEdit();
+    solver.suggestValue(x, 50)
+          .suggestValue(y, 60).endEdit();
+    t.t(c.approx(x, 50));
+    t.t(c.approx(y, 60));
+    t.t(c.approx(w, 30));
+    t.t(c.approx(h, 40));
+  },
+
+  function multiedit3(t) {
+    var rand = function(max, min) {
+      min = (typeof min != "undefined") ? min : 0;
+      max = max || Math.pow(2, 26);
+      return parseInt(Math.random() * (max-min), 10) + min;
+    };
+    var MAX = 500;
+    var MIN = 100;
+
+    var weak = c.Strength.weak;
+    var medium = c.Strength.medium;
+    var strong = c.Strength.strong;
+    var required = c.Strength.required;
+
+    var eq  = function(a1, a2, strength, w) {
+      return new c.LinearEquation(a1, a2, strength || weak, w||0);
+    };
+
+    var v = {
+      width: new c.Variable("width"),
+      height: new c.Variable("height"),
+      top: new c.Variable("top"),
+      bottom: new c.Variable("bottom"),
+      left: new c.Variable("left"),
+      right: new c.Variable("right"),
+    };
+
+    var solver = new c.SimplexSolver();
+
+    var iw = new c.Variable("window_innerWidth", rand(MAX, MIN));
+    var ih = new c.Variable("window_innerHeight", rand(MAX, MIN));
+    var iwStay = new c.StayConstraint(iw);
+    var ihStay = new c.StayConstraint(ih);
+
+    var widthEQ = eq(v.width, iw, strong);
+    var heightEQ = eq(v.height, ih, strong);
+
+    var constraints = [
+      widthEQ,
+      heightEQ,
+      eq(v.top, 0, weak),
+      eq(v.left, 0, weak),
+      eq(v.bottom, c.Plus(v.top, v.height), medium),
+      // Right is at least left + width
+      eq(v.right,  c.Plus(v.left, v.width), medium),
+      iwStay,
+      ihStay
+    ].forEach(function(c) { 
+      print(c.strength);
+      solver.addConstraint(c);
+    });
+
+    // Propigate viewport size changes.
+    var reCalc = function() {
+      
+      // Measurement should be cheap here.
+      var iwv = rand(MAX, MIN);
+      var ihv = rand(MAX, MIN);
+      print("innerWidth: " + iwv);
+      print("innerHeight: " + ihv);
+
+      solver.addEditVar(iw);
+      solver.addEditVar(ih);
+
+      solver.beginEdit();
+      solver.suggestValue(iw, iwv)
+            .suggestValue(ih, ihv);
+      solver.resolve();
+      solver.endEdit();
+
+      print("calculated right: " + v.right.value());
+      print("calculated bottom: " + v.bottom.value());
+      // console.log(iwv, ihv);
+      // console.log(v.top.value(), v.left.value(), v.bottom.value(), v.right.value());
+
+      t.is(v.top.value(), 0);
+      t.is(v.left.value(), 0);
+      t.t(v.bottom.value() <= MAX);
+      t.t(v.bottom.value() >= MIN);
+      t.t(v.right.value() <= MAX);
+      t.t(v.right.value() >= MIN);
+
+    }.bind(this);
+    reCalc();
+    reCalc();
+    reCalc();
+  },
 ]);
 
 })();
