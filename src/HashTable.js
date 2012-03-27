@@ -103,10 +103,17 @@ c.HashTable = c.inherit({
 
     var old = this._store[key];
     delete this._store[key];
+    delete this._keyStrMap[key];
 
     if (this._size > 0) {
       this._size--;
     }
+
+    var i = this._keyList.indexOf(key);
+    if (i >= 0) {
+      this._keyList.splice(i, 1);
+    }
+
     return old;
   },
 
@@ -117,7 +124,10 @@ c.HashTable = c.inherit({
   each: function(callback, scope) {
     if (!this._size) { return; }
 
-    this._keyList.forEach(function(k){
+    // FIXME(slightlyoff):
+    //      If we don't make a copy of the _keyList, remove() calls might cause
+    //      us to blow up as we'll wind up skipping items we shouldn't.
+    this._keyList.slice().forEach(function(k){
       if (this._store.hasOwnProperty(k)) {
         callback.call(scope||null, this._keyStrMap[k], this._store[k]);
       }
