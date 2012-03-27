@@ -43,9 +43,9 @@ var keyCode = function(key) {
 };
 
 var copyOwn = function(src, dest) {
-  for (var x in src) {
-    if (src.hasOwnProperty(x)) { dest[x] = src[x]; }
-  }
+  Object.keys(src).forEach(function(x) {
+    dest[x] = src[x];
+  });
 };
 
 // For escapingEach
@@ -82,7 +82,9 @@ c.HashTable = c.inherit({
 
     key = keyCode(key);
 
-    if (this._store.hasOwnProperty(key)) {
+    var v = this._store[key];
+    if (typeof v != "undefined") {
+    // if (this._store.hasOwnProperty(key)) {
       return this._store[key];
     }
     return null;
@@ -120,6 +122,16 @@ c.HashTable = c.inherit({
   size: function() {
     return this._size;
   },
+
+  _eachIter: function(callback, scope, idx) {
+    var k = this._keyList[idx];
+    var v = this._store[k];
+    var kn = this._keyStrMap[k];
+    // console.log(idx, k, typeof v);
+    if (typeof v != "undefined") {
+      callback.call(scope||null, kn, v);
+    }
+ },
 
   each: function(callback, scope) {
     if (!this._size) { return; }
