@@ -194,15 +194,17 @@ scope.c = {
   },
 
   approx: function(a /*double*/, b /*double*/) {
-    if (a instanceof c.Variable) { a = a.value(); }
-    if (b instanceof c.Variable) { b = b.value(); }
-    if (a == 0.0) {
-      return (Math.abs(b) < epsilon);
+    if (a === b) { return true; }
+    var av, bv;
+    av = (a instanceof c.Variable) ? a.value() : a;
+    bv = (b instanceof c.Variable) ? b.value() : b;
+    if (av == 0) {
+      return (Math.abs(bv) < epsilon);
     }
-    if (b == 0.0) {
-      return (Math.abs(a) < epsilon);
+    if (bv == 0) {
+      return (Math.abs(av) < epsilon);
     }
-    return (Math.abs(a - b) < Math.abs(a) * epsilon);
+    return (Math.abs(av - bv) < Math.abs(av) * epsilon);
   },
 
   hashToString: function(h) {
