@@ -28,7 +28,7 @@ scope.$ = function(query, opt_contextElement) {
 }
 
 // requestAnimationFrame shimming.
-var rAF = window.requestAnimationFrame       || 
+scope.rAF = window.requestAnimationFrame       || 
           window.webkitRequestAnimationFrame || 
           window.mozRequestAnimationFrame    || 
           window.oRequestAnimationFrame      || 

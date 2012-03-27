@@ -476,8 +476,8 @@ scope.RootPanel = c.inherit({
 
     Panel.ctor.call(this);
 
-    var iw = new c.Variable("window_innerWidth", window.innerWidth);
-    var ih = new c.Variable("window_innerHeight", window.innerHeight);
+    var iw = new c.Variable("window_innerWidth");
+    var ih = new c.Variable("window_innerHeight");
 
     var s = document.solver;
 
@@ -522,7 +522,6 @@ scope.RootPanel = c.inherit({
 
       // console.timeEnd("resolve");
 
-      /*
       if (iwv != this.v.width.value()) {
         // ZOMGWTFBBQ?
         console.log("width: suggested:", iwv, "got:", this.v.width.value());
@@ -530,17 +529,21 @@ scope.RootPanel = c.inherit({
         console.log("right: suggested:", iwv, "got:", this.v.right.value());
         console.log("bottom: suggested:", ihv, "got:", this.v.bottom.value());
       }
-      */
     }.bind(this);
 
-    reCalc();
+    var frame = 0;
+    var resizeNextFrame = function() {
+      var f = frame++;
+      window.rAF(function() {
+        if (f == frame-1) {
+          reCalc();
+        }
+      });
+    };
 
-    var t2 = null;
-    window.addEventListener("resize", function() {
-      if (t2) { clearTimeout(t2); }
-      // Rate-limiting of resizes until I get to the bottom of flicker.
-      t2 = setTimeout(function() { reCalc(); }, 50);
-    }, false);
+    resizeNextFrame();
+
+    window.addEventListener("resize", resizeNextFrame, false);
   },
 
   _updateStyles: function() {
