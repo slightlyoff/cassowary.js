@@ -34,9 +34,6 @@
     <script defer="defer" src="panels.js"></script>
 
     <script defer="defer">
-      //
-      // Ctrl-R testing. The VERY BEST kind ;-)
-      // 
       window.addEventListener("load", function() {
         "use strict";
 
@@ -94,6 +91,7 @@
         p3.debug = true;
 
         var p4 = window.p4 = new Panel();
+        p4.id = "p4";
         root.appendChild(p4);
         p4.top = root.v.top;
         // p4.right = root.v.right;
@@ -107,26 +105,25 @@
         p4.leftOf = p3;
         p4.debug = true;
 
-        // p4.above = sp;
-		
-        // p3._debugShadow.style.textAlign = "left";
-
         /*
+        // p4.above = sp;
+        // p3._debugShadow.style.textAlign = "left";
         document.body.appendChild(
           document.createElement("x-panel")
         );
         */
       });
     </script>
+  </head>
+  <body>
     <!--
       Notes:
         - Constraints are expressed in terms of relationships defined in
-          data-layout attributes on panels. The element instances themselves
-          maintain the set of constraints that are sent to the solver and
-          update their CSS in response to variable changes in the engine.
+          attributes on panels. The element instances themselves maintain the
+          set of constraints that are sent to the solver and update their CSS
+          in response to variable changes in the engine.
     -->
-  </head>
-  <body>
+
     <!--
     <script type="constraint-layout">
       #mh {
@@ -140,11 +137,13 @@
       }
     </script>
     -->
-    <x-panel id="mh"
-      box="{ minWidth: 300, maxWidth: 500, preferredWidth: 400 }">
+
+    <x-panel id="first" box='{ "left": 30, "height": 30, "width": 100 }'>
     </x-panel>
 
-    <x-panel id="cList">
+    <x-panel id="mh"
+      box='{ "minWidth": 300, "maxWidth": 500, "preferredWidth": 400, "rightOf": "#first" }'>
     </x-panel>
+
   </body>
 </html>

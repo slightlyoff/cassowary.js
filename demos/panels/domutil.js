@@ -28,15 +28,18 @@ scope.$ = function(query, opt_contextElement) {
 }
 
 // requestAnimationFrame shimming.
-scope.rAF = window.requestAnimationFrame       || 
-          window.webkitRequestAnimationFrame || 
-          window.mozRequestAnimationFrame    || 
-          window.oRequestAnimationFrame      || 
-          window.msRequestAnimationFrame     || 
+scope.rAF = window.requestAnimationFrame     ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame    ||
+          window.oRequestAnimationFrame      ||
+          window.msRequestAnimationFrame     ||
           function(callback) {
             window.setTimeout(callback, 1000 / 60);
           };
 
+//
+// Observe the document and upgrade custom elements that are added.
+//
 var tagMap = new Map();
 var tagList = [];
 
@@ -66,10 +69,10 @@ scope.HTMLElement.register = function(type) {
   });
 };
 
-scope.addEventListener("load", function() {
-  // SUPER hackey. Since we don't seem to be able to locate elements as
-  // they're created by the initial parse, look for them on startup and
-  // run the upgrade if we need to.
+// SUPER hackey. Since we don't seem to be able to locate elements as they're
+// created by the initial parse, look for them on startup and run the upgrade
+// if we need to.
+scope.addEventListener("DOMContentLoaded", function() {
   tagList.forEach(function(tn) {
     var elements = document.querySelectorAll(tn);
     Array.prototype.slice.call(elements).forEach(upTo(tagMap.get(tn)));

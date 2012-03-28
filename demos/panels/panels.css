@@ -70,6 +70,12 @@ body {
        -o-transition: all 400ms cubic-bezier(0.260, 0.860, 0.440, 0.985) 32ms; 
 }
 
+body.panel {
+  -webkit-transition: none;
+     -moz-transition: none;
+       -o-transition: none;
+}
+
 .debugShadow {
   position:   absolute;
   margin:     none;
