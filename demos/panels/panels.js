@@ -3,9 +3,11 @@
 
 // TODO(slightlyoff):
 //      * min* and max* properties need correctly weighted strengths.
-//      * Make panels draggable to show edit vars at work
+//      * Make panels draggable as an option.
 //      * Fix the hierarchy methods on the DOM prototypes so the whole thing
 //        doesn't suck to work with.
+//      * Move to using mutation observers for append child watching instead of
+//        overriding.
 
 var fireSolved = function() {
   var e = document.createEvent("UIEvents");
@@ -38,6 +40,22 @@ var toArray = function(a) {
 
 var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
   var ln = "_" + name;
+  if (typeof l == "string") {
+    if (l.charAt(0) == "#") {
+      var l = l.split(",");
+      console.log(l);
+      l.forEach(function(v, idx) {
+        var items = v.split(".");
+        l[idx] = document.querySelector(items.shift());
+        while(items.length) {
+          l[idx] = l[idx][items.shift()];
+        }
+        console.log(l[idx]);
+      });
+    } else {
+      varOrvalue = parseInt(varOrvalue, 10);
+    }
+  }
   this.remove.apply(this, this[ln]);
   this[ln] = toArray(l).map(function(v) {
     return new c.LinearInequality(this.v[own],
@@ -51,10 +69,19 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
 
 var valueSetter = function(item, varOrValue, oper) {
   var slot = "_" + item;
-  this.remove(this[slot]);
   if (typeof varOrvalue == "string") {
-    varOrvalue = parseInt(varOrvalue, 10);
+    if (varOrValue.charAt(0) == "#") {
+      var items = varOrValue.split(".");
+      varOrValue = document.querySelector(items.shift());
+      console.log(varOrValue);
+      while(items.length) {
+        varOrValue = varOrValue[items.shift()];
+      }
+    } else {
+      varOrvalue = parseInt(varOrvalue, 10);
+    }
   }
+  this.remove(this[slot]);
   // FIXME(slightlyoff): what's the strength of these?
   if (oper && oper != "=") {
     if (oper == ">=") oper = c.GEQ;
@@ -123,10 +150,10 @@ scope.Panel = c.inherit({
       _updateStyles: this._updateStyles.bind(this),
     });
 
-    this._setProperties(props);
     this.id = uniqueId(this);
     this._initConstraints();
     this.debug = this._debug;
+    this._setProperties(props);
     this._initStyles();
   },
 
@@ -161,17 +188,21 @@ scope.Panel = c.inherit({
     if (!this._debugShadow) { return; }
 
     var s = this.id + " dimensions:<br>";
-    [
-      "width", "height", "left", "top" // , "right", "bottom"
+    [ "width",
+      "height",
+      "left",
+      "top" // , "right", "bottom"
     ].forEach(function(name) {
       var v = this.v[name].value() + "px";
       this._debugShadow.style[name] = v;
       s += name + ": " + v + "  <br>";
     }, this);
 
-    [ "right", "bottom",
+    [ "right",
+      "bottom",
       "preferredWidth",
-      "preferredHeight" ].forEach(function(name) {
+      "preferredHeight"
+    ].forEach(function(name) {
       var v = this.v[name].value() + "px";
       s += name + ": " + this.v[name].value() + "px  <br>";
     }, this);
@@ -180,7 +211,11 @@ scope.Panel = c.inherit({
   },
 
   _setProperties: function(props) {
-    // TODO(slightlyoff)
+    // Grab the attributes we care about and parse/set
+    var b = this.getAttribute("box");
+    if (b) {
+     this.box = JSON.parse(b);
+    }
   },
 
   //
@@ -266,54 +301,64 @@ scope.Panel = c.inherit({
     return HTMLElement.prototype.removeChild.call(this, n);
   },
 
+  _valueConstraintNames: [
+    "width",
+    "height",
+    "left",
+    "right",
+    "top",
+    "bottom",
+    "contentWidth", "contentHeight",
+    "contentLeft", "contentRight",
+    "contentTop", "contentBottom",
+
+    // preferred
+    "preferredWidth",
+    "preferredHeight",
+
+    // min
+    "minWidth",
+    "minHeight",
+    "minLeft",
+    "minRight",
+    "minTop",
+    "minBottom",
+    "minContentWidth",
+    "minContentHeight",
+    "minContentLeft",
+    "minContentRight",
+    "minContentTop",
+    "minContentBottom",
+
+    // max
+    "maxWidth",
+    "maxHeight",
+    "maxLeft",
+    "maxRight",
+    "maxTop",
+    "maxBottom",
+    "maxContentWidth",
+    "maxContentHeight",
+    "maxContentLeft",
+    "maxContentRight",
+    "maxContentTop",
+    "maxContentBottom"
+  ],
+
+  _listConstraintNames: [
+    "above",
+    "below",
+    "leftOf",
+    "rightOf"
+  ],
+
   _initConstraints: function() {
     var Expr = c.LinearExpression;
     var Var = c.Variable;
 
     var v = this.v = {};
 
-    [
-      "width",
-      "height",
-      "left",
-      "right",
-      "top",
-      "bottom",
-      "preferredWidth",
-      "preferredHeight",
-      "contentWidth", "contentHeight",
-      "contentLeft", "contentRight",
-      "contentTop", "contentBottom",
-
-      // min
-      "minWidth",
-      "minHeight",
-      "minLeft",
-      "minRight",
-      "minTop",
-      "minBottom",
-      "minContentWidth",
-      "minContentHeight",
-      "minContentLeft",
-      "minContentRight",
-      "minContentTop",
-      "minContentBottom",
-
-      // max
-      "maxWidth",
-      "maxHeight",
-      "maxLeft",
-      "maxRight",
-      "maxTop",
-      "maxBottom",
-      "maxContentWidth",
-      "maxContentHeight",
-      "maxContentLeft",
-      "maxContentRight",
-      "maxContentTop",
-      "maxContentBottom"
-
-    ].forEach(function(name) {
+    this._valueConstraintNames.forEach(function(name) {
       v[name] = new Var(this.id + "_" + name);
     }, this);
 
@@ -370,9 +415,12 @@ scope.Panel = c.inherit({
     //
     // console.log("Updating styles for Panel:", this.id);
 
-    [ "width", "height",
-      "left", // "right",
-      "top" //, "bottom"
+    [ // "right",
+      // "bottom",
+      "width",
+      "height",
+      "left",
+      "top"
     ].forEach(function(name) {
       this.style[name] = this.v[name].value() + "px";
     }, this);
@@ -472,10 +520,11 @@ scope.Panel = c.inherit({
   get maxHeight()  { return valueGetter.call(this, "maxWHeight"); },
 
   set box(b) {
-    [ "left", "right", "top", "bottom", "width", "height" ].
-      forEach(function(prop) {
-        if (b[prop]) this[prop] = b[prop];
-      }, this);
+    this._valueConstraintNames.forEach(function(prop) {
+        if (b.hasOwnProperty(prop)) { this[prop] = b[prop]; } }, this); 
+
+    this._listConstraintNames.forEach(function(prop) {
+        if (b.hasOwnProperty(prop)) { this[prop] = b[prop]; } }, this);
   },
 
   centerIn: function(panel) {
@@ -483,6 +532,8 @@ scope.Panel = c.inherit({
   },
 
 });
+
+HTMLElement.register(Panel);
 
 // We sould only ever have one of these per document, so enforce it losely and
 // make sure that we set one up by default.
@@ -529,13 +580,11 @@ scope.RootPanel = c.inherit({
       // Time resolution
       // console.time("resolve");
 
-      s.addEditVar(iw);
-      s.addEditVar(ih);
-      s.beginEdit();
+      s.addEditVar(iw)
+       .addEditVar(ih).beginEdit();
 
       s.suggestValue(iw, iwv)
-       .suggestValue(ih, ihv);
-      s.resolve();
+       .suggestValue(ih, ihv).resolve();
 
       s.endEdit();
 
@@ -590,5 +639,4 @@ if (document.readyState != "complete") {
 }
 
 installRoot();
-
 })(this);
