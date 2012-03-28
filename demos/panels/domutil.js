@@ -37,4 +37,43 @@ scope.rAF = window.requestAnimationFrame       ||
             window.setTimeout(callback, 1000 / 60);
           };
 
-})(this);
+var tagMap = new Map();
+var tagList = [];
+
+var upTo = function(type) {
+  var up = type.prototype.upgrade;
+  return function(el) {
+    if (!(el instanceof type) && up) {
+      up(el);
+      if (el.parentNode) { el.attach(); }
+    }
+  };
+};
+
+scope.HTMLElement.register = function(type) {
+  var tn = type.tagName || type.prototype.tagName; 
+  var upgrade = upTo(type);
+
+  tagMap.set(tn, type);
+  tagList.push(tn);
+
+  var ms = new MutationSummary({
+    callback: function(summaries) {
+      var s = summaries[0];
+      s.added.forEach(upgrade);
+    },
+    queries: [{ element: tn }]
+  });
+};
+
+scope.addEventListener("load", function() {
+  // SUPER hackey. Since we don't seem to be able to locate elements as
+  // they're created by the initial parse, look for them on startup and
+  // run the upgrade if we need to.
+  tagList.forEach(function(tn) {
+    var elements = document.querySelectorAll(tn);
+    Array.prototype.slice.call(elements).forEach(upTo(tagMap.get(tn)));
+  });
+}, false);
+
+})(window);
