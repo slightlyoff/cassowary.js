@@ -4,16 +4,24 @@
 // TODO(slightlyoff):
 //      * min* and max* properties need correctly weighted strengths.
 //      * Make panels draggable as an option.
+//      * Optional remove-animation property
+//      * Child-panels. Mostly a question of what to generate in terms of own
+//        CSS values (since our frame of reference is the parent and not the
+//        root.
 //      * Fix the hierarchy methods on the DOM prototypes so the whole thing
 //        doesn't suck to work with.
 //      * Move to using mutation observers for append child watching instead of
 //        overriding.
 
-var fireSolved = function() {
-  var e = document.createEvent("UIEvents");
-  e.initUIEvent("solved", false, false, window, true);
-  document.dispatchEvent(e);
+var fireType = function(type) {
+  return function() {
+    var e = document.createEvent("UIEvents");
+    e.initUIEvent(type, false, false, window, true);
+    document.dispatchEvent(e);
+  }
 };
+
+var fireSolved = fireType("solved");
 
 // Create a global solver
 var s = document.solver = c.extend(new c.SimplexSolver(), { onsolved: fireSolved });
@@ -43,7 +51,6 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
   if (typeof l == "string") {
     if (l.charAt(0) == "#") {
       var l = l.split(",");
-      console.log(l);
       l.forEach(function(v, idx) {
         var items = v.split(".");
         l[idx] = document.querySelector(items.shift());
@@ -68,16 +75,21 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
 
 var valueSetter = function(item, varOrValue, oper) {
   var slot = "_" + item;
-  if (typeof varOrvalue == "string") {
-    if (varOrValue.charAt(0) == "#") {
+  if (typeof varOrValue == "string") {
+    if (typeof this[slot] == "boolean") {
+      varOrValue = (varOrValue == "true");
+    } else if (varOrValue.charAt(0) == "#") {
       var items = varOrValue.split(".");
-      varOrValue = document.querySelector(items.shift());
-      console.log(varOrValue);
-      while(items.length) {
-        varOrValue = varOrValue[items.shift()];
+      var id = items.shift().slice(1);
+      varOrValue = document.getElementById(id);
+      if (!varOrValue) {
+        console.log("couldn't find panel with ID:", id);
       }
+      items.forEach(function(prop, idx) {
+        varOrValue = varOrValue[prop];
+      }, this);
     } else {
-      varOrvalue = parseInt(varOrvalue, 10);
+      varOrValue = parseInt(varOrValue, 10);
     }
   }
   this.remove(this[slot]);
@@ -163,7 +175,6 @@ scope.Panel = c.inherit({
   },
 
   set debug(v) {
-    // console.log(this.id, "setting debug to:", v);
     if (v && this._attached) {
       if (!this._debugShadow) {
         var ds = this._debugShadow = document.createElement("div");
@@ -171,11 +182,9 @@ scope.Panel = c.inherit({
         ds.classList.add("debugShadow");
         document.body.appendChild(ds);
         this._updateDebugShadow();
-        // console.log("added debug shadow for", this.id);
       }
     } else {
       if (this._debugShadow) {
-        // console.log("removed debug shadow for", this.id);
         this._debugShadow.parentNode.removeChild(this._debugShadow);
         this._debugShadow = null;
       }
@@ -215,6 +224,29 @@ scope.Panel = c.inherit({
     if (b) {
      this.box = JSON.parse(b);
     }
+
+    var debug = this.getAttribute("debug");
+    if (debug) {
+      this.debug = (debug == "true");
+    }
+
+    [ "width",
+      "minWidth",
+      "maxWidth",
+      "height",
+      "minHeight",
+      "maxHeight",
+      "left",
+      "top",
+      "right",
+      "bottom",
+      "preferredWidth",
+      "preferredHeight"
+    ].concat(this._listConstraintNames)
+     .forEach(function(prop) {
+       var attr = this.getAttribute(prop);
+       if (attr) { this[prop] = attr; }
+     }, this);
   },
 
   //
@@ -280,7 +312,6 @@ scope.Panel = c.inherit({
         this.panels.push(n);
       }
       if (this._attached) {
-        // console.log("attaching:", n);
         n.attach();
       }
     }
@@ -411,7 +442,7 @@ scope.Panel = c.inherit({
     // FIXME(slightlyoff):
     //  Dig our style values out of the variables and update our CSS
     //  accordingly.
-    //
+
     // console.log("Updating styles for Panel:", this.id);
 
     [ // "right",
@@ -624,12 +655,13 @@ scope.RootPanel = c.inherit({
 var installRoot = function() {
   if (!document.rootPanel && document.body) {
     var rp = document.body;
-    rp.id = "rootPanel";
+    rp.id = rp.id || "root";
     scope.RootPanel.prototype.upgrade(rp);
     document.rootPanel = rp;
     rp.attach();
     fireSolved();
     rp._updateStyles();
+    fireType("root")();
   }
 };
 

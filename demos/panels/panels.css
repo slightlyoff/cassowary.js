@@ -63,7 +63,7 @@ body {
 
   box-shadow: inset 0px 0px 6px rgba(133, 133, 133, 1);
   /* FIXME(slightlyoff): need to make the panel constraints savy to padding */
-  padding: 10px;
+  /* padding: 10px; */
 
   -webkit-transition: all 400ms cubic-bezier(0.260, 0.860, 0.440, 0.985) 32ms; 
      -moz-transition: all 400ms cubic-bezier(0.260, 0.860, 0.440, 0.985) 32ms; 
