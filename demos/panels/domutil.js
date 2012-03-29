@@ -40,8 +40,7 @@ scope.rAF = window.requestAnimationFrame     ||
 //
 // Observe the document and upgrade custom elements that are added.
 //
-var tagMap = new Map();
-var tagList = [];
+var tagMap = {};
 
 var upTo = function(type) {
   var up = type.prototype.upgrade;
@@ -57,8 +56,7 @@ scope.HTMLElement.register = function(type) {
   var tn = type.tagName || type.prototype.tagName; 
   var upgrade = upTo(type);
 
-  tagMap.set(tn, type);
-  tagList.push(tn);
+  tagMap[tn] = type;
 
   var ms = new MutationSummary({
     callback: function(summaries) {
@@ -73,9 +71,9 @@ scope.HTMLElement.register = function(type) {
 // created by the initial parse, look for them on startup and run the upgrade
 // if we need to.
 document.addEventListener("root", function(e) {
-  tagList.forEach(function(tn) {
+  Object.keys(tagMap).forEach(function(tn) {
     var elements = document.querySelectorAll(tn);
-    Array.prototype.slice.call(elements).forEach(upTo(tagMap.get(tn)));
+    Array.prototype.slice.call(elements).forEach(upTo(tagMap[tn]));
   });
 }, false);
 

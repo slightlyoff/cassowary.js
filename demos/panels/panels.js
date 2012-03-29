@@ -50,7 +50,7 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
   var ln = "_" + name;
   if (typeof l == "string") {
     if (l.charAt(0) == "#") {
-      var l = l.split(",");
+      l = l.split(",");
       l.forEach(function(v, idx) {
         var items = v.split(".");
         l[idx] = document.querySelector(items.shift());
