@@ -35,10 +35,21 @@
 
     <script defer="defer">
       window.addEventListener("DOMContentLoaded", function(e) {
+        "use strict";
+
+        var randomizeChildren = function(el) {
+          var num = el.children.length;
+          var c;
+          for (var x = 0; x < num; x++) {
+            c = el.children[parseInt(Math.random() * x, 10)];
+            el.appendChild(c);
+          }
+        };
+
         [ "discussion", "channels", "contacts" ].forEach(function(id) {
           var ipsum = document.getElementById("ipsum").cloneNode(true);
           ipsum.id = "";
-          // TODO(slightlyoff): randomize the list elements.
+          randomizeChildren(ipsum);
           document.getElementById(id).appendChild(ipsum);
         });
       }, false);
