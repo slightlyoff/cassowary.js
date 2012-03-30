@@ -439,7 +439,6 @@ scope.Panel = c.inherit({
   },
 
   _updateStyles: function() {
-    if (this.debug) console.log("Updating styles for Panel:", this.id);
     // NOTE: "bottom" and "right" are assumed to be computed
     [ "width", "height" ].forEach(function(name) {
       this.style[name] = this.v[name].value() + "px";
@@ -451,7 +450,7 @@ scope.Panel = c.inherit({
       // If we're not direct children of the root, translate top/left to being
       // in the CSS "absolute" coordinate space from our absolutely positioned
       // parents
-      if (this.parentNode != document.body) {
+      if (this.parentNode && this.parentNode != document.body) {
         v = v - this.parentNode.v[name].value();
       }
       this.style[name] = v + "px";
