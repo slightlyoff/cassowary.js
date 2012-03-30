@@ -53,6 +53,13 @@
   padding-left: 0px;
 }
 
+#contacts {
+  border-left: 1px solid #C0D2FF;
+  border-right: 2px solid #C0D2FF;
+  background-color: #EDF4FF;
+  font-size: 14px;
+}
+
 #masthead {
   color: #527DFF;
   padding: 13px;
