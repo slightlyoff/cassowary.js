@@ -439,7 +439,7 @@ scope.Panel = c.inherit({
   },
 
   _updateStyles: function() {
-    // console.log("Updating styles for Panel:", this.id);
+    if (this.debug) console.log("Updating styles for Panel:", this.id);
     // NOTE: "bottom" and "right" are assumed to be computed
     [ "width", "height" ].forEach(function(name) {
       this.style[name] = this.v[name].value() + "px";

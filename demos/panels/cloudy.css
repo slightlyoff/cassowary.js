@@ -103,7 +103,26 @@
   color: #AFAFAF;
   color: black;
   font-size: 14px;
-  line-height: 1.25;
+  line-height: 1.45;
+}
+
+#discussion > ul > li:nth-child(5n),
+#discussion > ul > li:nth-child(17n) {
+  color: #AFAFAF;
+}
+
+#discussion > ul > li:nth-child(5n):before {
+  content: "thus spoke Zarthustra \2192";
+  font-weight: bold;
+  padding-right: 4px;
+  color: black;
+}
+
+#discussion > ul > li:nth-child(17n):before {
+  content: "Made you look \2192";
+  font-weight: bold;
+  padding-right: 4px;
+  color: black;
 }
 
 #input {
@@ -114,4 +133,47 @@
   padding-left: 1em;
   padding-top: 1em;
   color: #AAA;
+}
+
+#nickbox {
+}
+
+#nick {
+  padding: 7px 0px 7px 7px;
+  text-align: right;
+}
+
+#nick > div {
+  display: inline-block;
+  text-align: right;
+  line-height: 16px;
+  font-weight: bold;
+  padding: 4px 5px 4px 5px;
+  border-top: 1px solid #999;
+  border-left: 1px solid #999;
+  border-bottom: 1px solid #999;
+  border-right: 1px solid #DDD;
+  border-radius: 3px 0px 0px 3px;
+  background: #EEE;
+  background: -webkit-gradient(linear, left top, left bottom, from(#EEE), to(white));
+}
+
+#inputto {
+  /*
+  background-color: blue;
+  */
+  padding: 7px 7px 7px 0px;
+}
+
+#inputto > textarea {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+  border-left: none;
+  border-top: 1px solid #999;
+  border-bottom: 1px solid #999;
+  border-right: 1px solid #999;
+  border-radius: 0px 3px 3px 0px;
 }
