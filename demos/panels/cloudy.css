@@ -74,9 +74,19 @@
   border-radius: 0px 7px 0px 0px;
 }
 
-#chatter {
+#chatter,
+#bottomchatter {
+  font-weight: bold;
+  padding: 4px;
   background-color: #527DFF;
   color: white;
+}
+
+#timeinfo {
+  font-size: 13px;
+  line-height: 26px;
+  text-align: center;
+  background-color: whiteSmoke;
 }
 
 #discussion {
@@ -89,6 +99,7 @@
 }
 
 #discussion > ul > li {
+  padding-left: 2em;
   color: #AFAFAF;
   color: black;
   font-size: 14px;
@@ -99,3 +110,8 @@
   background-color: white;
 }
 
+#time {
+  padding-left: 1em;
+  padding-top: 1em;
+  color: #AAA;
+}

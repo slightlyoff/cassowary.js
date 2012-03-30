@@ -439,20 +439,22 @@ scope.Panel = c.inherit({
   },
 
   _updateStyles: function() {
-    // FIXME(slightlyoff):
-    //  Dig our style values out of the variables and update our CSS
-    //  accordingly.
-
     // console.log("Updating styles for Panel:", this.id);
-
-    [ // "right",
-      // "bottom",
-      "width",
-      "height",
-      "left",
-      "top"
-    ].forEach(function(name) {
+    // NOTE: "bottom" and "right" are assumed to be computed
+    [ "width", "height" ].forEach(function(name) {
       this.style[name] = this.v[name].value() + "px";
+    }, this);
+
+    // FIXME: caching? invalidation?
+    [ "left", "top" ].forEach(function(name) {
+      var v =  this.v[name].value();
+      // If we're not direct children of the root, translate top/left to being
+      // in the CSS "absolute" coordinate space from our absolutely positioned
+      // parents
+      if (this.parentNode != document.body) {
+        v = v - this.parentNode.v[name].value();
+      }
+      this.style[name] = v + "px";
     }, this);
     if (this._debugShadow) { this._updateDebugShadow(); }
   },

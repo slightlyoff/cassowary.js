@@ -66,9 +66,9 @@
       |========================================|  a   ||
       | Chatter                      x |      +|  n   ||
       |================================|  C   ||  n   ||
-      | ............................. +|  o   ||  e   ||
-      | ............................. ||  n   ||  l   ||
-      | ............................. ||  t   ||  s   ||
+      |           TimeInfo             |  o   ||  e   ||
+      |================================|  n   ||  l   ||
+      | ............................. +|  t   ||  s   ||
       | ............................. ||  a   ||      ||
       | ............................. ||  C   ||      ||
       | ............................. +|  t   ||      ||
@@ -93,8 +93,8 @@
       <div>
         <span class="logo">&#9729;</span> 
           Cloudy<span style="color: rgb(24,63,141);">Chat</span> 
-          <span style="font-size: 30px; line-height: 20px;">&#736;</span>: 
-          Very Probably The <em>Best</em> Way To Waste Time
+          <span style="font-size: 30px; line-height: 20px;">&#736;</span>
+          <span style="font-size: 0.8em;">Very Probably The <em>Best</em> Way To Waste Time</span>
       </div>
     </x-panel>
 
@@ -103,21 +103,38 @@
       right="#channels.v.left"
       top="#masthead.v.bottom"
       minHeight="50" height="50" maxHeight="100"
-      debug="false"></x-panel>
-
-    <x-panel id="chatter"
-      left="#root.v.left"
-      right="#channels.v.left"
-      top="#submast.v.bottom"
-      minHeight="0" height="25" maxHeight="25"
-      debug="false"></x-panel>
+      debug="false">
+      </x-panel>
 
     <x-panel id="contacts"
       right="#channels.v.left"
-      below="#chatter"
+      below="#submast"
       bottom="#root.v.bottom"
       maxWidth="200" minWidth="100"
       debug="false">
+    </x-panel>
+
+    <x-panel id="chatter"
+      left="#root.v.left"
+      right="#contacts.v.left"
+      top="#submast.v.bottom"
+      minHeight="0" height="25" maxHeight="25"
+      debug="false">
+      &uarr; ~4.5 billion years
+    </x-panel>
+
+    <x-panel id="timeinfo"
+      left="#root.v.left"
+      right="#contacts.v.left"
+      top="#chatter.v.bottom"
+      minHeight="0" maxHeight="26"
+      debug="false">
+      Friday, March 30th, 2012 
+        ...
+        <!--
+        <span style="line-height: 1em; font-size: 2em;">&#9202;</span>
+        -->
+      about forever ago
     </x-panel>
 
     <x-panel id="input"
@@ -125,13 +142,39 @@
       right="#contacts.v.left"
       bottom="#root.v.bottom"
       minHeight="50" maxHeight="50"
-      debug="true"></x-panel>
+      debug="false">
+      <x-panel id="time"
+        width="70"
+        top="#input.v.top"
+        left="#input.v.left"
+        height="#input.v.height"
+        debug="false">
+          now
+        </x-panel>
+      <x-panel id="nickbox"
+        top="#input.v.top"
+        height="#input.v.height"
+        right="#input.v.right"
+        left="#time.v.right"
+        debug="true">
+        <textarea></textarea>
+      </x-panel>
+    </x-panel>
+
+    <x-panel id="bottomchatter"
+      left="#root.v.left"
+      right="#contacts.v.left"
+      bottom="#input.v.top"
+      minHeight="0" height="25" maxHeight="25"
+      debug="false">
+      &darr; Stuff you should feel anxious about <em>just</em> missing
+    </x-panel>
 
     <x-panel id="discussion"
       left="#root.v.left"
       right="#contacts.v.left"
-      bottom="#input.v.top"
-      top="#chatter.v.bottom"
+      bottom="#bottomchatter.v.top"
+      top="#timeinfo.v.bottom"
       minHeight="50" minWidth="200"
       debug="false"></x-panel>
 
