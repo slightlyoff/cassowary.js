@@ -59,7 +59,7 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
         }
       });
     } else {
-      varOrvalue = parseInt(varOrvalue, 10);
+      l = [ document.querySelector(l) ];
     }
   }
   this.remove.apply(this, this[ln]);
@@ -73,7 +73,7 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
   this.add.apply(this, this[ln]);
 };
 
-var valueSetter = function(item, varOrValue, oper) {
+var valueSetter = function(item, varOrValue, oper, strength) {
   var slot = "_" + item;
   if (typeof varOrValue == "string") {
     if (typeof this[slot] == "boolean") {
@@ -97,9 +97,9 @@ var valueSetter = function(item, varOrValue, oper) {
   if (oper && oper != "=") {
     if (oper == ">=") oper = c.GEQ;
     if (oper == "<=") oper = c.LEQ;
-    this[slot] = new c.LinearInequality(this.v[item], oper, varOrValue);
+    this[slot] = new c.LinearInequality(this.v[item], oper, varOrValue, strength);
   } else {
-    this[slot] = new c.LinearEquation(this.v[item], varOrValue);
+    this[slot] = new c.LinearEquation(this.v[item], varOrValue, strength);
   }
   this.add(this[slot]);
 };
@@ -146,6 +146,20 @@ scope.Panel = c.inherit({
       _bottom: null,
 
       _debug: false,
+      _movable: false,
+      _moving: false,
+      _moveStartLocation: {
+        x: 0,
+        y: 0,
+        left: 0,
+        top: 0,
+      },
+      _moveHandlers: {
+        mousedown: this._mouseDown.bind(this),
+        mousemove: this._mouseMove.bind(this),
+        mouseup:   this._mouseUp.bind(this),
+        dragstart: function(e) { e.preventDefault(); },
+      },
 
       _leftOf: [],
       _rightOf: [],
@@ -190,6 +204,70 @@ scope.Panel = c.inherit({
       }
     }
     this._debug = v;
+    // this.setAttribute("debug", v);
+  },
+
+  // FIXME(slightlyoff):
+  //    coalesce event handlers to prevent all the registration duplication?
+  get movable() {
+    return this._movable;
+  },
+
+  set movable(v) {
+    if (v && !this._movable) {
+      // Set up drag handlers.
+      c.own(this._moveHandlers, function(h) {
+        var dh = this._moveHandlers[h];
+        window.addEventListener(h, dh, false);
+      }, this);
+    } else if(!v && this._movable) {
+      // Clobber existing move handlers
+      c.own(this._moveHandlers, function(h) {
+        var dh = this._moveHandlers[h];
+        window.removeEventListener(h, dh, false);
+      }, this);
+    }
+    this._movable = v;
+    // this.setAttribute("movable", v);
+  },
+
+  _mouseDown: function(e) {
+    // We're in absolute coordinate space, so we can use global location when
+    // comparing offsets.
+    if (e.target == this) {
+      var start = this._moveStartLocation;
+      start.x = e.pageX;
+      start.y = e.pageY;
+      start.left = this.v.left.value();
+      start.top = this.v.top.value();
+      document.solver.addEditVar(this.v.left, strong)
+                     .addEditVar(this.v.top, strong).beginEdit();
+      this._moving = true;
+    }
+  },
+
+  _mouseUp: function(e) {
+    if (this._moving) {
+      var l = this.v.left.value();
+      var t = this.v.top.value();
+      document.solver.endEdit();
+      // Re-set the current value at the default strength (weak) instead of our
+      // (strong) edit-time updates to it.
+      this.left = l;
+      this.top = t;
+    }
+    this._moving = false;
+  },
+
+  _mouseMove: function(e) {
+    if (this._moving) {
+      var start = this._moveStartLocation;
+      var deltaX = e.pageX - start.x;
+      var deltaY = e.pageY - start.y;
+
+      document.solver.suggestValue(this.v.left, start.left + deltaX)
+                     .suggestValue(this.v.top,  start.top + deltaY).resolve();
+    }
   },
 
   _updateDebugShadow: function() {
@@ -229,6 +307,12 @@ scope.Panel = c.inherit({
     if (debug) {
       this.debug = (debug == "true");
     }
+
+    var movable = this.getAttribute("movable");
+    if (movable) {
+      this.movable = (movable == "true");
+    }
+
 
     [ "width",
       "minWidth",
@@ -395,10 +479,10 @@ scope.Panel = c.inherit({
     // Sanity
     this.constraints.push(
       // Positive values only for now
-      geq(v.width,         0),
-      geq(v.height,        0),
-      geq(v.contentWidth,  0),
-      geq(v.contentHeight, 0),
+      geq(v.width,         0, required),
+      geq(v.height,        0, required),
+      geq(v.contentWidth,  0, required),
+      geq(v.contentHeight, 0, required),
 
       leq(v.width,         v.preferredWidth, medium, 10),
       leq(v.height,        v.preferredHeight, medium, 10),
@@ -420,6 +504,13 @@ scope.Panel = c.inherit({
 
       mediumStay(v.maxWidth),
       mediumStay(v.maxHeight),
+      */
+
+      /*
+      weakStay(v.left, 1),
+      weakStay(v.top, 1),
+      weakStay(v.right, 1),
+      weakStay(v.bottom, 1),
       */
 
       leq(v.width,         v.maxWidth, medium, 3),
@@ -503,10 +594,10 @@ scope.Panel = c.inherit({
   },
 
   // Some layout helpers
-  set above(l)   { listSetter.call(this, l, "above",   "bottom", "top",    c.LEQ, weak); },
-  set below(l)   { listSetter.call(this, l, "below",   "top",    "bottom", c.GEQ, weak); },
-  set leftOf(l)  { listSetter.call(this, l, "leftOf",  "right",  "left",   c.LEQ, weak); },
-  set rightOf(l) { listSetter.call(this, l, "rightOf", "left",   "right",  c.GEQ, weak); },
+  set above(l)   { listSetter.call(this, l, "above",   "bottom", "top",    c.LEQ, weak, 2); },
+  set below(l)   { listSetter.call(this, l, "below",   "top",    "bottom", c.GEQ, weak, 2); },
+  set leftOf(l)  { listSetter.call(this, l, "leftOf",  "right",  "left",   c.LEQ, weak, 2); },
+  set rightOf(l) { listSetter.call(this, l, "rightOf", "left",   "right",  c.GEQ, weak, 2); },
 
   get above()    { return this._above; },
   get below()    { return this._below; },
@@ -516,10 +607,10 @@ scope.Panel = c.inherit({
   // FIXME(slightlyoff):
   //    need to add max* and min* versions of all of the below
 
-  set top(v)    { valueSetter.call(this, "top", v);    }, 
-  set bottom(v) { valueSetter.call(this, "bottom", v); },
-  set left(v)   { valueSetter.call(this, "left", v);   },
-  set right(v)  { valueSetter.call(this, "right", v);  },
+  set top(v)    { valueSetter.call(this, "top", v, "=", weak);    },
+  set bottom(v) { valueSetter.call(this, "bottom", v, "=", weak); },
+  set left(v)   { valueSetter.call(this, "left", v, "=", weak);   },
+  set right(v)  { valueSetter.call(this, "right", v, "=", weak);  },
 
   get top()     { return valueGetter.call(this, "top"); }, 
   get bottom()  { return valueGetter.call(this, "bottom"); },

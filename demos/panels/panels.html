@@ -42,6 +42,13 @@
 
         // Create a panel, add it to the document.
         var p = window.p = new Panel();
+        p.left = 200;
+        p.top = 150;
+        p.width = 100;
+        p.height = 100;
+        p.debug = true;
+        p.movable = true;
+
 
         root.appendChild(p);
 
@@ -58,30 +65,22 @@
         var sp = window.sp = new SubPanel();
         root.appendChild(sp);
 
-        p.left = 200;
-        p.top = 150;
-        p.width = 100;
-        p.height = 100;
-
         sp.width = 140;
         sp.height = 100;
-
         sp.rightOf = p;
-
         sp.above = p;
+        sp.debug = true;
+        sp.movable = true;
 
         var sp2 = window.sp2 = new SubPanel();
-        sp2.innerHTML = "Howdy, y'all!";
-        sp2.style.outline = "1px solid black";
-        root.appendChild(sp2);
-
         sp2.box = { width: 100, height: 50 };
         sp2.leftOf = [ sp, p ];
         sp2.below = [ p, sp ];
+        sp2.debug = true;
+        sp2.movable = true;
+        root.appendChild(sp2);
 
         var p3 = window.p3 = new Panel();
-        root.appendChild(p3);
-
         p3.maxWidth = 300;
         p3.minWidth = 200;
         p3.top = root.v.top;
@@ -89,6 +88,8 @@
         p3.height = root.v.height;
         p3.innerHTML = "howdy!";
         p3.debug = true;
+        p3.movable = true;
+        root.appendChild(p3);
 
         var p4 = window.p4 = new Panel();
         p4.id = "p4";
@@ -104,6 +105,7 @@
         p4.maxWidth = 800;
         p4.leftOf = p3;
         p4.debug = true;
+        p4.movable = true;
 
         /*
         // p4.above = sp;
@@ -138,11 +140,17 @@
     </script>
     -->
 
-    <x-panel id="first" left="30" height="30" width="100">
+    <x-panel id="markupTest"
+      box='{ "minWidth": 300, "maxWidth": 500, "preferredWidth": 400, "left": 100, "top": 100, "height": 300 }'
+      movable="true"
+      debug="true">
     </x-panel>
 
-    <x-panel id="mh"
-      box='{ "minWidth": 300, "maxWidth": 500, "preferredWidth": 400, "rightOf": "#first" }'>
+    <x-panel id="attrTest"
+      above="#markupTest"
+      left="30" height="100" width="100"
+      movable="true"
+      debug="true">
     </x-panel>
 
   </body>

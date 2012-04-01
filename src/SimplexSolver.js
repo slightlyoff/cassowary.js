@@ -168,12 +168,12 @@ c.SimplexSolver = c.inherit({
   addPointStay: function(a1, a2, a3) {
     if (a1 instanceof c.Point) {
       var clp = a1, weight = a2;
-      this.addStay(clp.X(), c.Strength.weak, weight || 1.0);
-      this.addStay(clp.Y(), c.Strength.weak, weight || 1.0);
+      this.addStay(clp.X(), c.Strength.weak, weight || 1);
+      this.addStay(clp.Y(), c.Strength.weak, weight || 1);
     } else { // 
       var vx = a1, vy = a2, weight = a3;
-      this.addStay(vx, c.Strength.weak, weight || 1.0);
-      this.addStay(vy, c.Strength.weak, weight || 1.0);
+      this.addStay(vx, c.Strength.weak, weight || 1);
+      this.addStay(vy, c.Strength.weak, weight || 1);
     }
     return this;
   },
@@ -181,9 +181,11 @@ c.SimplexSolver = c.inherit({
   addStay: function(v /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
     var cn = new c.StayConstraint(v,
                                   strength || c.Strength.weak,
-                                  weight || 1.0);
+                                  weight || 1);
     return this.addConstraint(cn);
   },
+
+  // FIXME(slightlyoff): need a removeStay!
 
   removeConstraint: function(cn /*c.Constraint*/) {
     this.removeConstraintInternal(cn);
