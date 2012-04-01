@@ -182,7 +182,86 @@ doh.add("End-To-End", [
       t.is(width.value(), 10);
     }
   },
+  
+  {
+    name: "exp == exp",
+    runTest: function(t) {
+      // stay width, rightMin
+      // right >= rightMin
+      var solver = new c.SimplexSolver();
 
+      var x1 = new c.Variable(10);
+      var width1 = new c.Variable(10);
+      var right1 = new c.LinearExpression(x1).plus(width1);
+      var x2 = new c.Variable(100);
+      var width2 = new c.Variable(10);
+      var right2 = new c.LinearExpression(x2).plus(width2);
+      
+      var eq = new c.LinearEquation(right1, right2);
+
+      solver.addStay(width1)
+            .addStay(width2)
+            .addStay(x2)
+            .addConstraint(eq);    
+
+      t.is(x1.value(), 100);
+      t.is(x2.value(), 100);
+      t.is(width1.value(), 10);
+      t.is(width2.value(), 10);
+    }
+  },
+  
+  {    
+    name: "exp >= exp",
+    runTest: function(t) {
+      // stay width, rightMin
+      // right >= rightMin
+      var solver = new c.SimplexSolver();
+
+      var x1 = new c.Variable(10);
+      var width1 = new c.Variable(10);
+      var right1 = new c.LinearExpression(x1).plus(width1);
+      var x2 = new c.Variable(100);
+      var width2 = new c.Variable(10);
+      var right2 = new c.LinearExpression(x2).plus(width2);
+
+      var ieq = new c.LinearInequality(right1, c.GEQ, right2);
+
+      solver.addStay(width1)
+            .addStay(width2)
+            .addStay(x2)
+            .addConstraint(ieq);    
+
+      t.is(x1.value(), 100);
+
+    }
+  },
+  
+  {    
+    name: "exp <= exp",
+    runTest: function(t) {
+      // stay width, rightMin
+      // right >= rightMin
+      var solver = new c.SimplexSolver();
+
+      var x1 = new c.Variable(10);
+      var width1 = new c.Variable(10);
+      var right1 = new c.LinearExpression(x1).plus(width1);
+      var x2 = new c.Variable(100);
+      var width2 = new c.Variable(10);
+      var right2 = new c.LinearExpression(x2).plus(width2);
+      var ieq = new c.LinearInequality(right2, c.LEQ, right1);
+
+      solver.addStay(width1)
+            .addStay(width2)
+            .addStay(x2)
+            .addConstraint(ieq);    
+
+      t.is(x1.value(), 100);
+
+    }
+  },
+  
   function addDelete1(t) {
     var solver = new c.SimplexSolver();
     var x = new c.Variable("x");
