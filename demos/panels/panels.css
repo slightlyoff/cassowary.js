@@ -10,9 +10,6 @@ html, body {
 }
 
 body {
-  /*
-  min-width: 778px;
-  */
   overflow-y: hidden;
   overflow-x: hidden;
   position: absolute;
@@ -26,34 +23,6 @@ body {
   box-sizing: border-box;
 }
 
-/*
-  We're trying to look like IRC Cloud for this demo, so borrow their
-  toolbar styling
-*/
-::-webkit-scrollbar {
-  width: 14px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track-piece {
-  background-color: #f5f5f5;
-  background-clip: padding-box;
-  -webkit-background-clip: padding-box;
-  border: 3px solid #fff;
-  border-radius: 6px;
-  -webkit-border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #527dff;
-  background-clip: padding-box;
-  -webkit-background-clip: padding-box;
-  border: 3px solid #fff;
-  border-radius: 6px;
-  -webkit-border-radius: 6px;
-}
-
-/* Base styling for all panel elements */
 .panel {
   /* Turn off system constraint layouts for panels */
   position:   absolute;
@@ -68,12 +37,6 @@ body {
 .panel[movable="true"] {
   -webkit-user-select: none;
           user-select: none;
-}
-
-body.panel {
-  -webkit-transition: none;
-     -moz-transition: none;
-       -o-transition: none;
 }
 
 .debugShadow {
