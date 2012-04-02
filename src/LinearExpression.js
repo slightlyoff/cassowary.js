@@ -77,37 +77,37 @@ c.LinearExpression = c.inherit({
 
   plus: function(expr /*c.LinearExpression*/) {
     if (expr instanceof c.LinearExpression) {
-      return this.clone().addExpression(expr, 1.0);
+      return this.clone().addExpression(expr, 1);
     } else if (expr instanceof c.Variable) {
-      return this.clone().addVariable(expr, 1.0);
+      return this.clone().addVariable(expr, 1);
     }
   },
 
   minus: function(expr /*c.LinearExpression*/) {
     if (expr instanceof c.LinearExpression) {
-      return this.clone().addExpression(expr, -1.0);
+      return this.clone().addExpression(expr, -1);
     } else if (expr instanceof c.Variable) {
-      return this.clone().addVariable(expr, -1.0);
+      return this.clone().addVariable(expr, -1);
     }
   },
 
 
   divide: function(x) {
     if (typeof x == 'number') {
-      if (c.approx(x, 0.0)) {
+      if (c.approx(x, 0)) {
         throw new c.NonlinearExpression();
       }
-      return this.times(1.0 / x);
+      return this.times(1 / x);
     } else if (x instanceof c.LinearExpression) {
       if (!x.isConstant()) {
         throw new c.NonlinearExpression();
       }
-      return this.times(1.0 / x.constant);
+      return this.times(1 / x.constant);
     }
   },
 
   divFrom: function(expr) {
-    if (!this.isConstant() || c.approx(this.constant, 0.0)) {
+    if (!this.isConstant() || c.approx(this.constant, 0)) {
         throw new c.NonlinearExpression();
     }
     return x.divide(this.constant);
@@ -135,12 +135,12 @@ c.LinearExpression = c.inherit({
   },
 
   addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
-    cd = cd || 1.0;
+    cd = cd || 1;
     if (c.trace) c.fnenterprint("CLE: addVariable:" + v + ", " + cd);
     var coeff = this._terms.get(v);
     if (coeff) {
       var new_coefficient = coeff + cd;
-      if (c.approx(new_coefficient, 0.0)) {
+      if (c.approx(new_coefficient, 0)) {
         if (solver) {
           solver.noteRemovedVariable(v, subject);
         }
@@ -149,7 +149,7 @@ c.LinearExpression = c.inherit({
         this._terms.put(v, new_coefficient);
       }
     } else {
-      if (!c.approx(cd, 0.0)) {
+      if (!c.approx(cd, 0)) {
         this._terms.put(v, cd);
         if (solver) {
           solver.noteAddedVariable(v, subject);
@@ -189,7 +189,7 @@ c.LinearExpression = c.inherit({
       var old_coeff = this._terms.get(clv);
       if (old_coeff) {
         var newCoeff = old_coeff + multiplier * coeff;
-        if (c.approx(newCoeff, 0.0)) {
+        if (c.approx(newCoeff, 0)) {
           solver.noteRemovedVariable(clv, subject);
           this._terms.remove(clv);
         } else {
@@ -211,7 +211,7 @@ c.LinearExpression = c.inherit({
   newSubject: function(subject /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("newSubject:" + subject);
     
-    var reciprocal = 1.0 / this._terms.remove(subject);
+    var reciprocal = 1 / this._terms.remove(subject);
     this.multiplyMe(-reciprocal);
     return reciprocal;
   },
@@ -231,7 +231,7 @@ c.LinearExpression = c.inherit({
   toString: function() {
     var bstr = ''; // answer
     var needsplus = false;
-    if (!c.approx(this.constant, 0.0) || this.isConstant()) {
+    if (!c.approx(this.constant, 0) || this.isConstant()) {
       bstr += this.constant;
       if (this.isConstant()) {
         return bstr;

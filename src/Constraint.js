@@ -11,7 +11,7 @@ c.Constraint = c.inherit({
   initialize: function(strength /*c.Strength*/, weight /*double*/) {
     this.hash_code = c._inc();
     this.strength = strength || c.Strength.required;
-    this.weight = weight || 1.0;
+    this.weight = weight || 1;
     this._times_added = 0;
     this._attachedObject = null;
   },
@@ -61,7 +61,7 @@ c.Constraint = c.inherit({
 var EditOrStayCtor = function(clv /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
   c.Constraint.call(this, strength, weight);
   this.variable = clv;
-  this.expression = new c.LinearExpression(clv, -1.0, clv.value());
+  this.expression = new c.LinearExpression(clv, -1, clv.value());
 };
 
 c.EditConstraint = c.inherit({

@@ -108,12 +108,12 @@ c.LinearInequality = c.inherit({
     // >=
     } else if (a2 == c.GEQ) {
       c.LinearConstraint.call(this, new c.LinearExpression(a3), a4, a5);
-      this.expression.multiplyMe(-1.0);
+      this.expression.multiplyMe(-1);
       this.expression.addVariable(a1);
     // <=
     } else if (a2 == c.LEQ) {
       c.LinearConstraint.call(this, new c.LinearExpression(a3), a4, a5);
-      this.expression.addVariable(a1,-1.0);
+      this.expression.addVariable(a1,-1);
     // error
     } else {
       throw new c.InternalError("Invalid operator in ClLinearInequality constructor");

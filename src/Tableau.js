@@ -158,7 +158,7 @@ c.Tableau = c.inherit({
     varset.each(function(v) {
       var row = /* c.LinearExpression */that._rows.get(v);
       row.substituteOut(oldVar, expr, v, that);
-      if (v.isRestricted && row.constant < 0.0) {
+      if (v.isRestricted && row.constant < 0) {
         that._infeasibleRows.add(v);
       }
     });

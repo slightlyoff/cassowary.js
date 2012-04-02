@@ -35,7 +35,7 @@ var getTagName = function(proto) {
   }
   return tn || "div";
 };
-var epsilon = 1.0e-8;
+var epsilon = 1e-8;
 
 // Global
 scope.c = {

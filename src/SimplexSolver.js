@@ -651,7 +651,7 @@ c.SimplexSolver = c.inherit({
       if (!cn.isRequired()) {
         ++this._slackCounter;
         eminus = new c.SlackVariable(this._slackCounter, "em");
-        expr.setVariable(eminus, 1.0);
+        expr.setVariable(eminus, 1);
         var zRow = this.rowExpression(this._objective);
         var sw = cn.strength.symbolicWeight.times(cn.weight);
         zRow.setVariable(eminus, sw.toDouble());
@@ -663,7 +663,7 @@ c.SimplexSolver = c.inherit({
         if (c.trace) c.traceprint("Equality, required");
         ++this._dummyCounter;
         dummyVar = new c.DummyVariable(this._dummyCounter, "d");
-        expr.setVariable(dummyVar, 1.0);
+        expr.setVariable(dummyVar, 1);
         this._markerVars.put(cn, dummyVar);
         if (c.trace) c.traceprint("Adding dummyVar == d" + this._dummyCounter);
       } else {
@@ -671,8 +671,8 @@ c.SimplexSolver = c.inherit({
         ++this._slackCounter;
         eplus = new c.SlackVariable(this._slackCounter, "ep");
         eminus = new c.SlackVariable(this._slackCounter, "em");
-        expr.setVariable(eplus, -1.0);
-        expr.setVariable(eminus, 1.0);
+        expr.setVariable(eplus, -1);
+        expr.setVariable(eminus, 1);
         this._markerVars.put(cn, eplus);
         var zRow = this.rowExpression(this._objective);
         if (c.trace) console.log(zRow);
