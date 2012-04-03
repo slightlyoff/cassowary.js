@@ -182,7 +182,86 @@ doh.add("End-To-End", [
       t.is(width.value(), 10);
     }
   },
+  
+  {
+    name: "exp == exp",
+    runTest: function(t) {
+      // stay width, rightMin
+      // right >= rightMin
+      var solver = new c.SimplexSolver();
 
+      var x1 = new c.Variable(10);
+      var width1 = new c.Variable(10);
+      var right1 = new c.LinearExpression(x1).plus(width1);
+      var x2 = new c.Variable(100);
+      var width2 = new c.Variable(10);
+      var right2 = new c.LinearExpression(x2).plus(width2);
+      
+      var eq = new c.LinearEquation(right1, right2);
+
+      solver.addStay(width1)
+            .addStay(width2)
+            .addStay(x2)
+            .addConstraint(eq);    
+
+      t.is(x1.value(), 100);
+      t.is(x2.value(), 100);
+      t.is(width1.value(), 10);
+      t.is(width2.value(), 10);
+    }
+  },
+  
+  {    
+    name: "exp >= exp",
+    runTest: function(t) {
+      // stay width, rightMin
+      // right >= rightMin
+      var solver = new c.SimplexSolver();
+
+      var x1 = new c.Variable(10);
+      var width1 = new c.Variable(10);
+      var right1 = new c.LinearExpression(x1).plus(width1);
+      var x2 = new c.Variable(100);
+      var width2 = new c.Variable(10);
+      var right2 = new c.LinearExpression(x2).plus(width2);
+
+      var ieq = new c.LinearInequality(right1, c.GEQ, right2);
+
+      solver.addStay(width1)
+            .addStay(width2)
+            .addStay(x2)
+            .addConstraint(ieq);    
+
+      t.is(x1.value(), 100);
+
+    }
+  },
+  
+  {    
+    name: "exp <= exp",
+    runTest: function(t) {
+      // stay width, rightMin
+      // right >= rightMin
+      var solver = new c.SimplexSolver();
+
+      var x1 = new c.Variable(10);
+      var width1 = new c.Variable(10);
+      var right1 = new c.LinearExpression(x1).plus(width1);
+      var x2 = new c.Variable(100);
+      var width2 = new c.Variable(10);
+      var right2 = new c.LinearExpression(x2).plus(width2);
+      var ieq = new c.LinearInequality(right2, c.LEQ, right1);
+
+      solver.addStay(width1)
+            .addStay(width2)
+            .addStay(x2)
+            .addConstraint(ieq);    
+
+      t.is(x1.value(), 100);
+
+    }
+  },
+  
   function addDelete1(t) {
     var solver = new c.SimplexSolver();
     var x = new c.Variable("x");
@@ -347,6 +426,124 @@ doh.add("End-To-End", [
     t.t(c.approx(h, 40));
   },
 
+  function multiedit2(t) {
+    var x = new c.Variable("x");
+    var y = new c.Variable("y");
+    var w = new c.Variable("w");
+    var h = new c.Variable("h");
+    var solver = new c.SimplexSolver();
+    solver.addStay(x)
+          .addStay(y)
+          .addStay(w)
+          .addStay(h)
+          .addEditVar(x)
+          .addEditVar(y).beginEdit();
+    solver.suggestValue(x, 10)
+          .suggestValue(y, 20).resolve();
+    solver.endEdit();
+    t.t(c.approx(x, 10));
+    t.t(c.approx(y, 20));
+    t.t(c.approx(w, 0));
+    t.t(c.approx(h, 0));
+
+    solver.addEditVar(w)
+          .addEditVar(h).beginEdit();
+    solver.suggestValue(w, 30)
+          .suggestValue(h, 40).endEdit();
+    t.t(c.approx(x, 10));
+    t.t(c.approx(y, 20));
+    t.t(c.approx(w, 30));
+    t.t(c.approx(h, 40));
+
+    solver.addEditVar(x)
+          .addEditVar(y).beginEdit();
+    solver.suggestValue(x, 50)
+          .suggestValue(y, 60).endEdit();
+    t.t(c.approx(x, 50));
+    t.t(c.approx(y, 60));
+    t.t(c.approx(w, 30));
+    t.t(c.approx(h, 40));
+  },
+
+  function multiedit3(t) {
+    var rand = function(max, min) {
+      min = (typeof min != "undefined") ? min : 0;
+      max = max || Math.pow(2, 26);
+      return parseInt(Math.random() * (max-min), 10) + min;
+    };
+    var MAX = 500;
+    var MIN = 100;
+
+    var weak = c.Strength.weak;
+    var medium = c.Strength.medium;
+    var strong = c.Strength.strong;
+    var required = c.Strength.required;
+
+    var eq  = function(a1, a2, strength, w) {
+      return new c.LinearEquation(a1, a2, strength || weak, w||0);
+    };
+
+    var v = {
+      width: new c.Variable("width"),
+      height: new c.Variable("height"),
+      top: new c.Variable("top"),
+      bottom: new c.Variable("bottom"),
+      left: new c.Variable("left"),
+      right: new c.Variable("right"),
+    };
+
+    var solver = new c.SimplexSolver();
+
+    var iw = new c.Variable("window_innerWidth", rand(MAX, MIN));
+    var ih = new c.Variable("window_innerHeight", rand(MAX, MIN));
+    var iwStay = new c.StayConstraint(iw);
+    var ihStay = new c.StayConstraint(ih);
+
+    var widthEQ = eq(v.width, iw, strong);
+    var heightEQ = eq(v.height, ih, strong);
+
+    var constraints = [
+      widthEQ,
+      heightEQ,
+      eq(v.top, 0, weak),
+      eq(v.left, 0, weak),
+      eq(v.bottom, c.Plus(v.top, v.height), medium),
+      // Right is at least left + width
+      eq(v.right,  c.Plus(v.left, v.width), medium),
+      iwStay,
+      ihStay
+    ].forEach(function(c) { 
+      solver.addConstraint(c);
+    });
+
+    // Propigate viewport size changes.
+    var reCalc = function() {
+      
+      // Measurement should be cheap here.
+      var iwv = rand(MAX, MIN);
+      var ihv = rand(MAX, MIN);
+
+      solver.addEditVar(iw);
+      solver.addEditVar(ih);
+
+      solver.beginEdit();
+      solver.suggestValue(iw, iwv)
+            .suggestValue(ih, ihv);
+      solver.resolve();
+      solver.endEdit();
+
+      t.is(v.top.value(), 0);
+      t.is(v.left.value(), 0);
+      t.t(v.bottom.value() <= MAX);
+      t.t(v.bottom.value() >= MIN);
+      t.t(v.right.value() <= MAX);
+      t.t(v.right.value() >= MIN);
+
+    }.bind(this);
+    reCalc();
+    reCalc();
+    reCalc();
+  },
 ]);
 
 })();

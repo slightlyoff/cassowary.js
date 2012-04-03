@@ -43,9 +43,9 @@ var keyCode = function(key) {
 };
 
 var copyOwn = function(src, dest) {
-  for (var x in src) {
-    if (src.hasOwnProperty(x)) { dest[x] = src[x]; }
-  }
+  Object.keys(src).forEach(function(x) {
+    dest[x] = src[x];
+  });
 };
 
 // For escapingEach
@@ -57,7 +57,6 @@ c.HashTable = c.inherit({
     this._size = 0;
     this._store = {};
     this._keyStrMap = {};
-    this._keyList = [];
   },
 
   put: function(key, value) { 
@@ -71,9 +70,6 @@ c.HashTable = c.inherit({
     }
     this._store[hash] = value;
     this._keyStrMap[hash] = key;
-    if (this._keyList.indexOf(hash) == -1) {
-      this._keyList.push(hash);
-    }
     return old;
   },
 
@@ -82,7 +78,9 @@ c.HashTable = c.inherit({
 
     key = keyCode(key);
 
-    if (this._store.hasOwnProperty(key)) {
+    var v = this._store[key];
+    if (typeof v != "undefined") {
+    // if (this._store.hasOwnProperty(key)) {
       return this._store[key];
     }
     return null;
@@ -92,7 +90,7 @@ c.HashTable = c.inherit({
     this._size = 0;
     this._store = {};
     this._keyStrMap = {};
-    this._keyList = [];
+    // this._keyList = [];
   }, 
 
   remove: function(key) {
@@ -103,10 +101,12 @@ c.HashTable = c.inherit({
 
     var old = this._store[key];
     delete this._store[key];
+    delete this._keyStrMap[key];
 
     if (this._size > 0) {
       this._size--;
     }
+
     return old;
   },
 
@@ -117,18 +117,9 @@ c.HashTable = c.inherit({
   each: function(callback, scope) {
     if (!this._size) { return; }
 
-    this._keyList.forEach(function(k){
-      if (this._store.hasOwnProperty(k)) {
-        callback.call(scope||null, this._keyStrMap[k], this._store[k]);
-      }
+    Object.keys(this._store).forEach(function(k){
+      callback.call(scope||null, this._keyStrMap[k], this._store[k]);
     }, this);
-  },
-
-  _escapingEachCallback: function(callback, scope, key, value) {
-    var hash = keyCode(key);
-    if (this._store.hasOwnProperty(hash)) {
-      return callback.call(scope||null, hash, value);
-    }
   },
 
   escapingEach: function(callback, scope) {
@@ -136,7 +127,7 @@ c.HashTable = c.inherit({
 
     var that = this;
     var context = defaultContext;
-    var kl = this._keyList;
+    var kl = Object.keys(this._store);
     for (var x = 0; x < kl.length; x++) {
       (function(v) {
         if (that._store.hasOwnProperty(v)) {
@@ -159,7 +150,6 @@ c.HashTable = c.inherit({
     var n = new c.HashTable();
     if (this._size) {
       n._size = this._size;
-      n._keyList = this._keyList.slice();
       copyOwn(this._store, n._store);
       copyOwn(this._keyStrMap, n._keyStrMap);
     }

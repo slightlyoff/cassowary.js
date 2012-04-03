@@ -3,15 +3,25 @@
 
 // TODO(slightlyoff):
 //      * min* and max* properties need correctly weighted strengths.
-//      * Make panels draggable to show edit vars at work
+//      * Make panels draggable as an option.
+//      * Optional remove-animation property
+//      * Child-panels. Mostly a question of what to generate in terms of own
+//        CSS values (since our frame of reference is the parent and not the
+//        root.
 //      * Fix the hierarchy methods on the DOM prototypes so the whole thing
 //        doesn't suck to work with.
+//      * Move to using mutation observers for append child watching instead of
+//        overriding.
 
-var fireSolved = function() {
-  var e = document.createEvent("UIEvents");
-  e.initUIEvent("solved", false, false, window, true);
-  document.dispatchEvent(e);
+var fireType = function(type) {
+  return function() {
+    var e = document.createEvent("UIEvents");
+    e.initUIEvent(type, false, false, window, true);
+    document.dispatchEvent(e);
+  }
 };
+
+var fireSolved = fireType("solved");
 
 // Create a global solver
 var s = document.solver = c.extend(new c.SimplexSolver(), { onsolved: fireSolved });
@@ -38,6 +48,20 @@ var toArray = function(a) {
 
 var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
   var ln = "_" + name;
+  if (typeof l == "string") {
+    if (l.charAt(0) == "#") {
+      l = l.split(",");
+      l.forEach(function(v, idx) {
+        var items = v.split(".");
+        l[idx] = document.querySelector(items.shift());
+        while(items.length) {
+          l[idx] = l[idx][items.shift()];
+        }
+      });
+    } else {
+      l = [ document.querySelector(l) ];
+    }
+  }
   this.remove.apply(this, this[ln]);
   this[ln] = toArray(l).map(function(v) {
     return new c.LinearInequality(this.v[own],
@@ -49,19 +73,33 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
   this.add.apply(this, this[ln]);
 };
 
-var valueSetter = function(item, varOrValue, oper) {
+var valueSetter = function(item, varOrValue, oper, strength) {
   var slot = "_" + item;
-  this.remove(this[slot]);
-  if (typeof varOrvalue == "string") {
-    varOrvalue = parseInt(varOrvalue, 10);
+  if (typeof varOrValue == "string") {
+    if (typeof this[slot] == "boolean") {
+      varOrValue = (varOrValue == "true");
+    } else if (varOrValue.charAt(0) == "#") {
+      var items = varOrValue.split(".");
+      var id = items.shift().slice(1);
+      varOrValue = document.getElementById(id);
+      if (!varOrValue) {
+        console.log("couldn't find panel with ID:", id);
+      }
+      items.forEach(function(prop, idx) {
+        varOrValue = varOrValue[prop];
+      }, this);
+    } else {
+      varOrValue = parseInt(varOrValue, 10);
+    }
   }
+  this.remove(this[slot]);
   // FIXME(slightlyoff): what's the strength of these?
   if (oper && oper != "=") {
     if (oper == ">=") oper = c.GEQ;
     if (oper == "<=") oper = c.LEQ;
-    this[slot] = new c.LinearInequality(this.v[item], oper, varOrValue);
+    this[slot] = new c.LinearInequality(this.v[item], oper, varOrValue, strength);
   } else {
-    this[slot] = new c.LinearEquation(this.v[item], varOrValue);
+    this[slot] = new c.LinearEquation(this.v[item], varOrValue, strength);
   }
   this.add(this[slot]);
 };
@@ -87,6 +125,7 @@ var stay = function(v, strength, weight) {
   return new c.StayConstraint(v, strength || weak, weight || 1.0);
 };
 var weakStay =   function(v, w) { return stay(v, weak, w); };
+var mediumStay =   function(v, w) { return stay(v, medium, w); };
 var strongStay =   function(v, w) { return stay(v, strong, w); };
 var requiredStay = function(v, w) { return stay(v, required, w); }
 
@@ -107,6 +146,20 @@ scope.Panel = c.inherit({
       _bottom: null,
 
       _debug: false,
+      _movable: false,
+      _moving: false,
+      _moveStartLocation: {
+        x: 0,
+        y: 0,
+        left: 0,
+        top: 0,
+      },
+      _moveHandlers: {
+        mousedown: this._mouseDown.bind(this),
+        mousemove: this._mouseMove.bind(this),
+        mouseup:   this._mouseUp.bind(this),
+        dragstart: function(e) { e.preventDefault(); },
+      },
 
       _leftOf: [],
       _rightOf: [],
@@ -122,10 +175,10 @@ scope.Panel = c.inherit({
       _updateStyles: this._updateStyles.bind(this),
     });
 
-    this._setProperties(props);
     this.id = uniqueId(this);
     this._initConstraints();
     this.debug = this._debug;
+    this._setProperties(props);
     this._initStyles();
   },
 
@@ -136,7 +189,6 @@ scope.Panel = c.inherit({
   },
 
   set debug(v) {
-    // console.log(this.id, "setting debug to:", v);
     if (v && this._attached) {
       if (!this._debugShadow) {
         var ds = this._debugShadow = document.createElement("div");
@@ -144,31 +196,99 @@ scope.Panel = c.inherit({
         ds.classList.add("debugShadow");
         document.body.appendChild(ds);
         this._updateDebugShadow();
-        // console.log("added debug shadow for", this.id);
       }
     } else {
       if (this._debugShadow) {
-        // console.log("removed debug shadow for", this.id);
         this._debugShadow.parentNode.removeChild(this._debugShadow);
         this._debugShadow = null;
       }
     }
     this._debug = v;
+    // this.setAttribute("debug", v);
+  },
+
+  // FIXME(slightlyoff):
+  //    coalesce event handlers to prevent all the registration duplication?
+  get movable() {
+    return this._movable;
+  },
+
+  set movable(v) {
+    if (v && !this._movable) {
+      // Set up drag handlers.
+      c.own(this._moveHandlers, function(h) {
+        var dh = this._moveHandlers[h];
+        window.addEventListener(h, dh, false);
+      }, this);
+    } else if(!v && this._movable) {
+      // Clobber existing move handlers
+      c.own(this._moveHandlers, function(h) {
+        var dh = this._moveHandlers[h];
+        window.removeEventListener(h, dh, false);
+      }, this);
+    }
+    this._movable = v;
+    // this.setAttribute("movable", v);
+  },
+
+  _mouseDown: function(e) {
+    // We're in absolute coordinate space, so we can use global location when
+    // comparing offsets.
+    if (e.target == this) {
+      var start = this._moveStartLocation;
+      start.x = e.pageX;
+      start.y = e.pageY;
+      start.left = this.v.left.value();
+      start.top = this.v.top.value();
+      document.solver.addEditVar(this.v.left, strong)
+                     .addEditVar(this.v.top, strong).beginEdit();
+      this._moving = true;
+    }
+  },
+
+  _mouseUp: function(e) {
+    if (this._moving) {
+      var l = this.v.left.value();
+      var t = this.v.top.value();
+      document.solver.endEdit();
+      // Re-set the current value at the default strength (weak) instead of our
+      // (strong) edit-time updates to it.
+      this.left = l;
+      this.top = t;
+    }
+    this._moving = false;
+  },
+
+  _mouseMove: function(e) {
+    if (this._moving) {
+      var start = this._moveStartLocation;
+      var deltaX = e.pageX - start.x;
+      var deltaY = e.pageY - start.y;
+
+      document.solver.suggestValue(this.v.left, start.left + deltaX)
+                     .suggestValue(this.v.top,  start.top + deltaY).resolve();
+    }
   },
 
   _updateDebugShadow: function() {
     if (!this._debugShadow) { return; }
 
     var s = this.id + " dimensions:<br>";
-    [
-      "width", "height", "left", "top" // , "right", "bottom"
+    [ "width",
+      "height",
+      "left",
+      "top" // , "right", "bottom"
     ].forEach(function(name) {
       var v = this.v[name].value() + "px";
       this._debugShadow.style[name] = v;
       s += name + ": " + v + "  <br>";
     }, this);
 
-    [ "right", "bottom" ].forEach(function(name) {
+    [ "right",
+      "bottom",
+      "preferredWidth",
+      "preferredHeight"
+    ].forEach(function(name) {
       var v = this.v[name].value() + "px";
       s += name + ": " + this.v[name].value() + "px  <br>";
     }, this);
@@ -177,7 +297,40 @@ scope.Panel = c.inherit({
   },
 
   _setProperties: function(props) {
-    // TODO(slightlyoff)
+    // Grab the attributes we care about and parse/set
+    var b = this.getAttribute("box");
+    if (b) {
+     this.box = JSON.parse(b);
+    }
+
+    var debug = this.getAttribute("debug");
+    if (debug) {
+      this.debug = (debug == "true");
+    }
+
+    var movable = this.getAttribute("movable");
+    if (movable) {
+      this.movable = (movable == "true");
+    }
+
+
+    [ "width",
+      "minWidth",
+      "maxWidth",
+      "height",
+      "minHeight",
+      "maxHeight",
+      "left",
+      "top",
+      "right",
+      "bottom",
+      "preferredWidth",
+      "preferredHeight"
+    ].concat(this._listConstraintNames)
+     .forEach(function(prop) {
+       var attr = this.getAttribute(prop);
+       if (attr) { this[prop] = attr; }
+     }, this);
   },
 
   //
@@ -243,7 +396,6 @@ scope.Panel = c.inherit({
         this.panels.push(n);
       }
       if (this._attached) {
-        // console.log("attaching:", n);
         n.attach();
       }
     }
@@ -263,93 +415,136 @@ scope.Panel = c.inherit({
     return HTMLElement.prototype.removeChild.call(this, n);
   },
 
+  _valueConstraintNames: [
+    "width",
+    "height",
+    "left",
+    "right",
+    "top",
+    "bottom",
+    "contentWidth", "contentHeight",
+    "contentLeft", "contentRight",
+    "contentTop", "contentBottom",
+
+    // preferred
+    "preferredWidth",
+    "preferredHeight",
+
+    // min
+    "minWidth",
+    "minHeight",
+    "minLeft",
+    "minRight",
+    "minTop",
+    "minBottom",
+    "minContentWidth",
+    "minContentHeight",
+    "minContentLeft",
+    "minContentRight",
+    "minContentTop",
+    "minContentBottom",
+
+    // max
+    "maxWidth",
+    "maxHeight",
+    "maxLeft",
+    "maxRight",
+    "maxTop",
+    "maxBottom",
+    "maxContentWidth",
+    "maxContentHeight",
+    "maxContentLeft",
+    "maxContentRight",
+    "maxContentTop",
+    "maxContentBottom"
+  ],
+
+  _listConstraintNames: [
+    "above",
+    "below",
+    "leftOf",
+    "rightOf"
+  ],
+
   _initConstraints: function() {
     var Expr = c.LinearExpression;
     var Var = c.Variable;
 
     var v = this.v = {};
 
-    [
-      "width", "height",
-      "left", "right",
-      "top", "bottom",
-      "contentWidth", "contentHeight",
-      "contentLeft", "contentRight",
-      "contentTop", "contentBottom",
-
-      // min
-      "minWidth",
-      "minHeight",
-      "minLeft",
-      "minRight",
-      "minTop",
-      "minBottom",
-      "minContentWidth",
-      "minContentHeight",
-      "minContentLeft",
-      "minContentRight",
-      "minContentTop",
-      "minContentBottom",
-
-      // max
-      "maxWidth",
-      "maxHeight",
-      "maxLeft",
-      "maxRight",
-      "maxTop",
-      "maxBottom",
-      "maxContentWidth",
-      "maxContentHeight",
-      "maxContentLeft",
-      "maxContentRight",
-      "maxContentTop",
-      "maxContentBottom"
-
-    ].forEach(function(name) {
+    this._valueConstraintNames.forEach(function(name) {
       v[name] = new Var(this.id + "_" + name);
     }, this);
 
     // Sanity
     this.constraints.push(
       // Positive values only for now
-      geq(v.width,         0),
-      geq(v.height,        0),
-      geq(v.contentWidth,  0),
-      geq(v.contentHeight, 0),
+      geq(v.width,         0, required),
+      geq(v.height,        0, required),
+      geq(v.contentWidth,  0, required),
+      geq(v.contentHeight, 0, required),
 
-      geq(v.width,         v.minWidth, medium, 1000),
-      geq(v.height,        v.minHeight, medium, 1000),
-      geq(v.contentWidth,  v.minContetnWidth, medium, 1000),
-      geq(v.contentHeight, v.minContentHeight, medium, 1000),
+      leq(v.width,         v.preferredWidth, medium, 10),
+      leq(v.height,        v.preferredHeight, medium, 10),
 
-      leq(v.width,         v.maxWidth, medium, 10),
-      leq(v.height,        v.maxHeight, medium, 10),
-      leq(v.contentWidth,  v.maxContetnWidth, medium, 10),
-      leq(v.contentHeight, v.maxContentHeight, medium, 10),
+      geq(v.width,         v.minWidth, medium , 5),
+      geq(v.height,        v.minHeight, medium, 5),
+      geq(v.contentWidth,  v.minContentWidth, medium, 3),
+      geq(v.contentHeight, v.minContentHeight, medium, 3),
+
+      /*
+      weakStay(v.preferredWidth, 2),
+      weakStay(v.preferredHeight, 2),
+
+      weakStay(v.width, 1),
+      weakStay(v.height, 1),
+
+      strongStay(v.minWidth),
+      strongStay(v.minHeight),
+
+      mediumStay(v.maxWidth),
+      mediumStay(v.maxHeight),
+      */
+
+      /*
+      weakStay(v.left, 1),
+      weakStay(v.top, 1),
+      weakStay(v.right, 1),
+      weakStay(v.bottom, 1),
+      */
+
+      leq(v.width,         v.maxWidth, medium, 3),
+      leq(v.height,        v.maxHeight, medium, 3),
+      leq(v.contentWidth,  v.maxContetnWidth, medium, 2),
+      leq(v.contentHeight, v.maxContentHeight, medium, 2),
 
       // Total width is bigger than content width.
-      geq(v.width,         v.contentWidth, medium, 10000),
-      geq(v.height,        v.contentHeight, medium, 10000),
+      geq(v.width,         v.contentWidth, medium, 1),
+      geq(v.height,        v.contentHeight, medium, 1),
 
       // Bottom is at least top + height
-      eq(v.bottom, c.Plus(v.top, v.height), medium, 1),
+      eq(v.bottom, c.Plus(v.top, v.height), medium, 10),
       // Right is at least left + width
-      eq(v.right,  c.Plus(v.left, v.width), medium, 1)
+      eq(v.right,  c.Plus(v.left, v.width), medium, 10)
     );
   },
 
   _updateStyles: function() {
-    // FIXME(slightlyoff):
-    //  Dig our style values out of the variables and update our CSS
-    //  accordingly.
-    //
-    // console.log("Updating styles for Panel:", this.id);
-
-    [ "width", "height",
-      "left", // "right",
-      "top" //, "bottom"
-    ].forEach(function(name) {
+    // NOTE: "bottom" and "right" are assumed to be computed
+    [ "width", "height" ].forEach(function(name) {
       this.style[name] = this.v[name].value() + "px";
+    }, this);
+
+    // FIXME: caching? invalidation?
+    [ "left", "top" ].forEach(function(name) {
+      var v =  this.v[name].value();
+      // If we're not direct children of the root, translate top/left to being
+      // in the CSS "absolute" coordinate space from our absolutely positioned
+      // parents
+      if (this.parentNode && this.parentNode != document.body) {
+        v = v - this.parentNode.v[name].value();
+      }
+      this.style[name] = v + "px";
     }, this);
     if (this._debugShadow) { this._updateDebugShadow(); }
   },
@@ -399,10 +594,10 @@ scope.Panel = c.inherit({
   },
 
   // Some layout helpers
-  set above(l)   { listSetter.call(this, l, "above",   "bottom", "top",    c.LEQ); },
-  set below(l)   { listSetter.call(this, l, "below",   "top",    "bottom", c.GEQ); },
-  set leftOf(l)  { listSetter.call(this, l, "leftOf",  "right",  "left",   c.LEQ); },
-  set rightOf(l) { listSetter.call(this, l, "rightOf", "left",   "right",  c.GEQ); },
+  set above(l)   { listSetter.call(this, l, "above",   "bottom", "top",    c.LEQ, weak, 2); },
+  set below(l)   { listSetter.call(this, l, "below",   "top",    "bottom", c.GEQ, weak, 2); },
+  set leftOf(l)  { listSetter.call(this, l, "leftOf",  "right",  "left",   c.LEQ, weak, 2); },
+  set rightOf(l) { listSetter.call(this, l, "rightOf", "left",   "right",  c.GEQ, weak, 2); },
 
   get above()    { return this._above; },
   get below()    { return this._below; },
@@ -412,10 +607,10 @@ scope.Panel = c.inherit({
   // FIXME(slightlyoff):
   //    need to add max* and min* versions of all of the below
 
-  set top(v)    { valueSetter.call(this, "top", v);    }, 
-  set bottom(v) { valueSetter.call(this, "bottom", v); },
-  set left(v)   { valueSetter.call(this, "left", v);   },
-  set right(v)  { valueSetter.call(this, "right", v);  },
+  set top(v)    { valueSetter.call(this, "top", v, "=", weak);    },
+  set bottom(v) { valueSetter.call(this, "bottom", v, "=", weak); },
+  set left(v)   { valueSetter.call(this, "left", v, "=", weak);   },
+  set right(v)  { valueSetter.call(this, "right", v, "=", weak);  },
 
   get top()     { return valueGetter.call(this, "top"); }, 
   get bottom()  { return valueGetter.call(this, "bottom"); },
@@ -427,6 +622,12 @@ scope.Panel = c.inherit({
 
   get width()   { return valueGetter.call(this, "width"); },
   get height()  { return valueGetter.call(this, "width"); },
+
+  set preferredWidth(v)  { valueSetter.call(this, "preferredWidth", v); },
+  set preferredHeight(v) { valueSetter.call(this, "preferredHeight", v); },
+
+  get preferredWidth()   { return valueGetter.call(this, "preferredWidth"); },
+  get preferredHeight()  { return valueGetter.call(this, "preferredHeight"); },
 
   set minWidth(v)  { valueSetter.call(this, "minWidth", v); },
   set minHeight(v) { valueSetter.call(this, "minHeight", v); },
@@ -441,10 +642,11 @@ scope.Panel = c.inherit({
   get maxHeight()  { return valueGetter.call(this, "maxWHeight"); },
 
   set box(b) {
-    [ "left", "right", "top", "bottom", "width", "height" ].
-      forEach(function(prop) {
-        if (b[prop]) this[prop] = b[prop];
-      }, this);
+    this._valueConstraintNames.forEach(function(prop) {
+        if (b.hasOwnProperty(prop)) { this[prop] = b[prop]; } }, this); 
+
+    this._listConstraintNames.forEach(function(prop) {
+        if (b.hasOwnProperty(prop)) { this[prop] = b[prop]; } }, this);
   },
 
   centerIn: function(panel) {
@@ -452,6 +654,8 @@ scope.Panel = c.inherit({
   },
 
 });
+
+HTMLElement.register(Panel);
 
 // We sould only ever have one of these per document, so enforce it losely and
 // make sure that we set one up by default.
@@ -464,15 +668,13 @@ scope.RootPanel = c.inherit({
 
     Panel.ctor.call(this);
 
-    var iw = new c.Variable("window_innerWidth", window.innerWidth);
-    var ih = new c.Variable("window_innerHeight", window.innerHeight);
+    var iw = new c.Variable("window_innerWidth");
+    var ih = new c.Variable("window_innerHeight");
 
     var s = document.solver;
-    s.addEditVar(iw); // FIXME(slightlyoff): not sure I understand this
-    s.addEditVar(ih);
 
-    var widthEQ = eq(this.v.width, iw, required);
-    var heightEQ = eq(this.v.height, ih, required);
+    var widthEQ = eq(this.v.width, iw, medium, 5);
+    var heightEQ = eq(this.v.height, ih, medium, 5);
 
     // At this point, we won't be attached but will have had our constraints
     // initialized. We clobber them and add our own.
@@ -481,11 +683,13 @@ scope.RootPanel = c.inherit({
     this.constraints.push(
       widthEQ,
       heightEQ,
-      eq(this.v.top, 0, required, 1000),
-      eq(this.v.left, 0, required, 1000),
-      eq(this.v.bottom, c.Plus(this.v.top, this.v.height), required, 1000),
+      eq(this.v.top, 0, medium),
+      eq(this.v.left, 0, medium),
+      eq(this.v.bottom, c.Plus(this.v.top, this.v.height), medium, 2),
       // Right is at least left + width
-      eq(this.v.right,  c.Plus(this.v.left, this.v.width), required, 1000)
+      eq(this.v.right,  c.Plus(this.v.left, this.v.width), medium, 2),
+      stay(this.v.right),
+      stay(this.v.bottom)
     );
 
     // Propigate viewport size changes.
@@ -498,17 +702,13 @@ scope.RootPanel = c.inherit({
       // Time resolution
       // console.time("resolve");
 
-      // FIXME(slightlyoff):
-      //    This approach should work but doesn't. We leave the edit session
-      //    open instead.
-      // s.addEditVar(iw);
-      // s.addEditVar(ih);
+      s.addEditVar(iw)
+       .addEditVar(ih).beginEdit();
 
-      // s.beginEdit();
       s.suggestValue(iw, iwv)
-       .suggestValue(ih, ihv);
-      s.resolve();
-      // s.endEdit();
+       .suggestValue(ih, ihv).resolve();
+
+      s.endEdit();
 
       // console.timeEnd("resolve");
 
@@ -521,7 +721,19 @@ scope.RootPanel = c.inherit({
       }
     }.bind(this);
 
-    window.addEventListener("resize", reCalc, false);
+    var frame = 0;
+    var resizeNextFrame = function() {
+      var f = frame++;
+      window.rAF(function() {
+        if (f == frame-1) {
+          reCalc();
+        }
+      });
+    };
+
+    resizeNextFrame();
+
+    window.addEventListener("resize", resizeNextFrame, false);
   },
 
   _updateStyles: function() {
@@ -535,12 +747,13 @@ scope.RootPanel = c.inherit({
 var installRoot = function() {
   if (!document.rootPanel && document.body) {
     var rp = document.body;
-    rp.id = "rootPanel";
+    rp.id = rp.id || "root";
     scope.RootPanel.prototype.upgrade(rp);
     document.rootPanel = rp;
     rp.attach();
     fireSolved();
     rp._updateStyles();
+    fireType("root")();
   }
 };
 
@@ -549,5 +762,4 @@ if (document.readyState != "complete") {
 }
 
 installRoot();
-
 })(this);

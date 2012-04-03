@@ -28,13 +28,53 @@ scope.$ = function(query, opt_contextElement) {
 }
 
 // requestAnimationFrame shimming.
-var rAF = window.requestAnimationFrame       || 
-          window.webkitRequestAnimationFrame || 
-          window.mozRequestAnimationFrame    || 
-          window.oRequestAnimationFrame      || 
-          window.msRequestAnimationFrame     || 
+scope.rAF = window.requestAnimationFrame     ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame    ||
+          window.oRequestAnimationFrame      ||
+          window.msRequestAnimationFrame     ||
           function(callback) {
             window.setTimeout(callback, 1000 / 60);
           };
 
-})(this);
+//
+// Observe the document and upgrade custom elements that are added.
+//
+var tagMap = {};
+
+var upTo = function(type) {
+  var up = type.prototype.upgrade;
+  return function(el) {
+    if (!(el instanceof type) && up) {
+      up(el);
+      if (el.parentNode) { el.attach(); }
+    }
+  };
+};
+
+scope.HTMLElement.register = function(type) {
+  var tn = type.tagName || type.prototype.tagName; 
+  var upgrade = upTo(type);
+
+  tagMap[tn] = type;
+
+  var ms = new MutationSummary({
+    callback: function(summaries) {
+      var s = summaries[0];
+      s.added.forEach(upgrade);
+    },
+    queries: [{ element: tn }]
+  });
+};
+
+// SUPER hackey. Since we don't seem to be able to locate elements as they're
+// created by the initial parse, look for them on startup and run the upgrade
+// if we need to.
+document.addEventListener("root", function(e) {
+  Object.keys(tagMap).forEach(function(tn) {
+    var elements = document.querySelectorAll(tn);
+    Array.prototype.slice.call(elements).forEach(upTo(tagMap[tn]));
+  });
+}, false);
+
+})(window);

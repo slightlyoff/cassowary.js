@@ -5,102 +5,13 @@
     Use of this source code is governed by the LGPL, which can be found in the
     COPYING.LGPL file.
   -->
-
   <head>
     <title>Bork Bork Bork!</title>
 
     <!-- GCF -->
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-    <style type="text/css">
-      /* We're an app, so lay ourselves out like one. Just the basics, ma'am. */
-      html, body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
-        color: #222;
-        background-color: #D9E7FF;
-      }
-
-      body {
-        /*
-        min-width: 778px;
-        */
-        overflow-y: hidden;
-        overflow-x: hidden;
-        position: absolute;
-        font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
-      }
-
-      /* Ensure that we are always in a layout mode that doesn't suck eggs */
-      * {
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-      }
-
-      /*
-        We're trying to look like IRC Cloud for this demo, so borrow their
-        toolbar styling
-      */
-      ::-webkit-scrollbar {
-        width: 14px;
-        height: 10px;
-      }
-
-      ::-webkit-scrollbar-track-piece {
-        background-color: #f5f5f5;
-        background-clip: padding-box;
-        -webkit-background-clip: padding-box;
-        border: 3px solid #fff;
-        border-radius: 6px;
-        -webkit-border-radius: 6px;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background-color: #527dff;
-        background-clip: padding-box;
-        -webkit-background-clip: padding-box;
-        border: 3px solid #fff;
-        border-radius: 6px;
-        -webkit-border-radius: 6px;
-      }
-
-      /* Base styling for all panel elements */
-      .panel {
-        /* Turn off system constraint layouts for panels */
-        position:   absolute;
-        margin:     none;
-        padding:    none;
-        border:     none;
-
-        box-shadow: inset 0px 0px 6px rgba(133, 133, 133, 1);
-        /* FIXME(slightlyoff): need to make the panel constraints savy to padding */
-        padding: 10px;
-      }
-
-      .debugShadow {
-        position:   absolute;
-        margin:     none;
-        padding:    1em;
-        border:     none;
-        overflow:   hidden;
-        background: rgba(159,196,84, 0.5);
-        width:      0px;
-        height:     0px;
-        left:       0px;
-        top:        0px;
-        z-index:    100;
-        outline:    1px solid blue;
-        pointer-events: none;
-        font:       normal 85%/1 "Consolas", "Courier New", "Courier", monospace;
-        text-align: right;
-        color:      black;
-        opacity:    0.5;
-      }
-    </style>
+    <link href="panels.css" rel="stylesheet" type="text/css">
 
     <script defer="defer" src="../../src/c.js"></script>
     <script defer="defer" src="../../src/HashTable.js"></script>
@@ -116,17 +27,13 @@
     <script defer="defer" src="../../src/EditInfo.js"></script>
     <script defer="defer" src="../../src/Tableau.js"></script>
     <script defer="defer" src="../../src/SimplexSolver.js"></script>
-    <!--
     <script defer="defer" src="../../src/Timer.js"></script>
-    -->
 
+    <script defer="defer" src="../../util/mutation-summary/mutation_summary.js"></script>
     <script defer="defer" src="domutil.js"></script>
     <script defer="defer" src="panels.js"></script>
 
     <script defer="defer">
-      //
-      // Ctrl-R testing. The VERY BEST kind ;-)
-      // 
       window.addEventListener("load", function() {
         "use strict";
 
@@ -135,6 +42,13 @@
 
         // Create a panel, add it to the document.
         var p = window.p = new Panel();
+        p.left = 200;
+        p.top = 150;
+        p.width = 100;
+        p.height = 100;
+        p.debug = true;
+        p.movable = true;
+
 
         root.appendChild(p);
 
@@ -146,34 +60,27 @@
           },
           tagName: "x-subpanel",
         });
+        HTMLElement.register(SubPanel);
 
         var sp = window.sp = new SubPanel();
         root.appendChild(sp);
 
-        p.left = 200;
-        p.top = 150;
-        p.width = 100;
-        p.height = 100;
-
         sp.width = 140;
         sp.height = 100;
-
         sp.rightOf = p;
-
         sp.above = p;
+        sp.debug = true;
+        sp.movable = true;
 
         var sp2 = window.sp2 = new SubPanel();
-        sp2.innerHTML = "Howdy, y'all!";
-        sp2.style.outline = "1px solid black";
-        root.appendChild(sp2);
-
         sp2.box = { width: 100, height: 50 };
         sp2.leftOf = [ sp, p ];
         sp2.below = [ p, sp ];
+        sp2.debug = true;
+        sp2.movable = true;
+        root.appendChild(sp2);
 
         var p3 = window.p3 = new Panel();
-        root.appendChild(p3);
-
         p3.maxWidth = 300;
         p3.minWidth = 200;
         p3.top = root.v.top;
@@ -181,40 +88,65 @@
         p3.height = root.v.height;
         p3.innerHTML = "howdy!";
         p3.debug = true;
+        p3.movable = true;
+        root.appendChild(p3);
 
         var p4 = window.p4 = new Panel();
+        p4.id = "p4";
         root.appendChild(p4);
         p4.top = root.v.top;
         // p4.right = root.v.right;
         p4.left = 30;
         p4.top = 30;
+        p4.preferredWidth = 600;
         p4.maxHeight = 100;
         p4.minHeight = 10;
         p4.minWidth = 500;
         p4.maxWidth = 800;
         p4.leftOf = p3;
         p4.debug = true;
+        p4.movable = true;
 
-		// p4.above = sp;
-		
+        /*
+        // p4.above = sp;
         // p3._debugShadow.style.textAlign = "left";
+        document.body.appendChild(
+          document.createElement("x-panel")
+        );
+        */
       });
     </script>
+    <style>
+      body.panel {
+        -webkit-transition: none;
+           -moz-transition: none;
+             -o-transition: none;
 
+        -webkit-user-select: none;
+                user-select: none;
+      }
+
+      .panel {
+        box-shadow: inset 0px 0px 6px rgba(133, 133, 133, 1);
+
+        /*
+        -webkit-transition: all 400ms cubic-bezier(0.260, 0.860, 0.440, 0.985) 32ms; 
+           -moz-transition: all 400ms cubic-bezier(0.260, 0.860, 0.440, 0.985) 32ms; 
+             -o-transition: all 400ms cubic-bezier(0.260, 0.860, 0.440, 0.985) 32ms; 
+             */
+      }
+    </style>
+  </head>
+  <body>
     <!--
       Notes:
-        - I'm using invented tag names in order to make it clear what I'm
-          trying to say and for no other reason. Scripts give them meaning. So be
-          it.
         - Constraints are expressed in terms of relationships defined in
-          data-layout attributes on panels. The element instances themselves
-          maintain the set of constraints that are sent to the solver and
-          update their CSS in response to variable changes in the engine.
+          attributes on panels. The element instances themselves maintain the
+          set of constraints that are sent to the solver and update their CSS
+          in response to variable changes in the engine.
     -->
+
     <!--
-      NOTE:
-        Nothing in the body currently has any effect. See above for what's
-        currently working.
     <script type="constraint-layout">
       #mh {
         width = 300;
@@ -226,15 +158,20 @@
       #cList {
       }
     </script>
-
-    <x-panel id="mh">
-    </x-panel>
-
-    <x-panel id="cList">
-    </x-panel>
     -->
 
-  </head>
-  <body>
+    <x-panel id="markupTest"
+      box='{ "minWidth": 300, "maxWidth": 500, "preferredWidth": 400, "left": 100, "top": 100, "height": 300 }'
+      movable="true"
+      debug="true">
+    </x-panel>
+
+    <x-panel id="attrTest"
+      above="#markupTest"
+      left="30" height="100" width="100"
+      movable="true"
+      debug="true">
+    </x-panel>
+
   </body>
 </html>

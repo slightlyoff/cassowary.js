@@ -32,10 +32,10 @@ c.Strength = c.inherit({
 /* public static final */
 c.Strength.required = new c.Strength("<Required>", 1000, 1000, 1000);
 /* public static final  */
-c.Strength.strong = new c.Strength("strong", 1.0, 0.0, 0.0);
+c.Strength.strong = new c.Strength("strong", 1, 0, 0);
 /* public static final  */
-c.Strength.medium = new c.Strength("medium", 0.0, 1.0, 0.0);
+c.Strength.medium = new c.Strength("medium", 0, 1, 0);
 /* public static final  */
-c.Strength.weak = new c.Strength("weak", 0.0, 0.0, 1.0);
+c.Strength.weak = new c.Strength("weak", 0, 0, 1);
 
 })(c);

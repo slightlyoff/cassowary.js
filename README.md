@@ -12,6 +12,10 @@ translation (8x under V8, 5x under Rhino), removing external library
 dependencies while improving hackability. The solver core can now be used
 inside web workers and many modern browsers.
 
+For discussion, questions on how to use the solver, and a small but civil
+community of folks working in this space is forming on the [Overconstrained
+mailing list](https://groups.google.com/forum/?fromgroups#!forum/overconstrained).
+
 Constraint Solver? Say What?
 ----------------------------
 

@@ -278,6 +278,7 @@ var PerfTest = c.inherit({
 });
 
 (new PerfTest()).main(1, 100, 10, 50);
+// (new PerfTest()).main(1, 500, 10, 500);
 
 //clt.main(new Array());
 })(c);

@@ -41,7 +41,7 @@ c.Variable = c.inherit({
   initialize: function(name_or_val, value) {
     if (typeof name_or_val == "string") {
       av.call(this, name_or_val);
-      this._value = value || 0.0;
+      this._value = value || 0;
     } else {
       av.call(this);
       if (typeof name_or_val == "number") {

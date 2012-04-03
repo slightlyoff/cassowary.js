@@ -36,8 +36,15 @@ c.LinearInequality = c.inherit({
     // console.log("c.LinearInequality.initialize(", a1, a2, a3, a4, a5, ")");
     // 
     // (cle || number), op, clv
-    if ((a1 instanceof c.LinearExpression || typeof(a1) == 'number') &&
-        a3 instanceof c.AbstractVariable) {      
+    var a1IsExp, a3IsExp, a1IsNum, a3IsNum, a1IsVar, a3IsVar;
+    a1IsExp = a1 instanceof c.LinearExpression;
+    a3IsExp = a3 instanceof c.LinearExpression;
+    a1IsVar = a1 instanceof c.AbstractVariable;
+    a3IsVar = a3 instanceof c.AbstractVariable;
+    a1IsNum = typeof(a1) == 'number';
+    a3IsNum = typeof(a3) == 'number';
+    
+    if ((a1IsExp || a1IsNum) && a3IsVar) {      
       var cle = a1, op = a2, clv = a3, strength = a4, weight = a5;
       c.LinearConstraint.call(this, this._cloneOrNewCle(cle), strength, weight);
       if (op == c.LEQ) {
@@ -49,7 +56,7 @@ c.LinearInequality = c.inherit({
         throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
       }    
     // clv, op, (cle || number)
-    } else if (a1 instanceof c.AbstractVariable && (a3 instanceof c.LinearExpression || typeof(a3) == 'number')) {      
+    } else if (a1IsVar && (a3IsExp || a3IsNum)) {      
       var cle = a3, op = a2, clv = a1, strength = a4, weight = a5;
       c.LinearConstraint.call(this, this._cloneOrNewCle(cle), strength, weight);
       if (op == c.GEQ) {
@@ -61,7 +68,7 @@ c.LinearInequality = c.inherit({
         throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
       }    
     // cle, op, num
-    } else if (a1 instanceof c.LinearExpression && typeof(a3) == 'number') {
+    } else if (a1IsExp && a3IsNum) {
       var cle1 = a1, op = a2, cle2 = a3, strength = a4, weight = a5;
       c.LinearConstraint.call(this, this._cloneOrNewCle(cle1), strength, weight);
       if (op == c.LEQ) {
@@ -74,7 +81,7 @@ c.LinearInequality = c.inherit({
       }
       return this      
     // num, op, cle
-    } else if (a3 instanceof c.LinearExpression && typeof(a1) == 'number') {
+    } else if (a1IsNum && a3IsExp) {
       var cle1 = a3, op = a2, cle2 = a1, strength = a4, weight = a5; 
       c.LinearConstraint.call(this, this._cloneOrNewCle(cle1), strength, weight);      
       if (op == c.GEQ) {
@@ -85,19 +92,28 @@ c.LinearInequality = c.inherit({
       } else {
         throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
       }
-      return this            
+      return this     
+    // cle op cle
+    } else if (a1IsExp && a3IsExp) {
+      var cle1 = a1, op = a2, cle2 = a3, strength = a4, weight = a5;
+      c.LinearConstraint.call(this, this._cloneOrNewCle(cle1), strength, weight);
+      if (op == c.LEQ || op == c.GEQ) {
+        this.expression.addExpression(this._cloneOrNewCle(cle2), -1);
+      } else {
+        throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
+      }       
     // cle
-    } else if (a1 instanceof c.LinearExpression) {
+    } else if (a1IsExp) {
       return c.LinearConstraint.call(this, a1, a2, a3);    
     // >=
     } else if (a2 == c.GEQ) {
       c.LinearConstraint.call(this, new c.LinearExpression(a3), a4, a5);
-      this.expression.multiplyMe(-1.0);
+      this.expression.multiplyMe(-1);
       this.expression.addVariable(a1);
     // <=
     } else if (a2 == c.LEQ) {
       c.LinearConstraint.call(this, new c.LinearExpression(a3), a4, a5);
-      this.expression.addVariable(a1,-1.0);
+      this.expression.addVariable(a1,-1);
     // error
     } else {
       throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
