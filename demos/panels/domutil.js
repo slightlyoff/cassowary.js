@@ -58,13 +58,16 @@ scope.HTMLElement.register = function(type) {
 
   tagMap[tn] = type;
 
-  var ms = new MutationSummary({
-    callback: function(summaries) {
-      var s = summaries[0];
-      s.added.forEach(upgrade);
-    },
-    queries: [{ element: tn }]
-  });
+  if ((scope.WebKitMutationObserver || scope.MutationObserver) && 
+      scope.MutationSummary) {
+    var ms = new MutationSummary({
+      callback: function(summaries) {
+        var s = summaries[0];
+        s.added.forEach(upgrade);
+      },
+      queries: [{ element: tn }]
+    });
+  }
 };
 
 // SUPER hackey. Since we don't seem to be able to locate elements as they're
