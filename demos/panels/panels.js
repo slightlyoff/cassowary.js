@@ -556,22 +556,21 @@ scope.Panel = c.inherit({
   },
 
   add: function(/* c1, c2, ... */) {
+    s.autoSolve = false;
     Array.prototype.slice.call(arguments).forEach(function(cns) {
       if (!cns) return;
       // FIXME(slightlyoff): should we try to prevent double-adding?
       this.constraints.push(cns);
-      if (this._attached) {
-        // FIXME(slightlyoff):
-        //    when we turn off auto-solving, update this to mark us unsolved.
-        document.solver.addConstraint(cns);
-      }
+      if (this._attached) { s.addConstraint(cns); }
     }, this);
+    s.autoSolve = true;
     return this;
   },
 
   remove: function(/* c1, c2, ... */) {
     var al = arguments.length;
     if (!al) { return; }
+    s.autoSolve = false;
     Array.prototype.slice.call(arguments).forEach(function(cns) {
       if (!cns) return;
       var ci = this.constraints.indexOf(cns);
@@ -584,6 +583,7 @@ scope.Panel = c.inherit({
         }
       }
     }, this);
+    s.autoSolve = true;
     return this;
   },
 
