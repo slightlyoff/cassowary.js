@@ -742,7 +742,7 @@ c.SimplexSolver = c.inherit({
         if (v.isPivotable) {
           var expr = this.rowExpression(v);
           var coeff = expr.coefficientFor(entryVar);
-          if (c.trace) this.traceprint("pivotable, coeff = " + coeff);
+          if (c.trace) c.traceprint("pivotable, coeff = " + coeff);
           if (coeff < 0) {
             r = -expr.constant / coeff;
             if (r < minRatio || (c.approx(r, minRatio) && v.hashCode() < exitVar.hashCode())) {
