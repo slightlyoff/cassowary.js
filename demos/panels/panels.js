@@ -240,8 +240,8 @@ scope.Panel = c.inherit({
       start.y = e.pageY;
       start.left = this.v.left.value();
       start.top = this.v.top.value();
-      document.solver.addEditVar(this.v.left, strong)
-                     .addEditVar(this.v.top, strong).beginEdit();
+      s.addEditVar(this.v.left, strong)
+       .addEditVar(this.v.top, strong).beginEdit();
       this._moving = true;
     }
   },
@@ -250,7 +250,7 @@ scope.Panel = c.inherit({
     if (this._moving) {
       var l = this.v.left.value();
       var t = this.v.top.value();
-      document.solver.endEdit();
+      s.endEdit();
       // Re-set the current value at the default strength (weak) instead of our
       // (strong) edit-time updates to it.
       this.left = l;
@@ -265,8 +265,8 @@ scope.Panel = c.inherit({
       var deltaX = e.pageX - start.x;
       var deltaY = e.pageY - start.y;
 
-      document.solver.suggestValue(this.v.left, start.left + deltaX)
-                     .suggestValue(this.v.top,  start.top + deltaY).resolve();
+      s.suggestValue(this.v.left, start.left + deltaX)
+       .suggestValue(this.v.top,  start.top + deltaY).resolve();
     }
   },
 
@@ -352,9 +352,10 @@ scope.Panel = c.inherit({
     });
 
     // We add our constraints to the solver ONLY when we're 
-    this.constraints.forEach(function(cns) {
-      document.solver.addConstraint(cns);
-    });
+    s.autoSolve = false;
+    this.constraints.forEach(function(cns) { s.addConstraint(cns); });
+    s.resolve();
+    s.autoSolve = true;
 
     this.debug = this.debug;
 
@@ -378,9 +379,10 @@ scope.Panel = c.inherit({
     });
 
     // Remove our constraints from the solver
-    this.constraints.forEach(function(c) {
-      document.solver.removeConstraint(c);
-    });
+    s.autoSolve = false;
+    this.constraints.forEach(function(c) { s.removeConstraint(c); });
+    s.resolve();
+    s.autoSolve = true;
 
     this.debug = this.debug;
 
@@ -492,27 +494,6 @@ scope.Panel = c.inherit({
       geq(v.contentWidth,  v.minContentWidth, medium, 3),
       geq(v.contentHeight, v.minContentHeight, medium, 3),
 
-      /*
-      weakStay(v.preferredWidth, 2),
-      weakStay(v.preferredHeight, 2),
-
-      weakStay(v.width, 1),
-      weakStay(v.height, 1),
-
-      strongStay(v.minWidth),
-      strongStay(v.minHeight),
-
-      mediumStay(v.maxWidth),
-      mediumStay(v.maxHeight),
-      */
-
-      /*
-      weakStay(v.left, 1),
-      weakStay(v.top, 1),
-      weakStay(v.right, 1),
-      weakStay(v.bottom, 1),
-      */
-
       leq(v.width,         v.maxWidth, medium, 3),
       leq(v.height,        v.maxHeight, medium, 3),
       leq(v.contentWidth,  v.maxContetnWidth, medium, 2),
@@ -563,6 +544,7 @@ scope.Panel = c.inherit({
       this.constraints.push(cns);
       if (this._attached) { s.addConstraint(cns); }
     }, this);
+    s.resolve();
     s.autoSolve = true;
     return this;
   },
@@ -577,12 +559,11 @@ scope.Panel = c.inherit({
       if (ci >= 0) {
         this.constraints.splice(ci, 1);
         if (this._attached) {
-          // FIXME(slightlyoff):
-          //    when we turn off auto-solving, update this to mark us unsolved.
-          document.solver.removeConstraint(cns);
+          s.removeConstraint(cns);
         }
       }
     }, this);
+    s.resolve();
     s.autoSolve = true;
     return this;
   },
@@ -699,14 +680,13 @@ scope.RootPanel = c.inherit({
       var iwv = window.innerWidth;
       var ihv = window.innerHeight;
 
-      // Time resolution
       // console.time("resolve");
 
       s.addEditVar(iw)
        .addEditVar(ih).beginEdit();
 
       s.suggestValue(iw, iwv)
-       .suggestValue(ih, ihv).resolve();
+       .suggestValue(ih, ihv); // .resolve();
 
       s.endEdit();
 
