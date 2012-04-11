@@ -58,6 +58,10 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
           l[idx] = l[idx][items.shift()];
         }
       });
+    } else if(l == "previous") {
+      l = [ this.previousElementSibling ];
+    } else if(l == "next") {
+      l = [ this.nextElementSibling ];
     } else {
       l = [ document.querySelector(l) ];
     }
@@ -78,6 +82,9 @@ var valueSetter = function(item, varOrValue, oper, strength) {
   if (typeof varOrValue == "string") {
     if (typeof this[slot] == "boolean") {
       varOrValue = (varOrValue == "true");
+    } else if (varOrValue == "inherit") {
+      oper = "=";
+      varOrValue = this.parentNode.v[item];
     } else if (varOrValue.charAt(0) == "#") {
       var items = varOrValue.split(".");
       var id = items.shift().slice(1);
@@ -166,6 +173,7 @@ scope.Panel = c.inherit({
       _above: [],
       _below: [],
       _centeredIn: [],
+      _avoid: [],
       constraints: [],
 
       v: {}, // Our variables
@@ -656,8 +664,18 @@ scope.Panel = c.inherit({
     this.add.apply(this, this._centeredIn);
     this._centeredIn.other = other;
   },
-
   get centeredIn() { return this._centeredIn.other; },
+
+  /*
+  set avoid(other) {
+    this.remove.apply(this, this._avoid);
+    this._avoid = [
+    ];
+    this.add.apply(this, this._avoid);
+    this._avoid.other = other;
+  },
+  get avoid(other) { return this._avoid.other; },
+  */
 });
 
 HTMLElement.register(Panel);

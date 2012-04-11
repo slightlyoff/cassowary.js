@@ -36,7 +36,17 @@
       window.addEventListener("DOMContentLoaded", function(e) {
         "use strict";
 
+        // Put a button in the center of the page
         $("#button").centeredIn = $("#root");
+
+        var menu = $("menu"),
+            sub = $("submenu");
+        // Descending strengths of constraints:
+        //  - Menus should always be inside the page
+        //  - Menus should not overlap their parent menu if possible.
+        //  - Menus should maintain their width
+        //  - Menus should maintain their height
+
       }, false);
     </script>
 
@@ -46,16 +56,106 @@
         background-color: #527DFF;
         border-radius: 4px;
         font-size: 15px;
+        line-height: 30px;
         font-weight: bold;
-        padding: 4px 7px 4px 7px;
         text-align: center;
+        vertical-align: center;
+      }
+
+      /* FIXME(slightlyoff) */
+      .menu {
+        background-color: #527DFF;
+        border-radius: 4px;
+        font-size: 15px;
+        line-height: 30px;
+        font-weight: bold;
+      }
+
+      .menu > * {
+        line-height: 30px;
+        color: white;
+        border-bottom: 1px solid white;
+        padding-left: 1em;
+        padding-right: 1em;
       }
     </style>
   </head>
   <body debug="false" id="root">
 
-    <x-panel id="button" preferredWidth="80" preferredHeight="30">
-      Howdy!
+    <x-panel id="button" preferredWidth="100" preferredHeight="30">
+      Howdy! &#9660;
+    </x-panel>
+
+    <x-panel id="menu"
+      minWidth="200" preferredHeight="300"
+      top="#button.v.bottom" left="#button.v.left" class="menu">
+      <x-panel preferredHeight="30"
+        preferredWidth="#menu.v.width" left="inherit" top="#menu.v.top" id="i1">
+        Item 1
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="i2">
+        Item 2
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="i3">
+        Item 3
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="i4">
+        Item 4 <span style="float: right;">&#9654;</span>
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="i5">
+        Item 5
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="i6">
+        Item 6
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="i7">
+        Item 7
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="i8">
+        Item 8
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="i9">
+        Item 9
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="i10">
+        Item 10
+      </x-panel>
+    </x-panel>
+
+    <x-panel id="submenu"
+      minWidth="200" preferredHeight="500"
+      top="#i4.v.top" rightOf="#i4" class="menu">
+      <x-panel preferredHeight="30"
+        preferredWidth="#submenu.v.width" left="#submenu.v.left" top="#submenu.v.top" id="si1">
+        Item 1
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="si2">
+        Item 2
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="si3">
+        Item 3
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="si4">
+        Item 4
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="si5">
+        Item 5
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="si6">
+        Item 6
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="si7">
+        Item 7
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="si8">
+        Item 8
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="si9">
+        Item 9
+      </x-panel>
+      <x-panel preferredHeight="30" left="inherit" right="inherit" below="previous" id="si10">
+        Item 10
+      </x-panel>
     </x-panel>
 
   </body>
