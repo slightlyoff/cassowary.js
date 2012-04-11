@@ -165,6 +165,7 @@ scope.Panel = c.inherit({
       _rightOf: [],
       _above: [],
       _below: [],
+      _centeredIn: [],
       constraints: [],
 
       v: {}, // Our variables
@@ -630,10 +631,33 @@ scope.Panel = c.inherit({
         if (b.hasOwnProperty(prop)) { this[prop] = b[prop]; } }, this);
   },
 
-  centerIn: function(panel) {
-    // TODO(slightlyoff)
+  set centeredIn(other) {
+    this.remove.apply(this, this._centeredIn);
+    this._centeredIn = [
+      // this.left = other.left + (other.width/2 - this.width/2)
+      eq(this.v.left,
+        c.Plus(other.v.left, 
+          c.Minus(
+            c.Divide(other.v.width, 2),
+            c.Divide(this.v.width, 2)
+          )
+        ), medium, 2),
+
+      // this.top = other.top + (other.height/2 - this.height/2)
+      eq(this.v.top,
+        c.Plus(other.v.top, 
+          c.Minus(
+            c.Divide(other.v.height, 2),
+            c.Divide(this.v.height, 2)
+          )
+        ), medium, 2)
+    ];
+
+    this.add.apply(this, this._centeredIn);
+    this._centeredIn.other = other;
   },
 
+  get centeredIn() { return this._centeredIn.other; },
 });
 
 HTMLElement.register(Panel);

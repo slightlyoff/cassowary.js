@@ -91,7 +91,6 @@ c.LinearExpression = c.inherit({
     }
   },
 
-
   divide: function(x) {
     if (typeof x == 'number') {
       if (c.approx(x, 0)) {

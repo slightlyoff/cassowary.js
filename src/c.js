@@ -190,6 +190,13 @@ scope.c = {
   },
 
   Divide: function(e1 /*c.LinearExpression*/, e2 /*c.LinearExpression*/) {
+    if (typeof e1 == "number" || e1 instanceof c.Variable) {
+      e1 = new c.LinearExpression(e1);
+    }
+    if (typeof e2 == "number" || e2 instanceof c.Variable) {
+      e2 = new c.LinearExpression(e2);
+    }
+
     return e1.divide(e2);
   },
 

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <!--
+    Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
+    Use of this source code is governed by the LGPL, which can be found in the
+    COPYING.LGPL file.
+  -->
+  <head>
+    <title>Bork bork bork</title>
+
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link href="panels.css" rel="stylesheet" type="text/css">
+
+    <script defer="defer" src="../../src/c.js"></script>
+    <script defer="defer" src="../../src/HashTable.js"></script>
+    <script defer="defer" src="../../src/HashSet.js"></script>
+    <script defer="defer" src="../../src/Error.js"></script>
+    <script defer="defer" src="../../src/SymbolicWeight.js"></script>
+    <script defer="defer" src="../../src/Strength.js"></script>
+    <script defer="defer" src="../../src/Variable.js"></script>
+    <script defer="defer" src="../../src/Point.js"></script>
+    <script defer="defer" src="../../src/LinearExpression.js"></script>
+    <script defer="defer" src="../../src/Constraint.js"></script>
+    <script defer="defer" src="../../src/LinearConstraint.js"></script>
+    <script defer="defer" src="../../src/EditInfo.js"></script>
+    <script defer="defer" src="../../src/Tableau.js"></script>
+    <script defer="defer" src="../../src/SimplexSolver.js"></script>
+    <script defer="defer" src="../../src/Timer.js"></script>
+
+    <script defer="defer" src="../../util/mutation-summary/mutation_summary.js"></script>
+    <script defer="defer" src="domutil.js"></script>
+    <script defer="defer" src="panels.js"></script>
+
+    <script defer="defer">
+      window.addEventListener("DOMContentLoaded", function(e) {
+        "use strict";
+
+        $("#button").centeredIn = $("#root");
+      }, false);
+    </script>
+
+    <style>
+      #button {
+        color: white;
+        background-color: #527DFF;
+        border-radius: 4px;
+        font-size: 15px;
+        font-weight: bold;
+        padding: 4px 7px 4px 7px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body debug="false" id="root">
+
+    <x-panel id="button" preferredWidth="80" preferredHeight="30">
+      Howdy!
+    </x-panel>
+
+  </body>
+</html>
