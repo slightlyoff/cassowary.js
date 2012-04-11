@@ -83,18 +83,16 @@
     -->
 
     <x-panel id="channels"
-      right="#root.v.right"
-      top="#root.v.top"
-      bottom="#root.v.bottom"
+      right="inherit" top="inherit" bottom="inherit"
       preferredWidth="200"
       minWidth="100" maxWidth="300"
       debug="false">
     </x-panel>
 
     <x-panel id="masthead"
-      left="#root.v.left"
+      left="inherit"
       right="#channels.v.left"
-      top="#root.v.top"
+      top="inherit"
       minHeight="50" height="50" maxHeight="100"
       debug="false">
       <div>
@@ -106,7 +104,7 @@
     </x-panel>
 
     <x-panel id="submast"
-      left="#root.v.left"
+      left="inherit"
       right="#channels.v.left"
       top="#masthead.v.bottom"
       minHeight="50" height="50" maxHeight="100"
@@ -115,14 +113,14 @@
 
     <x-panel id="contacts"
       right="#channels.v.left"
-      below="#submast"
-      bottom="#root.v.bottom"
+      below="previous"
+      bottom="inherit"
       maxWidth="200" minWidth="100"
       debug="false">
     </x-panel>
 
     <x-panel id="chatter"
-      left="#root.v.left"
+      left="inherit"
       right="#contacts.v.left"
       top="#submast.v.bottom"
       minHeight="0" height="25" maxHeight="25"
@@ -131,7 +129,7 @@
     </x-panel>
 
     <x-panel id="timeinfo"
-      left="#root.v.left"
+      left="inherit"
       right="#contacts.v.left"
       top="#chatter.v.bottom"
       minHeight="0" maxHeight="26"
@@ -145,9 +143,9 @@
     </x-panel>
 
     <x-panel id="input"
-      left="#root.v.left"
+      left="inherit"
       right="#contacts.v.left"
-      bottom="#root.v.bottom"
+      bottom="inherit"
       minHeight="40"
       maxHeight="40"
       debug="false">
@@ -190,7 +188,7 @@
     </x-panel>
 
     <x-panel id="bottomchatter"
-      left="#root.v.left"
+      left="inherit"
       right="#contacts.v.left"
       bottom="#input.v.top"
       minHeight="0" height="25" maxHeight="25"
@@ -199,7 +197,7 @@
     </x-panel>
 
     <x-panel id="discussion"
-      left="#root.v.left"
+      left="inherit"
       right="#contacts.v.left"
       bottom="#bottomchatter.v.top"
       top="#timeinfo.v.bottom"
