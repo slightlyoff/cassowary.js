@@ -1,3 +1,9 @@
+/**
+ * Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
+ * Use of this source code is governed by the LGPL, which can be found in the
+ * COPYING.LGPL file.
+ */
+
 (function(scope) {
 "use strict";
 
@@ -77,7 +83,7 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
   this.add.apply(this, this[ln]);
 };
 
-var valueSetter = function(item, varOrValue, oper, strength) {
+var valueSetter = function(item, varOrValue, oper, strength, weight) {
   var slot = "_" + item;
   if (typeof varOrValue == "string") {
     if (typeof this[slot] == "boolean") {
@@ -104,8 +110,10 @@ var valueSetter = function(item, varOrValue, oper, strength) {
   if (oper && oper != "=") {
     if (oper == ">=") oper = c.GEQ;
     if (oper == "<=") oper = c.LEQ;
+    // this[slot] = new c.LinearInequality(this.v[item], oper, varOrValue, strength||weak, weight||1);
     this[slot] = new c.LinearInequality(this.v[item], oper, varOrValue, strength);
   } else {
+    // this[slot] = new c.LinearEquation(this.v[item], varOrValue, strength||weak, weight||1);
     this[slot] = new c.LinearEquation(this.v[item], varOrValue, strength);
   }
   this.add(this[slot]);
@@ -597,10 +605,10 @@ scope.Panel = c.inherit({
   // FIXME(slightlyoff):
   //    need to add max* and min* versions of all of the below
 
-  set top(v)    { valueSetter.call(this, "top", v, "=", weak);    },
-  set bottom(v) { valueSetter.call(this, "bottom", v, "=", weak); },
-  set left(v)   { valueSetter.call(this, "left", v, "=", weak);   },
-  set right(v)  { valueSetter.call(this, "right", v, "=", weak);  },
+  set top(v)    { valueSetter.call(this, "top",    v, "=", strong); },
+  set bottom(v) { valueSetter.call(this, "bottom", v, "=", strong); },
+  set left(v)   { valueSetter.call(this, "left",   v, "=", strong); },
+  set right(v)  { valueSetter.call(this, "right",  v, "=", strong); },
 
   get top()     { return valueGetter.call(this, "top"); }, 
   get bottom()  { return valueGetter.call(this, "bottom"); },
