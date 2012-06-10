@@ -7,8 +7,6 @@
 "use strict";
 
 doh.add("c.LinearConstraint", [
-  // FIXME(slightlyoff): these tests are STUPID. FIXME>
-
   function equationFromExpression(t) {
     var ex = new c.LinearExpression();
     var c1 = new c.LinearEquation(ex);
@@ -27,4 +25,27 @@ doh.add("c.LinearConstraint", [
     var cly = new c.LinearExpression(y);
     var eq = new c.LinearEquation(x, cly);
   },
+
+  function equationStrengthTest(t) {
+    var solver = new c.SimplexSolver();
+    var x = new c.Variable("x", 10);
+    var y = new c.Variable("y", 20);
+    var z = new c.Variable("z", 1);
+    var e0 = new c.LinearEquation(x, y);
+    solver.addStay(x)
+          .addStay(y);
+    solver.addConstraint(e0);
+    print("x: " + x.value());
+    print("y: " + y.value());
+
+    var e1 = new c.LinearEquation(x, y, c.Strength.weak);
+    solver.addConstraint(e1);
+    print("x: " + x.value());
+    print("y: " + y.value());
+
+    // var leq = new c.LinearInequality(a, c.LEQ, b, c.Strength.strong);
+    // print(a.value());
+    // print(b.value());
+    // t.is(a.value(
+  }
 ]);

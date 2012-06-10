@@ -544,6 +544,42 @@ doh.add("End-To-End", [
     reCalc();
     reCalc();
   },
+
+  function errorWeights(t) {
+    var solver = new c.SimplexSolver();
+
+    var weak = c.Strength.weak;
+    var medium = c.Strength.medium;
+    var strong = c.Strength.strong;
+    var required = c.Strength.required;
+
+    var eq  = function(a1, a2, strength, w) {
+      return new c.LinearEquation(a1, a2, strength || weak, w||0);
+    };
+
+    var x = new c.Variable("x", 100);
+    var y = new c.Variable("y", 200);
+    var z = new c.Variable("z",  50);
+    t.is(x.value(), 100);
+    t.is(y.value(), 200);
+    t.is(z.value(),  50);
+
+    solver.addConstraint(new c.LinearEquation(z,   x,   weak))
+          .addConstraint(new c.LinearEquation(x,  20,   weak))
+          .addConstraint(new c.LinearEquation(y, 200, strong));
+
+    t.is(x.value(),  20);
+    t.is(y.value(), 200);
+    t.is(z.value(),  20);
+
+    solver.addConstraint(
+      new c.LinearInequality(c.Plus(z, 150), c.LEQ, y, medium)
+    );
+
+    t.is(x.value(),  20);
+    t.is(y.value(), 200);
+    t.is(z.value(),  20);
+  },
 ]);
 
 })();
