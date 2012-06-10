@@ -57,6 +57,13 @@ c.SimplexSolver = c.inherit({
     return this;
   },
 
+  add: function(/*c.Constraint, ...*/) {
+    for (var x = 0; x < arguments.length; x++) {
+      this.addConstraint(arguments[x]);
+    }
+    return this;
+  },
+
   addConstraint: function(cn /*c.Constraint*/) {
     // console.log("addConstraint: " + cn);
     if (c.trace) c.fnenterprint("addConstraint: " + cn);
