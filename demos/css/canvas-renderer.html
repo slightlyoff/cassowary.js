@@ -18,6 +18,8 @@
 
       Open issues:
         * How to demonstrate that we're doing what we say?
+        * Tables and flexbox are still TODO
+        * %-based widths aren't correctly resolved yet
         * Is there an HTML/CSS parser written in JS that does style resolution
           already? Could I go full-stack that way?
         * Would be slick to have a JSON serialization format for the render
@@ -59,11 +61,16 @@
 
     <script defer="defer" src="../../util/mutation-summary/mutation_summary.js"></script>
 
-    <!--
-      Emits CSS box rules to a solver and returns an array of variables which contain "box objects" which can be used to render their contents
-    -->
     <script src="util.js"></script>
+    <!--
+      Emits CSS box rules to a solver and returns an array of variables which
+      contain "box objects" that are used to render their contents
+    -->
     <script defer="defer" src="layout.js"></script>
+
+    <!--
+      Takes box objects and draws them to an HTML5 2d canvas.
+    -->
     <script defer="defer" src="renderer.js"></script>
 
     <script>
