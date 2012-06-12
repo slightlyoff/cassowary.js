@@ -287,13 +287,34 @@ var Edgy = function() {
 var VarHeavy = function(properties) {
   this.values = {};
   this.vars = {};
+  this.value = function(p, v) {
+    var pn = toCamelCase(p);
+    var val = this.values[pn];
+    if (typeof v != "undefined") {
+      if (!val) {
+        val = this.values[pn] = new CSSValue(p, v);
+      } else {
+        val.value = v;
+      }
+    }
+    return val;
+  };
+  this.var = function(p, v) {
+    var pn = toCamelCase(p);
+    var varv = this.vars[pn];
+    if (typeof v != "undefined") {
+      if (!varv) {
+        varv = this.vars[pn] = new c.Variable(p, v);
+      } else {
+        varv._value = v;
+      }
+    }
+    return varv;
+  };
   properties.forEach(function(p) {
-    this.values[toCamelCase(p)] = new CSSValue(p, "auto");
-    this.vars[toCamelCase(p)]   = new c.Variable(p);
+    this.value(p, "auto");
+    this.var(p, p)
   }, this);
-  this.value = function(p) {
-    return this.values[toCamelCase(p)]; };
-  this.var = function(p) { return this.vars[toCamelCase(p)]; };
 };
 
 var Nodey = function(node, properties) {
@@ -335,8 +356,8 @@ var FlowRoot = function() {
 
     this._flowBoxes.forEach(function(child) {
 
-      if (!isInFlow(child.node)) {
-        console.warn("not in flow!", child.node);
+      if (!isInFlow(child.node) && !(child instanceof AnonymousBlock)) {
+        console.warn("not in flow!: " + child);
         return;
       }
 
@@ -480,44 +501,44 @@ var RenderBox = c.inherit({
     );
 
     constrain(
-      eq(c.Minus(ref.padding._top, this.value("border-top-width").px),
+      eq(c.Minus(ref.padding._top, vals.borderTopWidth.px),
         ref.border._top,
         required
       ),
-      eq(c.Minus(ref.padding._left, this.value("border-left-width").px),
+      eq(c.Minus(ref.padding._left, vals.borderLeftWidth.px),
         ref.border._left,
         required
       ),
-      eq(c.Plus(ref.padding._right, this.value("border-right-width").px),
+      eq(c.Plus(ref.padding._right, vals.borderRightWidth.px),
         ref.border._right,
         required
       ),
-      eq(c.Plus(ref.padding._bottom, this.value("border-bottom-width").px),
+      eq(c.Plus(ref.padding._bottom, vals.borderBottomWidth.px),
         ref.border._bottom,
         required
       )
     );
 
     constrain(
-      eq(c.Minus(ref.border._top, this.value("margin-top").px),
+      eq(c.Minus(ref.border._top, vals.marginTop.px),
         ref.margin._top,
         required
       ),
-      eq(c.Minus(ref.border._left, this.value("margin-left").px),
+      eq(c.Minus(ref.border._left, vals.marginLeft.px),
         ref.margin._left,
         required
       ),
-      eq(c.Plus(ref.border._right, this.value("margin-right").px),
+      eq(c.Plus(ref.border._right, vals.marginRight.px),
         ref.margin._right,
         required
       ),
-      eq(c.Plus(ref.border._bottom, this.value("margin-bottom").px),
+      eq(c.Plus(ref.border._bottom, vals.marginBottom.px),
         ref.margin._bottom,
         required
       )
     );
 
-    // console.log("width:", width.raw);
+    // FIXME: if %-valued, need to do the obvious thing
     if (!vals.width.isAuto) {
       constrain(
         eq(c.Plus(ref.content._left, this.value("width").px),
@@ -526,7 +547,7 @@ var RenderBox = c.inherit({
         )
       );
     }
-    // console.log("height:", height.raw);
+
     if (!vals.height.isAuto) {
       constrain(
         eq(c.Plus(ref.content._top, this.value("height").px),
@@ -553,19 +574,13 @@ var RenderBox = c.inherit({
     constrain(eq(this.var("width"), this.naturalSize.width, medium));
 
     if (!vals.width.isAuto) {
-      // console.log("width:", width + "");
-      constrain(eq(this.var("width"),
-                   this.value("width").px,
-                   strong)
-      );
+      constrain(eq(vars.width, vals.width.px, strong));
     }
 
-    constrain(eq(this.var("height"), this.naturalSize.height, medium));
+    constrain(eq(vars.height, this.naturalSize.height, medium));
 
     if (!vals.height.isAuto) {
-      // console.log("height:", height + "");
-      constrain(eq(this.var("height"),
-                   this.value("height").px, strong));
+      constrain(eq(vars.height, vals.height.px, strong));
     }
 
     [
@@ -636,7 +651,7 @@ var RenderBox = c.inherit({
     // TODO(slightlyoff)
     //
     var pos = vals.position;
-    console.log("pos:", pos+" {", vals.top+"", vals.right+"", vals.bottom+"", vals.left+" }");
+    // console.log("pos:", pos+" {", vals.top+"", vals.right+"", vals.bottom+"", vals.left+" }");
     if (pos == "relative") {
       if (!vals.top.isAuto) {
         constrain(
