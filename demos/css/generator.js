@@ -164,6 +164,11 @@ var isInline = function(n) {
   );
 };
 
+var isFixed = function(n) {
+  if (!isElement(n)) return false;
+  return (css("position", n).raw == "fixed");
+};
+
 var isPositioned = function(n) {
   // TODO(slightlyoff): should floated elements be counted as positioned here?
   if (!isElement(n)) return false;
@@ -286,21 +291,21 @@ var FlowRoot = c.inherit({
   _className: "FlowRoot",
 })
 
-var RenderBlock = c.inherit({
+var Block = c.inherit({
   extends: RenderBox,
-  _className: "RenderBlock",
+  _className: "Block",
   initialize: function(node, containingBlock){
     RenderBox.call(this, node, containingBlock);
   },
 });
 
-var InlineBox = c.inherit({
+var Inline = c.inherit({
   extends: RenderBox,
   _className: "RenderBox",
 });
 
 var AnonymousBlock = c.inherit({
-  extends: RenderBlock,
+  extends: Block,
   _className: "AnonymousBlock",
   ...
 });
@@ -336,10 +341,13 @@ var FlowRoot = function() {
 
     this.flowBoxes.forEach(function(child) {
       console.log("flowing:", child.node);
+
+      /*
       if (!isInFlow(child.node)) {
         console.warn("not in flow!", child.node);
         return;
       }
+      */
 
       switch(this.blockProgression) {
         case "tb":
@@ -723,22 +731,40 @@ var RenderBox = c.inherit({
   },
 });
 
+var Block = c.inherit({
+  extends: RenderBox, // TODO: Block, 
+  _className: "Block",
+  initialize: function(node, cb){
+    RenderBox.call(this, node, cb);
+    cb.addBlock(this);
+    this._hasBlocks = false;
+    this._hasInlines = false;
+  },
+  addBlock: function(b) {
+    if (b == this) { return; }
+    console.log("block:", this.node.tagName, "got block", b.node);
+  },
+  addInline: function(i) {
+    console.log("block:", this.node.tagName, "got inline", i.node);
+    // TODO(slightlyoff): anonymous box generation!
+  },
+});
+
 var Viewport = c.inherit({
-  extends: RenderBox, // TODO: RenderBlock, 
+  extends: Block, // TODO: Block, 
   _className: "Viewport", // for toString()
   initialize: function(width, height, node){
     // Viewport:
     //  The item that everything else is realtive to. It takes a source node
     //  whose dimensions it copies, setting margin/padding/border to zero.
     this.solver = new c.SimplexSolver();
-    RenderBox.call(this, node);
+    Block.call(this, node, this);
     FlowRoot.call(this);
-    //TODO: RenderBlock.call(this, node);
+    //TODO: Block.call(this, node);
     this.naturalSize = new MeasuredBox(0, 0, width, height);
     this.containingBlock = this;
     this.generate();
   },
-
   generate: function() {
     var actual = this.edges.actual;
     var solver = this.solver;
@@ -758,12 +784,14 @@ var Viewport = c.inherit({
 });
 
 
-var InlineBox = c.inherit({
+var Inline = c.inherit({
   extends: RenderBox,
-  _className: "InlineBox", // for toString()
+  _className: "Inline", // for toString()
   initialize: function(node, cb){
     RenderBox.call(this, node, cb);
+    cb.addInline(this);
   },
+  /*
   follow: function() {
     // Called once our container's width is determined. We assume our previous
     // sibling has been placed. If no sibling, we root ourselves at our
@@ -784,23 +812,22 @@ var InlineBox = c.inherit({
       console.log("no prev!");
     }
 
-    /*
-    constrain(
-      geq(containing.content._right, actual.content._right, strong),
-      geq(containing.content._top,   actual.content._bottom, strong)
-    );
-    */
+    // constrain(
+    //   geq(containing.content._right, actual.content._right, strong),
+    //   geq(containing.content._top,   actual.content._bottom, strong)
+    // );
   },
   newLine: function() {
   },
+  */
 });
 
 var TextBox = c.inherit({
-  extends: InlineBox,
+  extends: Inline,
   _className: "TextBox", // for toString()
   initialize: function(node, cb){
     this.text = node.nodeValue;
-    InlineBox.call(this, node, cb);
+    Inline.call(this, node, cb);
     this.edges.ref = null; // We deal only in actual values.
   },
   generate: function() {
@@ -964,10 +991,26 @@ var _generateFor = function(id, boxesCallback) {
     // our ancestors to see which one is block, else our containing block is
     // the viewport.
 
+    // Positioned elements need positioned parents!
     var pn = n.parentNode;
-    while (pn && pn != dde && !isBlock(pn)) {
-      pn = pn.parentNode;
+
+    if (isFixed(n)) {
+      // Fixed elements are always relative to the viewport.
+      pn = dde;
+    } else {
+      if (!isPositioned(n)) {
+        while (pn && pn != dde && !isBlock(pn)) {
+          pn = pn.parentNode;
+        }
+      } else {
+        // console.log("looking for a positioned parent for:", n);
+        while (pn && pn != dde && !(isBlock(pn) && isPositioned(pn))) {
+          pn = pn.parentNode;
+        }
+        // console.log("found:", pn);
+      }
     }
+
     if (!pn) { pn = dde; }
     return nodeToBoxMap.get(pn);
   };
@@ -994,49 +1037,18 @@ var _generateFor = function(id, boxesCallback) {
       // console.log("isBlock:", isBlock(node), "isInline:", isInline(node), node);
       // console.log("containgBlock node:", getContainingBlock(node).node);
 
-      // TODO(slightlyoff): anonymous box generation!
-  
-      /*
-      if (isPositioned(node)) {
-        switch(css("position", node).raw) {
-          case "fixed":
-            // Fixed elements are always relative to the viewport.
-            break;
-          case "absolute":
-            // Absolute elements are contained by their nearest non-static ancestor.
-            var pn = node.parentNode;
-            while (pn && pn != dde && css("position", pn).raw == "static") {
-              // console.log("pn:", pn);
-              pn = pn.parentNode;
-            }
-            pn = pn || dde;
-            // console.log("absolute containing node:", pn, "containing box:", nodeToBoxMap.get(pn).toString());
-            tContaining = nodeToBoxMap.get(pn);
-            break;
-          case "center":
-            console.warn("position: center; is currently unsupported!");
-            break;
-          case "page":
-            console.warn("position: page; is currently unsupported!");
-            // TODO(slightlyoff)
-            break;
-          default: break;
-        }
-      } else {
-        tContaining = nodeToBoxMap.get(node.parentNode);
-      }
-      */
-
       // TODO(slightlyoff): implement run-in detection
       var b;
       if (isBlock(node)) {
-        b = new RenderBox(node, cb);
+        b = new Block(node, cb);
       }
       if (isInline(node)) {
-        b = new InlineBox(node, cb);
+        b = new Inline(node, cb);
       }
 
-      getFlowRoot(node).flowBoxes.push(b);
+      if (isInFlow(node)) {
+        getFlowRoot(node).flowBoxes.push(b);
+      }
       nodeToBoxMap.set(node, b);
       boxes.push(b);
       if (b.flowRoot) {
@@ -1067,7 +1079,6 @@ var _generateFor = function(id, boxesCallback) {
           nodeToBoxMap.set(head, b);
           boxes.push(b);
           prev = b;
-          // console.log("'"+head.nodeValue+"'");
         }
         head = tail;
       });
