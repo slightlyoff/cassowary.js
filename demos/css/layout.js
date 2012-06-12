@@ -951,7 +951,7 @@ var contentSize = function(node) {
   return new MeasuredBox(0, 0, m.scrollWidth, m.scrollHeight);
 };
 
-var _generateFor = function(id, boxesCallback) {
+var _layoutFor = function(id, boxesCallback) {
   // TODO(slightlyoff):
   //    Make generic by allowing the current document/scope to be
   //    generated for in addition to same-domain iframes.
@@ -1212,8 +1212,8 @@ var _generateFor = function(id, boxesCallback) {
   boxesCallback(boxes);
 };
 
-scope.generateFor = function(id, boxesCallback) {
-  ready(function() { _generateFor(id, boxesCallback) }, id);
+scope.layoutFor = function(id, boxesCallback) {
+  ready(function() { _layoutFor(id, boxesCallback) }, id);
 };
 
 })(this);

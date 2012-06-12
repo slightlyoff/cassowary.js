@@ -63,7 +63,7 @@
       Emits CSS box rules to a solver and returns an array of variables which contain "box objects" which can be used to render their contents
     -->
     <script src="util.js"></script>
-    <script defer="defer" src="generator.js"></script>
+    <script defer="defer" src="layout.js"></script>
     <script defer="defer" src="renderer.js"></script>
 
     <script>
@@ -72,7 +72,7 @@
       // this.renderDebug = true;
 
       ready(function() {
-        generateFor("f", function(boxes) {
+        layoutFor("f", function(boxes) {
           renderTo("c", boxes);
         });
       });
