@@ -284,6 +284,15 @@ var Edgy = function() {
   this.edges.actual.inner = this.edges.actual.content;
 };
 
+var EdgyLight = function() {
+  // We don't really have the potential to be rel pos or margin/padding/border,
+  // so we make content/margin/padding/border all the same and only deal in
+  // actual, outer values.
+  this.edges = { actual: { margin: new Box() } }
+  var e = this.edges.ref = this.edges.actual;
+  e.content = e.padding = e.border = e.inner = e.outer = e.margin;
+}
+
 var VarHeavy = function(properties) {
   this.values = {};
   this.vars = {};
@@ -337,6 +346,13 @@ var FlowRoot = function() {
   this._flowBoxes = [];
   this.addFlowBox = function(b) {
     console.log("addFlowBox(", b+")", "to FlowRoot", this+"");
+    if (this._flowBoxes.length) {
+      console.log("-- after: " + this._flowBoxes[this._flowBoxes.length - 1]);
+      console.log("--      :",   this._flowBoxes[this._flowBoxes.length - 1].node);
+    }
+    if (b.node) {
+      console.log(b.node);
+    }
     b.flowRoot = this;
     this._flowBoxes.push(b);
   };
@@ -801,13 +817,8 @@ var AnonymousBlock = c.inherit({
   _className: "AnonymousBlock",
   initialize: function(cb){
     this._id = _boxCtr++;
-    Edgy.call(this);
-    // We don't really have the potential to be rel pos, so we make
-    // content/margin/padding/border all the same and only deal in actual
-    // values.
-    this.edges.ref = this.edges.actual;
-    this.edges.actual.content = this.edges.actual.padding =
-       this.edges.actual.border = this.edges.actual.margin;
+    EdgyLight.call(this);
+
     VarHeavy.call(this, this.boxProperties);
     this.containingBlock = cb;
     this.solver = cb.solver;
@@ -863,6 +874,7 @@ var AnonymousBlock = c.inherit({
     // end, we set our height to be the height of the 
     var lb = new LineBox(this);
     lb.below(actual.outer._top);
+    console.log("FIRST LINEBOX AT:", lb.edges.actual.outer.left, lb.edges.actual.outer.top);
     this.lineBoxes.push(lb);
     var l = actual.outer._left.value();
     var w = vars.width.value();
@@ -873,6 +885,7 @@ var AnonymousBlock = c.inherit({
         var nlb = new LineBox(this);
         this.lineBoxes.push(nlb);
         nlb.below(lb.edges.actual.outer._bottom);
+        console.log("NEWLINE AT:", nlb.edges.actual.outer.left, nlb.edges.actual.outer.top);
         lb = nlb;
       }
     }, this);
@@ -887,7 +900,6 @@ var AnonymousBlock = c.inherit({
     console.log("containing right:", containing.outer._right.value());
     console.log(this.toString());
     */
-
   },
 });
 
@@ -895,18 +907,20 @@ var LineBox = c.inherit({
   _className: "LineBox",
   initialize: function(cb){
     this._id = _boxCtr++;
-    Edgy.call(this);
+    EdgyLight.call(this);
     VarHeavy.call(this, this.boxProperties);
     this.containingBlock = cb;
     this.solver = cb.solver;
     this.inlines = [];
     this.accumulatedWidth = 0;
-    this.fitIn(cb);
+    this.maxHeight = 0;
+    this._heightConstraint = null;
+    this.fitIn();
   },
   boxProperties: [
     "width", "height", "left", "right", "top", "bottom",
   ],
-  fitIn: function(container) {
+  fitIn: function() {
     var actual = this.edges.actual;
     var containing = this.containingBlock.edges.actual;
     var vals = this.values;
@@ -933,22 +947,21 @@ var LineBox = c.inherit({
 
     // Set our left/right to our containing's
     this.solver.add(
-      eq(actual.outer._left, containing.outer._left, required),
+      eq(actual.outer._left,  containing.outer._left, required),
       eq(actual.outer._right, containing.outer._right, required)
     );
 
-    // Fake height for now
-    this.solver.add(geq(vars.height, 20, strong));
-    // console.log("my width:", vars.width.value());
-    // console.log("container width:", this.containingBlock.vars.width.value());
   },
   below: function(edge) {
+    // console.log("my top:", this.edges.actual.outer._top.value());
+    // console.log("container new top edge:", edge.value());
     this.solver.add( eq(this.edges.actual.outer._top, edge, required) );
+    // console.log("my new top:", this.edges.actual.outer._top.value());
   },
   canAccept: function(inline) {
     var outerWidth = this.containingBlock.vars.width.value();
-    console.log("canAccpet:", inline.vars.width.value(), this.accumulatedWidth,  outerWidth);
-    return (inline.vars.width.value() + this.accumulatedWidth <= outerWidth);
+    // console.log("canAccpet:", inline.edges.actual.outer.width, this.accumulatedWidth,  outerWidth);
+    return (inline.edges.actual.outer.width + this.accumulatedWidth <= outerWidth);
   },
   add: function(inline) {
     this.solver.add(
@@ -961,8 +974,19 @@ var LineBox = c.inherit({
          strong
       )
     );
-    this.accumulatedWidth += inline.vars.width.value();
-    console.log("left:", inline.edges.actual.outer._left.value(), "top:", inline.edges.actual.outer._top.value());
+    // console.log("width.value():", inline.vars.width.value(), ".width:", inline.edges.actual.outer.width);
+    this.accumulatedWidth += inline.edges.actual.outer.width;
+    var inlineHeight = inline.edges.actual.outer.height;
+    if (inlineHeight > this.maxHeight) {
+      // console.log("new max height:", inlineHeight, "up from", this.maxHeight);
+      this.maxHeight = inlineHeight;
+      if (this._heightConstraint) {
+        this.solver.removeConstraint(this._heightConstraint);
+      }
+      this._heightConstraint = eq(this.vars.height, 20, strong)
+      this.solver.add(this._heightConstraint);
+    }
+    // console.log("left:", inline.edges.actual.outer._left.value(), "top:", inline.edges.actual.outer._top.value());
   },
 });
 
@@ -1013,8 +1037,8 @@ var TextBox = c.inherit({
   initialize: function(node, cb){
     this.text = node.nodeValue;
     Inline.call(this, node, cb);
-    this.edges.ref = this.edges.actual;
-    this.edges.actual.outer = this.edges.actual.inner;
+    var e = this.edges.ref = this.edges.actual;
+    e.content = e.padding = e.border = e.inner = e.margin;
     this._generated = false;
   },
   toString: function() {
