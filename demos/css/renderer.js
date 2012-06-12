@@ -173,21 +173,21 @@ var paintText = function(box, ctx) {
               box.text);
   */
 
-  pathWithStyle(
-      ctx,
-      [
-        { x: o.left,  y: o.top },
-        { x: o.right, y: o.top },
-        { x: o.right, y: o.bottom },
-        { x: o.left,  y: o.bottom },
-        { x: o.left,  y: o.top },
-      ],
-      "rgba(173,173,173,0.7)",
-      1,
-      "solid"
-  );
-  /*
-  */
+  if (scope.renderDebug) {
+    pathWithStyle(
+        ctx,
+        [
+          { x: o.left,  y: o.top },
+          { x: o.right, y: o.top },
+          { x: o.right, y: o.bottom },
+          { x: o.left,  y: o.bottom },
+          { x: o.left,  y: o.top },
+        ],
+        "rgba(173,173,173,0.7)",
+        1,
+        "solid"
+    );
+  }
 };
 
 scope.renderTo = function(id, boxes) {

@@ -438,7 +438,7 @@ var RenderBox = c.inherit({
     return this._className + ": { top: " + m.top +
                                ", right: " + m.right +
                                ", bottom: " + m.bottom +
-                               ", left: " + m.left + " } box:" + this._id;
+                               ", left: " + m.left + " } box: " + this._id;
   },
 
   boxProperties: [
@@ -802,6 +802,12 @@ var AnonymousBlock = c.inherit({
   initialize: function(cb){
     this._id = _boxCtr++;
     Edgy.call(this);
+    // We don't really have the potential to be rel pos, so we make
+    // content/margin/padding/border all the same and only deal in actual
+    // values.
+    this.edges.ref = this.edges.actual;
+    this.edges.actual.content = this.edges.actual.padding =
+       this.edges.actual.border = this.edges.actual.margin;
     VarHeavy.call(this, this.boxProperties);
     this.containingBlock = cb;
     this.solver = cb.solver;
