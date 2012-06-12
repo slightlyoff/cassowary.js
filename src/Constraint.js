@@ -32,14 +32,6 @@ c.Constraint = c.inherit({
     return this.strength + " {" + this.weight + "} (" + this.expression +")";
   },
 
-  setAttachedObject: function(o /*Object*/) {
-    this._attachedObject = o;
-  },
-
-  getAttachedObject: function() {
-    return this._attachedObject;
-  },
-
   /* Never used!? */
   changeStrength: function(strength /*c.Strength*/) {
     if (this._times_added == 0) {
