@@ -303,17 +303,21 @@ var VarHeavy = function(properties) {
     var pn = toCamelCase(p);
     var varv = this.vars[pn];
     if (typeof v != "undefined") {
-      if (!varv) {
-        varv = this.vars[pn] = new c.Variable(p, v);
+      if (v instanceof c.Variable) {
+        varv = this.vars[pn] = v;
       } else {
-        varv._value = v;
+        if (!varv) {
+          varv = this.vars[pn] = new c.Variable(p, v);
+        } else {
+          varv._value = v;
+        }
       }
     }
     return varv;
   };
   properties.forEach(function(p) {
     this.value(p, "auto");
-    this.var(p, p)
+    this.var(p, p);
   }, this);
 };
 
@@ -322,7 +326,7 @@ var Nodey = function(node, properties) {
   this.css = css;
 
   properties.forEach(function(p) {
-    this.values[toCamelCase(p)] = css(p, this.node);
+    this.value(p, css(p, this.node).raw);
   }, this);
 };
 
@@ -541,7 +545,7 @@ var RenderBox = c.inherit({
     // FIXME: if %-valued, need to do the obvious thing
     if (!vals.width.isAuto) {
       constrain(
-        eq(c.Plus(ref.content._left, this.value("width").px),
+        eq(c.Plus(ref.content._left, vals.width.px),
           ref.content._right,
           required
         )
@@ -550,7 +554,7 @@ var RenderBox = c.inherit({
 
     if (!vals.height.isAuto) {
       constrain(
-        eq(c.Plus(ref.content._top, this.value("height").px),
+        eq(c.Plus(ref.content._top, vals.height.px),
           ref.content._bottom,
           required
         )
@@ -571,7 +575,7 @@ var RenderBox = c.inherit({
       )
     );
 
-    constrain(eq(this.var("width"), this.naturalSize.width, medium));
+    constrain(eq(vars.width, this.naturalSize.width, medium));
 
     if (!vals.width.isAuto) {
       constrain(eq(vars.width, vals.width.px, strong));
