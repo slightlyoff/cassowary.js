@@ -7,6 +7,10 @@
 (function(c) {
 "use strict";
 
+// FIXME(slightlyoff):
+//      Half of this file could removed with judicious use of getters/setters
+//      if we can get the perf in the right neighborhood.
+
 c.Point = c.inherit({
   initialize: function(x, y, suffix) {
     if (x instanceof c.Variable) {
@@ -32,12 +36,12 @@ c.Point = c.inherit({
     if (x instanceof c.Variable) {
       this.x = x;
     } else {
-      this.x.set_value(x);
+      this.x._value = x;
     }
     if (y instanceof c.Variable) {
       this.y = y;
     } else {
-      this.y.set_value(y);
+      this.y._value = y;
     }
   },
 

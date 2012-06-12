@@ -380,7 +380,7 @@ c.SimplexSolver = c.inherit({
 
   setEditedValue: function(v /*c.Variable*/, n /*double*/) {
     if (!this.FContainsVariable(v)) {
-      v.change_value(n);
+      v._value = n;
       return this;
     }
 
@@ -802,14 +802,14 @@ c.SimplexSolver = c.inherit({
       if (this.rowExpression(v) != null) {
         console.log("Error: variable" + v + " in _externalParametricVars is basic");
       } else {
-        v.change_value(0);
+        v._value = 0;
       }
     }, this);
     this._externalRows.each(function(v) {
       var expr = this.rowExpression(v);
       if (c.trace) c.debugprint("v == " + v);
       if (c.trace) c.debugprint("expr == " + expr);
-      v.change_value(expr.constant);
+      v._value = expr.constant;
     }, this);
     this._fNeedsSolving = false;
     this.onsolved();

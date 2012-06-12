@@ -56,8 +56,6 @@ c.Variable = c.inherit({
 
   // FIXME(slightlyoff)
   value: function() { return this._value; },
-  set_value: function(value) { this._value = value; },
-  change_value: function(value) { this._value = value; },
   setAttachedObject: function(o) { this._attachedObject = o; },
   getAttachedObject: function() { return this._attachedObject; },
 });
