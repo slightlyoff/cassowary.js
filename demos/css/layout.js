@@ -336,6 +336,7 @@ var FlowRoot = function() {
   this._isFlowRoot = true;
   this._flowBoxes = [];
   this.addFlowBox = function(b) {
+    console.log("addFlowBox(", b+")", "to FlowRoot", this+"");
     b.flowRoot = this;
     this._flowBoxes.push(b);
   };
@@ -351,10 +352,10 @@ var FlowRoot = function() {
     var ref = this.edges.ref;
     var actual = this.edges.actual;
     var containing = actual;
-    var solver = this.solver;
-    var constrain = solver.add.bind(solver);
+    var constrain = this.solver.add.bind(this.solver);
 
-    var last;
+    var prev = null;
+    var last = null;
 
     this._flowBoxes.forEach(function(child) {
 
@@ -375,13 +376,14 @@ var FlowRoot = function() {
           // Next, top is the previous bottom, else containing's content top;
           if (last) {
             constrain(
-              eq(child.edges.ref.margin._top, last.edges.ref.margin._bottom, strong)
+              eq(child.edges.actual.outer._top, last.edges.actual.outer._bottom, strong)
             );
           } else {
             constrain(
               eq(child.edges.ref.margin._top, containing.content._top, strong)
             );
           }
+          prev = last;
           last = child;
 
           // TODO(slightlyoff): margin collapsing!
@@ -394,7 +396,7 @@ var FlowRoot = function() {
                        this.blockProgression);
           break;
       }
-      console.log("flowing: " + child);
+      console.log("flowing: " + child + " in relation to: " + (prev||this));
     }, this);
   };
 };
@@ -435,8 +437,8 @@ var RenderBox = c.inherit({
     var m = this.edges.actual.margin;
     return this._className + ": { top: " + m.top +
                                ", right: " + m.right +
-                               ", bottom:" + m.bottom +
-                               ", left:" + m.left + " } box:" + this._id;
+                               ", bottom: " + m.bottom +
+                               ", left: " + m.left + " } box:" + this._id;
   },
 
   boxProperties: [
@@ -476,15 +478,17 @@ var RenderBox = c.inherit({
     "padding-right-width",
     "padding-bottom-width",
     "padding-left-width",
+    "font-size",
+    "font-family",
+    "color"
   ],
 
   generate: function() {
     // Constraints for all boxes
     var ref = this.edges.ref;
     var actual = this.edges.actual;
-    var solver = this.solver;
     var containing = this.containingBlock.edges.actual;
-    var constrain = solver.add.bind(solver);
+    var constrain = this.solver.add.bind(this.solver);
     var vals = this.values;
     var vars = this.vars;
 
@@ -751,7 +755,7 @@ var Block = c.inherit({
     this._hasBlocks = false;
     this._hasInlines = false;
     this._openAnonymousBlock = null;
-    this._anonymousBLocks = [];
+    this._anonymousBlocks = [];
   },
   addBlock: function(b) {
     if (b == this) { return; }
@@ -767,26 +771,28 @@ var Block = c.inherit({
       var oab = this._openAnonymousBlock = new AnonymousBlock(this);
       oab._isInFlow = true;
       oab.value("min-height", 10);
-      this._anonymousBLocks.push(oab);
-      console.log("adding:", oab.toString(), "to flow");
+      this._anonymousBlocks.push(oab);
       if (this._isFlowRoot) {
+        console.log("adding: " + oab, "to flow directly");
         this.addFlowBox(oab);
       } else if (this.flowRoot) {
+        console.log("adding: " + oab, "to flowRoot");
         this.flowRoot.addFlowBox(oab);
       } else {
         console.error("No FlowRoot found when attempting to flow anonymous box in:", this);
       }
+      // console.log(this._anonymousBlocks.length);
     }
     this._openAnonymousBlock.addInline(i);
   },
   // Hook layout generation and line-box filling
   generate: function() {
     RenderBox.prototype.generate.call(this);
-    this._anonymousBLocks.forEach(function(ab){ ab.generate(); });
+    this._anonymousBlocks.forEach(function(ab){ ab.generate(); });
   },
   fillLineBoxes: function() {
     RenderBox.prototype.fillLineBoxes.call(this);
-    this._anonymousBLocks.forEach(function(ab){ ab.fillLineBoxes(); });
+    this._anonymousBlocks.forEach(function(ab){ ab.fillLineBoxes(); });
   },
 });
 
@@ -804,9 +810,153 @@ var AnonymousBlock = c.inherit({
   },
   addInline: function(i) {
     // Collect inlines for line box generation.
+    this.inlines.push(i);
   },
   generate: function() {
-    // Stub us out.
+    var actual = this.edges.actual;
+    var containing = this.containingBlock.edges.actual;
+    var constrain = this.solver.add.bind(this.solver);
+    var vars = this.vars;
+
+    // Basic block model
+    constrain(
+      geq(vars.width, 0, required),
+      geq(vars.height, 0, required)
+    );
+
+    constrain(
+      eq(c.Plus(actual.outer._left, vars.width), actual.outer._right,
+        required
+      ),
+      eq(c.Plus(actual.outer._top, vars.height), actual.outer._bottom,
+        required
+      )
+    );
+
+
+    // Set our left/right to our containing's
+    constrain(
+      eq(actual.outer._left, containing.outer._left, required),
+      eq(actual.outer._right, containing.outer._right, required)
+    );
+
+    // Our top should come from the flow and our bottom will be generated as a
+    // result of filling line boxes.
+  },
+  fillLineBoxes: function() {
+    console.log("fillLineBoxes() for " + this);
+    var actual = this.edges.actual;
+    var containing = this.containingBlock.edges.actual;
+    var constrain = this.solver.add.bind(this.solver);
+    var vars = this.vars;
+    console.log("our top is:", actual.outer._top.value());
+    console.log("our container's top is:", containing.outer._top.value());
+
+    // Create at least one line box, fill it with our inlines until their
+    // cumulative widths overflow the block, and then keep going. At the very
+    // end, we set our height to be the height of the 
+    var lb = new LineBox(this);
+    lb.below(actual.outer._top);
+    this.lineBoxes.push(lb);
+    var l = actual.outer._left.value();
+    var w = vars.width.value();
+    this.inlines.forEach(function(i) {
+      if (lb.canAccept(i)) {
+        lb.add(i);
+      } else {
+        var nlb = new LineBox(this);
+        this.lineBoxes.push(nlb);
+        nlb.below(lb.edges.actual.outer._bottom);
+        lb = nlb;
+      }
+    }, this);
+
+    constrain(geq(actual.outer._bottom, lb.edges.actual.outer._bottom, strong));
+    console.log("filling line box with width:", vars.width.value(), "height:", vars.height.value());
+
+    /*
+    console.log("left:", actual.outer._left.value());
+    console.log("right:", actual.outer._right.value());
+    console.log("containing left:", containing.outer._left.value());
+    console.log("containing right:", containing.outer._right.value());
+    console.log(this.toString());
+    */
+
+  },
+});
+
+var LineBox = c.inherit({
+  _className: "LineBox",
+  initialize: function(cb){
+    this._id = _boxCtr++;
+    Edgy.call(this);
+    VarHeavy.call(this, this.boxProperties);
+    this.containingBlock = cb;
+    this.solver = cb.solver;
+    this.inlines = [];
+    this.accumulatedWidth = 0;
+    this.fitIn(cb);
+  },
+  boxProperties: [
+    "width", "height", "left", "right", "top", "bottom",
+  ],
+  fitIn: function(container) {
+    var actual = this.edges.actual;
+    var containing = this.containingBlock.edges.actual;
+    var vals = this.values;
+    var vars = this.vars;
+
+    // Basic block model
+    this.solver.add(
+      geq(vars.width, 0, required),
+      geq(vars.height, 0, required)
+    );
+
+    this.solver.add(
+      eq(
+        actual.outer._right,
+        c.Plus(actual.outer._left, vars.width),
+        required
+      ),
+      eq(
+        actual.outer._bottom,
+        c.Plus(actual.outer._top, vars.height),
+        required
+      )
+    );
+
+    // Set our left/right to our containing's
+    this.solver.add(
+      eq(actual.outer._left, containing.outer._left, required),
+      eq(actual.outer._right, containing.outer._right, required)
+    );
+
+    // Fake height for now
+    this.solver.add(geq(vars.height, 20, strong));
+    // console.log("my width:", vars.width.value());
+    // console.log("container width:", this.containingBlock.vars.width.value());
+  },
+  below: function(edge) {
+    this.solver.add( eq(this.edges.actual.outer._top, edge, required) );
+  },
+  canAccept: function(inline) {
+    var outerWidth = this.containingBlock.vars.width.value();
+    console.log("canAccpet:", inline.vars.width.value(), this.accumulatedWidth,  outerWidth);
+    return (inline.vars.width.value() + this.accumulatedWidth <= outerWidth);
+  },
+  add: function(inline) {
+    this.solver.add(
+      eq(inline.edges.actual.outer._left,
+        c.Plus(this.edges.actual.outer._left, this.accumulatedWidth),
+         strong
+      ),
+      eq(inline.edges.actual.outer._top, 
+         this.edges.actual.outer._top,
+         strong
+      )
+    );
+    this.accumulatedWidth += inline.vars.width.value();
+    console.log("left:", inline.edges.actual.outer._left.value(), "top:", inline.edges.actual.outer._top.value());
   },
 });
 
@@ -827,10 +977,9 @@ var Viewport = c.inherit({
   },
   generate: function() {
     var actual = this.edges.actual;
-    var solver = this.solver;
     var width = this.naturalSize.width;
     var height = this.naturalSize.height;
-    var constrain = solver.add.bind(solver);
+    var constrain = this.solver.add.bind(this.solver);
 
     ["margin", "border", "padding", "content"].forEach(function(type) {
       constrain(
@@ -858,7 +1007,8 @@ var TextBox = c.inherit({
   initialize: function(node, cb){
     this.text = node.nodeValue;
     Inline.call(this, node, cb);
-    this.edges.ref = null; // We deal only in actual values.
+    this.edges.ref = this.edges.actual;
+    this.edges.actual.outer = this.edges.actual.inner;
     this._generated = false;
   },
   toString: function() {
@@ -879,15 +1029,14 @@ var TextBox = c.inherit({
     // console.log(this.naturalSize.width, this.naturalSize.height);
 
     var actual = this.edges.actual;
-    var solver = this.solver;
-    var constrain = solver.add.bind(solver);
+    var constrain = this.solver.add.bind(this.solver);
 
     constrain(eq(this.vars.width, this.naturalSize.width, medium));
     constrain(eq(this.vars.height, this.naturalSize.height, medium));
 
     constrain(
-      eq(c.Plus(actual.content._left, this.vars.width), actual.content._right, required),
-      eq(c.Plus(actual.content._top, this.vars.height), actual.content._bottom, required)
+      eq(c.Plus(actual.outer._left, this.vars.width), actual.outer._right, required),
+      eq(c.Plus(actual.outer._top, this.vars.height), actual.outer._bottom, required)
     );
   },
 });

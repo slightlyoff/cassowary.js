@@ -145,14 +145,49 @@ var paintBorder = function(box, ctx) {
 };
 
 var paintText = function(box, ctx) {
-  var c = box.edges.actual.content;
-  ctx.font = box.css("font-size") + " " + box.css("font-family");
+  var o = box.edges.actual.outer;
+  ctx.font = box.css("font-size").raw + " " + box.value("font-family").raw;
   // ctx.strokeText(box.text, c.left, c.top);
   // console.log(box.css("color").raw);
-  ctx.fillStyle = box.css("color").raw;
-  var y = c.top + box.css("line-height").px;
+  ctx.fillStyle = box.value("color").raw;
+  // var y = c.top + box.css("line-height").px;
   // console.log("line-height:", box.css("line-height"), "y:", y);
-  ctx.fillText(box.text, c.left, y);
+  ctx.textBaseline = "top",
+  ctx.fillText(box.text, o.left, o.top);
+  /*
+  var i = box.edges.actual.inner;
+  console.log(o.top,
+              o.right,
+              o.bottom,
+              o.left,
+              "width:", o.width,
+              "height:", o.height,
+              box.text);
+
+  console.log(i.top,
+              i.right,
+              i.bottom,
+              i.left,
+              i.width,
+              i.height,
+              box.text);
+  */
+
+  pathWithStyle(
+      ctx,
+      [
+        { x: o.left,  y: o.top },
+        { x: o.right, y: o.top },
+        { x: o.right, y: o.bottom },
+        { x: o.left,  y: o.bottom },
+        { x: o.left,  y: o.top },
+      ],
+      "rgba(173,173,173,0.7)",
+      1,
+      "solid"
+  );
+  /*
+  */
 };
 
 scope.renderTo = function(id, boxes) {
