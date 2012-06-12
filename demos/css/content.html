@@ -18,11 +18,11 @@
         font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
         color: #222;
         background-color: #D9E7FF;
-      }
-
-      body {
-        font: normal 95%/1 "Helvetica Neue", "Arial", sans-serif;
-        margin: 10px;
+        /*
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        */
       }
 
       #button {
@@ -44,29 +44,6 @@
         */
       }
 
-      /* FIXME(slightlyoff) */
-      .menu {
-        background-color: #527DFF;
-        border-radius: 4px;
-        font-size: 13px;
-        line-height: 30px;
-        font-family: "Helvetica Neue";
-        letter-spacing: 1px;
-        box-shadow: 0px 6px 20px rgba(54,54,54,0.7);
-      }
-
-      .menu > * {
-        line-height: 30px;
-        color: white;
-        border-bottom: 1px solid white;
-        padding-left: 1em;
-        padding-right: 1em;
-      }
-
-      .menu > :last-child {
-        border-bottom: none;
-      }
-
       .hidden {
         display: none;
       }
@@ -78,10 +55,10 @@
     <p class="hidden">Brunch pork belly whatever, portland keytar kogi retro authentic mlkshk jean shorts PBR.
     <p>Tofu retro put a bird on it brooklyn blog skateboard pop-up umami sartorial.
     <p class="hidden">Keytar craft beer selvage, squid scenester pickled vegan terry richardson Austin tumblr butcher bushwick sartorial.
-    <div style="color: white; background: black;">
-      I'm a block!
-    </div>
-      
+    <p style="display: inline-block;">Keytar craft beer selvage, squid scenester pickled vegan terry richardson Austin tumblr butcher bushwick sartorial.
+      <span style="color: white; background: black; display: block;">
+        I'm a block!
+      </span>
     </p>
     <div id="button">
       Howdy! &#9660;

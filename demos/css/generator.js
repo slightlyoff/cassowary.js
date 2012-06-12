@@ -36,12 +36,6 @@ var mediumStay =   function(v, w) { return stay(v, medium, w); };
 var strongStay =   function(v, w) { return stay(v, strong, w); };
 var requiredStay = function(v, w) { return stay(v, required, w); };
 
-//////////////////////////////////////////////////////
-//  Types
-//////////////////////////////////////////////////////
-
-var defaultMediumWidth = 3;
-
 var CSSValue = c.inherit({
   initialize: function(value, name) {
     this.value = value;
@@ -67,6 +61,168 @@ var CSSValue = c.inherit({
   toString: function() { return this.value; },
   get auto() { return this.value == "auto"; },
 });
+
+//  getComputedStyle returns USED width/height/etc. (post-layout) in the
+//  original document, not the COMPUTED width/height/etc. This defeats our
+//  engine entirely. To avoid writing a parser and resolver, we require
+//  (for now) that all the following styles be declared *on the elements
+//  themselves* or on simple in-document ID rules:
+//    background-position
+//    bottom, left, right, top
+//    height, width
+//    margin-bottom, margin-left, margin-right, margin-top,
+//    min-height, min-width
+//    padding-bottom, padding-left, padding-right, padding-top
+//    text-indent
+//  
+//  This means that we effectively only support these styles when written as:
+//
+//    <style>
+//        #thinger {
+//            left: 100px;
+//            ...
+//        }
+//    </style>
+//    <div id="thinger" style="width: 500px; height 500px;">...</div>
+//  
+//  See also:
+//      https://developer.mozilla.org/en/DOM/window.getComputedStyle
+//      https://developer.mozilla.org/en/CSS/used_value
+//      https://developer.mozilla.org/en/CSS/computed_value
+var _localCssProperties = [
+  "background-position",
+  "bottom", "left", "right", "top",
+  "height", "width", "min-height", "min-width",
+  "margin-bottom", "margin-left", "margin-right", "margin-top",
+  "padding-bottom", "padding-left", "padding-right", "padding-top",
+  "text-indent"
+];
+var css = function(propertyName, node) {
+  var value;
+  if (!node && this.node) {
+    node = this.node;
+  }
+  node = (node.nodeType == 1) ? node : node.parentNode;
+  if (_localCssProperties.indexOf(propertyName) >= 0) {
+    // We don't trust getComputedStyle since it returns used values for these
+    // properties, so we instead look to see what the node itself has
+    // specified.
+    value = node.style[toCamelCase(propertyName)];
+
+
+    // If we don't get something from the node, we try to honour ID-targeted
+    // rules. We're not looking to understand "!important", settle ordering
+    // issues, handle linked sheets, etc. This is purely a hack.
+    if (!value) {
+      // FIXME: expensive, cache!
+      value = "auto";
+      var id = node.id;
+      if (id) {
+        var idRe = new RegExp("\#"+id+"\\s*{");
+        toArray(node.ownerDocument.styleSheets).forEach(function(sheetList) {
+          toArray(sheetList).forEach(function(sheet) {
+            toArray(sheet.cssRules).forEach(function(rule) {
+              if (rule.type == 1) {
+                if (rule.cssText.search(idRe) == 0) {
+                  var tv = rule.style[toCamelCase(propertyName)];
+                  if (tv) {
+                    value = tv;
+                  }
+                }
+              }
+            });
+          });
+        });
+      }
+    }
+  } else {
+    value = node.ownerDocument.defaultView.getComputedStyle(node).getPropertyValue(propertyName);
+  }
+  return new CSSValue(value, propertyName);
+};
+
+var isElement = function(n) {
+  return n.nodeType == 1;
+};
+
+var isBlock = function(n) {
+  if (!isElement(n)) return false;
+  return (
+    css("display", n).raw == "block" ||
+    css("display", n).raw == "list-item" ||
+    css("display", n).raw.indexOf("table") == 0
+  );
+};
+
+var isInline = function(n) {
+  if (!isElement(n)) return false;
+  return (
+    css("display", n).raw == "inline" ||
+    css("display", n).raw == "inline-block" ||
+    css("display", n).raw == "inline-table" ||
+    css("display", n).raw == "ruby"
+  );
+};
+
+var isPositioned = function(n) {
+  // TODO(slightlyoff): should floated elements be counted as positioned here?
+  if (!isElement(n)) return false;
+  return (
+    css("position", n).raw == "fixed" ||
+    css("position", n).raw == "absolute" ||
+    css("position", n).raw == "center" ||
+    css("position", n).raw == "page" // TODO(slightlyoff)
+  );
+};
+
+var isFlowRoot = function(n) {
+  if (!isElement(n)) return false;
+  return (
+    css("float", n).raw != "none" ||
+    css("overflow", n).raw != "visible" || // FIXME: need to get USED value!
+    css("display", n).raw == "table-cell" ||
+    css("display", n).raw == "table-caption" ||
+    css("display", n).raw == "inline-block" ||
+    css("display", n).raw == "inline-table" ||
+    (
+      css("position", n).raw != "static" &&
+      css("position", n).raw != "relative"
+    )
+    // FIXME:
+    //      Need to account for "block-progression" here, but WebKit
+    //      doesn't support it yet, so it's not accessible through the DOM.
+  );
+};
+
+var isInFlow = function(n) {
+  if (!isElement(n)) return false;
+  return (
+    ( // FIXME: need to get USED values here!
+      css("display", n).raw == "block" ||
+      css("display", n).raw == "list-item" ||
+      css("display", n).raw == "table"
+    ) &&
+    css("float", n).raw == "none" &&
+    (
+      css("position", n).raw == "static" ||
+      css("position", n).raw == "relative"
+    )
+    // FIXME:
+    //  "4. It is either a child of the flow root or a child of a box that
+    //  belogs to the flow."
+  );
+};
+
+var isRunIn = function(n){
+  // TODO(slightlyoff)
+  return false;
+};
+
+var DEFULT_MEDIUM_WIDTH = 3;
+
+//////////////////////////////////////////////////////
+//  Types
+//////////////////////////////////////////////////////
 
 var MeasuredBox = c.inherit({
   initialize: function(top, left, right, bottom) {
@@ -96,8 +252,132 @@ var Box = c.inherit({
   // FIXME(slightlyoff): need setters to over-ride the values for debugging!
 });
 
+/*
+
+// What follows are prototypical outlines of the class structure we want to be
+// dealing with.
+
+// FlowRoot mixin.
+var FlowRoot = function() {
+  this.flowRoot = true;
+  this.flowBoxes = [];
+  this.flow = function() {
+    // ...
+  };
+};
+
 var RenderBox = c.inherit({
-  initialize: function(containing, prev, cs, node){
+  initialize: function(node, containingBlock){
+    this.node = node;
+    this.containingBlock = containingBlock;
+    if (isFlowRoot(node)) {
+      FlowRoot.call(this);
+    }
+  },
+  _className: "RenderBox",
+  get global() {
+    return this.node.ownerDocument.defaultView;
+  },
+  css: css,
+});
+
+var FlowRoot = c.inherit({
+  extends: RenderBox,
+  _className: "FlowRoot",
+})
+
+var RenderBlock = c.inherit({
+  extends: RenderBox,
+  _className: "RenderBlock",
+  initialize: function(node, containingBlock){
+    RenderBox.call(this, node, containingBlock);
+  },
+});
+
+var InlineBox = c.inherit({
+  extends: RenderBox,
+  _className: "RenderBox",
+});
+
+var AnonymousBlock = c.inherit({
+  extends: RenderBlock,
+  _className: "AnonymousBlock",
+  ...
+});
+
+var LineBox = 
+*/
+
+// FlowRoot mixin.
+var FlowRoot = function() {
+  console.log("I'm a flow root!", this.node);
+
+  this.blockProgression = "tb";
+  this.flowRoot = true;
+  this.flowBoxes = [];
+  this.flow = function() {
+    // 
+    // "So here we go now
+    //  Holla if ya hear me though
+    //  Come and feel me, flow" -- NBN
+    // 
+ 
+    // console.log("flowing in:", this.node);
+
+    if (!this.flowBoxes.length) { return; }
+
+    var ref = this.edges.ref;
+    var actual = this.edges.actual;
+    var containing = actual;
+    var solver = this.solver;
+    var constrain = solver.add.bind(solver);
+
+    var last;
+
+    this.flowBoxes.forEach(function(child) {
+      console.log("flowing:", child.node);
+      if (!isInFlow(child.node)) {
+        console.warn("not in flow!", child.node);
+        return;
+      }
+
+      switch(this.blockProgression) {
+        case "tb":
+          // Left and right edges of our block children are our content
+          // left/right.
+          constrain(
+            eq(child.edges.ref.margin._left, containing.content._left, strong),
+            eq(child.edges.ref.margin._right, containing.content._right, strong)
+          );
+
+          // Next, top is the previous bottom, else containing's content top;
+          if (last) {
+            constrain(
+              eq(child.edges.ref.margin._top, last.edges.ref.margin._bottom, strong)
+            );
+          } else {
+            constrain(
+              eq(child.edges.ref.margin._top, containing.content._top, strong)
+            );
+          }
+          last = child;
+
+          // TODO(slightlyoff): margin collapsing!
+          break;
+        case "rl": // TODO(slightlyoff)
+        case "bt": // TODO(slightlyoff)
+        case "lr": // TODO(slightlyoff)
+        default:
+          console.warn("Unsupported block-progression:",
+                       this.blockProgression);
+          break;
+      }
+    }, this);
+  };
+};
+
+var RenderBox = c.inherit({
+  initialize: function(node, containingBlock){
     this.edges = {
       ref: {
         margin:   new Box(),
@@ -122,40 +402,50 @@ var RenderBox = c.inherit({
     this.edges.actual.outer = this.edges.actual.margin;
     this.edges.actual.inner = this.edges.actual.content;
 
-    // The RenderBox we're relative to
-    this.containing = containing;
-    this.prev = prev;
-    this.computedStyle = cs || null;
+    // The RenderBox we're relative to.
+    // TODO: Is this our flow root?
+    //
+    this.containingBlock = containingBlock;
+    // this.prev = prev;
+ 
     this.node = node;
     this.naturalSize = contentSize(node);
-    this.solver = this.solver || this.containing.solver;
+    this.solver = this.solver || this.containingBlock.solver;
+
+    if (isFlowRoot(node)) {
+      FlowRoot.call(this);
+    }
   },
+  get computedStyle() {
+    return this.node.ownerDocument.defaultView.getComputedStyle(this.node);
+  },
+
+  _className: "RenderBox",
 
   toString: function() {
     var m = this.edges.actual.margin;
-    return "RenderBox: { top: " + m.top +
-                      ", right: " + m.right +
-                      ", bottom:" + m.bottom +
-                      ",left:" + m.left +
-                      "}";
+    return this._className + ": { top: " + m.top +
+                               ", right: " + m.right +
+                               ", bottom:" + m.bottom +
+                               ", left:" + m.left + " }";
   },
+  // Hack.
+  css: css,
 
   generate: function() {
     // Constraints for all boxes
     var ref = this.edges.ref;
     var actual = this.edges.actual;
     var solver = this.solver;
-    var containing = this.containing.edges.actual;
+    var containing = this.containingBlock.edges.actual;
     var constrain = solver.add.bind(solver);
-
-    // solver.autoSolve = false;
 
     // FIXME(slightlyoff):
     //      Need to generate different rules for %-based values!
 
     // Michalowski '98, Section 3.1
     
-    var mediumWidth = new c.Variable(defaultMediumWidth);
+    var _mediumWidth = new c.Variable("mediumWidth", DEFULT_MEDIUM_WIDTH);
 
     var width = this.css("width");
     var _width = new c.Variable(width.raw);
@@ -181,20 +471,20 @@ var RenderBox = c.inherit({
     var bottom = this.css("bottom");
     var _bottom = new c.Variable(bottom.raw);
 
-    var marginTop = new c.Variable(this.css("margin-top").raw);
-    var marginRight = new c.Variable(this.css("margin-right").raw);
-    var marginBottom = new c.Variable(this.css("margin-bottom").raw);
-    var marginLeft = new c.Variable(this.css("margin-left").raw);
+    var _marginTop = new c.Variable(this.css("margin-top").raw);
+    var _marginRight = new c.Variable(this.css("margin-right").raw);
+    var _marginBottom = new c.Variable(this.css("margin-bottom").raw);
+    var _marginLeft = new c.Variable(this.css("margin-left").raw);
 
-    var borderTop = new c.Variable(this.css("border-top").raw);
-    var borderRight = new c.Variable(this.css("border-right").raw);
-    var borderBottom = new c.Variable(this.css("border-bottom").raw);
-    var borderLeft = new c.Variable(this.css("border-left").raw);
+    var _borderTop = new c.Variable(this.css("border-top").raw);
+    var _borderRight = new c.Variable(this.css("border-right").raw);
+    var _borderBottom = new c.Variable(this.css("border-bottom").raw);
+    var _borderLeft = new c.Variable(this.css("border-left").raw);
 
-    var paddingTop = new c.Variable(this.css("padding-top").raw);
-    var paddingRight = new c.Variable(this.css("padding-right").raw);
-    var paddingBottom = new c.Variable(this.css("padding-bottom").raw);
-    var paddingLeft = new c.Variable(this.css("padding-left").raw);
+    var _paddingTop = new c.Variable(this.css("padding-top").raw);
+    var _paddingRight = new c.Variable(this.css("padding-right").raw);
+    var _paddingBottom = new c.Variable(this.css("padding-bottom").raw);
+    var _paddingLeft = new c.Variable(this.css("padding-left").raw);
 
     constrain(
       eq(c.Minus(ref.content._top, this.css("padding-top").px),
@@ -272,6 +562,20 @@ var RenderBox = c.inherit({
       );
     }
 
+    // Width and height are the result of:
+    //  w = right - left;
+    //  h = bottom - top;
+    constrain(
+      eq(c.Minus(ref.border._right, ref.border._left),
+        _width,
+        required
+      ),
+      eq(c.Minus(ref.border._bottom, ref.border._top),
+        _height,
+        required
+      )
+    );
+
     constrain(eq(_width, this.naturalSize.width, medium));
 
     if (!width.auto) {
@@ -286,12 +590,12 @@ var RenderBox = c.inherit({
       constrain(eq(_height, height.px, strong));
     }
 
-    [ marginTop, marginRight, marginBottom, marginLeft,
-      paddingTop, paddingRight, paddingBottom, paddingLeft
+    [ _marginTop, _marginRight, _marginBottom, _marginLeft,
+      _paddingTop, _paddingRight, _paddingBottom, _paddingLeft
     ].forEach(function(v) { constrain(eq(v, 0, weak)); });
 
-    [ borderTop, borderRight, borderBottom, borderLeft
-    ].forEach(function(v) { constrain(eq(v, mediumWidth, weak)); }); 
+    [ _borderTop, _borderRight, _borderBottom, _borderLeft
+    ].forEach(function(v) { constrain(eq(v, _mediumWidth, weak)); }); 
 
 
     ["margin", "border", "padding", "content"].forEach(function(type) {
@@ -308,13 +612,25 @@ var RenderBox = c.inherit({
       geq(_height, 0, required)
     );
 
+    // RENDER DEBUGGING ONLY:
+    /*
+    constrain(
+      eq(_minWidth, 10, strong),
+      eq(_minHeight, 30, strong)
+    );
+    */
+
+    constrain(
+      geq(_width, _minWidth, required),
+      geq(_height, _minHeight, required)
+    );
+
     constrain(
       eq(_left, 0, weak),
       eq(_right, 0, weak),
       eq(_top, 0, weak),
       eq(_bottom, 0, weak)
     );
-
 
     // FIXME(slightlyoff):
     //  Missing 9.5 items for floated boxes
@@ -404,175 +720,22 @@ var RenderBox = c.inherit({
     //
     // TODO(slightlyoff)
     //
-
-    // solver.autoSolve = true;
-    // solver.resolve();
-  },
-
-  //  getComputedStyle returns USED width/height/etc. (post-layout) in the
-  //  original document, not the COMPUTED width/height/etc. This defeats our
-  //  engine entirely. To avoid writing a parser and resolver, we require
-  //  (for now) that all the following styles be declared *on the elements
-  //  themselves* or on simple in-document ID rules:
-  //    background-position
-  //    bottom, left, right, top
-  //    height, width
-  //    margin-bottom, margin-left, margin-right, margin-top,
-  //    min-height, min-width
-  //    padding-bottom, padding-left, padding-right, padding-top
-  //    text-indent
-  //  
-  //  This means that we effectively only support these styles when written as:
-  //
-  //    <style>
-  //        #thinger {
-  //            left: 100px;
-  //            ...
-  //        }
-  //    </style>
-  //    <div id="thinger" style="width: 500px; height 500px;">...</div>
-  //  
-  //  See also:
-  //      https://developer.mozilla.org/en/DOM/window.getComputedStyle
-  //      https://developer.mozilla.org/en/CSS/used_value
-  //      https://developer.mozilla.org/en/CSS/computed_value
-  css: function(propertyName) {
-    var value;
-    var node = (this.node.nodeType == 1) ? this.node : this.node.parentNode;
-    if (this._localCssProperties.indexOf(propertyName) >= 0) {
-      // We don't trust getComputedStyle since it returns used values for these
-      // properties, so we instead look to see what the node itself has
-      // specified.
-      value = node.style[toCamelCase(propertyName)];
-
-
-      // If we don't get something from the node, we try to honour ID-targeted
-      // rules. We're not looking to understand "!important", settle ordering
-      // issues, handle linked sheets, etc. This is purely a hack.
-      if (!value) {
-        // FIXME: expensive, cache!
-        value = "auto";
-        var id = this.node.id;
-        if (id) {
-          var idRe = new RegExp("\#"+id+"\\s*{");
-          toArray(node.ownerDocument.styleSheets).forEach(function(sheetList) {
-            toArray(sheetList).forEach(function(sheet) {
-              toArray(sheet.cssRules).forEach(function(rule) {
-                if (rule.type == 1) {
-                  if (rule.cssText.search(idRe) == 0) {
-                    var tv = rule.style[toCamelCase(propertyName)];
-                    if (tv) {
-                      value = tv;
-                    }
-                  }
-                }
-              });
-            });
-          });
-        }
-      }
-    } else {
-      value = this.computedStyle.getPropertyValue(propertyName);
-    }
-
-    /*
-    if(value.indexOf("%") >= 0) {
-      // Walk the DOM to resolve what we're a % *of*
-      var pct = parseFloat(value);
-      var dv = node.ownerDocument.defaultView;
-      var cs = dv.getComputedStyle(node.parentNode, null);
-      console.log(cs, propertyName, cs.getPropertyValue(propertyName));
-
-      // pctOf = this.computedStyle.getPropertyValue(propertyName);
-      // console.log(value);
-    }
-    */
-
-    return new CSSValue(value, propertyName);
-  },
-  _localCssProperties: [
-    "background-position",
-    "bottom", "left", "right", "top",
-    "height", "width", "min-height", "min-width",
-    "margin-bottom", "margin-left", "margin-right", "margin-top",
-    "padding-bottom", "padding-left", "padding-right", "padding-top",
-    "text-indent"
-  ],
-
-});
-
-var LineBox = c.inherit({
-  extends: RenderBox,
-  initialize: function(containing, prev, text, cs, node){
-    this.text = text;
-    RenderBox.call(this, containing, prev, cs, node);
-  },
-  generate: function() {
-    // TODO(slightlyoff):
-    //      set our top to the prev's top or the containing's content top (or
-    //      whatever makes sense based on text-align)
-
-    // Michalowski '98, Section 3.2
-    // Line-box Constraints
-
-    // FIXME(slightlyoff): need to add the float constraints back in!
- 
-    // c.top + this.css("line-height").px;
-    // console.log(this.naturalSize.width, this.naturalSize.height);
-
-    var ref = this.edges.ref;
-    var actual = this.edges.actual;
-    var solver = this.solver;
-    var constrain = solver.add.bind(solver);
-    var containing = this.containing.edges.actual;
-
-    var _width = new c.Variable();
-    var _height = new c.Variable();
-
-    constrain(eq(_width, this.naturalSize.width, medium));
-    constrain(eq(_height, this.naturalSize.height, medium));
-
-    // FIXME: need to find some way to linearize the following if/else:
-    // if (previous.RM + width <= enclosing.RP) {
-    //   // If we're not going to intersect the right-hand-side of our
-    //   // container, put our left at the previous right and or top at the
-    //   // previous top.
-    //   ref.TM = previous.RM?
-    //   ref.LM = previous.TM?
-    // } else {
-    //   // Else, drop down a line and go flush left.
-    //   ref.TM = previous.BM?
-    //   ref.LM = 0
-    // }
-    //
-    // http://www.aimms.com/aimms/download/manuals/aimms3om_integerprogrammingtricks.pdf
-
-    constrain(
-      eq(actual.content._top, this.prev.edges.actual.content._top, strong),
-      eq(actual.content._left, this.prev.edges.actual.content._right, strong)
-    );
-
-    constrain(
-      eq(c.Plus(actual.content._left, _width), actual.content._right, required),
-      eq(c.Plus(actual.content._top, _height), actual.content._bottom, required)
-    );
-
-    constrain(
-      geq(containing.content._right, actual.content._right, strong),
-      geq(containing.content._top, actual.content._bottom, strong)
-    );
   },
 });
 
 var Viewport = c.inherit({
-  extends: RenderBox, 
-  initialize: function(width, height, cs, node){
+  extends: RenderBox, // TODO: RenderBlock, 
+  _className: "Viewport", // for toString()
+  initialize: function(width, height, node){
     // Viewport:
     //  The item that everything else is realtive to. It takes a source node
     //  whose dimensions it copies, setting margin/padding/border to zero.
     this.solver = new c.SimplexSolver();
-    RenderBox.call(this, this, null, cs, node);
+    RenderBox.call(this, node);
+    FlowRoot.call(this);
+    //TODO: RenderBlock.call(this, node);
     this.naturalSize = new MeasuredBox(0, 0, width, height);
+    this.containingBlock = this;
     this.generate();
   },
 
@@ -594,13 +757,91 @@ var Viewport = c.inherit({
   },
 });
 
+
+var InlineBox = c.inherit({
+  extends: RenderBox,
+  _className: "InlineBox", // for toString()
+  initialize: function(node, cb){
+    RenderBox.call(this, node, cb);
+  },
+  follow: function() {
+    // Called once our container's width is determined. We assume our previous
+    // sibling has been placed. If no sibling, we root ourselves at our
+    // container's 0,0 position.
+    var ref = this.edges.ref;
+    var actual = this.edges.actual;
+    var solver = this.solver;
+    var containing = this.containingBlock.edges.actual;
+    var constrain = solver.add.bind(solver);
+
+    if(this.prev) {
+      var prev = this.prev.edges.actual;
+      constrain(
+        eq(actual.content._top, prev.content._top, strong),
+        eq(actual.content._left, prev.content._right, strong)
+      );
+    } else {
+      console.log("no prev!");
+    }
+
+    /*
+    constrain(
+      geq(containing.content._right, actual.content._right, strong),
+      geq(containing.content._top,   actual.content._bottom, strong)
+    );
+    */
+  },
+  newLine: function() {
+  },
+});
+
+var TextBox = c.inherit({
+  extends: InlineBox,
+  _className: "TextBox", // for toString()
+  initialize: function(node, cb){
+    this.text = node.nodeValue;
+    InlineBox.call(this, node, cb);
+    this.edges.ref = null; // We deal only in actual values.
+  },
+  generate: function() {
+    // TODO(slightlyoff):
+    //      set our top to the prev's top or the containing's content top (or
+    //      whatever makes sense based on text-align)
+
+    // Michalowski '98, Section 3.2
+    // Line-box Constraints
+
+    // FIXME(slightlyoff): need to add the float constraints back in!
+ 
+    // c.top + this.css("line-height").px;
+    // console.log(this.naturalSize.width, this.naturalSize.height);
+
+    var actual = this.edges.actual;
+    var solver = this.solver;
+    var constrain = solver.add.bind(solver);
+    var containing = this.containingBlock.edges.actual;
+
+    var _width = new c.Variable();
+    var _height = new c.Variable();
+
+    constrain(eq(_width, this.naturalSize.width, medium));
+    constrain(eq(_height, this.naturalSize.height, medium));
+
+    constrain(
+      eq(c.Plus(actual.content._left, _width), actual.content._right, required),
+      eq(c.Plus(actual.content._top, _height), actual.content._bottom, required)
+    );
+
+  },
+});
+
 //////////////////////////////////////////////////////
 //  Workhorse functions
 //////////////////////////////////////////////////////
 
-var findBoxGenerators = function(element, doc, global) {
-  doc = doc || document;
-  global = global || scope;
+var findBoxGenerators = function(element) {
+  var doc = element.ownerDocument || document;
+  var global = doc.defaultView || scope;
   var NodeFilter = global.NodeFilter;
   var generators = [];
   var nf = NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT;
@@ -682,13 +923,16 @@ var _generateFor = function(id, boxesCallback) {
     return;
   }
   var d = doc(id),
-      visibleNodes = findBoxGenerators(d.documentElement, d, g);
+      visibleNodes = findBoxGenerators(d.documentElement);
 
   // console.log(visibleNodes);
 
-  var vn = document.getElementById(id);
+  var viewportNode = document.getElementById(id);
   var dde = d.documentElement;
-  var v = new Viewport(vn.clientWidth, vn.clientHeight, g.getComputedStyle(dde), dde);
+  var v = new Viewport(viewportNode.clientWidth, viewportNode.clientHeight, dde);
+
+  var nodeToBoxMap = new Map();
+  nodeToBoxMap.set(dde, v);
 
   // Run through the visible nodes, creating box types as needed and setting
   // forward/back/ref references.
@@ -696,11 +940,140 @@ var _generateFor = function(id, boxesCallback) {
   // The most recent document-ordered element that is not absolute, fixed, or float
   var prev = null;
   var containing = v;
-  var containingNode = dde;
-  var containingStack = [{ box: v, node: containingNode }];
+
+  // var containingNode = dde;
+  // var containingStack = [{ box: v, node: containingNode }];
+
   var boxes = [];
+  var flowRoots = [];
+  var solver = v.solver;
+  var defaultBlockProgression = "tb";
+
+  // solver.autoSolve = false;
+
+  var getContainingBlock = function(n) {
+    // Everything has a containing block. CSS 3 says:
+    //
+    //      "The containing block of other boxes is the rectangle formed by the
+    //      content edge of their nearest ancestor box that is block-level.
+    //      This may be an anonymous box. The ‘direction’ and
+    //      ‘block-progression’ of the containing block are those of the box
+    //      whose content edge it is."
+    //
+    // Since we've visiting in document order, we can simply look up through
+    // our ancestors to see which one is block, else our containing block is
+    // the viewport.
+
+    var pn = n.parentNode;
+    while (pn && pn != dde && !isBlock(pn)) {
+      pn = pn.parentNode;
+    }
+    if (!pn) { pn = dde; }
+    return nodeToBoxMap.get(pn);
+  };
+
+  var getFlowRoot = function(n) {
+    var pn = n.parentNode;
+    while (pn && pn != dde && !nodeToBoxMap.get(pn).flowRoot) {
+      pn = pn.parentNode;
+    }
+    if (!pn) { pn = dde; }
+    return nodeToBoxMap.get(pn);
+  };
 
   visibleNodes.forEach(function(node) {
+    var parentBox = nodeToBoxMap.get(node.parentNode);
+
+    var cb = getContainingBlock(node);
+
+    // console.log("containingBlock:", cb.node, "for node:", node);
+
+    // Boxes in CSS always ahve "containing blocks". Boxes that are in a flow
+    // also have "flow roots".
+    if (isElement(node)) {
+      // console.log("isBlock:", isBlock(node), "isInline:", isInline(node), node);
+      // console.log("containgBlock node:", getContainingBlock(node).node);
+
+      // TODO(slightlyoff): anonymous box generation!
+  
+      /*
+      if (isPositioned(node)) {
+        switch(css("position", node).raw) {
+          case "fixed":
+            // Fixed elements are always relative to the viewport.
+            break;
+          case "absolute":
+            // Absolute elements are contained by their nearest non-static ancestor.
+            var pn = node.parentNode;
+            while (pn && pn != dde && css("position", pn).raw == "static") {
+              // console.log("pn:", pn);
+              pn = pn.parentNode;
+            }
+            pn = pn || dde;
+            // console.log("absolute containing node:", pn, "containing box:", nodeToBoxMap.get(pn).toString());
+            tContaining = nodeToBoxMap.get(pn);
+            break;
+          case "center":
+            console.warn("position: center; is currently unsupported!");
+            break;
+          case "page":
+            console.warn("position: page; is currently unsupported!");
+            // TODO(slightlyoff)
+            break;
+          default: break;
+        }
+      } else {
+        tContaining = nodeToBoxMap.get(node.parentNode);
+      }
+      */
+
+      // TODO(slightlyoff): implement run-in detection
+      var b;
+      if (isBlock(node)) {
+        b = new RenderBox(node, cb);
+      }
+      if (isInline(node)) {
+        b = new InlineBox(node, cb);
+      }
+
+      getFlowRoot(node).flowBoxes.push(b);
+      nodeToBoxMap.set(node, b);
+      boxes.push(b);
+      if (b.flowRoot) {
+        flowRoots.push(b);
+      }
+      prev = b;
+
+    } else {
+      // We're a text node, so create text blocks for the constituent words and
+      // add them to our container's inlines list.
+ 
+      //  Could *really* do with access to these right about now:
+      //   http://msdn.microsoft.com/en-us/library/windows/desktop/dd319118(v=vs.85).aspx
+      //   http://developer.apple.com/library/mac/#documentation/Carbon/Reference/CTLineRef/Reference/reference.html
+      var head = node;
+      var tail = null;
+      var pn = node.parentNode;
+      var cs = g.getComputedStyle(pn);
+      node.nodeValue.split(/\s+/).forEach(function(word) {
+        if (!word) { return; }
+        // Next, find the index of the current word in our remaining node,
+        // split on the word end, and create LineBox items for the newly
+        // split-off head element.
+        var hnv = head.nodeValue;
+        if (hnv.indexOf(word) >= 0) {
+          tail = head.splitText(hnv.indexOf(word)+word.length);
+          var b = new TextBox(head, cb)
+          nodeToBoxMap.set(head, b);
+          boxes.push(b);
+          prev = b;
+          // console.log("'"+head.nodeValue+"'");
+        }
+        head = tail;
+      });
+    }
+
+    /*
     switch (node.nodeType) {
       case 1: // Element
         // FIXME(slightlyoff):
@@ -725,6 +1098,7 @@ var _generateFor = function(id, boxesCallback) {
           containingNode = node;
           containing = b;
         }
+        nodeToBoxMap.set(node, b);
         boxes.push(b);
         // FIXME(slightlyoff):
         //      If our pos isn't the default, we are the new "containing" for
@@ -732,14 +1106,26 @@ var _generateFor = function(id, boxesCallback) {
         return;
       case 3: // TextNode
 
-        //  Could *really* do with access to these right about now:
-        //   http://msdn.microsoft.com/en-us/library/windows/desktop/dd319118(v=vs.85).aspx
-        //   http://developer.apple.com/library/mac/#documentation/Carbon/Reference/CTLineRef/Reference/reference.html
+        // FIXME: need to find some way to linearize the following if/else that
+        // we need for inline-level boxes:
+        // if (previous.RM + width <= enclosing.RP) {
+        //   // If we're not going to intersect the right-hand-side of our
+        //   // container, put our left at the previous right and or top at the
+        //   // previous top.
+        //   ref.TM = previous.RM?
+        //   ref.LM = previous.TM?
+        // } else {
+        //   // Else, drop down a line and go flush left.
+        //   ref.TM = previous.BM?
+        //   ref.LM = 0
+        // }
+        //
+        // http://www.aimms.com/aimms/download/manuals/aimms3om_integerprogrammingtricks.pdf
 
         var head = node;
         var tail = null;
         var pn = node.parentNode;
-        var cs = g.getComputedStyle(node.parentNode);
+        var cs = g.getComputedStyle(pn);
         node.nodeValue.split(/\s+/).forEach(function(word) {
           if (!word) { return; }
           // Next, find the index of the current word in our remaining node,
@@ -748,9 +1134,11 @@ var _generateFor = function(id, boxesCallback) {
           var hnv = head.nodeValue;
           if (hnv.indexOf(word) >= 0) {
             tail = head.splitText(hnv.indexOf(word)+word.length);
-            var b = new LineBox(containing, prev, head.nodeValue, cs, head)
+            var b = new TextBox(containing, prev, head.nodeValue, cs, head)
+            nodeToBoxMap.set(head, b);
             boxes.push(b);
             prev = b;
+            // console.log("'"+head.nodeValue+"'");
           }
           head = tail;
         });
@@ -761,17 +1149,45 @@ var _generateFor = function(id, boxesCallback) {
     }
     // console.log("'" + node.nodeValue + "'", b.naturalSize.width, b.naturalSize.height);
     // console.log("natural size:", b.naturalSize.width, b.naturalSize.height, "node type:", node.nodeType);
+    */
   });
 
+  // Add the viewport to the list.
+  boxes.unshift(v);
+  flowRoots.unshift(v);
+
+  // FIXME(slightlyoff):
+  //    Add anonymous boxe parents here for text children of flow roots with
+  //    other block children.
+
+  // Generate our generic box constraints.
+  boxes.forEach(function(box) {
+    box.generate();
+  });
+
+
+  flowRoots.forEach(function(root) {
+    console.log("flowing root:", root+"");
+    root.flow();
+  });
+
+  // Generate constraints to resolve widths.
+
+  // solver.resolve();
+
+  // Text layout pass. Once our widths have all been determined, we place each
+  // text segment and do wrapping. Once we've
+  // solved for flowed blocks, we update our container's height to fit and
+  // re-solve the entire system. We only call for painting once this has been
+  // done everywhere.
+  //
   boxes.forEach(function(box) {
   });
 
   // TODO(slightlyoff): sort boxes into stacking contexts for rendering!
   //                    See CSS 2.1 section E.2 for details.
 
-  boxes.unshift(v);
-
-  boxes.forEach(function(box) { box.generate(); });
+  // boxes.forEach(function(box) { console.log(box+""); });
 
   boxesCallback(boxes);
 };

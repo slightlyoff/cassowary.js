@@ -25,15 +25,15 @@ var pathWithStyle = function(ctx, points, color, width, style) {
       lineCap = "round";
       break;
     case "solid":
+      lineCap = "square";
     default:
       break;
   }
 
-  ctx.save();
+  // ctx.save();
   ctx.beginPath();
   ctx.lineWidth = width;
   ctx.strokeStyle = color;
-  // console.log(width, color)
   ctx.lineCap = lineCap;
 
 
@@ -41,11 +41,13 @@ var pathWithStyle = function(ctx, points, color, width, style) {
   var point = points.shift();
   var x = point.x;
   var y = point.y;
+  // console.log("moveTo:", x, y);
   ctx.moveTo(x, y);
   points.push(point);
   points.forEach(function(point) {
     var xd = point.x;
     var yd = point.y;
+    // console.log("moveTo:", xd, yd);
     var distance = Math.sqrt(Math.pow(xd - x, 2) + Math.pow(yd - y, 2));
     // console.log(x, y, xd, yd, distance);
     // FIXME(slightlyoff): alternate path/space to respect line style!
@@ -56,7 +58,7 @@ var pathWithStyle = function(ctx, points, color, width, style) {
 
   ctx.stroke();
   ctx.closePath();
-  ctx.restore();
+  // ctx.restore();
 };
 
 var paintOutline = function(box, ctx) {
@@ -84,27 +86,14 @@ var paintOutline = function(box, ctx) {
   }
 
   if (scope.renderDebug) {
-    /*
-    b = {
-      left: 100,
-      right: 200,
-      top: 100,
-      bottom: 200
-    };
-    */
     pathWithStyle(
         ctx,
-        // FIXME(slightlyoff): add params for border/outline radius
-        [ { x: b.left - how, 
-            y: b.top - how },
-          { x: b.right + how, 
-            y: b.top - how },
-          { x: b.right + how, 
-            y: b.bottom + how },
-          { x: b.left - how, 
-            y: b.bottom + how } ],
-        box.css("outline-color"),
-        2,
+        [ { x: b.left, y: b.top},
+          { x: b.right, y: b.top},
+          { x: b.right, y: b.bottom},
+          { x: b.left, y: b.bottom} ],
+        "gray", // box.css("outline-color"),
+        1,
         "solid"
     );
   }
@@ -128,6 +117,31 @@ var paintBackground = function(box, ctx) {
 };
 
 var paintBorder = function(box, ctx) {
+  var b = box.edges.actual.border;
+  if (box.css("border-style") != "none") {
+    console.log("border:", box.css("border-width").px, box.css("border-style").raw, box.css("border-color").raw);
+    var btw = box.css("border-top-width").px;
+    var top = b.top + btw/2;
+    var brw = box.css("border-right-width").px;
+    var right = b.right - brw / 2;
+    var bbw = box.css("border-bottom-width").px;
+    var bottom = b.bottom - bbw / 2;
+    var blw = box.css("border-left-width").px;
+    var left = b.left + blw / 2;
+    console.log(b.top, btw);
+    pathWithStyle(
+        ctx,
+        [
+          { x: left, y: top },
+          { x: right, y: top },
+          { x: right, y: bottom },
+          { x: left, y: bottom },
+        ],
+        box.css("border-color").raw,
+        box.css("border-width").px,
+        box.css("border-style")
+    );
+  }
 };
 
 var paintText = function(box, ctx) {
