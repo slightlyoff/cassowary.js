@@ -172,7 +172,6 @@ var isFixed = function(n) {
 };
 
 var isPositioned = function(n) {
-  // TODO(slightlyoff): should floated elements be counted as positioned here?
   if (!isElement(n)) return false;
   return (
     css("position", n).raw == "fixed" ||
@@ -182,6 +181,7 @@ var isPositioned = function(n) {
   );
 };
 
+/*
 var isFlowRoot = function(n) {
   if (!isElement(n)) return false;
   return (
@@ -200,6 +200,7 @@ var isFlowRoot = function(n) {
     //      doesn't support it yet, so it's not accessible through the DOM.
   );
 };
+*/
 
 var isInFlow = function(n) {
   if (!isElement(n)) return false;
@@ -217,6 +218,33 @@ var isInFlow = function(n) {
     // FIXME:
     //  "4. It is either a child of the flow root or a child of a box that
     //  belogs to the flow."
+  );
+};
+
+var isBFC = function(n) {
+  // CSS 2.1 says:
+  //    Floats, absolutely positioned elements, block containers (such as
+  //    inline-blocks, table-cells, and table-captions) that are not block
+  //    boxes, and block boxes with ’overflow’ other than ’visible’ (except
+  //    when that value has been propagated to the viewport) establish new
+  //    block formatting contexts for their contents.
+  if (!isElement(n)) return false;
+  var display = css("display", n).raw;
+  var pos = css("position", n).raw;
+  return (
+    // floated
+    css("float", n).raw != "none" ||
+    // abs and fixed
+    ( pos != "static" && pos != "relative") ||
+    // block boxes with overflow != visible
+    (
+      (display == "block") && (css("overflow", n).raw != "visible")
+    ) ||
+    // block containers that are not block boxes
+    display == "table-cell" ||
+    display == "table-caption" ||
+    display == "inline-block" ||
+    display == "inline-table"
   );
 };
 
@@ -339,82 +367,8 @@ var Nodey = function(node, properties) {
   }, this);
 };
 
-// FlowRoot mixin.
-var FlowRoot = function() {
-  this.blockProgression = "tb";
-  this._isFlowRoot = true;
-  this._flowBoxes = [];
-  this.addFlowBox = function(b) {
-    console.log("addFlowBox(", b+")", "to FlowRoot", this+"");
-    if (this._flowBoxes.length) {
-      console.log("-- after: " + this._flowBoxes[this._flowBoxes.length - 1]);
-      console.log("--      :",   this._flowBoxes[this._flowBoxes.length - 1].node);
-    }
-    if (b.node) {
-      console.log(b.node);
-    }
-    b.flowRoot = this;
-    this._flowBoxes.push(b);
-  };
-  this.flow = function() {
-    // 
-    // "So here we go now
-    //  Holla if ya hear me though
-    //  Come and feel me flow" -- NBN
-    // 
-
-    if (!this._flowBoxes.length) { return; }
-
-    var ref = this.edges.ref;
-    var actual = this.edges.actual;
-    var containing = actual;
-    var constrain = this.solver.add.bind(this.solver);
-
-    var prev = null;
-    var last = null;
-
-    this._flowBoxes.forEach(function(child) {
-
-      if (!child._isInFlow) {
-        console.warn("not in flow!: " + child);
-        return;
-      }
-
-      switch(this.blockProgression) {
-        case "tb":
-          // Left and right edges of our block children are our content
-          // left/right.
-          constrain(
-            eq(child.edges.ref.margin._left, containing.content._left, strong),
-            eq(child.edges.ref.margin._right, containing.content._right, strong)
-          );
-
-          // Next, top is the previous bottom, else containing's content top;
-          if (last) {
-            constrain(
-              eq(child.edges.actual.outer._top, last.edges.actual.outer._bottom, strong)
-            );
-          } else {
-            constrain(
-              eq(child.edges.ref.margin._top, containing.content._top, strong)
-            );
-          }
-          prev = last;
-          last = child;
-
-          // TODO(slightlyoff): margin collapsing!
-          break;
-        case "rl": // TODO(slightlyoff)
-        case "bt": // TODO(slightlyoff)
-        case "lr": // TODO(slightlyoff)
-        default:
-          console.warn("Unsupported block-progression:",
-                       this.blockProgression);
-          break;
-      }
-      console.log("flowing: " + child + " in relation to: " + (prev||this));
-    }, this);
-  };
+var BFC = function() {
+  this._isBFC = true;
 };
 
 var _boxCtr = 0;
@@ -436,15 +390,9 @@ var RenderBox = c.inherit({
     // FIXME:
     //  Hate having these properties hanging off of every box, but it keeps the
     //  nodes out of our layout logic.
-    this._isInFlow = false;
     this._isInline = false;
     this._isBlock = false;
-    this._isFlowRoot = false;
-
-    if (isFlowRoot(node)) {
-      FlowRoot.call(this);
-    }
-
+    this._isBFC = false;
   },
 
   _className: "RenderBox",
@@ -768,6 +716,11 @@ var Block = c.inherit({
   initialize: function(node, cb){
     RenderBox.call(this, node, cb);
     cb.addBlock(this);
+
+    // Blocks are block containers.
+    this.blockProgression = "tb";
+    this._blocks = [];
+
     this._hasBlocks = false;
     this._hasInlines = false;
     this._openAnonymousBlock = null;
@@ -775,29 +728,19 @@ var Block = c.inherit({
   },
   addBlock: function(b) {
     if (b == this) { return; }
-
-    if (this._openAnonymousBlock) {
+    if (this._openAnonymousBlock &&
+        b != this._openAnonymousBlock) {
       // Open season is now closed.
       this._openAnonymousBlock = null;
     }
+    this._blocks.push(b);
   },
   addInline: function(i) {
     if (!this._openAnonymousBlock) {
       // Open season is now closed.
-      var oab = this._openAnonymousBlock = new AnonymousBlock(this);
-      oab._isInFlow = true;
-      oab.value("min-height", 10);
-      this._anonymousBlocks.push(oab);
-      if (this._isFlowRoot) {
-        console.log("adding: " + oab, "to flow directly");
-        this.addFlowBox(oab);
-      } else if (this.flowRoot) {
-        console.log("adding: " + oab, "to flowRoot");
-        this.flowRoot.addFlowBox(oab);
-      } else {
-        console.error("No FlowRoot found when attempting to flow anonymous box in:", this);
-      }
-      // console.log(this._anonymousBlocks.length);
+      this._openAnonymousBlock = new AnonymousBlock(this);
+      this._anonymousBlocks.push(this._openAnonymousBlock);
+      this.addBlock(this._openAnonymousBlock);
     }
     this._openAnonymousBlock.addInline(i);
   },
@@ -809,6 +752,65 @@ var Block = c.inherit({
   fillLineBoxes: function() {
     RenderBox.prototype.fillLineBoxes.call(this);
     this._anonymousBlocks.forEach(function(ab){ ab.fillLineBoxes(); });
+  },
+  flow: function() {
+    // 
+    // "So here we go now
+    //  Holla if ya hear me though
+    //  Come and feel me flow" -- NBN
+    // 
+
+    if (!this._blocks.length) { return; }
+
+    var ref = this.edges.ref;
+    var actual = this.edges.actual;
+    var containing = actual;
+    var constrain = this.solver.add.bind(this.solver);
+
+    var prev = null;
+    var last = null;
+
+    this._blocks.forEach(function(child) {
+
+      if (child.node && !isInFlow(child.node)) {
+        console.warn("not in flow!: " + child);
+        return;
+      }
+
+      switch(this.blockProgression) {
+        case "tb":
+          // Left and right edges of our block children are our content
+          // left/right.
+          constrain(
+            eq(child.edges.ref.margin._left, containing.content._left, strong),
+            eq(child.edges.ref.margin._right, containing.content._right, strong)
+          );
+
+          // Next, top is the previous bottom, else containing's content top;
+          if (last) {
+            constrain(
+              eq(child.edges.actual.outer._top, last.edges.actual.outer._bottom, strong)
+            );
+          } else {
+            constrain(
+              eq(child.edges.ref.margin._top, containing.content._top, strong)
+            );
+          }
+          prev = last;
+          last = child;
+
+          // TODO(slightlyoff): margin collapsing!
+          break;
+        case "rl": // TODO(slightlyoff)
+        case "bt": // TODO(slightlyoff)
+        case "lr": // TODO(slightlyoff)
+        default:
+          console.warn("Unsupported block-progression:",
+                       this.blockProgression);
+          break;
+      }
+      console.log("flowing: " + child + " in relation to: " + (prev||this));
+    }, this);
   },
 });
 
@@ -999,7 +1001,6 @@ var Viewport = c.inherit({
     //  whose dimensions it copies, setting margin/padding/border to zero.
     this.solver = new c.SimplexSolver();
     Block.call(this, node, this);
-    FlowRoot.call(this);
     //TODO: Block.call(this, node);
     this.naturalSize = new MeasuredBox(0, 0, width, height);
     this.containingBlock = this;
@@ -1181,7 +1182,7 @@ var _layoutFor = function(id, boxesCallback) {
   // var containingStack = [{ box: v, node: containingNode }];
 
   var boxes = [];
-  var flowRoots = [];
+  var blocks = [];
   var solver = v.solver;
   var defaultBlockProgression = "tb";
 
@@ -1222,6 +1223,7 @@ var _layoutFor = function(id, boxesCallback) {
     return nodeToBoxMap.get(pn);
   };
 
+  /*
   var getFlowRoot = function(n) {
     var pn = n.parentNode;
     while (pn && pn != dde && !nodeToBoxMap.get(pn)._isFlowRoot) {
@@ -1230,6 +1232,7 @@ var _layoutFor = function(id, boxesCallback) {
     if (!pn) { pn = dde; }
     return nodeToBoxMap.get(pn);
   };
+  */
 
   visibleNodes.forEach(function(node) {
     var parentBox = nodeToBoxMap.get(node.parentNode);
@@ -1249,21 +1252,15 @@ var _layoutFor = function(id, boxesCallback) {
       if (isBlock(node)) {
         b = new Block(node, cb);
         b._isBlock = true; b._isInline = false;
+        blocks.push(b);
       }
       if (isInline(node)) {
         b = new Inline(node, cb);
         b._isInline = true; b._isBlock = false;
       }
 
-      if (isInFlow(node)) {
-        b._isInFlow = true;
-        getFlowRoot(node).addFlowBox(b);
-      }
       nodeToBoxMap.set(node, b);
       boxes.push(b);
-      if (b._isFlowRoot) {
-        flowRoots.push(b);
-      }
       prev = b;
 
     } else {
@@ -1298,7 +1295,7 @@ var _layoutFor = function(id, boxesCallback) {
 
   // Add the viewport to the list.
   boxes.unshift(v);
-  flowRoots.unshift(v);
+  blocks.unshift(v);
 
   // FIXME(slightlyoff):
   //    Add anonymous boxe parents here for text children of flow roots with
@@ -1308,7 +1305,7 @@ var _layoutFor = function(id, boxesCallback) {
   boxes.forEach(function(box) { box.generate(); });
 
   // Genereate constraints to flow all normally-positioned block boxes.
-  flowRoots.forEach(function(root) { root.flow(); });
+  blocks.forEach(function(root) { root.flow(); });
 
   // Text layout pass. Once our widths have all been determined, we place each
   // text segment and do wrapping. Once we've
