@@ -516,19 +516,6 @@ var RenderBox = c.inherit({
     var ml = (vals.marginLeft.isAuto && !vals.webkitMarginStart.isAuto) ?
                 vals.webkitMarginStart.px : vals.marginLeft.px;
 
-
-    /*
-    console.log("margin before/end/after/start:", vals.webkitMarginBefore.raw,
-                                                  vals.webkitMarginEnd.raw,
-                                                  vals.webkitMarginAfter.raw,
-                                                  vals.webkitMarginStart.raw);
-    console.log("specified margins:", vals.marginTop.raw,
-                                      vals.marginRight.raw,
-                                      vals.marginBottom.raw,
-                                      vals.marginLeft.raw);
-    console.log("effective margin of:", mt, mr, mb, ml);
-    */
-
     constrain(
       eq(c.Minus(ref.border._top, mt),
         ref.margin._top,
@@ -666,6 +653,7 @@ var RenderBox = c.inherit({
     ) {
       posRefBox = containing;
     }
+
     if (posRefBox) {
       // TODO: tersify and add similar % support in other places.
       if (!vals.top.isAuto) {
@@ -680,8 +668,9 @@ var RenderBox = c.inherit({
         } else {
           topExpr = c.Plus(posRefBox.margin._top, vals.top.px);
         }
-        constrain(eq(actual.margin._top, topExpr, required));
+        constrain(eq(actual.border._top, topExpr, required));
       }
+
       if (!vals.left.isAuto) {
         var leftExpr;
         if (vals.left.isPct) {
@@ -694,8 +683,9 @@ var RenderBox = c.inherit({
         } else {
           leftExpr = c.Plus(posRefBox.margin._left, vals.left.px);
         }
-        constrain(eq(actual.margin._left, leftExpr, required));
+        constrain(eq(actual.border._left, leftExpr, required));
       }
+
       if (!vals.right.isAuto) {
         var rightExpr;
         if (vals.right.isPct) {
@@ -706,10 +696,11 @@ var RenderBox = c.inherit({
                               )
                        );
         } else {
-          rightExpr = c.Minus(posRefBox.margin._right, vals.right.px);
+          rightExpr = c.Minus(posRefBox.content._right, vals.right.px);
         }
-        constrain(eq(actual.margin._right, rightExpr, required));
+        constrain(eq(actual.border._right, rightExpr, required));
       }
+
       if (!vals.bottom.isAuto) {
         var bottomExpr;
         if (vals.bottom.isPct) {
@@ -722,7 +713,7 @@ var RenderBox = c.inherit({
         } else {
           bottomExpr = c.Minus(posRefBox.margin._bottom, vals.bottom.px);
         }
-        constrain(eq(actual.margin._bottom, bottomExpr, required));
+        constrain(eq(actual.border._bottom, bottomExpr, required));
       }
     }
 
