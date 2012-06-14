@@ -59,7 +59,7 @@ c.Variable = c.inherit({
 });
 
 /* static */
-c.Variable._map = [];
+// c.Variable._map = [];
 
 c.DummyVariable = c.inherit({
   extends: c.AbstractVariable,
