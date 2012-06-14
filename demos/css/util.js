@@ -26,10 +26,16 @@ scope.toArray = function(a) {
   return Array.prototype.slice.call(arguments);
 };
 
+var tcc = new Map();
+
 scope.toCamelCase = function(str) {
   // TODO(slightlyoff): memoize!
+  var cr = tcc.get(str);
+  if (cr) {
+    return cr;
+  }
   var first = true;
-  return str.split(/[-_]/).map(function(v, i) {
+  var ccv = str.split(/[-_]/).map(function(v, i) {
     if (!v) { return; }
     if (v && !first) {
       return v.substr(0, 1).toUpperCase() + v.substr(1);
@@ -37,6 +43,8 @@ scope.toCamelCase = function(str) {
     first = false;
     return v;
   }).join("");
+  tcc.set(str, ccv);
+  return ccv;
 };
 
 var callOrOnload = function(obj, cb) {
