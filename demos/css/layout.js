@@ -105,6 +105,12 @@ var css = function(propertyName, node) {
     node = this.node;
   }
   node = (node.nodeType == 1) ? node : node.parentNode;
+  /*
+  if (!node || !node.ownerDocument) {
+    console.error("NO NODE!");
+    debugger;
+  }
+  */
   if (_localCssProperties.indexOf(propertyName) >= 0) {
     // We don't trust getComputedStyle since it returns used values for these
     // properties, so we instead look to see what the node itself has
@@ -651,74 +657,72 @@ var RenderBox = c.inherit({
     //
     // TODO(slightlyoff)
     //
-    var pos = vals.position;
-    // console.log("pos:", pos+" {", vals.top+"", vals.right+"", vals.bottom+"", vals.left+" }");
-    if (pos == "relative") {
+    var posRefBox;
+    if (vals.position == "relative") {
+      posRefBox = ref;
+    } else if(
+      vals.position == "absolute" ||
+      vals.position == "fixed"
+    ) {
+      posRefBox = containing;
+    }
+    if (posRefBox) {
+      // TODO: tersify and add similar % support in other places.
       if (!vals.top.isAuto) {
-        constrain(
-          eq(actual.margin._top,
-            c.Plus(ref.margin._top, vals.top.px),
-            required
-          )
-        );
+        var topExpr;
+        if (vals.top.isPct) {
+          topExpr = c.Plus(posRefBox.margin._top, 
+                              c.Times(
+                                c.Minus(posRefBox.border._bottom, posRefBox.border._top),
+                                vals.top.pct/100
+                              )
+                       );
+        } else {
+          topExpr = c.Plus(posRefBox.margin._top, vals.top.px);
+        }
+        constrain(eq(actual.margin._top, topExpr, required));
       }
       if (!vals.left.isAuto) {
-        constrain(
-          eq(actual.margin._left,
-            c.Plus(ref.margin._left, vals.left.px),
-            required
-          )
-        );
+        var leftExpr;
+        if (vals.left.isPct) {
+          leftExpr = c.Plus(posRefBox.margin._left, 
+                            c.Times(
+                              c.Minus(posRefBox.border._right, posRefBox.border._left),
+                              vals.left.pct/100
+                            )
+                     );
+        } else {
+          leftExpr = c.Plus(posRefBox.margin._left, vals.left.px);
+        }
+        constrain(eq(actual.margin._left, leftExpr, required));
       }
       if (!vals.right.isAuto) {
-        constrain(
-          eq(actual.margin._right,
-            c.Minus(ref.margin._right, vals.right.px),
-            required
-          )
-        );
+        var rightExpr;
+        if (vals.right.isPct) {
+          rightExpr = c.Minus(posRefBox.margin._right, 
+                              c.Times(
+                                c.Minus(posRefBox.border._right, posRefBox.border._left),
+                                vals.right.pct/100
+                              )
+                       );
+        } else {
+          rightExpr = c.Minus(posRefBox.margin._right, vals.right.px);
+        }
+        constrain(eq(actual.margin._right, rightExpr, required));
       }
       if (!vals.bottom.isAuto) {
-        constrain(
-          eq(actual.margin._bottom,
-            c.Minus(ref.margin._bottom, vals.bottom.px),
-            required
-          )
-        );
-      }
-    } else if(pos == "absolute" || pos == "fixed") {
-      if (!vals.top.isAuto) {
-        constrain(
-          eq(
-            actual.margin._top,
-            c.Plus(containing.margin._top, vals.top.px),
-            required
-          )
-        );
-      }
-      if (!vals.left.isAuto) {
-        constrain(
-          eq(actual.margin._left,
-            c.Plus(containing.margin._left, vals.left.px),
-            required
-          )
-        );
-      }
-      if (!vals.right.isAuto) {
-        constrain(
-          eq(actual.margin._right,
-            c.Minus(containing.margin._right, vals.right.px),
-            required
-          )
-        );
-      }
-      if (!vals.bottom.isAuto) {
-        constrain(
-          eq(actual.margin._bottom,
-            c.Minus(containing.margin._bottom, vals.bottom.px),
-            required
-          )
-        );
+        var bottomExpr;
+        if (vals.bottom.isPct) {
+          bottomExpr = c.Minus(posRefBox.margin._bottom, 
+                               c.Times(
+                                 c.Minus(posRefBox.border._bottom, posRefBox.border._top),
+                                 vals.bottom.pct/100
+                               )
+                       );
+        } else {
+          bottomExpr = c.Minus(posRefBox.margin._bottom, vals.bottom.px);
+        }
+        constrain(eq(actual.margin._bottom, bottomExpr, required));
       }
     }
 

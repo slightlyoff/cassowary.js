@@ -78,16 +78,18 @@
 
       // this.renderDebug = true;
 
+      this.doLayout = function() {
+        console.time("layout");
+        layoutFor("f", function(boxes) {
+          console.timeEnd("layout");
+          console.time("render");
+          renderTo("c", boxes);
+          console.timeEnd("render");
+        });
+      };
+
       ready(function() {
-        setTimeout(function() {
-          console.time("layout");
-          layoutFor("f", function(boxes) {
-            console.timeEnd("layout");
-            console.time("render");
-            renderTo("c", boxes);
-            console.timeEnd("render");
-          });
-        }, 100);
+        setTimeout(doLayout, 100);
       });
     </script>
 
@@ -98,5 +100,6 @@
 
     <h2>Constraint rendering to a <code>&lt;canvas&gt;</code></h2>
     <canvas id="c" width="800" height="200" style="background-color: lightgray"></canvas>
+    <button onclick="doLayout();">Do layout.</button>
   </body>
 </html>
