@@ -166,6 +166,14 @@ var isInline = function(n) {
   );
 };
 
+var isInlineBlock = function(n) {
+  if (!isElement(n)) return false;
+  return (
+    css("display", n).raw == "inline-block" ||
+    css("display", n).raw == "inline-table"
+  );
+};
+
 var isFixed = function(n) {
   if (!isElement(n)) return false;
   return (css("position", n).raw == "fixed");
@@ -180,27 +188,6 @@ var isPositioned = function(n) {
     css("position", n).raw == "page" // TODO(slightlyoff)
   );
 };
-
-/*
-var isFlowRoot = function(n) {
-  if (!isElement(n)) return false;
-  return (
-    css("float", n).raw != "none" ||
-    css("overflow", n).raw != "visible" || // FIXME: need to get USED value!
-    css("display", n).raw == "table-cell" ||
-    css("display", n).raw == "table-caption" ||
-    css("display", n).raw == "inline-block" ||
-    css("display", n).raw == "inline-table" ||
-    (
-      css("position", n).raw != "static" &&
-      css("position", n).raw != "relative"
-    )
-    // FIXME:
-    //      Need to account for "block-progression" here, but WebKit
-    //      doesn't support it yet, so it's not accessible through the DOM.
-  );
-};
-*/
 
 var isInFlow = function(n) {
   if (!isElement(n)) return false;
@@ -285,6 +272,12 @@ var Box = c.inherit({
   get height() { return this.bottom - this.top; },
 
   // FIXME(slightlyoff): need setters to over-ride the values for debugging!
+  toString: function() {
+    return "Box: { top: "    + this.top +
+                ", right: "  + this.right +
+                ", bottom: " + this.bottom +
+                ", left: "   + this.left + " }";
+  },
 });
 
 var Edgy = function() {
@@ -418,6 +411,10 @@ var RenderBox = c.inherit({
     "margin-right-width",
     "margin-bottom-width",
     "margin-left-width",
+    "-webkit-margin-before",
+    "-webkit-margin-after",
+    "-webkit-margin-start",
+    "-webkit-margin-end",
     "border-top",
     "border-right",
     "border-bottom",
@@ -501,20 +498,45 @@ var RenderBox = c.inherit({
       )
     );
 
+    var mt = (vals.marginTop.isAuto && !vals.webkitMarginBefore.isAuto) ?
+                vals.webkitMarginBefore.px : vals.marginTop.px;
+
+    var mr = (vals.marginRight.isAuto && !vals.webkitMarginEnd.isAuto) ?
+                vals.webkitMarginEnd.px : vals.marginRight.px;
+
+    var mb = (vals.marginBottom.isAuto && !vals.webkitMarginAfter.isAuto) ?
+                vals.webkitMarginAfter.px : vals.marginBottom.px;
+
+    var ml = (vals.marginLeft.isAuto && !vals.webkitMarginStart.isAuto) ?
+                vals.webkitMarginStart.px : vals.marginLeft.px;
+
+
+    /*
+    console.log("margin before/end/after/start:", vals.webkitMarginBefore.raw,
+                                                  vals.webkitMarginEnd.raw,
+                                                  vals.webkitMarginAfter.raw,
+                                                  vals.webkitMarginStart.raw);
+    console.log("specified margins:", vals.marginTop.raw,
+                                      vals.marginRight.raw,
+                                      vals.marginBottom.raw,
+                                      vals.marginLeft.raw);
+    console.log("effective margin of:", mt, mr, mb, ml);
+    */
+
     constrain(
-      eq(c.Minus(ref.border._top, vals.marginTop.px),
+      eq(c.Minus(ref.border._top, mt),
         ref.margin._top,
         required
       ),
-      eq(c.Minus(ref.border._left, vals.marginLeft.px),
+      eq(c.Minus(ref.border._left, ml),
         ref.margin._left,
         required
       ),
-      eq(c.Plus(ref.border._right, vals.marginRight.px),
+      eq(c.Plus(ref.border._right, mr),
         ref.margin._right,
         required
       ),
-      eq(c.Plus(ref.border._bottom, vals.marginBottom.px),
+      eq(c.Plus(ref.border._bottom, mb),
         ref.margin._bottom,
         required
       )
@@ -713,13 +735,19 @@ var RenderBox = c.inherit({
 var Block = c.inherit({
   extends: RenderBox, // TODO: Block, 
   _className: "Block",
-  initialize: function(node, cb){
+  debugColor: "rgba(82,125,255,1)",
+  // debugColor: "yellow",
+  initialize: function(node, cb, noAddBlock){
     RenderBox.call(this, node, cb);
-    cb.addBlock(this);
+    if (typeof noAddBlock == "undefined" && noAddBlock !== false) {
+      console.log("adding block", this._className, this._id, "to", cb._className, cb._id);
+      cb.addBlock(this);
+    }
 
     // Blocks are block containers.
     this.blockProgression = "tb";
     this._blocks = [];
+    this.childBoxes = [];
 
     this._hasBlocks = false;
     this._hasInlines = false;
@@ -734,6 +762,7 @@ var Block = c.inherit({
       this._openAnonymousBlock = null;
     }
     this._blocks.push(b);
+    this.childBoxes.push(b);
   },
   addInline: function(i) {
     if (!this._openAnonymousBlock) {
@@ -760,7 +789,10 @@ var Block = c.inherit({
     //  Come and feel me flow" -- NBN
     // 
 
-    if (!this._blocks.length) { return; }
+    if (!this._blocks.length) {
+      console.warn("bailing on flow(), no child blocks!");
+      return;
+    }
 
     var ref = this.edges.ref;
     var actual = this.edges.actual;
@@ -795,6 +827,16 @@ var Block = c.inherit({
             constrain(
               eq(child.edges.ref.margin._top, containing.content._top, strong)
             );
+            // console.log("initial flow child: " + child, "below:", containing.content._top.value());
+            if (this.className == "InlineBlock") {
+              console.log("initial flow child: " + child);
+              console.log(" -- below:", this._id);
+              console.log(" -- outer: "  + this.edges.actual.margin);
+              console.log(" -- inner: "  + this.edges.actual.content);
+              console.log(" -- margin-top:", this.value("margin-top").raw);
+              console.log(" -- padding-top:", this.value("padding-top").raw);
+              console.log(" -- border-top:", this.value("border-top-width").raw);
+            }
           }
           prev = last;
           last = child;
@@ -809,7 +851,7 @@ var Block = c.inherit({
                        this.blockProgression);
           break;
       }
-      console.log("flowing: " + child + " in relation to: " + (prev||this));
+      // console.log("flowing: " + child + " in relation to: " + (prev||this));
     }, this);
   },
 });
@@ -817,15 +859,17 @@ var Block = c.inherit({
 var AnonymousBlock = c.inherit({
   extends: RenderBox, // TODO: Block, 
   _className: "AnonymousBlock",
+  debugColor: "rgba(255,84,186,1)",
   initialize: function(cb){
     this._id = _boxCtr++;
     EdgyLight.call(this);
-
     VarHeavy.call(this, this.boxProperties);
     this.containingBlock = cb;
     this.solver = cb.solver;
     this.inlines = [];
     this.lineBoxes = [];
+    this.childBoxes = [];
+    // this._heightConstraint = null;
   },
   addInline: function(i) {
     // Collect inlines for line box generation.
@@ -864,6 +908,7 @@ var AnonymousBlock = c.inherit({
   },
   fillLineBoxes: function() {
     console.log("fillLineBoxes() for " + this);
+    if (!this.inlines.length) { return; }
     var actual = this.edges.actual;
     var containing = this.containingBlock.edges.actual;
     var constrain = this.solver.add.bind(this.solver);
@@ -876,8 +921,10 @@ var AnonymousBlock = c.inherit({
     // end, we set our height to be the height of the 
     var lb = new LineBox(this);
     lb.below(actual.outer._top);
-    console.log("FIRST LINEBOX AT:", lb.edges.actual.outer.left, lb.edges.actual.outer.top);
+    var inc = 0;
+    console.log("LINEBOX", inc, "AT:", lb.edges.actual.outer.left, lb.edges.actual.outer.top);
     this.lineBoxes.push(lb);
+    this.childBoxes.push(lb);
     var l = actual.outer._left.value();
     var w = vars.width.value();
     this.inlines.forEach(function(i) {
@@ -886,14 +933,25 @@ var AnonymousBlock = c.inherit({
       } else {
         var nlb = new LineBox(this);
         this.lineBoxes.push(nlb);
+        this.childBoxes.push(lb);
         nlb.below(lb.edges.actual.outer._bottom);
-        console.log("NEWLINE AT:", nlb.edges.actual.outer.left, nlb.edges.actual.outer.top);
+        inc++;
+        // console.log("AT:", nlb.edges.actual.outer.left, nlb.edges.actual.outer.top);
+        console.log("LINEBOX", inc++, "AT:", nlb.edges.actual.outer.left, nlb.edges.actual.outer.top);
         lb = nlb;
       }
     }, this);
 
-    constrain(geq(actual.outer._bottom, lb.edges.actual.outer._bottom, strong));
-    console.log("filling line box with width:", vars.width.value(), "height:", vars.height.value());
+    console.log("Setting AnonymousBlock bottom to:", lb.edges.actual.outer._bottom.value());
+    constrain(eq(actual.content._bottom, lb.edges.actual.outer._bottom, strong));
+    /*
+    if (this._heightConstraint) {
+      this.solver.removeConstraint(this._heightConstraint);
+    }
+    this._heightConstraint = eq(this.vars.height, this.maxHeight, strong)
+    this.solver.add(this._heightConstraint);
+    */
+    // console.log("filling line box with width:", vars.width.value(), "height:", vars.height.value());
 
     /*
     console.log("left:", actual.outer._left.value());
@@ -907,6 +965,8 @@ var AnonymousBlock = c.inherit({
 
 var LineBox = c.inherit({
   _className: "LineBox",
+  debugColor: "rgba(156,250,152,1)",
+  // debugColor: "yellow",
   initialize: function(cb){
     this._id = _boxCtr++;
     EdgyLight.call(this);
@@ -914,6 +974,7 @@ var LineBox = c.inherit({
     this.containingBlock = cb;
     this.solver = cb.solver;
     this.inlines = [];
+    this.childBoxes = [];
     this.accumulatedWidth = 0;
     this.maxHeight = 0;
     this._heightConstraint = null;
@@ -966,6 +1027,7 @@ var LineBox = c.inherit({
     return (inline.edges.actual.outer.width + this.accumulatedWidth <= outerWidth);
   },
   add: function(inline) {
+    this.childBoxes.push(inline);
     this.solver.add(
       eq(inline.edges.actual.outer._left,
         c.Plus(this.edges.actual.outer._left, this.accumulatedWidth),
@@ -985,8 +1047,9 @@ var LineBox = c.inherit({
       if (this._heightConstraint) {
         this.solver.removeConstraint(this._heightConstraint);
       }
-      this._heightConstraint = eq(this.vars.height, 20, strong)
+      this._heightConstraint = eq(this.vars.height, this.maxHeight, strong)
       this.solver.add(this._heightConstraint);
+      console.log("MAX HEIGHT NOW:", this.maxHeight);
     }
     // console.log("left:", inline.edges.actual.outer._left.value(), "top:", inline.edges.actual.outer._top.value());
   },
@@ -995,13 +1058,13 @@ var LineBox = c.inherit({
 var Viewport = c.inherit({
   extends: Block, // TODO: Block, 
   _className: "Viewport", // for toString()
+  debugColor: "rgba(233,250,124,1)",
   initialize: function(width, height, node){
     // Viewport:
     //  The item that everything else is realtive to. It takes a source node
     //  whose dimensions it copies, setting margin/padding/border to zero.
     this.solver = new c.SimplexSolver();
     Block.call(this, node, this);
-    //TODO: Block.call(this, node);
     this.naturalSize = new MeasuredBox(0, 0, width, height);
     this.containingBlock = this;
     this.generate();
@@ -1026,15 +1089,33 @@ var Viewport = c.inherit({
 var Inline = c.inherit({
   extends: RenderBox,
   _className: "Inline", // for toString()
+  debugColor: "rgba(154,254,254,1)",
   initialize: function(node, cb){
     RenderBox.call(this, node, cb);
+    this._isBlock = false;
+    this._isInline = true;
     cb.addInline(this);
+    console.log("adding inline", this._className, this._id, "to", cb._className, cb._id);
+  },
+});
+
+var InlineBlock = c.inherit({
+  extends: Block,
+  _className: "InlineBlock",
+  initialize: function(node, cb){
+    Block.call(this, node, cb, true);
+    this._isBlock = true;
+    this._isInline = true;
+    cb.addInline(this);
+    console.log("adding inline", this._className, this._id, "to", cb._className, cb._id);
   },
 });
 
 var TextBox = c.inherit({
   extends: Inline,
   _className: "TextBox", // for toString()
+  // debugColor: "rgba(173,173,173,1)",
+  debugColor: "rgba(173,173,173,1)",
   initialize: function(node, cb){
     this.text = node.nodeValue;
     Inline.call(this, node, cb);
@@ -1207,7 +1288,7 @@ var _layoutFor = function(id, boxesCallback) {
       pn = dde;
     } else {
       if (!isPositioned(n)) {
-        while (pn && pn != dde && !isBlock(pn)) {
+        while (pn && pn != dde && !isBlock(pn) && !isInlineBlock(pn)) {
           pn = pn.parentNode;
         }
       } else {
@@ -1233,6 +1314,7 @@ var _layoutFor = function(id, boxesCallback) {
     return nodeToBoxMap.get(pn);
   };
   */
+  console.time("nodes to boxes");
 
   visibleNodes.forEach(function(node) {
     var parentBox = nodeToBoxMap.get(node.parentNode);
@@ -1249,14 +1331,14 @@ var _layoutFor = function(id, boxesCallback) {
 
       // TODO(slightlyoff): implement run-in detection
       var b;
-      if (isBlock(node)) {
-        b = new Block(node, cb);
-        b._isBlock = true; b._isInline = false;
+      if (isInlineBlock(node)) {
+        b = new InlineBlock(node, cb);
         blocks.push(b);
-      }
-      if (isInline(node)) {
+      } else if (isBlock(node)) {
+        b = new Block(node, cb);
+        blocks.push(b);
+      } else if(isInline(node)) {
         b = new Inline(node, cb);
-        b._isInline = true; b._isBlock = false;
       }
 
       nodeToBoxMap.set(node, b);
@@ -1285,7 +1367,7 @@ var _layoutFor = function(id, boxesCallback) {
           var b = new TextBox(head, cb)
           b.generate();
           nodeToBoxMap.set(head, b);
-          boxes.push(b);
+          // boxes.push(b);
           prev = b;
         }
         head = tail;
@@ -1297,22 +1379,46 @@ var _layoutFor = function(id, boxesCallback) {
   boxes.unshift(v);
   blocks.unshift(v);
 
+  console.timeEnd("nodes to boxes");
+
+  solver.autoSolve = false;
+
   // FIXME(slightlyoff):
   //    Add anonymous boxe parents here for text children of flow roots with
   //    other block children.
 
   // Generate our generic box constraints.
+  console.time("generate initial constraints");
   boxes.forEach(function(box) { box.generate(); });
+  solver.resolve();
+  console.timeEnd("generate initial constraints");
 
   // Genereate constraints to flow all normally-positioned block boxes.
-  blocks.forEach(function(root) { root.flow(); });
+  console.time("flow blocks");
+  // FIXME: should be able to disable auto-solve here!
+  solver.autoSolve = true;
+  blocks.forEach(function(block) {
+    console.log("flowing:", block._className);
+    block.flow();
+    // solver.resolve();
+  });
+  solver.autoSolve = false;
+  console.timeEnd("flow blocks");
 
   // Text layout pass. Once our widths have all been determined, we place each
   // text segment and do wrapping. Once we've
   // solved for flowed blocks, we update our container's height to fit and
   // re-solve the entire system. We only call for painting once this has been
   // done everywhere.
-  boxes.forEach(function(box) { box.fillLineBoxes(); });
+  console.time("fill line boxes");
+  // FIXME: should be able to disable auto-solve here!
+  solver.autoSolve = true;
+  boxes.forEach(function(box) {
+    box.fillLineBoxes();
+    // solver.resolve();
+  });
+  solver.autoSolve = false;
+  console.timeEnd("fill line boxes");
 
   // TODO(slightlyoff): sort boxes into stacking contexts for rendering!
   //                    See CSS 2.1 section E.2 for details.

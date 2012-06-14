@@ -28,10 +28,13 @@ scope.toArray = function(a) {
 
 scope.toCamelCase = function(str) {
   // TODO(slightlyoff): memoize!
+  var first = true;
   return str.split(/[-_]/).map(function(v, i) {
-    if (v && i) {
+    if (!v) { return; }
+    if (v && !first) {
       return v.substr(0, 1).toUpperCase() + v.substr(1);
     }
+    first = false;
     return v;
   }).join("");
 };
@@ -48,7 +51,8 @@ scope.ready = function(cb, d) {
   cb = cb || function(){};
   if (d) { // id of an iframe
     if (typeof d == "string") {
-      callOrOnload(scope.frames[d], cb);
+      var f = scope.frames[d]||document.getElementById(d).contentWindow;
+      callOrOnload(f, cb);
     } else {
       callOrOnload(d, cb);
     }

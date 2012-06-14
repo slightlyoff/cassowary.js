@@ -76,12 +76,18 @@
     <script>
       "use strict";
 
-      this.renderDebug = true;
+      // this.renderDebug = true;
 
       ready(function() {
-        layoutFor("f", function(boxes) {
-          renderTo("c", boxes);
-        });
+        setTimeout(function() {
+          console.time("layout");
+          layoutFor("f", function(boxes) {
+            console.timeEnd("layout");
+            console.time("render");
+            renderTo("c", boxes);
+            console.timeEnd("render");
+          });
+        }, 100);
       });
     </script>
 
