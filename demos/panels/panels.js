@@ -513,7 +513,7 @@ scope.Panel = c.inherit({
 
       leq(v.width,         v.maxWidth, medium, 3),
       leq(v.height,        v.maxHeight, medium, 3),
-      leq(v.contentWidth,  v.maxContetnWidth, medium, 2),
+      leq(v.contentWidth,  v.maxContentWidth, medium, 2),
       leq(v.contentHeight, v.maxContentHeight, medium, 2),
 
       // Total width is bigger than content width.
