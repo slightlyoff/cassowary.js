@@ -31,10 +31,16 @@ var leq = function(a1, a2, str, w) { return new c.LinearInequality(a1, c.LEQ, a2
 var stay = function(v, strength, weight) { 
   return new c.StayConstraint(v, strength || weak, weight || 1.0);
 };
-var weakStay =   function(v, w) { return stay(v, weak, w); };
-var mediumStay =   function(v, w) { return stay(v, medium, w); };
-var strongStay =   function(v, w) { return stay(v, strong, w); };
+var weakStay     = function(v, w) { return stay(v, weak, w); };
+var mediumStay   = function(v, w) { return stay(v, medium, w); };
+var strongStay   = function(v, w) { return stay(v, strong, w); };
 var requiredStay = function(v, w) { return stay(v, required, w); };
+
+var plus  = function(a1, a2) { return c.Plus(a1, a2); };
+var minus = function(a1, a2) { return c.Minus(a1, a2); };
+var times = function(a1, a2) { return c.Times(a1, a2); };
+var div   = function(a1, a2) { return c.Divide(a1, a2); };
+var cv    = function(n, val) { return new c.Variable(n, val); };
 
 var CSSValue = c.inherit({
   initialize: function(value, name) {
@@ -265,10 +271,10 @@ var MeasuredBox = c.inherit({
 
 var Box = c.inherit({
   initialize: function(top, left, right, bottom) {
-    this._top =    new c.Variable(top||0);
-    this._left =   new c.Variable(left||0);
-    this._right =  new c.Variable(right||0);
-    this._bottom = new c.Variable(bottom||0);
+    this._top =    cv(top||0);
+    this._left =   cv(left||0);
+    this._right =  cv(right||0);
+    this._bottom = cv(bottom||0);
   },
   get top()    { return this._top.value(); },
   get left()   { return this._left.value(); },
@@ -343,7 +349,7 @@ var VarHeavy = function(properties) {
         varv = this.vars[pn] = v;
       } else {
         if (!varv) {
-          varv = this.vars[pn] = new c.Variable(p, v);
+          varv = this.vars[pn] = cv(p, v);
         } else {
           varv._value = v;
         }
@@ -382,7 +388,7 @@ var RenderBox = c.inherit({
     }
     this.containingBlock = containingBlock;
  
-    this.vars.mediumWidth = new c.Variable("mediumWidth", DEFULT_MEDIUM_WIDTH);
+    this.vars.mediumWidth = cv("mediumWidth", DEFULT_MEDIUM_WIDTH);
     this.naturalSize = contentSize(node);
     this.solver = this.solver || this.containingBlock.solver;
 
@@ -464,7 +470,7 @@ var RenderBox = c.inherit({
 
     // Michalowski '98, Section 3.1
     
-    var _mediumWidth = new c.Variable("mediumWidth", DEFULT_MEDIUM_WIDTH);
+    var _mediumWidth = cv("mediumWidth", DEFULT_MEDIUM_WIDTH);
 
     constrain(
       eq(c.Minus(ref.content._top, vals.paddingTop.px),
@@ -917,7 +923,10 @@ var AnonymousBlock = c.inherit({
     var lb = new LineBox(this);
     lb.below(actual.outer._top);
     var inc = 0;
-    console.log("LINEBOX", inc, "AT:", lb.edges.actual.outer.left, lb.edges.actual.outer.top);
+    console.log("LINEBOX", inc, "AT:", lb.edges.actual.outer.left,
+                                       lb.edges.actual.outer.top,
+                                       "width:",
+                                       actual.outer.width);
     this.lineBoxes.push(lb);
     this.childBoxes.push(lb);
     var l = actual.outer._left.value();
