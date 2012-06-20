@@ -7,14 +7,14 @@ the [Cassowary hierarchial constraint
 toolkit](http://www.cs.washington.edu/research/constraints/cassowary/) to
 [JavaScript](http://cassowary.cvs.sourceforge.net/viewvc/cassowary/cassowary/js/).
 
-This fork dramatically improves the performance of the original mechanical
-translation (8x under V8, 5x under Rhino), removing external library
-dependencies while improving hackability. The solver core can now be used
-inside web workers and many modern browsers.
+This fork dramatically improves the performance of the original translation (8x
+under V8, 5x under Rhino), removes external library dependencies, and improves
+hackability. The solver core can now be used inside web workers and many modern
+browsers (see below for the list of supported runtimes).
 
-For discussion, questions on how to use the solver, and a small but civil
-community of folks working in this space is forming on the [Overconstrained
-mailing list](https://groups.google.com/forum/?fromgroups#!forum/overconstrained).
+For help using the system and civil discussion of constraint-based layout on
+the web, join the [Overconstrained mailing
+list](https://groups.google.com/forum/?fromgroups#!forum/overconstrained).
 
 Constraint Solver? Say What?
 ----------------------------
@@ -47,7 +47,8 @@ Web"](http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.101.4819)
 Getting Started
 ---------------
 
-This repo pulls in other Git repositories through [submodules](http://help.github.com/submodules/), so after cloning the repo, issue the following commands:
+This repo pulls in other Git repositories through
+[submodules](http://help.github.com/submodules/). After cloning the repo, run:
 
 ```
 $ git submodule init
@@ -132,9 +133,7 @@ This refactoring currently runs in:
 
 This is an unapolgetically modern reinterpretation optimized for size, low
 complexity, and speed. And litle else. No, it will not work on old versions of
-IE. Get [Chrome Frame](http://google.com/chromeframe) ;-) The idioms in use are
-tracking dev-channel Chrome and as soon as ES.next features become available
-there, this port will begin to use them. You have been warned.
+IE -- that's what [Chrome Frame](http://google.com/chromeframe) is for.
 
 Configuration
 -------------
@@ -152,9 +151,9 @@ c.traceAdded = [ false || true ]; // default false
 c.GC = [ false || true ]; // default false
 ```
 
-TODO(slightlyoff): show how to set configuration information through command line and in the tests.
-
-API
----
-
-TODO(slightlyoff)
+# TODO(slightlyoff): show how to set configuration information through command line and in the tests.
+# 
+# API
+# ---
+# 
+# TODO(slightlyoff)
