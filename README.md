@@ -151,9 +151,11 @@ c.traceAdded = [ false || true ]; // default false
 c.GC = [ false || true ]; // default false
 ```
 
-# TODO(slightlyoff): show how to set configuration information through command line and in the tests.
-# 
-# API
-# ---
-# 
-# TODO(slightlyoff)
+<!--
+TODO(slightlyoff): show how to set configuration information through command line and in the tests.
+
+API
+---
+
+TODO(slightlyoff)
+-->
