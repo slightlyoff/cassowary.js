@@ -183,6 +183,7 @@ var _renderTo = function(boxes, ctx) {
 
 scope.renderTo = function(id, boxes) {
   var ctx = document.getElementById(id).getContext("2d");
+  ctx.translate(30, 30);
   _renderTo(boxes, ctx);
 };
 
