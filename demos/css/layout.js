@@ -1466,13 +1466,14 @@ var _layoutFor = function(id, boxesCallback) {
   // Genereate constraints to flow all normally-positioned block boxes.
   console.time("flow blocks");
   // FIXME: should be able to disable auto-solve here!
-  solver.autoSolve = true;
+  // solver.autoSolve = true;
   blocks.forEach(function(block) {
     // console.log("flowing children of: " + block);
     block.flow();
     // solver.resolve();
   });
-  solver.autoSolve = false;
+  // solver.autoSolve = false;
+  solver.resolve();
   console.timeEnd("flow blocks");
 
   // Text layout pass. Once our widths have all been determined, we place each
@@ -1482,12 +1483,12 @@ var _layoutFor = function(id, boxesCallback) {
   // done everywhere.
   console.time("fill line boxes");
   // FIXME: should be able to disable auto-solve here!
-  solver.autoSolve = true;
+  // solver.autoSolve = true;
   boxes.forEach(function(box) {
     box.fillLineBoxes();
-    // solver.resolve();
   });
-  solver.autoSolve = false;
+  solver.resolve();
+  // solver.autoSolve = false;
   console.timeEnd("fill line boxes");
 
   // TODO(slightlyoff): sort boxes into stacking contexts for rendering!
