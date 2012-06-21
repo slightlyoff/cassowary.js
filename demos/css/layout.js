@@ -626,13 +626,15 @@ var RenderBox = c.inherit({
       )
     );
 
+    /*
     console.log("Generating for: " + this);
     console.log(" -- naturalSize:", "width:", this.naturalSize.width, "height:", this.naturalSize.height);
+    */
 
     constrain(eq(vars.width, this.naturalSize.width, weak));
 
     if (!vals.width.isAuto) {
-      console.log(" -- using specified size:", vals.width.px);
+      // console.log(" -- using specified size:", vals.width.px);
       constrain(eq(vars.width, vals.width.px, strong));
     }
 
@@ -870,10 +872,10 @@ var Block = c.inherit({
     var last = null;
 
     this._blocks.forEach(function(child) {
-      console.log("flowing child: " + child);
+      // console.log("flowing child: " + child);
 
       if (child.node && !isInFlow(child.node)) {
-        console.warn("not in flow!: " + child);
+        // console.warn("not in flow!: " + child);
         return;
       }
 
@@ -885,14 +887,14 @@ var Block = c.inherit({
             eq(child.edges.ref.outer._left, ref.content._left, required),
             eq(child.edges.ref.outer._right, ref.content._right, required)
           );
-          console.log(" -- our width is:", this.vars.width.value());
-          console.log(" -- child width is now:", child.vars.width.value());
+          // console.log(" -- our width is:", this.vars.width.value());
+          // console.log(" -- child width is now:", child.vars.width.value());
           constrain(
             leq(child.vars.width, this.vars.width, required),
             leq(child.vars.height, this.vars.height, required)
           );
-          console.log(" -- child width is now:", child.vars.width.value());
-          console.log(" -- our width is now:", this.vars.width.value());
+          // console.log(" -- child width is now:", child.vars.width.value());
+          // console.log(" -- our width is now:", this.vars.width.value());
 
           // Next, top is the previous bottom, else containing's content top;
           if (last) {
@@ -900,19 +902,19 @@ var Block = c.inherit({
               eq(child.edges.ref.outer._top, last.edges.ref.outer._bottom, medium)
             );
           } else {
-            console.log(" -- setting top to:", ref.content._top._value);
+            // console.log(" -- setting top to:", ref.content._top._value);
             constrain(
               eq(child.edges.ref.margin._top, ref.content._top, strong)
             );
             // console.log("initial flow child: " + child, "below:", containing.content._top.value());
             if (true || this.className == "InlineBlock") {
               // console.log("initial flow child: " + child);
-              console.log(" -- inside:", this+"");
-              console.log(" -- outer: "  + child.edges.actual.margin);
-              console.log(" -- inner: "  + child.edges.actual.content);
-              console.log(" -- margin-top:", child.value("margin-top").raw);
-              console.log(" -- padding-top:", child.value("padding-top").raw);
-              console.log(" -- border-top:", child.value("border-top-width").raw);
+              // console.log(" -- inside:", this+"");
+              // console.log(" -- outer: "  + child.edges.actual.margin);
+              // console.log(" -- inner: "  + child.edges.actual.content);
+              // console.log(" -- margin-top:", child.value("margin-top").raw);
+              // console.log(" -- padding-top:", child.value("padding-top").raw);
+              // console.log(" -- border-top:", child.value("border-top-width").raw);
             }
           }
           prev = last;
@@ -928,7 +930,7 @@ var Block = c.inherit({
                        this.blockProgression);
           break;
       }
-      console.log(" -- child dimensions now: " + child);
+      // console.log(" -- child dimensions now: " + child);
       // console.log("flowing: " + child + " in relation to: " + (prev||this));
     }, this);
   },
@@ -959,44 +961,44 @@ var AnonymousBlock = c.inherit({
     var constrain = this.solver.add.bind(this.solver);
     var vars = this.vars;
 
-    // Basic block model
     constrain(
+      // Basic block model
       geq(vars.width, 0, required),
       geq(vars.height, 0, required),
       geq(ref.outer._bottom, ref.outer._top, required),
-      // geq(ref.outer._top, 0, required),
       geq(ref.outer._right, ref.outer._left, required),
+      eq(
+        c.Plus(ref.outer._left, vars.width),
+        ref.outer._right,
+        strong
+      ),
+      eq(
+        c.Plus(ref.outer._top, vars.height),
+        ref.outer._bottom,
+        strong
+      ),
+      eq(ref.outer._left, vars.left, required),
+      eq(ref.outer._top, vars.top, required),
 
       eq(vars.width, this.containingBlock.naturalSize.width, weak),
 
-      eq(c.Plus(ref.outer._left, vars.width), ref.outer._right,
-        weak 
-      ),
-      eq(c.Plus(ref.outer._top, vars.height), ref.outer._bottom,
-        weak
-      ),
-
       // Set our left/right to our containing's
-      eq(ref.outer._left, containing.content._left, strong),
-      eq(ref.outer._right, containing.content._right, strong)
+      eq(vars.left, containing.content._left, medium),
+      eq(vars.right, containing.content._right, medium)
     );
-
-    console.log("AnonymousBlock containingBlock: " + this.containingBlock, this.containingBlock.node.tagName);
-    console.log("WIDTH:", this.containingBlock.vars.width, vars.width);
- 
-    // Our top should come from the flow and our bottom will be generated as a
-    // result of filling line boxes.
   },
   fillLineBoxes: function() {
-    console.log("fillLineBoxes() for " + this);
+    // console.log("fillLineBoxes() for " + this);
     // return;
     if (!this.inlines.length) { return; }
     var ref = this.edges.ref;
     var containing = this.containingBlock.edges.ref;
     var constrain = this.solver.add.bind(this.solver);
     var vars = this.vars;
+    /*
     console.log("our top is:", ref.outer._top.value());
     console.log("our container's top is:", containing.outer._top.value());
+    */
 
     // Create at least one line box, fill it with our inlines until their
     // cumulative widths overflow the block, and then keep going. At the very
@@ -1004,50 +1006,22 @@ var AnonymousBlock = c.inherit({
     var lb = new LineBox(this);
     lb.below(ref.outer._top);
     var inc = 0;
-    console.log("LINEBOX", inc, "AT:", lb.edges.ref.outer.left,
-                                       lb.edges.ref.outer.top,
-                                       "width:",
-                                       ref.outer.width,
-                                       "containing width:", containing.content.width);
-    console.log("  -- content:", this.inlines.map(function(i) { return i.text || i.node.outerHTML; }).join(" "));
     this.lineBoxes.push(lb);
     this.childBoxes.push(lb);
-    var l = ref.outer._left.value();
-    var w = vars.width.value();
     this.inlines.forEach(function(i) {
-      if (lb.canAccept(i)) {
-        lb.add(i);
-      } else {
+      if (!lb.canAccept(i)) {
         var nlb = new LineBox(this);
         this.lineBoxes.push(nlb);
         this.childBoxes.push(nlb);
         nlb.below(lb.edges.ref.outer._bottom);
         inc++;
-        // console.log("AT:", nlb.edges.ref.outer.left, nlb.edges.ref.outer.top);
-        console.log("LINEBOX", inc, "AT:", nlb.edges.ref.outer.left, nlb.edges.ref.outer.top);
         lb = nlb;
       }
+      lb.add(i);
     }, this);
 
-    console.log("Setting AnonymousBlock bottom to:", lb.edges.ref.outer._bottom.value());
+    // console.log("Setting AnonymousBlock bottom to:", lb.edges.ref.outer._bottom.value());
     constrain(eq(ref.content._bottom, lb.edges.ref.outer._bottom, strong));
-
-    /*
-    if (this._heightConstraint) {
-      this.solver.removeConstraint(this._heightConstraint);
-    }
-    this._heightConstraint = eq(this.vars.height, this.maxHeight, strong);
-    this.solver.add(this._heightConstraint);
-    */
-    // console.log("filling line box with width:", vars.width.value(), "height:", vars.height.value());
-
-    /*
-    console.log("left:", ref.outer._left.value());
-    console.log("right:", ref.outer._right.value());
-    console.log("containing left:", containing.outer._left.value());
-    console.log("containing right:", containing.outer._right.value());
-    console.log(this.toString());
-    */
   },
 });
 
@@ -1085,7 +1059,9 @@ var LineBox = c.inherit({
     // Basic block model
     this.solver.add(
       geq(vars.width, 0, required),
-      geq(vars.height, 0, required)
+      geq(vars.height, 0, required),
+      eq(ref.outer._left, vars.left, required),
+      eq(ref.outer._top, vars.top, required)
     );
 
     this.solver.add(
@@ -1101,14 +1077,13 @@ var LineBox = c.inherit({
       )
     );
 
-    console.log("fitting LineBox:", this._id, "in width:", this.containingBlock.vars.width.value());
     // Set our left/right to our containing's
     this.solver.add(
-      // weakStay(containing.outer._left),
-      // weakStay(containing.outer._right),
-      eq(vars.width,  this.containingBlock.vars.width, strong) // ,
+      eq(vars.width,  this.containingBlock.vars.width, medium),
+      eq(vars.left,  this.containingBlock.vars.left, medium) // ,
       // eq(ref.outer._right, containing.content._right, medium)
     );
+    // console.log("fitting LineBox:", this._id, "in width:", this.containingBlock.vars.width.value(), this+"");
   },
   below: function(edge) {
     // console.log("my top:", this.edges.actual.outer._top.value());
@@ -1119,13 +1094,13 @@ var LineBox = c.inherit({
     // console.log("my new top:", this.edges.actual.outer._top.value());
   },
   canAccept: function(inline) {
-    var outerWidth = this.containingBlock.vars.width.value();
-    console.log("canAccpet:", inline.edges.ref.outer.width + this.accumulatedWidth,  outerWidth, (inline.text||""));
-    return (inline.edges.ref.outer.width + this.accumulatedWidth <= outerWidth);
+    var cb = this.containingBlock;
+    var io = inline.edges.ref.outer;
+    var outerWidth = cb.vars.width.value();
+    return (io.width + this.accumulatedWidth <= outerWidth);
   },
   add: function(inline) {
     this.childBoxes.push(inline);
-    console.log("setting left of: " + inline, "to:", this.edges.ref.outer._left);
     this.solver.add(
       eq(inline.edges.ref.outer._left,
         c.Plus(this.edges.ref.outer._left, this.accumulatedWidth),
@@ -1139,16 +1114,13 @@ var LineBox = c.inherit({
     this.accumulatedWidth += inline.edges.ref.outer.width;
     var inlineHeight = inline.edges.ref.outer.height;
     if (inlineHeight > this.maxHeight) {
-      // console.log("new max height:", inlineHeight, "up from", this.maxHeight);
       this.maxHeight = inlineHeight;
       if (this._heightConstraint) {
         this.solver.removeConstraint(this._heightConstraint);
       }
       this._heightConstraint = eq(this.vars.height, this.maxHeight, strong)
       this.solver.add(this._heightConstraint);
-      console.log("MAX HEIGHT NOW:", this.maxHeight);
     }
-    // console.log("left:", inline.edges.ref.outer._left.value(), "top:", inline.edges.ref.outer._top.value());
   },
 });
 
@@ -1189,8 +1161,6 @@ var Viewport = c.inherit({
         eq(ref[type]._bottom, h, required)
       );
     }, this);
-
-    console.log("Generating for:" + this);
   },
 });
 
@@ -1203,7 +1173,6 @@ var Inline = c.inherit({
     this._isBlock = false;
     this._isInline = true;
     cb.addInline(this);
-    // console.log("adding inline", this._className, this._id, "to", cb._className, cb._id);
   },
 });
 
@@ -1215,7 +1184,6 @@ var InlineBlock = c.inherit({
     this._isBlock = true;
     this._isInline = true;
     cb.addInline(this);
-    // console.log("adding inline", this._className, this._id, "to", cb._className, cb._id);
   },
 });
 
@@ -1253,7 +1221,6 @@ var TextBox = c.inherit({
   generate: function() {
     if (this._generated) { return; }
     this._generated = true;
-    // console.log(this.naturalSize.width, this.naturalSize.height);
 
     var ref = this.edges.ref;
     this.solver.add(
@@ -1339,7 +1306,7 @@ var contentSize = function(node) {
   }
   m.appendChild(c);
   var mb = new MeasuredBox(0, 0, m.scrollWidth, m.scrollHeight);
-  console.log("contentSize(): returning: " + mb, "for:", node);
+  // console.log("contentSize(): returning: " + mb, "for:", node);
   return mb;
 };
 
@@ -1354,8 +1321,6 @@ var _layoutFor = function(id, boxesCallback) {
   }
   var d = doc(id),
       visibleNodes = findBoxGenerators(d.documentElement);
-
-  // console.log(visibleNodes);
 
   var viewportNode = document.getElementById(id);
   var dde = d.documentElement;
@@ -1404,11 +1369,9 @@ var _layoutFor = function(id, boxesCallback) {
           pn = pn.parentNode;
         }
       } else {
-        // console.log("looking for a positioned parent for:", n);
         while (pn && pn != dde && !(isBlock(pn) && isPositioned(pn))) {
           pn = pn.parentNode;
         }
-        // console.log("found:", pn);
       }
     }
 
@@ -1433,14 +1396,9 @@ var _layoutFor = function(id, boxesCallback) {
 
     var cb = getContainingBlock(node);
 
-    // console.log("containingBlock:", cb.node, "for node:", node);
-
     // Boxes in CSS always ahve "containing blocks". Boxes that are in a flow
     // also have "flow roots".
     if (isElement(node)) {
-      // console.log("isBlock:", isBlock(node), "isInline:", isInline(node), node);
-      // console.log("containgBlock node:", getContainingBlock(node).node);
-
       // TODO(slightlyoff): implement run-in detection
       var b;
       if (isInlineBlock(node)) {
@@ -1510,7 +1468,7 @@ var _layoutFor = function(id, boxesCallback) {
   // FIXME: should be able to disable auto-solve here!
   solver.autoSolve = true;
   blocks.forEach(function(block) {
-    console.log("flowing children of: " + block);
+    // console.log("flowing children of: " + block);
     block.flow();
     // solver.resolve();
   });
