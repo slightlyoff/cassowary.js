@@ -4,7 +4,7 @@
  * Use of this source code is governed by the LGPL, which can be found in the
  * COPYING.LGPL file.
  *
- * This is an API compatible re-implementation of a the subset of jshashtable
+ * This is an API compatible re-implementation of the subset of jshashtable
  * which Cassowary actually uses.
  *
  * Features removed:
