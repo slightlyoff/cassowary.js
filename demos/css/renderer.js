@@ -182,9 +182,13 @@ var _renderTo = function(boxes, ctx) {
 };
 
 scope.renderTo = function(id, boxes) {
-  var ctx = document.getElementById(id).getContext("2d");
+  var n = document.getElementById(id);
+  var ctx = n.getContext("2d");
+  ctx.save();
+  ctx.clearRect(0, 0, n.scrollWidth, n.scrollHeight);
   ctx.translate(30, 30);
   _renderTo(boxes, ctx);
+  ctx.restore();
 };
 
 })(this);

@@ -77,17 +77,17 @@
 
     <script>
       "use strict";
-      ready(function() {
-        setTimeout(function() {
-          console.time("layout");
-          layoutFor("f", function(boxes) {
-            console.timeEnd("layout");
-            console.time("render");
-            renderTo("c", boxes);
-            console.timeEnd("render");
-          });
-        }, 10);
-      });
+      this.doLayout = function() {
+        console.time("layout");
+        layoutFor("f", function(boxes) {
+          console.timeEnd("layout");
+          console.time("render");
+          renderTo("c", boxes);
+          console.timeEnd("render");
+        });
+      };
+
+      ready(function() { setTimeout(doLayout, 10); });
     </script>
 
   </head>
@@ -97,8 +97,7 @@
 
     <h2>Constraint rendering to a <code>&lt;canvas&gt;</code></h2>
     <canvas id="c" width="800" height="200" style="background-color: lightgray"></canvas>
-    <!--
+    <br>
     <button onclick="doLayout();">Do layout.</button>
-    -->
   </body>
 </html>

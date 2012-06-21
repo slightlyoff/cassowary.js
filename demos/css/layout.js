@@ -276,6 +276,7 @@ var isRunIn = function(n){
 };
 
 var DEFULT_MEDIUM_WIDTH = 3;
+var MEASURE_NODE_ID = "__measureNode";
 
 //////////////////////////////////////////////////////
 //  Types
@@ -1249,7 +1250,10 @@ var findBoxGenerators = function(element) {
         // Filter on elements that have some sort of display
         if (node.nodeType == 1) {
           var cs = global.getComputedStyle(node);
-          if (cs.getPropertyValue("display") == "none") {
+          if (
+            (cs.getPropertyValue("display") == "none") ||
+            (node.id == MEASURE_NODE_ID)
+          ) {
             return NodeFilter.FILTER_REJECT;
           }
         }
@@ -1288,6 +1292,7 @@ var getMeasureNode = function(doc) {
   mn.style.padding = "0px";
   mn.style.border = "0px";
   mn.style.margin = "0px";
+  mn.id = MEASURE_NODE_ID;
   doc.documentElement.appendChild(mn);
   docMeasureNodeMap.set(doc, mn);
   return mn;
