@@ -101,7 +101,6 @@ c.SimplexSolver = c.inherit({
       this.optimize(this._objective);
       this.setExternalVariables();
     }
-    cn.addedTo(this);
     return this;
   },
 
@@ -196,7 +195,6 @@ c.SimplexSolver = c.inherit({
 
   removeConstraint: function(cn /*c.Constraint*/) {
     this.removeConstraintInternal(cn);
-    cn.removedFrom(this);
     return this;
   },
 

@@ -12,7 +12,6 @@ c.Constraint = c.inherit({
     this.hash_code = c._inc();
     this.strength = strength || c.Strength.required;
     this.weight = weight || 1;
-    this._times_added = 0;
     this._attachedObject = null;
   },
 
@@ -30,23 +29,6 @@ c.Constraint = c.inherit({
     // this is abstract -- it intentionally leaves the parens unbalanced for
     // the subclasses to complete (e.g., with ' = 0', etc.
     return this.strength + " {" + this.weight + "} (" + this.expression +")";
-  },
-
-  /* Never used!? */
-  changeStrength: function(strength /*c.Strength*/) {
-    if (this._times_added == 0) {
-      this.strength = strength;
-    } else {
-      throw new c.TooDifficult();
-    }
-  },
-
-  addedTo: function(solver /*c.SimplexSolver*/) {
-    ++this._times_added;
-  },
-
-  removedFrom: function(solver /*c.SimplexSolver*/) {
-    --this._times_added;
   },
 });
 
