@@ -1277,6 +1277,7 @@ var findBoxGenerators = function(element) {
 //    hosting parents
 // The right answer, of course, is to just plumb through a measurement API from
 // WebKit directly and use this only in case of fallback.
+var Map = Map || scope.c.HashTable;
 var docMeasureNodeMap = new Map();
 var getMeasureNode = function(doc) {
   var mn = docMeasureNodeMap.get(doc);

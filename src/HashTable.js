@@ -157,4 +157,8 @@ c.HashTable = c.inherit({
   }
 });
 
+c.extend(c.HashTable.prototype, {
+  set: c.HashTable.prototype.put,
+});
+
 })(c);
