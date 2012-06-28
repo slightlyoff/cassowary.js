@@ -71,4 +71,4 @@ load('../src/Tableau.js')
 load('../src/SimplexSolver.js')
 
 load('../src/Timer.js')
-load('PerfTest.js')
+load('../tests/PerfTest.js')

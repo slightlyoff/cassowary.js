@@ -26,6 +26,7 @@ scope.toArray = function(a) {
   return Array.prototype.slice.call(arguments);
 };
 
+var Map = Map || scope.c.HashTable;
 var tcc = new Map();
 
 scope.toCamelCase = function(str) {
@@ -70,4 +71,3 @@ scope.ready = function(cb, d) {
 };
 
 })(this);
-

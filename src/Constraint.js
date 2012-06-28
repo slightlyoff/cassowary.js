@@ -12,17 +12,12 @@ c.Constraint = c.inherit({
     this.hash_code = c._inc();
     this.strength = strength || c.Strength.required;
     this.weight = weight || 1;
-    this._times_added = 0;
-    this._attachedObject = null;
-  },
-
-  hashCode: function() {
-    return this.hash_code;
   },
 
   isEditConstraint: false,
   isInequality:     false,
   isStayConstraint: false,
+  hashCode: function() { return this.hash_code; },
   // FIXME(slightlyoff): value, at worst a getter
   isRequired: function() { return this.strength.isRequired(); },
 
@@ -31,51 +26,28 @@ c.Constraint = c.inherit({
     // the subclasses to complete (e.g., with ' = 0', etc.
     return this.strength + " {" + this.weight + "} (" + this.expression +")";
   },
-
-  /* Never used!? */
-  changeStrength: function(strength /*c.Strength*/) {
-    if (this._times_added == 0) {
-      this.strength = strength;
-    } else {
-      throw new c.TooDifficult();
-    }
-  },
-
-  addedTo: function(solver /*c.SimplexSolver*/) {
-    ++this._times_added;
-  },
-
-  removedFrom: function(solver /*c.SimplexSolver*/) {
-    --this._times_added;
-  },
 });
 
+var ts = c.Constraint.prototype.toString;
+
 var EditOrStayCtor = function(clv /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
-  c.Constraint.call(this, strength, weight);
+  c.Constraint.call(this, strength || c.Strength.strong, weight);
   this.variable = clv;
   this.expression = new c.LinearExpression(clv, -1, clv.value());
 };
 
 c.EditConstraint = c.inherit({
   extends: c.Constraint,
-  initialize: function() {
-    EditOrStayCtor.apply(this, arguments);
-  },
+  initialize: function() { EditOrStayCtor.apply(this, arguments); },
   isEditConstraint: true,
-  toString: function() { 
-    return "edit:" + c.Constraint.prototype.toString.call(this);
-  },
+  toString: function() { return "edit:" + ts.call(this); },
 });
 
 c.StayConstraint = c.inherit({
   extends: c.Constraint,
-  initialize: function(clv /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
-    EditOrStayCtor.call(this, clv, strength || c.Strength.weak, weight);
-  },
+  initialize: function() { EditOrStayCtor.apply(this, arguments); },
   isStayConstraint: true,
-  toString: function() { 
-    return "stay:" + c.Constraint.prototype.toString.call(this);
-  },
+  toString: function() { return "stay:" + ts.call(this); },
 });
 
 })(c);

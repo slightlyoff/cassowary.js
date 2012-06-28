@@ -907,6 +907,7 @@ var Block = c.inherit({
             constrain(
               eq(child.edges.ref.margin._top, ref.content._top, strong)
             );
+            /*
             // console.log("initial flow child: " + child, "below:", containing.content._top.value());
             if (true || this.className == "InlineBlock") {
               // console.log("initial flow child: " + child);
@@ -917,6 +918,7 @@ var Block = c.inherit({
               // console.log(" -- padding-top:", child.value("padding-top").raw);
               // console.log(" -- border-top:", child.value("border-top-width").raw);
             }
+            */
           }
           prev = last;
           last = child;
@@ -931,8 +933,6 @@ var Block = c.inherit({
                        this.blockProgression);
           break;
       }
-      // console.log(" -- child dimensions now: " + child);
-      // console.log("flowing: " + child + " in relation to: " + (prev||this));
     }, this);
   },
 });
@@ -940,7 +940,7 @@ var Block = c.inherit({
 var AnonymousBlock = c.inherit({
   extends: RenderBox, // TODO: Block, 
   _className: "AnonymousBlock",
-  debugColor: "rgba(255,84,186,1)",
+  debugColor: "rgba(255,84,186,1)", // Bright pink.
   initialize: function(cb){
     this._id = _boxCtr++;
     EdgyLight.call(this);
@@ -1028,7 +1028,7 @@ var AnonymousBlock = c.inherit({
 
 var LineBox = c.inherit({
   _className: "LineBox",
-  debugColor: "rgba(156,250,152,1)",
+  debugColor: "rgba(156,250,152,1)", // Lime green.
   // debugColor: "yellow",
   initialize: function(cb){
     this._id = _boxCtr++;
@@ -1191,16 +1191,15 @@ var InlineBlock = c.inherit({
 var TextBox = c.inherit({
   extends: Inline,
   _className: "TextBox", // for toString()
-  // debugColor: "rgba(173,173,173,1)",
-  debugColor: "rgba(173,173,173,1)",
-  initialize: function(node, cb){
+  debugColor: "rgba(173,173,173,1)", // Light grey.
+  initialize: function(node, cb, cs){
     this._id = _boxCtr++;
     this.text = node.nodeValue;
     EdgyLight.call(this);
     VarHeavy.call(this, this.boxProperties);
     Nodey.call(this, node, this.boxProperties);
     this.containingBlock = cb;
-    this.naturalSize = contentSize(node);
+    this.naturalSize = textSize(node, cs);
     this.solver = this.solver || this.containingBlock.solver;
 
     this._isInline = true;
@@ -1277,6 +1276,7 @@ var findBoxGenerators = function(element) {
 //    hosting parents
 // The right answer, of course, is to just plumb through a measurement API from
 // WebKit directly and use this only in case of fallback.
+var Map = Map || scope.c.HashTable;
 var docMeasureNodeMap = new Map();
 var getMeasureNode = function(doc) {
   var mn = docMeasureNodeMap.get(doc);
@@ -1298,6 +1298,21 @@ var getMeasureNode = function(doc) {
   return mn;
 };
 
+var mc;
+var getMeasureCanvas = function() {
+  if (mc) return mc;
+
+  mc = document.createElement("canvas");
+  mc.style.position = "absolute";
+  mc.style.left = "-5000px";
+  mc.style.top = "-5000px";
+  mc.width = "100";
+  mc.height = "100";
+  mc.style.visibility = "hidden";
+  document.body.appendChild(mc);
+  return mc;
+};
+
 var contentSize = function(node) {
   var w = 0,
       h = 0,
@@ -1306,13 +1321,21 @@ var contentSize = function(node) {
   m.innerHTML = "";
   var c = node.cloneNode(true);
   if (c.nodeType == 1) {
-    c.style.width = "auto !important";
-    c.style.height = "auto !important";
+    c.style.width = "auto";
+    c.style.height = "auto";
   }
   m.appendChild(c);
   var mb = new MeasuredBox(0, 0, m.scrollWidth, m.scrollHeight);
-  // console.log("contentSize(): returning: " + mb, "for:", node);
   return mb;
+};
+
+var textSize = function(node) {
+  var ctx = getMeasureCanvas().getContext("2d");
+  ctx.font = css("font-size", node).raw + " " + css("font-family", node).raw;
+  // console.log(css("line-height", node).px);
+  return new MeasuredBox(0, 0,
+                         ctx.measureText(node.nodeValue).width,
+                         css("line-height", node).px);
 };
 
 var _layoutFor = function(id, boxesCallback) {
@@ -1427,26 +1450,59 @@ var _layoutFor = function(id, boxesCallback) {
       //  Could *really* do with access to these right about now:
       //   http://msdn.microsoft.com/en-us/library/windows/desktop/dd319118(v=vs.85).aspx
       //   http://developer.apple.com/library/mac/#documentation/Carbon/Reference/CTLineRef/Reference/reference.html
+
+      // Clobber pure whitespace nodes.
+      if (node.nodeValue.search(/[\S]+/g) == -1) { return; }
+
+      var pn = node.parentNode;
+
+      // If we're the first child or last child, collapse whitespace.
+      if (node == pn.firstChild) {
+        var idx = node.nodeValue.search(/[\S]+/);
+        if (idx > 0) {
+          // Split off the leading whitespace
+          node = node.splitText(idx);
+        }
+      }
+
+      if (!node.nodeValue) { return; }
+
+      if (node == pn.lastChild) {
+        var parts = node.nodeValue.split(/[\s\t]+/)
+        var last = parts[parts.length - 1];
+        while(!last && parts.length) {
+          parts.pop();
+          last = parts[parts.length - 1];
+        }
+        if (!last) { return; }
+        node.splitText(node.nodeValue.lastIndexOf(last) + last.length);
+      }
+
       var head = node;
       var tail = null;
-      var pn = node.parentNode;
       var cs = g.getComputedStyle(pn);
-      node.nodeValue.split(/\s+/).forEach(function(word) {
-        if (!word) { return; }
-        // Next, find the index of the current word in our remaining node,
-        // split on the word end, and create LineBox items for the newly
-        // split-off head element.
-        var hnv = head.nodeValue;
-        if (hnv.indexOf(word) >= 0) {
-          tail = head.splitText(hnv.indexOf(word)+word.length);
-          var b = new TextBox(head, cb)
-          b.generate();
-          nodeToBoxMap.set(head, b);
-          // boxes.push(b);
-          prev = b;
-        }
+      var result = "";
+      var nv = node.nodeValue;
+      var match;
+      var lastSplit = 0;
+      var re = /[\s\t]+/g;
+      var b;
+
+      while ((match = re.exec(nv)) != null)  {  
+        tail = head.splitText(re.lastIndex - lastSplit);
+        lastSplit = re.lastIndex;
+        b = new TextBox(head, cb, cs);
+        b.generate();
+        nodeToBoxMap.set(head, b);
+        prev = b;
         head = tail;
-      });
+      }
+      if (tail.nodeValue) {
+        b = new TextBox(head, cb, cs);
+        b.generate();
+        nodeToBoxMap.set(head, b);
+        prev = b;
+      }
     }
   });
 

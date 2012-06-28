@@ -32,22 +32,29 @@ doh.add("c.LinearConstraint", [
     var x = new c.Variable("x", 10);
     var y = new c.Variable("y", 20);
     var z = new c.Variable("z", 1);
+    var w = new c.Variable("w", 1);
+    
+    // Default weights.
     var e0 = new c.LinearEquation(x, y);
-    solver.addStay(x)
-          .addStay(y);
+    solver.addStay(y);
     solver.addConstraint(e0);
-    print("x: " + x.value());
-    print("y: " + y.value());
+    t.t(c.approx(x, 20));
+    t.t(c.approx(y, 20));
 
-    var e1 = new c.LinearEquation(x, y, c.Strength.weak);
+    // Weak.
+    var e1 = new c.LinearEquation(x, z, c.Strength.weak);
+    solver.addStay(x);
     solver.addConstraint(e1);
-    print("x: " + x.value());
-    print("y: " + y.value());
+    t.t(c.approx(x, 20));
+    t.t(c.approx(z, 20));
+    return;
 
-    // var leq = new c.LinearInequality(a, c.LEQ, b, c.Strength.strong);
-    // print(a.value());
-    // print(b.value());
-    // t.is(a.value(
+    // Strong.
+    var e2 = new c.LinearEquation(z, w, c.Strength.strong);
+    solver.addStay(w);
+    solver.addConstraint(e2);
+    t.is(w.value(), 1);
+    t.is(z.value(), 1);
   },
   
   function equation_variable_number(t) {

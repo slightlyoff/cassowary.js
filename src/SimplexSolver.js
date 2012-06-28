@@ -35,7 +35,7 @@ c.SimplexSolver = c.inherit({
 
     this._rows = new c.HashTable(); // clv -> expression
 
-    this._rows.put(this._objective, new c.LinearExpression());
+    this._rows.set(this._objective, new c.LinearExpression());
     this._stkCedcns = [0]; // Stack
     if (c.trace)
       c.traceprint("objective expr == " + this.rowExpression(this._objective));
@@ -94,14 +94,13 @@ c.SimplexSolver = c.inherit({
       //                               + clvEminus + ", " + prevEConstant + ", " 
       //                               + i +")");
       var ei = new c.EditInfo(cn, clvEplus, clvEminus, prevEConstant, i)
-      this._editVarMap.put(cn.variable, ei);
+      this._editVarMap.set(cn.variable, ei);
       this._editVarList[i] = { v: cn.variable, info: ei };
     }
     if (this.autoSolve) {
       this.optimize(this._objective);
       this.setExternalVariables();
     }
-    cn.addedTo(this);
     return this;
   },
 
@@ -196,7 +195,6 @@ c.SimplexSolver = c.inherit({
 
   removeConstraint: function(cn /*c.Constraint*/) {
     this.removeConstraintInternal(cn);
-    cn.removedFrom(this);
     return this;
   },
 
@@ -503,7 +501,7 @@ c.SimplexSolver = c.inherit({
     var subject = null;
     var foundUnrestricted = false;
     var foundNewRestricted = false;
-    var terms = expr.terms();
+    var terms = expr.terms;
     var rv = terms.escapingEach(function(v, c) {
       if (foundUnrestricted) {
         if (!v.isRestricted) {
@@ -604,7 +602,7 @@ c.SimplexSolver = c.inherit({
         if (expr.constant < 0) {
           var ratio = Number.MAX_VALUE;
           var r;
-          var terms = expr.terms();
+          var terms = expr.terms;
           terms.each(function(v, cd) {
             if (cd > 0 && v.isPivotable) {
               var zc = zRow.coefficientFor(v);
@@ -637,7 +635,7 @@ c.SimplexSolver = c.inherit({
     var dummyVar = new c.DummyVariable();
     var eminus = new c.SlackVariable();
     var eplus = new c.SlackVariable();
-    var cnTerms = cnExpr.terms();
+    var cnTerms = cnExpr.terms;
     // console.log(cnTerms.size());
 
     cnTerms.each(function(v, c) {
@@ -654,7 +652,7 @@ c.SimplexSolver = c.inherit({
       ++this._slackCounter;
       slackVar = new c.SlackVariable(this._slackCounter, "s");
       expr.setVariable(slackVar, -1);
-      this._markerVars.put(cn, slackVar);
+      this._markerVars.set(cn, slackVar);
       if (!cn.isRequired()) {
         ++this._slackCounter;
         eminus = new c.SlackVariable(this._slackCounter, "em");
@@ -671,7 +669,7 @@ c.SimplexSolver = c.inherit({
         ++this._dummyCounter;
         dummyVar = new c.DummyVariable(this._dummyCounter, "d");
         expr.setVariable(dummyVar, 1);
-        this._markerVars.put(cn, dummyVar);
+        this._markerVars.set(cn, dummyVar);
         if (c.trace) c.traceprint("Adding dummyVar == d" + this._dummyCounter);
       } else {
         if (c.trace) c.traceprint("Equality, not required");
@@ -680,7 +678,7 @@ c.SimplexSolver = c.inherit({
         eminus = new c.SlackVariable(this._slackCounter, "em");
         expr.setVariable(eplus, -1);
         expr.setVariable(eminus, 1);
-        this._markerVars.put(cn, eplus);
+        this._markerVars.set(cn, eplus);
         var zRow = this.rowExpression(this._objective);
         if (c.trace) console.log(zRow);
         var sw = cn.strength.symbolicWeight.times(cn.weight);
@@ -722,18 +720,18 @@ c.SimplexSolver = c.inherit({
 
     while (true) {
       var objectiveCoeff = 0;
-      var terms = zRow.terms();
+      var terms = zRow.terms;
 
       terms.escapingEach(function(v, c) {
         if (v.isPivotable && c < objectiveCoeff) {
           objectiveCoeff = c;
           entryVar = v;
           // Break on success
-          return { brk: 1};
+          return { brk: 1 };
         }
       }, this);
 
-      if (objectiveCoeff >= -epsilon) 
+      if (objectiveCoeff >= -epsilon)
         return;
 
       if (c.trace) {
@@ -825,7 +823,7 @@ c.SimplexSolver = c.inherit({
     var cnsetRes;
     if (!cnset) {
       cnsetRes = new c.HashSet();
-      this._errorVars.put(cn, cnsetRes);
+      this._errorVars.set(cn, cnsetRes);
     } else {
       cnsetRes = cnset;
     }

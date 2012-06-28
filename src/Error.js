@@ -8,16 +8,22 @@
   "use strict";
 
   c.Error = c.inherit({
-    initialize: function(s /*String*/) { if (s) { this.description = s; } },
+    // extends: Error,
+    initialize: function(s /*String*/) { if (s) { this._description = s; } },
     _name: "c.Error",
     _description: "An error has occured in Cassowary",
-    set description(v) { this._description = v; },
-    get description()  { return "(" + this._name + ") " + this._description; },
+    set description(v)   { this._description = v; },
+    get description()    { return "(" + this._name + ") " + this._description; },
+    get message()        { return this.description; },
     toString: function() { return this.description; },
   });
 
   var errorType = function(name, error) {
-    return c.inherit({ extends: c.Error, _name: name||"", _description: error||"" });
+    return c.inherit({
+      extends: c.Error,
+      initialize: function() { c.Error.apply(this, arguments); },
+      _name: name||"", _description: error||""
+    });
   };
 
   c.ConstraintNotFound = 

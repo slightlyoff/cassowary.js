@@ -13,17 +13,21 @@
 c.LinearExpression = c.inherit({
   /* FIELDS:
      private ClDouble constant
-     private Hashtable _terms
   */
   initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
-    if (c.GC) print("new c.LinearExpression");
-    this.constant = constant || 0;
-    this._terms = new c.HashTable();
+    if (c.GC) console.log("new c.LinearExpression");
+    this.constant = (typeof constant == "number" && !isNaN(constant)) ? constant : 0;
+    this.terms = new c.HashTable();
 
     if (clv instanceof c.AbstractVariable) {
-      this._terms.put(clv, typeof value == 'number' ? value : 1);
-    } else if (typeof clv == 'number') {
-      this.constant = clv;
+      this.terms.set(clv, typeof value == 'number' ? value : 1);
+    } else if (typeof clv == "number") {
+      // FIXME(slighltyoff):
+      //    This isNaN() check slows us down by ~75% on V8 in our synthetic
+      //    perf test!
+      if (!isNaN(clv)) {
+        this.constant = clv;
+      }
     }
   },
 
@@ -34,18 +38,16 @@ c.LinearExpression = c.inherit({
       console.log("*******************************");
     }
 
-    if (c.GC) print("clone c.LinearExpression");
+    if (c.GC) console.log("clone c.LinearExpression");
     this.constant = constant;
-    this._terms = terms.clone();
+    this.terms = terms.clone();
     return this;
   },
   
   multiplyMe: function(x /*double*/) {
-    var that = this;
     this.constant *= x;
-    this._terms.each(function(clv, coeff) {
-      that._terms.put(clv, coeff * x);
-    });
+    var t = this.terms;
+    t.each(function(clv, coeff) { t.set(clv, coeff * x); });
     return this;
   },
 
@@ -57,7 +59,7 @@ c.LinearExpression = c.inherit({
     }
 
     var le = new c.LinearExpression();
-    le.initializeFromHash(this.constant, this._terms);
+    le.initializeFromHash(this.constant, this.terms);
     return le;
   },
 
@@ -105,17 +107,6 @@ c.LinearExpression = c.inherit({
     }
   },
 
-  divFrom: function(expr) {
-    if (!this.isConstant() || c.approx(this.constant, 0)) {
-        throw new c.NonlinearExpression();
-    }
-    return x.divide(this.constant);
-  },
-
-  subtractFrom: function(expr /*c.LinearExpression*/) {
-    return expr.minus(this);
-  },
-
   addExpression: function(expr /*c.LinearExpression*/,
                           n /*double*/,
                           subject /*c.AbstractVariable*/,
@@ -123,11 +114,11 @@ c.LinearExpression = c.inherit({
 
     if (expr instanceof c.AbstractVariable) {
       expr = new c.LinearExpression(expr);
-      if(c.trace) print("addExpression: Had to cast a var to an expression");
+      if(c.trace) console.log("addExpression: Had to cast a var to an expression");
     }
     n = n || 1;
     this.constant += (n * expr.constant);
-    expr.terms().each(function(clv, coeff) {
+    expr.terms.each(function(clv, coeff) {
       this.addVariable(clv, coeff * n, subject, solver);
     }, this);
     return this;
@@ -139,20 +130,20 @@ c.LinearExpression = c.inherit({
     }
     
     if (c.trace) c.fnenterprint("CLE: addVariable:" + v + ", " + cd);
-    var coeff = this._terms.get(v);
+    var coeff = this.terms.get(v);
     if (coeff) {
       var new_coefficient = coeff + cd;
       if (c.approx(new_coefficient, 0)) {
         if (solver) {
           solver.noteRemovedVariable(v, subject);
         }
-        this._terms.remove(v);
+        this.terms.remove(v);
       } else {
-        this._terms.put(v, new_coefficient);
+        this.terms.set(v, new_coefficient);
       }
     } else {
       if (!c.approx(cd, 0)) {
-        this._terms.put(v, cd);
+        this.terms.set(v, cd);
         if (solver) {
           solver.noteAddedVariable(v, subject);
         }
@@ -162,7 +153,7 @@ c.LinearExpression = c.inherit({
   },
 
   setVariable: function(v /*c.AbstractVariable*/, c /*double*/) {
-    this._terms.put(v, c);
+    this.terms.set(v, c);
     return this;
   },
 
@@ -171,7 +162,7 @@ c.LinearExpression = c.inherit({
       throw new c.InternalError("anyPivotableVariable called on a constant");
     } 
     
-    var rv = this._terms.escapingEach(function(clv, c) {
+    var rv = this.terms.escapingEach(function(clv, c) {
       if (clv.isPivotable) return { retval: clv };
     });
     
@@ -190,20 +181,20 @@ c.LinearExpression = c.inherit({
       c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
       c.traceprint("this = " + this);
     }
-    var multiplier = this._terms.remove(outvar);
+    var multiplier = this.terms.remove(outvar);
     this.constant += (multiplier * expr.constant);
-    expr.terms().each(function(clv, coeff) {
-      var old_coeff = this._terms.get(clv);
+    expr.terms.each(function(clv, coeff) {
+      var old_coeff = this.terms.get(clv);
       if (old_coeff) {
         var newCoeff = old_coeff + multiplier * coeff;
         if (c.approx(newCoeff, 0)) {
           solver.noteRemovedVariable(clv, subject);
-          this._terms.remove(clv);
+          this.terms.remove(clv);
         } else {
-          this._terms.put(clv, newCoeff);
+          this.terms.set(clv, newCoeff);
         }
       } else {
-        this._terms.put(clv, multiplier * coeff);
+        this.terms.set(clv, multiplier * coeff);
         if (solver) solver.noteAddedVariable(clv, subject);
       }
     }, this);
@@ -212,27 +203,23 @@ c.LinearExpression = c.inherit({
 
   changeSubject: function(old_subject /*c.AbstractVariable*/,
                           new_subject /*c.AbstractVariable*/) {
-    this._terms.put(old_subject, this.newSubject(new_subject));
+    this.terms.set(old_subject, this.newSubject(new_subject));
   },
 
   newSubject: function(subject /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("newSubject:" + subject);
     
-    var reciprocal = 1 / this._terms.remove(subject);
+    var reciprocal = 1 / this.terms.remove(subject);
     this.multiplyMe(-reciprocal);
     return reciprocal;
   },
 
   coefficientFor: function(clv /*c.AbstractVariable*/) {
-    return this._terms.get(clv) || 0;
-  },
-
-  terms: function() {
-    return this._terms;
+    return this.terms.get(clv) || 0;
   },
 
   isConstant: function() {
-    return this._terms.size() == 0;
+    return this.terms.size() == 0;
   },
 
   toString: function() {
@@ -246,7 +233,7 @@ c.LinearExpression = c.inherit({
         needsplus = true;
       }
     } 
-    this._terms.each( function(clv, coeff) {
+    this.terms.each( function(clv, coeff) {
       if (needsplus) {
         bstr += " + ";
       }
