@@ -20,7 +20,7 @@ c.LinearExpression = c.inherit({
     this.terms = new c.HashTable();
 
     if (clv instanceof c.AbstractVariable) {
-      this.terms.set(clv, value || 1);
+      this.terms.set(clv, typeof value == 'number' ? value : 1);
     } else if (typeof clv == "number") {
       // FIXME(slighltyoff):
       //    This isNaN() check slows us down by ~75% on V8 in our synthetic
@@ -116,8 +116,8 @@ c.LinearExpression = c.inherit({
       expr = new c.LinearExpression(expr);
       if(c.trace) console.log("addExpression: Had to cast a var to an expression");
     }
-    this.constant += (n * expr.constant);
     n = n || 1;
+    this.constant += (n * expr.constant);
     expr.terms.each(function(clv, coeff) {
       this.addVariable(clv, coeff * n, subject, solver);
     }, this);
@@ -125,7 +125,10 @@ c.LinearExpression = c.inherit({
   },
 
   addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
-    cd = cd || 1;
+    if (cd == null) {
+      cd = 1;
+    }
+    
     if (c.trace) c.fnenterprint("CLE: addVariable:" + v + ", " + cd);
     var coeff = this.terms.get(v);
     if (coeff) {
@@ -159,9 +162,14 @@ c.LinearExpression = c.inherit({
       throw new c.InternalError("anyPivotableVariable called on a constant");
     } 
     
-    this.terms.each(function(clv, c) {
-      if (clv.isPivotable) return clv;
+    var rv = this.terms.escapingEach(function(clv, c) {
+      if (clv.isPivotable) return { retval: clv };
     });
+    
+    if (rv && rv.retval !== undefined) {
+      return rv.retval;
+    }
+    
     return null;
   },
   
@@ -187,7 +195,7 @@ c.LinearExpression = c.inherit({
         }
       } else {
         this.terms.set(clv, multiplier * coeff);
-        solver.noteAddedVariable(clv, subject);
+        if (solver) solver.noteAddedVariable(clv, subject);
       }
     }, this);
     if (c.trace) c.traceprint("Now this is " + this);

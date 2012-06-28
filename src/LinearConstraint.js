@@ -96,9 +96,12 @@ c.LinearInequality = c.inherit({
     // cle op cle
     } else if (a1IsExp && a3IsExp) {
       var cle1 = a1, op = a2, cle2 = a3, strength = a4, weight = a5;
-      c.LinearConstraint.call(this, this._cloneOrNewCle(cle1), strength, weight);
-      if (op == c.LEQ || op == c.GEQ) {
-        this.expression.addExpression(this._cloneOrNewCle(cle2), -1);
+      c.LinearConstraint.call(this, this._cloneOrNewCle(cle2), strength, weight);
+      if (op == c.GEQ) {
+        this.expression.multiplyMe(-1);
+        this.expression.addExpression(this._cloneOrNewCle(cle1));
+      } else if (op == c.LEQ) {
+        this.expression.addExpression(this._cloneOrNewCle(cle1), -1);
       } else {
         throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
       }       
