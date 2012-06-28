@@ -501,7 +501,7 @@ c.SimplexSolver = c.inherit({
     var subject = null;
     var foundUnrestricted = false;
     var foundNewRestricted = false;
-    var terms = expr.terms();
+    var terms = expr.terms;
     var rv = terms.escapingEach(function(v, c) {
       if (foundUnrestricted) {
         if (!v.isRestricted) {
@@ -602,7 +602,7 @@ c.SimplexSolver = c.inherit({
         if (expr.constant < 0) {
           var ratio = Number.MAX_VALUE;
           var r;
-          var terms = expr.terms();
+          var terms = expr.terms;
           terms.each(function(v, cd) {
             if (cd > 0 && v.isPivotable) {
               var zc = zRow.coefficientFor(v);
@@ -635,7 +635,7 @@ c.SimplexSolver = c.inherit({
     var dummyVar = new c.DummyVariable();
     var eminus = new c.SlackVariable();
     var eplus = new c.SlackVariable();
-    var cnTerms = cnExpr.terms();
+    var cnTerms = cnExpr.terms;
     // console.log(cnTerms.size());
 
     cnTerms.each(function(v, c) {
@@ -720,7 +720,7 @@ c.SimplexSolver = c.inherit({
 
     while (true) {
       var objectiveCoeff = 0;
-      var terms = zRow.terms();
+      var terms = zRow.terms;
 
       terms.escapingEach(function(v, c) {
         if (v.isPivotable && c < objectiveCoeff) {

@@ -91,20 +91,19 @@ c.Tableau = c.inherit({
   },
 
   addRow: function(aVar /*ClAbstractVariable*/, expr /*c.LinearExpression*/) {
-    var that = this;
     if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
     // print("addRow: " + aVar + " (key), " + expr + " (value)");
     // print(this._rows.size());
     this._rows.set(aVar, expr);
-    expr.terms().each(function(clv, coeff) {
+    expr.terms.each(function(clv, coeff) {
       // print("insertColVar(" + clv + ", " + aVar + ")");
-      that.insertColVar(clv, aVar);
+      this.insertColVar(clv, aVar);
       if (clv.isExternal) {
-        that._externalParametricVars.add(clv);
+        this._externalParametricVars.add(clv);
         // print("External parametric variables added to: " + 
-        //       c.setToString(that._externalParametricVars));
+        //       c.setToString(this._externalParametricVars));
       }
-    });
+    }, this);
     if (aVar.isExternal) {
       this._externalRows.add(aVar);
     }
@@ -112,14 +111,13 @@ c.Tableau = c.inherit({
   },
 
   removeColumn: function(aVar /*ClAbstractVariable*/) {
-    var that = this;
     if (c.trace) c.fnenterprint("removeColumn:" + aVar);
     var rows = /* Set */ this._columns.remove(aVar);
     if (rows) {
       rows.each(function(clv) {
-        var expr = /* c.LinearExpression */that._rows.get(clv);
-        expr.terms().remove(aVar);
-      });
+        var expr = /* c.LinearExpression */this._rows.get(clv);
+        expr.terms.remove(aVar);
+      }, this);
     } else {
       if (c.trace) c.debugprint("Could not find var " + aVar + " in _columns");
     }
@@ -130,17 +128,16 @@ c.Tableau = c.inherit({
   },
 
   removeRow: function(aVar /*ClAbstractVariable*/) {
-    var that = this;
     if (c.trace) c.fnenterprint("removeRow:" + aVar);
     var expr = /* c.LinearExpression */this._rows.get(aVar);
     c.Assert(expr != null);
-    expr.terms().each(function(clv, coeff) {
-      var varset = that._columns.get(clv);
+    expr.terms.each(function(clv, coeff) {
+      var varset = this._columns.get(clv);
       if (varset != null) {
         if (c.trace) c.debugprint("removing from varset " + aVar);
         varset.remove(aVar);
       }
-    });
+    }, this);
     this._infeasibleRows.remove(aVar);
     if (aVar.isExternal) {
       this._externalRows.remove(aVar);
@@ -151,17 +148,16 @@ c.Tableau = c.inherit({
   },
 
   substituteOut: function(oldVar /*ClAbstractVariable*/, expr /*c.LinearExpression*/) {
-    var that = this;
     if (c.trace) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
     if (c.trace) c.traceprint(this.toString());
     var varset = /* Set */this._columns.get(oldVar);
     varset.each(function(v) {
-      var row = /* c.LinearExpression */that._rows.get(v);
-      row.substituteOut(oldVar, expr, v, that);
+      var row = /* c.LinearExpression */this._rows.get(v);
+      row.substituteOut(oldVar, expr, v, this);
       if (v.isRestricted && row.constant < 0) {
-        that._infeasibleRows.add(v);
+        this._infeasibleRows.add(v);
       }
-    });
+    }, this);
     if (oldVar.isExternal) {
       this._externalRows.add(oldVar);
       this._externalParametricVars.remove(oldVar);
