@@ -21,7 +21,7 @@ c.LinearExpression = c.inherit({
     this._terms = new c.HashTable();
 
     if (clv instanceof c.AbstractVariable) {
-      this._terms.put(clv, value || 1);
+      this._terms.put(clv, value == null ? 1 : value);
     } else if (typeof clv == 'number') {
       this.constant = clv;
     }
@@ -125,8 +125,8 @@ c.LinearExpression = c.inherit({
       expr = new c.LinearExpression(expr);
       if(c.trace) print("addExpression: Had to cast a var to an expression");
     }
-    this.constant += (n * expr.constant);
     n = n || 1;
+    this.constant += (n * expr.constant);
     expr.terms().each(function(clv, coeff) {
       this.addVariable(clv, coeff * n, subject, solver);
     }, this);
@@ -134,7 +134,7 @@ c.LinearExpression = c.inherit({
   },
 
   addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
-    cd = cd || 1;
+    if (cd == null) cd = 1;
     if (c.trace) c.fnenterprint("CLE: addVariable:" + v + ", " + cd);
     var coeff = this._terms.get(v);
     if (coeff) {
@@ -168,9 +168,14 @@ c.LinearExpression = c.inherit({
       throw new c.InternalError("anyPivotableVariable called on a constant");
     } 
     
-    this._terms.each(function(clv, c) {
-      if (clv.isPivotable) return clv;
+    // FIXME
+    var rv = this._terms.escapingEach(function(clv, c) {
+      if (clv.isPivotable) return { retval: clv };
     });
+    
+    if (rv && rv.retval !== undefined)
+      return rv.retval;
+    
     return null;
   },
   
@@ -196,7 +201,7 @@ c.LinearExpression = c.inherit({
         }
       } else {
         this._terms.put(clv, multiplier * coeff);
-        solver.noteAddedVariable(clv, subject);
+        if (solver) solver.noteAddedVariable(clv, subject);
       }
     }, this);
     if (c.trace) c.traceprint("Now this is " + this);
