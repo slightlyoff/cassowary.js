@@ -1428,26 +1428,55 @@ var _layoutFor = function(id, boxesCallback) {
       //  Could *really* do with access to these right about now:
       //   http://msdn.microsoft.com/en-us/library/windows/desktop/dd319118(v=vs.85).aspx
       //   http://developer.apple.com/library/mac/#documentation/Carbon/Reference/CTLineRef/Reference/reference.html
+      var pn = node.parentNode;
+
+      // If we're the first child or last child, collapse whitespace.
+      if (node == pn.firstChild) {
+        var idx = node.nodeValue.search(/[\S]+/);
+        if (idx > 0) {
+          // Split off the leading whitespace
+          node = node.splitText(idx);
+        }
+      }
+
+      if (!node.nodeValue) { return; }
+
+      if (node == pn.lastChild) {
+        var parts = node.nodeValue.split(/[\s\t]+/)
+        var last = parts[parts.length - 1];
+        while(!last && parts.length) {
+          parts.pop();
+          last = parts[parts.length - 1];
+        }
+        if (!last) { return; }
+        node.splitText(node.nodeValue.lastIndexOf(last) + last.length);
+      }
+
       var head = node;
       var tail = null;
-      var pn = node.parentNode;
       var cs = g.getComputedStyle(pn);
-      node.nodeValue.split(/\s+/).forEach(function(word) {
-        if (!word) { return; }
-        // Next, find the index of the current word in our remaining node,
-        // split on the word end, and create LineBox items for the newly
-        // split-off head element.
-        var hnv = head.nodeValue;
-        if (hnv.indexOf(word) >= 0) {
-          tail = head.splitText(hnv.indexOf(word)+word.length);
-          var b = new TextBox(head, cb)
-          b.generate();
-          nodeToBoxMap.set(head, b);
-          // boxes.push(b);
-          prev = b;
-        }
+      var result = "";
+      var nv = node.nodeValue;
+      var match;
+      var lastSplit = 0;
+      var re = /[\s\t]+/g;
+      var b;
+
+      while ((match = re.exec(nv)) != null)  {  
+        tail = head.splitText(re.lastIndex - lastSplit);
+        lastSplit = re.lastIndex;
+        b = new TextBox(head, cb)
+        b.generate();
+        nodeToBoxMap.set(head, b);
+        prev = b;
         head = tail;
-      });
+      }
+      if (tail.nodeValue) {
+        b = new TextBox(head, cb)
+        b.generate();
+        nodeToBoxMap.set(head, b);
+        prev = b;
+      }
     }
   });
 
