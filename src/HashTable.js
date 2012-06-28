@@ -59,7 +59,7 @@ c.HashTable = c.inherit({
     this._keyStrMap = {};
   },
 
-  put: function(key, value) { 
+  set: function(key, value) { 
     var hash = keyCode(key);
 
     var old = null;
@@ -155,10 +155,6 @@ c.HashTable = c.inherit({
     }
     return n;
   }
-});
-
-c.extend(c.HashTable.prototype, {
-  set: c.HashTable.prototype.put,
 });
 
 })(c);

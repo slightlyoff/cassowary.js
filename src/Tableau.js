@@ -79,7 +79,7 @@ c.Tableau = c.inherit({
     var rowset = /* Set */ this._columns.get(param_var);
     if (!rowset) {
       rowset = new c.HashSet();
-      this._columns.put(param_var, rowset);
+      this._columns.set(param_var, rowset);
     }
     rowset.add(rowvar);
 
@@ -95,7 +95,7 @@ c.Tableau = c.inherit({
     if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
     // print("addRow: " + aVar + " (key), " + expr + " (value)");
     // print(this._rows.size());
-    this._rows.put(aVar, expr);
+    this._rows.set(aVar, expr);
     expr.terms().each(function(clv, coeff) {
       // print("insertColVar(" + clv + ", " + aVar + ")");
       that.insertColVar(clv, aVar);

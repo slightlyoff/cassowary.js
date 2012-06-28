@@ -21,7 +21,7 @@ c.LinearExpression = c.inherit({
     this._terms = new c.HashTable();
 
     if (clv instanceof c.AbstractVariable) {
-      this._terms.put(clv, value || 1);
+      this._terms.set(clv, value || 1);
     } else if (typeof clv == 'number') {
       this.constant = clv;
     }
@@ -44,7 +44,7 @@ c.LinearExpression = c.inherit({
     var that = this;
     this.constant *= x;
     this._terms.each(function(clv, coeff) {
-      that._terms.put(clv, coeff * x);
+      that._terms.set(clv, coeff * x);
     });
     return this;
   },
@@ -145,11 +145,11 @@ c.LinearExpression = c.inherit({
         }
         this._terms.remove(v);
       } else {
-        this._terms.put(v, new_coefficient);
+        this._terms.set(v, new_coefficient);
       }
     } else {
       if (!c.approx(cd, 0)) {
-        this._terms.put(v, cd);
+        this._terms.set(v, cd);
         if (solver) {
           solver.noteAddedVariable(v, subject);
         }
@@ -159,7 +159,7 @@ c.LinearExpression = c.inherit({
   },
 
   setVariable: function(v /*c.AbstractVariable*/, c /*double*/) {
-    this._terms.put(v, c);
+    this._terms.set(v, c);
     return this;
   },
 
@@ -192,10 +192,10 @@ c.LinearExpression = c.inherit({
           solver.noteRemovedVariable(clv, subject);
           this._terms.remove(clv);
         } else {
-          this._terms.put(clv, newCoeff);
+          this._terms.set(clv, newCoeff);
         }
       } else {
-        this._terms.put(clv, multiplier * coeff);
+        this._terms.set(clv, multiplier * coeff);
         solver.noteAddedVariable(clv, subject);
       }
     }, this);
@@ -204,7 +204,7 @@ c.LinearExpression = c.inherit({
 
   changeSubject: function(old_subject /*c.AbstractVariable*/,
                           new_subject /*c.AbstractVariable*/) {
-    this._terms.put(old_subject, this.newSubject(new_subject));
+    this._terms.set(old_subject, this.newSubject(new_subject));
   },
 
   newSubject: function(subject /*c.AbstractVariable*/) {

@@ -35,7 +35,7 @@ c.SimplexSolver = c.inherit({
 
     this._rows = new c.HashTable(); // clv -> expression
 
-    this._rows.put(this._objective, new c.LinearExpression());
+    this._rows.set(this._objective, new c.LinearExpression());
     this._stkCedcns = [0]; // Stack
     if (c.trace)
       c.traceprint("objective expr == " + this.rowExpression(this._objective));
@@ -94,7 +94,7 @@ c.SimplexSolver = c.inherit({
       //                               + clvEminus + ", " + prevEConstant + ", " 
       //                               + i +")");
       var ei = new c.EditInfo(cn, clvEplus, clvEminus, prevEConstant, i)
-      this._editVarMap.put(cn.variable, ei);
+      this._editVarMap.set(cn.variable, ei);
       this._editVarList[i] = { v: cn.variable, info: ei };
     }
     if (this.autoSolve) {
@@ -652,7 +652,7 @@ c.SimplexSolver = c.inherit({
       ++this._slackCounter;
       slackVar = new c.SlackVariable(this._slackCounter, "s");
       expr.setVariable(slackVar, -1);
-      this._markerVars.put(cn, slackVar);
+      this._markerVars.set(cn, slackVar);
       if (!cn.isRequired()) {
         ++this._slackCounter;
         eminus = new c.SlackVariable(this._slackCounter, "em");
@@ -669,7 +669,7 @@ c.SimplexSolver = c.inherit({
         ++this._dummyCounter;
         dummyVar = new c.DummyVariable(this._dummyCounter, "d");
         expr.setVariable(dummyVar, 1);
-        this._markerVars.put(cn, dummyVar);
+        this._markerVars.set(cn, dummyVar);
         if (c.trace) c.traceprint("Adding dummyVar == d" + this._dummyCounter);
       } else {
         if (c.trace) c.traceprint("Equality, not required");
@@ -678,7 +678,7 @@ c.SimplexSolver = c.inherit({
         eminus = new c.SlackVariable(this._slackCounter, "em");
         expr.setVariable(eplus, -1);
         expr.setVariable(eminus, 1);
-        this._markerVars.put(cn, eplus);
+        this._markerVars.set(cn, eplus);
         var zRow = this.rowExpression(this._objective);
         if (c.trace) console.log(zRow);
         var sw = cn.strength.symbolicWeight.times(cn.weight);
@@ -823,7 +823,7 @@ c.SimplexSolver = c.inherit({
     var cnsetRes;
     if (!cnset) {
       cnsetRes = new c.HashSet();
-      this._errorVars.put(cn, cnsetRes);
+      this._errorVars.set(cn, cnsetRes);
     } else {
       cnsetRes = cnset;
     }
