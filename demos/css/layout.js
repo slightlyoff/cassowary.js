@@ -1193,14 +1193,14 @@ var TextBox = c.inherit({
   _className: "TextBox", // for toString()
   // debugColor: "rgba(173,173,173,1)",
   debugColor: "rgba(173,173,173,1)",
-  initialize: function(node, cb){
+  initialize: function(node, cb, cs){
     this._id = _boxCtr++;
     this.text = node.nodeValue;
     EdgyLight.call(this);
     VarHeavy.call(this, this.boxProperties);
     Nodey.call(this, node, this.boxProperties);
     this.containingBlock = cb;
-    this.naturalSize = contentSize(node);
+    this.naturalSize = textSize(node, cs);
     this.solver = this.solver || this.containingBlock.solver;
 
     this._isInline = true;
@@ -1299,6 +1299,21 @@ var getMeasureNode = function(doc) {
   return mn;
 };
 
+var mc;
+var getMeasureCanvas = function() {
+  if (mc) return mc;
+
+  mc = document.createElement("canvas");
+  mc.style.position = "absolute";
+  mc.style.left = "-5000px";
+  mc.style.top = "-5000px";
+  mc.width = "100";
+  mc.height = "100";
+  mc.style.visibility = "hidden";
+  document.body.appendChild(mc);
+  return mc;
+};
+
 var contentSize = function(node) {
   var w = 0,
       h = 0,
@@ -1307,13 +1322,21 @@ var contentSize = function(node) {
   m.innerHTML = "";
   var c = node.cloneNode(true);
   if (c.nodeType == 1) {
-    c.style.width = "auto !important";
-    c.style.height = "auto !important";
+    c.style.width = "auto";
+    c.style.height = "auto";
   }
   m.appendChild(c);
   var mb = new MeasuredBox(0, 0, m.scrollWidth, m.scrollHeight);
-  // console.log("contentSize(): returning: " + mb, "for:", node);
   return mb;
+};
+
+var textSize = function(node) {
+  var ctx = getMeasureCanvas().getContext("2d");
+  ctx.font = css("font-size", node).raw + " " + css("font-family", node).raw;
+  // console.log(css("line-height", node).px);
+  return new MeasuredBox(0, 0,
+                         ctx.measureText(node.nodeValue).width,
+                         css("line-height", node).px);
 };
 
 var _layoutFor = function(id, boxesCallback) {
@@ -1428,6 +1451,10 @@ var _layoutFor = function(id, boxesCallback) {
       //  Could *really* do with access to these right about now:
       //   http://msdn.microsoft.com/en-us/library/windows/desktop/dd319118(v=vs.85).aspx
       //   http://developer.apple.com/library/mac/#documentation/Carbon/Reference/CTLineRef/Reference/reference.html
+
+      // Clobber pure whitespace nodes.
+      if (node.nodeValue.search(/[\S]+/g) == -1) { return; }
+
       var pn = node.parentNode;
 
       // If we're the first child or last child, collapse whitespace.
@@ -1465,14 +1492,14 @@ var _layoutFor = function(id, boxesCallback) {
       while ((match = re.exec(nv)) != null)  {  
         tail = head.splitText(re.lastIndex - lastSplit);
         lastSplit = re.lastIndex;
-        b = new TextBox(head, cb)
+        b = new TextBox(head, cb, cs);
         b.generate();
         nodeToBoxMap.set(head, b);
         prev = b;
         head = tail;
       }
       if (tail.nodeValue) {
-        b = new TextBox(head, cb)
+        b = new TextBox(head, cb, cs);
         b.generate();
         nodeToBoxMap.set(head, b);
         prev = b;
