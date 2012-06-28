@@ -21,7 +21,7 @@ c.LinearExpression = c.inherit({
     this._terms = new c.HashTable();
 
     if (clv instanceof c.AbstractVariable) {
-      this._terms.put(clv, value == null ? 1 : value);
+      this._terms.put(clv, typeof value == 'number' ? value : 1);
     } else if (typeof clv == 'number') {
       this.constant = clv;
     }
@@ -134,7 +134,10 @@ c.LinearExpression = c.inherit({
   },
 
   addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
-    if (cd == null) cd = 1;
+    if (cd == null) {
+      cd = 1;
+    }
+    
     if (c.trace) c.fnenterprint("CLE: addVariable:" + v + ", " + cd);
     var coeff = this._terms.get(v);
     if (coeff) {
@@ -168,13 +171,13 @@ c.LinearExpression = c.inherit({
       throw new c.InternalError("anyPivotableVariable called on a constant");
     } 
     
-    // FIXME
     var rv = this._terms.escapingEach(function(clv, c) {
       if (clv.isPivotable) return { retval: clv };
     });
     
-    if (rv && rv.retval !== undefined)
+    if (rv && rv.retval !== undefined) {
       return rv.retval;
+    }
     
     return null;
   },
