@@ -727,11 +727,11 @@ c.SimplexSolver = c.inherit({
           objectiveCoeff = c;
           entryVar = v;
           // Break on success
-          return { brk: 1};
+          return { brk: 1 };
         }
       }, this);
 
-      if (objectiveCoeff >= -epsilon) 
+      if (objectiveCoeff >= -epsilon)
         return;
 
       if (c.trace) {

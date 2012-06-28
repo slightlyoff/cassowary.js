@@ -16,12 +16,12 @@ c.LinearExpression = c.inherit({
   */
   initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
     if (c.GC) console.log("new c.LinearExpression");
-    this.constant = constant || 0;
+    this.constant = (typeof constant == "number" && !isNaN(constant)) ? constant : 0;
     this.terms = new c.HashTable();
 
     if (clv instanceof c.AbstractVariable) {
       this.terms.set(clv, value || 1);
-    } else if (typeof clv == 'number') {
+    } else if (typeof clv == 'number' && !isNaN(clv)) {
       this.constant = clv;
     }
   },
