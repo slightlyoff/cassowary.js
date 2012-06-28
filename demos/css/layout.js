@@ -907,6 +907,7 @@ var Block = c.inherit({
             constrain(
               eq(child.edges.ref.margin._top, ref.content._top, strong)
             );
+            /*
             // console.log("initial flow child: " + child, "below:", containing.content._top.value());
             if (true || this.className == "InlineBlock") {
               // console.log("initial flow child: " + child);
@@ -917,6 +918,7 @@ var Block = c.inherit({
               // console.log(" -- padding-top:", child.value("padding-top").raw);
               // console.log(" -- border-top:", child.value("border-top-width").raw);
             }
+            */
           }
           prev = last;
           last = child;
@@ -931,8 +933,6 @@ var Block = c.inherit({
                        this.blockProgression);
           break;
       }
-      // console.log(" -- child dimensions now: " + child);
-      // console.log("flowing: " + child + " in relation to: " + (prev||this));
     }, this);
   },
 });
@@ -940,7 +940,7 @@ var Block = c.inherit({
 var AnonymousBlock = c.inherit({
   extends: RenderBox, // TODO: Block, 
   _className: "AnonymousBlock",
-  debugColor: "rgba(255,84,186,1)",
+  debugColor: "rgba(255,84,186,1)", // Bright pink.
   initialize: function(cb){
     this._id = _boxCtr++;
     EdgyLight.call(this);
@@ -1028,7 +1028,7 @@ var AnonymousBlock = c.inherit({
 
 var LineBox = c.inherit({
   _className: "LineBox",
-  debugColor: "rgba(156,250,152,1)",
+  debugColor: "rgba(156,250,152,1)", // Lime green.
   // debugColor: "yellow",
   initialize: function(cb){
     this._id = _boxCtr++;
@@ -1191,8 +1191,7 @@ var InlineBlock = c.inherit({
 var TextBox = c.inherit({
   extends: Inline,
   _className: "TextBox", // for toString()
-  // debugColor: "rgba(173,173,173,1)",
-  debugColor: "rgba(173,173,173,1)",
+  debugColor: "rgba(173,173,173,1)", // Light grey.
   initialize: function(node, cb, cs){
     this._id = _boxCtr++;
     this.text = node.nodeValue;
