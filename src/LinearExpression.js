@@ -21,8 +21,13 @@ c.LinearExpression = c.inherit({
 
     if (clv instanceof c.AbstractVariable) {
       this.terms.set(clv, value || 1);
-    } else if (typeof clv == 'number' && !isNaN(clv)) {
-      this.constant = clv;
+    } else if (typeof clv == "number") {
+      // FIXME(slighltyoff):
+      //    This isNaN() check slows us down by ~75% on V8 in our synthetic
+      //    perf test!
+      if (!isNaN(clv)) {
+        this.constant = clv;
+      }
     }
   },
 
