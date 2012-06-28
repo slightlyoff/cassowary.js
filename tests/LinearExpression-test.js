@@ -48,37 +48,37 @@ doh.add("c.LinearExpression", [
   function zero_args(t) {
     var exp = new c.LinearExpression;
     t.is(0, exp.constant);
-    t.is(0, exp.terms().size());
+    t.is(0, exp.terms.size());
   },
   
   function one_number(t) {
     var exp = new c.LinearExpression(10);
     t.is(10, exp.constant);
-    t.is(0, exp.terms().size());
+    t.is(0, exp.terms.size());
   },
   
   function one_variable(t) {
     var v = new c.Variable(10);
     var exp = new c.LinearExpression(v);
     t.is(0, exp.constant);
-    t.is(1, exp.terms().size());
-    t.is(1, exp.terms().get(v));
+    t.is(1, exp.terms.size());
+    t.is(1, exp.terms.get(v));
   },
   
   function variable_number(t) {
     var v = new c.Variable(10);
     var exp = new c.LinearExpression(v, 20);
     t.is(0, exp.constant);
-    t.is(1, exp.terms().size());
-    t.is(20, exp.terms().get(v));
+    t.is(1, exp.terms.size());
+    t.is(20, exp.terms.get(v));
   },
   
   function variable_number_number(t) {
     var v = new c.Variable(10);
     var exp = new c.LinearExpression(v, 20, 2);
     t.is(2, exp.constant);
-    t.is(1, exp.terms().size());
-    t.is(20, exp.terms().get(v));
+    t.is(1, exp.terms.size());
+    t.is(20, exp.terms.get(v));
   },
   
   function clone(t) {
@@ -87,8 +87,8 @@ doh.add("c.LinearExpression", [
     var clone = exp.clone();
     
     t.is(clone.constant, exp.constant);
-    t.is(clone.terms().size(), exp.terms().size());
-    t.is(20, clone.terms().get(v));
+    t.is(clone.terms.size(), exp.terms.size());
+    t.is(20, clone.terms.get(v));
   },
   
   function isConstant(t) {
@@ -107,7 +107,7 @@ doh.add("c.LinearExpression", [
 
     t.is(e.constant, -2);
     t.is(v.value(), 10);
-    t.is(e.terms().get(v), -20);
+    t.is(e.terms.get(v), -20);
   },
   
   function times(t) {
@@ -117,17 +117,17 @@ doh.add("c.LinearExpression", [
     // times a number
     var e = a.times(10);
     t.is(e.constant, 20);
-    t.is(e.terms().get(v), 200);
+    t.is(e.terms.get(v), 200);
 
     // times a constant exression
     var e = a.times(new c.LinearExpression(10))
     t.is(e.constant, 20);
-    t.is(e.terms().get(v), 200);
+    t.is(e.terms.get(v), 200);
 
     // constant expression times another expression
     var e = new c.LinearExpression(10).times(a)
     t.is(e.constant, 20);
-    t.is(e.terms().get(v), 200);
+    t.is(e.terms.get(v), 200);
 
     // multiplying two non-constant expressions
     t.e(c.NonlinearExpression, a, 'times', [a]);
@@ -139,23 +139,23 @@ doh.add("c.LinearExpression", [
 
     // implicit coefficient of 1
     a.addVariable(v);
-    t.is(a.terms().size(), 2);
-    t.is(a.terms().get(v), 1);
+    t.is(a.terms.size(), 2);
+    t.is(a.terms.get(v), 1);
 
     // add again, with different coefficient
     a.addVariable(v, 2);
-    t.is(a.terms().size(), 2);
-    t.is(a.terms().get(v), 3);
+    t.is(a.terms.size(), 2);
+    t.is(a.terms.get(v), 3);
 
     // add again, with resulting 0 coefficient. should remove the term.
     a.addVariable(v, -3);
-    t.is(a.terms().size(), 1);
-    t.is(null, a.terms().get(v));
+    t.is(a.terms.size(), 1);
+    t.is(null, a.terms.get(v));
 
     // try adding the removed term back, with 0 coefficient
     a.addVariable(v, 0);
-    t.is(a.terms().size(), 1);
-    t.is(null, a.terms().get(v));
+    t.is(a.terms.size(), 1);
+    t.is(null, a.terms.get(v));
   },
   
   function addExpression_variable(t) {
@@ -164,8 +164,8 @@ doh.add("c.LinearExpression", [
 
     // should work just like addVariable
     a.addExpression(v, 2);
-    t.is(a.terms().size(), 2);
-    t.is(a.terms().get(v), 2);
+    t.is(a.terms.size(), 2);
+    t.is(a.terms.get(v), 2);
   },
   
   function addExpression(t) {
@@ -176,22 +176,22 @@ doh.add("c.LinearExpression", [
 
     // different variable and implicit coefficient of 1, should make new term
     a.addExpression(new c.LinearExpression(vb, 10, 5));
-    t.is(a.terms().size(), 2);
+    t.is(a.terms.size(), 2);
     t.is(a.constant, 7);
-    t.is(a.terms().get(vb), 10);
+    t.is(a.terms.get(vb), 10);
 
     // same variable, should reuse existing term
     a.addExpression(new c.LinearExpression(vb, 2, 5));
-    t.is(a.terms().size(), 2);
+    t.is(a.terms.size(), 2);
     t.is(a.constant, 12);
-    t.is(a.terms().get(vb), 12);
+    t.is(a.terms.get(vb), 12);
     
     // another variable and a coefficient, 
     // should multiply the constant and all terms in the new expression
     a.addExpression(new c.LinearExpression(vc, 1, 2), 2);
-    t.is(a.terms().size(), 3);
+    t.is(a.terms.size(), 3);
     t.is(a.constant, 16);
-    t.is(a.terms().get(vc), 2);
+    t.is(a.terms.get(vc), 2);
   },
   
   function plus(t) {
@@ -205,9 +205,9 @@ doh.add("c.LinearExpression", [
     t.assertNotEqual(a, b);
 
     t.is(p.constant, 7);
-    t.is(p.terms().size(), 2);
-    t.is(p.terms().get(va), 20);
-    t.is(p.terms().get(vb), 10);
+    t.is(p.terms.size(), 2);
+    t.is(p.terms.get(va), 20);
+    t.is(p.terms.get(vb), 10);
   },
   
   function minus(t) {
@@ -221,9 +221,9 @@ doh.add("c.LinearExpression", [
     t.assertNotEqual(a, b);
 
     t.is(p.constant, -3);
-    t.is(p.terms().size(), 2);
-    t.is(p.terms().get(va), 20);
-    t.is(p.terms().get(vb), -10);
+    t.is(p.terms.size(), 2);
+    t.is(p.terms.get(va), 20);
+    t.is(p.terms.get(vb), -10);
   },
   
   function divide(t) {
@@ -235,14 +235,14 @@ doh.add("c.LinearExpression", [
     
     var p = a.divide(2);
     t.is(p.constant, 1);
-    t.is(p.terms().get(va), 10);
+    t.is(p.terms.get(va), 10);
     
     t.e(c.NonlinearExpression, a, 'divide', [new c.LinearExpression(vb, 10, 5)]);
     t.e(c.NonlinearExpression, new c.LinearExpression(vb, 10, 5), 'divide', [a]);
     
     p = a.divide(new c.LinearExpression(2));
     t.is(p.constant, 1);
-    t.is(p.terms().get(va), 10);
+    t.is(p.terms.get(va), 10);
   },
   
   function coefficientFor(t) {
@@ -261,12 +261,12 @@ doh.add("c.LinearExpression", [
     
     // set existing variable
     a.setVariable(va, 2);
-    t.is(a.terms().size(), 1);
+    t.is(a.terms.size(), 1);
     t.is(a.coefficientFor(va), 2);
     
     // set new variable
     a.setVariable(vb, 2);
-    t.is(a.terms().size(), 2);
+    t.is(a.terms.size(), 2);
     t.is(a.coefficientFor(vb), 2);
   },
   
@@ -291,16 +291,16 @@ doh.add("c.LinearExpression", [
     // new variable
     a.substituteOut(v1, new c.LinearExpression(v2, 4, 4));
     t.is(a.constant, 10);
-    t.is(null, a.terms().get(v1));
-    t.is(a.terms().get(v2), 8);
+    t.is(null, a.terms.get(v1));
+    t.is(a.terms.get(v2), 8);
     
     // existing variable
     a.setVariable(v1, 1);
     a.substituteOut(v2, new c.LinearExpression(v1, 2, 2));
 
     t.is(a.constant, 26);
-    t.is(null, a.terms().get(v2));
-    t.is(a.terms().get(v1), 17);
+    t.is(null, a.terms.get(v2));
+    t.is(a.terms.get(v1), 17);
   },
   
   function newSubject(t) {
@@ -309,7 +309,7 @@ doh.add("c.LinearExpression", [
 
     t.is(e.newSubject(v), 1 / 2);
     t.is(e.constant, -2.5);
-    t.is(null, e.terms().get(v));
+    t.is(null, e.terms.get(v));
     t.is(true, e.isConstant());
   },
   
@@ -320,8 +320,8 @@ doh.add("c.LinearExpression", [
 
     e.changeSubject(vb, va);
     t.is(e.constant, -2.5);
-    t.is(null, e.terms().get(va));
-    t.is(e.terms().get(vb), 0.5);
+    t.is(null, e.terms.get(va));
+    t.is(e.terms.get(vb), 0.5);
   },
   
   function toString(t) {
