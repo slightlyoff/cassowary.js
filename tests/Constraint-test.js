@@ -6,7 +6,7 @@
 
 "use strict";
 
-doh.add("c.LinearConstraint", [
+doh.add("c.Constraint", [
   function equationFromExpression(t) {
     var ex = new c.LinearExpression(10);
     var c1 = new c.LinearEquation(ex);

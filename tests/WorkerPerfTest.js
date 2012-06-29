@@ -56,7 +56,7 @@ importScripts("../src/Variable.js");
 importScripts("../src/Point.js");
 importScripts("../src/LinearExpression.js");
 importScripts("../src/Constraint.js");
-importScripts("../src/LinearConstraint.js");
+importScripts("../src/Constraint.js");
 importScripts("../src/EditInfo.js");
 importScripts("../src/Tableau.js");
 importScripts("../src/SimplexSolver.js");

@@ -13,7 +13,7 @@ load("../src/Variable.js");
 load("../src/Point.js");
 load("../src/LinearExpression.js");
 load("../src/Constraint.js");
-load("../src/LinearConstraint.js");
+load("../src/Constraint.js");
 load("../src/EditInfo.js");
 load("../src/Tableau.js");
 load("../src/SimplexSolver.js");
@@ -27,7 +27,7 @@ c.verbose = false;
 */
 doh.squelch = false;
 
-load("LinearConstraint-test.js");
+load("Constraint-test.js");
 load("LinearExpression-test.js");
 load("Point-test.js");
 load("SimplexSolver-test.js");
