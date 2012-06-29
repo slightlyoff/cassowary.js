@@ -8,28 +8,21 @@
 "use strict";
 
 c.EditInfo = c.inherit({
-  /* FIELDS:
-      var cn //c.Constraint
-      var clvEditPlus //c.SlackVariable
-      var clvEditMinus //c.SlackVariable
-      var prevEditConstant //double
-      var i //int
-  */
-  initialize: function(cn_ /*c.Constraint*/, 
-                       eplus_ /*c.SlackVariable*/,
-                       eminus_ /*c.SlackVariable*/,
-                       prevEditConstant_ /*double*/,
-                       i_ /*int*/) {
-    this.constraint = cn_;
-    this.clvEditPlus = eplus_;
-    this.clvEditMinus = eminus_;
-    this.prevEditConstant = prevEditConstant_;
-    this.index = i_;
+  initialize: function(cn      /*c.Constraint*/, 
+                       eplus   /*c.SlackVariable*/,
+                       eminus  /*c.SlackVariable*/,
+                       prevEditConstant /*double*/,
+                       i /*int*/) {
+    this.constraint = cn;
+    this.editPlus = eplus;
+    this.editMinus = eminus;
+    this.prevEditConstant = prevEditConstant;
+    this.index = i;
   },
   toString: function() {
     return "<cn=" + this.constraint +
-           ", ep=" + this.clvEditPlus +
-           ", em=" +this.clvEditMinus +
+           ", ep=" + this.editPlus +
+           ", em=" + this.editMinus +
            ", pec=" + this.prevEditConstant +
            ", index=" + this.index + ">";
   }

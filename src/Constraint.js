@@ -30,10 +30,10 @@ c.AbstractConstraint = c.inherit({
 
 var ts = c.AbstractConstraint.prototype.toString;
 
-var EditOrStayCtor = function(clv /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
+var EditOrStayCtor = function(cv /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
   c.AbstractConstraint.call(this, strength || c.Strength.strong, weight);
-  this.variable = clv;
-  this.expression = new c.Expression(clv, -1, clv.value());
+  this.variable = cv;
+  this.expression = new c.Expression(cv, -1, cv.value());
 };
 
 c.EditConstraint = c.inherit({
@@ -75,38 +75,37 @@ c.Inequality = c.inherit({
   initialize: function(a1, a2, a3, a4, a5) {
     // FIXME(slightlyoff): what a disgusting mess. Should at least add docs.
     // console.log("c.Inequality.initialize(", a1, a2, a3, a4, a5, ")");
-    // 
-    // (cle || number), op, clv
-    var a1IsExp, a3IsExp, a1IsNum, a3IsNum, a1IsVar, a3IsVar;
-    a1IsExp = a1 instanceof c.Expression;
-    a3IsExp = a3 instanceof c.Expression;
-    a1IsVar = a1 instanceof c.AbstractVariable;
-    a3IsVar = a3 instanceof c.AbstractVariable;
-    a1IsNum = typeof(a1) == 'number';
-    a3IsNum = typeof(a3) == 'number';
+ 
+    var a1IsExp = a1 instanceof c.Expression,
+        a3IsExp = a3 instanceof c.Expression,
+        a1IsVar = a1 instanceof c.AbstractVariable,
+        a3IsVar = a3 instanceof c.AbstractVariable,
+        a1IsNum = typeof(a1) == 'number',
+        a3IsNum = typeof(a3) == 'number';
     
+    // (cle || number), op, cv
     if ((a1IsExp || a1IsNum) && a3IsVar) {      
-      var cle = a1, op = a2, clv = a3, strength = a4, weight = a5;
+      var cle = a1, op = a2, cv = a3, strength = a4, weight = a5;
       c.Constraint.call(this, this._cloneOrNewCle(cle), strength, weight);
       if (op == c.LEQ) {
         this.expression.multiplyMe(-1);
-        this.expression.addVariable(clv);
+        this.expression.addVariable(cv);
       } else if (op == c.GEQ) {
-        this.expression.addVariable(clv, -1);
+        this.expression.addVariable(cv, -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClInequality constructor");
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
       }    
-    // clv, op, (cle || number)
+    // cv, op, (cle || number)
     } else if (a1IsVar && (a3IsExp || a3IsNum)) {      
-      var cle = a3, op = a2, clv = a1, strength = a4, weight = a5;
+      var cle = a3, op = a2, cv = a1, strength = a4, weight = a5;
       c.Constraint.call(this, this._cloneOrNewCle(cle), strength, weight);
       if (op == c.GEQ) {
         this.expression.multiplyMe(-1);
-        this.expression.addVariable(clv);
+        this.expression.addVariable(cv);
       } else if (op == c.LEQ) {
-        this.expression.addVariable(clv, -1);
+        this.expression.addVariable(cv, -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClInequality constructor");
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
       }    
     // cle, op, num
     } else if (a1IsExp && a3IsNum) {
@@ -118,7 +117,7 @@ c.Inequality = c.inherit({
       } else if (op == c.GEQ) {
         this.expression.addExpression(this._cloneOrNewCle(cle2), -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClInequality constructor");
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
       }
       return this      
     // num, op, cle
@@ -131,7 +130,7 @@ c.Inequality = c.inherit({
       } else if (op == c.LEQ) {
         this.expression.addExpression(this._cloneOrNewCle(cle2), -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClInequality constructor");
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
       }
       return this     
     // cle op cle
@@ -144,7 +143,7 @@ c.Inequality = c.inherit({
       } else if (op == c.LEQ) {
         this.expression.addExpression(this._cloneOrNewCle(cle1), -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClInequality constructor");
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
       }       
     // cle
     } else if (a1IsExp) {
@@ -160,7 +159,7 @@ c.Inequality = c.inherit({
       this.expression.addVariable(a1,-1);
     // error
     } else {
-      throw new c.InternalError("Invalid operator in ClInequality constructor");
+      throw new c.InternalError("Invalid operator in c.Inequality constructor");
     }
   },
 
@@ -182,19 +181,19 @@ c.Equation = c.inherit({
       lc.call(this, a1, a2, a3);
     } else if ((a1 instanceof c.AbstractVariable) &&
                (a2 instanceof c.Expression)) {
-      var clv = a1, cle = a2, strength = a3, weight = a4;
+      var cv = a1, cle = a2, strength = a3, weight = a4;
       lc.call(this, cle, strength, weight);
-      this.expression.addVariable(clv, -1);
+      this.expression.addVariable(cv, -1);
     } else if ((a1 instanceof c.AbstractVariable) &&
                (typeof(a2) == 'number')) {
-      var clv = a1, val = a2, strength = a3, weight = a4;
+      var cv = a1, val = a2, strength = a3, weight = a4;
       lc.call(this, new c.Expression(val), strength, weight);
-      this.expression.addVariable(clv, -1);
+      this.expression.addVariable(cv, -1);
     } else if ((a1 instanceof c.Expression) &&
                (a2 instanceof c.AbstractVariable)) {
-      var cle = a1, clv = a2, strength = a3, weight = a4;
+      var cle = a1, cv = a2, strength = a3, weight = a4;
       lc.call(this, cle.clone(), strength, weight);
-      this.expression.addVariable(clv, -1);
+      this.expression.addVariable(cv, -1);
     } else if (((a1 instanceof c.Expression) || (a1 instanceof c.AbstractVariable) ||
                 (typeof(a1) == 'number')) &&
                ((a2 instanceof c.Expression) || (a2 instanceof c.AbstractVariable) ||
@@ -212,7 +211,7 @@ c.Equation = c.inherit({
       lc.call(this, a1, a3, a4);
       this.expression.addExpression(a2, -1);
     } else {
-      throw "Bad initializer to ClEquation";
+      throw "Bad initializer to c.Equation";
     }
     c.Assert(this.strength instanceof c.Strength, "_strength not set");
   },

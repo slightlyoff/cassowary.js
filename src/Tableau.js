@@ -10,16 +10,15 @@
 c.Tableau = c.inherit({
   initialize: function() {
     /* FIELDS:
-        var _columns // c.HashTable of vars -> set of vars
-        var _rows // c.HashTable of vars -> expr
+        var columns // c.HashTable of vars -> set of vars
+        var rows // c.HashTable of vars -> expr
         var _infeasibleRows //Set of vars
         var _externalRows //Set of vars
         var _externalParametricVars //Set of vars
    */
 
-    this._columns = new c.HashTable(); // values are sets
-
-    this._rows = new c.HashTable(); // values are c.Expressions
+    this.columns = new c.HashTable(); // values are sets
+    this.rows = new c.HashTable();    // values are c.Expressions
 
     this._infeasibleRows = new c.HashSet();
     this._externalRows = new c.HashSet();
@@ -29,7 +28,7 @@ c.Tableau = c.inherit({
   noteRemovedVariable: function(v /*ClAbstractVariable*/, subject /*ClAbstractVariable*/) {
     if (c.verbose) c.fnenterprint("noteRemovedVariable: " + v + ", " + subject);
     if (subject != null) {
-      this._columns.get(v).remove(subject);
+      this.columns.get(v).remove(subject);
     }
   },
 
@@ -42,9 +41,9 @@ c.Tableau = c.inherit({
 
   getInternalInfo: function() {
     var retstr = "Tableau Information:\n";
-    retstr += "Rows: " + this._rows.size();
-    retstr += " (= " + (this._rows.size() - 1) + " constraints)";
-    retstr += "\nColumns: " + this._columns.size();
+    retstr += "Rows: " + this.rows.size();
+    retstr += " (= " + (this.rows.size() - 1) + " constraints)";
+    retstr += "\nColumns: " + this.columns.size();
     retstr += "\nInfeasible Rows: " + this._infeasibleRows.size();
     retstr += "\nExternal basic variables: " + this._externalRows.size();
     retstr += "\nExternal parametric variables: ";
@@ -55,14 +54,14 @@ c.Tableau = c.inherit({
 
   toString: function() {
     var bstr = "Tableau:\n";
-    this._rows.each(function(clv, expr) {
+    this.rows.each(function(clv, expr) {
       bstr += clv;
       bstr += " <==> ";
       bstr += expr;
       bstr += "\n";
     });
     bstr += "\nColumns:\n";
-    bstr += c.hashToString(this._columns);
+    bstr += c.hashToString(this.columns);
     bstr += "\nInfeasible rows: ";
     bstr += c.setToString(this._infeasibleRows);
     bstr += "External basic variables: ";
@@ -73,28 +72,28 @@ c.Tableau = c.inherit({
   },
 
   // Convenience function to insert a variable into
-  // the set of rows stored at _columns[param_var],
+  // the set of rows stored at columns[param_var],
   // creating a new set if needed
   insertColVar: function(param_var /*Variable*/, rowvar /*Variable*/) {
-    var rowset = /* Set */ this._columns.get(param_var);
+    var rowset = /* Set */ this.columns.get(param_var);
     if (!rowset) {
       rowset = new c.HashSet();
-      this._columns.set(param_var, rowset);
+      this.columns.set(param_var, rowset);
     }
     rowset.add(rowvar);
 
     /*
     print("rowvar =" + rowvar);
     print("rowset = " + c.setToString(rowset));
-    print("this._columns = " + c.hashToString(this._columns));
+    print("this.columns = " + c.hashToString(this.columns));
     */
   },
 
   addRow: function(aVar /*ClAbstractVariable*/, expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
     // print("addRow: " + aVar + " (key), " + expr + " (value)");
-    // print(this._rows.size());
-    this._rows.set(aVar, expr);
+    // print(this.rows.size());
+    this.rows.set(aVar, expr);
     expr.terms.each(function(clv, coeff) {
       // print("insertColVar(" + clv + ", " + aVar + ")");
       this.insertColVar(clv, aVar);
@@ -112,14 +111,14 @@ c.Tableau = c.inherit({
 
   removeColumn: function(aVar /*ClAbstractVariable*/) {
     if (c.trace) c.fnenterprint("removeColumn:" + aVar);
-    var rows = /* Set */ this._columns.remove(aVar);
+    var rows = /* Set */ this.columns.remove(aVar);
     if (rows) {
       rows.each(function(clv) {
-        var expr = /* c.Expression */this._rows.get(clv);
+        var expr = /* c.Expression */this.rows.get(clv);
         expr.terms.remove(aVar);
       }, this);
     } else {
-      if (c.trace) c.debugprint("Could not find var " + aVar + " in _columns");
+      if (c.trace) c.debugprint("Could not find var " + aVar + " in columns");
     }
     if (aVar.isExternal) {
       this._externalRows.remove(aVar);
@@ -129,10 +128,10 @@ c.Tableau = c.inherit({
 
   removeRow: function(aVar /*ClAbstractVariable*/) {
     if (c.trace) c.fnenterprint("removeRow:" + aVar);
-    var expr = /* c.Expression */this._rows.get(aVar);
+    var expr = /* c.Expression */this.rows.get(aVar);
     c.Assert(expr != null);
     expr.terms.each(function(clv, coeff) {
-      var varset = this._columns.get(clv);
+      var varset = this.columns.get(clv);
       if (varset != null) {
         if (c.trace) c.debugprint("removing from varset " + aVar);
         varset.remove(aVar);
@@ -142,7 +141,7 @@ c.Tableau = c.inherit({
     if (aVar.isExternal) {
       this._externalRows.remove(aVar);
     }
-    this._rows.remove(aVar);
+    this.rows.remove(aVar);
     if (c.trace) c.fnexitprint("returning " + expr);
     return expr;
   },
@@ -150,35 +149,30 @@ c.Tableau = c.inherit({
   substituteOut: function(oldVar /*ClAbstractVariable*/, expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
     if (c.trace) c.traceprint(this.toString());
-    var varset = /* Set */this._columns.get(oldVar);
+
+    var varset = this.columns.get(oldVar);
     varset.each(function(v) {
-      var row = /* c.Expression */this._rows.get(v);
+      var row = this.rows.get(v);
       row.substituteOut(oldVar, expr, v, this);
       if (v.isRestricted && row.constant < 0) {
         this._infeasibleRows.add(v);
       }
     }, this);
+
     if (oldVar.isExternal) {
       this._externalRows.add(oldVar);
       this._externalParametricVars.remove(oldVar);
     }
-    this._columns.remove(oldVar);
-  },
 
-  columns: function() {
-    return this._columns;
-  },
-
-  rows: function() {
-    return this._rows;
+    this.columns.remove(oldVar);
   },
 
   columnsHasKey: function(subject /*ClAbstractVariable*/) {
-    return (this._columns.get(subject) != null);
+    return (this.columns.get(subject) != null);
   },
 
   rowExpression: function(v /*ClAbstractVariable*/) {
-    return /* c.Expression */this._rows.get(v);
+    return /* c.Expression */this.rows.get(v);
   },
 });
 

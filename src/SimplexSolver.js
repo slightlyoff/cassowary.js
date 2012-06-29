@@ -17,14 +17,14 @@ c.SimplexSolver = c.inherit({
     this._stayMinusErrorVars = [];
     this._stayPlusErrorVars = [];
 
-    this._errorVars = new c.HashTable(); // cn -> Set of clv
+    this._errorVars = new c.HashTable(); // cn -> Set of cv
 
-    this._markerVars = new c.HashTable(); // cn -> Set of clv
+    this._markerVars = new c.HashTable(); // cn -> Set of cv
 
     // this._resolve_pair = [0, 0]; 
     this._objective = new c.ObjectiveVariable("Z");
 
-    this._editVarMap = new c.HashTable(); // clv -> c.EditInfo
+    this._editVarMap = new c.HashTable(); // cv -> c.EditInfo
     this._editVarList = [];
 
     this._slackCounter = 0;
@@ -33,9 +33,9 @@ c.SimplexSolver = c.inherit({
     this.autoSolve = true;
     this._fNeedsSolving = false;
 
-    this._rows = new c.HashTable(); // clv -> expression
+    this.rows = new c.HashTable(); // cv -> expression
 
-    this._rows.set(this._objective, new c.Expression());
+    this.rows.set(this._objective, new c.Expression());
     this._stkCedcns = [0]; // Stack
     if (c.trace)
       c.traceprint("objective expr == " + this.rowExpression(this._objective));
@@ -82,18 +82,18 @@ c.SimplexSolver = c.inherit({
     this._fNeedsSolving = true;
     if (cn.isEditConstraint) {
       var i = this._editVarMap.size();
-      var clvEplus = /* c.SlackVariable */eplus_eminus[0];
-      var clvEminus = /* c.SlackVariable */eplus_eminus[1];
-      if (!clvEplus instanceof c.SlackVariable) {
-        console.log("clvEplus not a slack variable = " + clvEplus);
+      var cvEplus = /* c.SlackVariable */eplus_eminus[0];
+      var cvEminus = /* c.SlackVariable */eplus_eminus[1];
+      if (!cvEplus instanceof c.SlackVariable) {
+        console.log("cvEplus not a slack variable = " + cvEplus);
       }
-      if (!clvEminus instanceof c.SlackVariable) {
-        console.log("clvEminus not a slack variable = " + clvEminus);
+      if (!cvEminus instanceof c.SlackVariable) {
+        console.log("cvEminus not a slack variable = " + cvEminus);
       }
-      // console.log("new c.EditInfo(" + cn + ", " + clvEplus + ", " + 
-      //                               + clvEminus + ", " + prevEConstant + ", " 
+      // console.log("new c.EditInfo(" + cn + ", " + cvEplus + ", " + 
+      //                               + cvEminus + ", " + prevEConstant + ", " 
       //                               + i +")");
-      var ei = new c.EditInfo(cn, clvEplus, clvEminus, prevEConstant, i)
+      var ei = new c.EditInfo(cn, cvEplus, cvEminus, prevEConstant, i)
       this._editVarMap.set(cn.variable, ei);
       this._editVarList[i] = { v: cn.variable, info: ei };
     }
@@ -208,10 +208,10 @@ c.SimplexSolver = c.inherit({
     var eVars = /* Set */this._errorVars.get(cn);
     if (c.trace) c.traceprint("eVars == " + c.setToString(eVars));
     if (eVars != null) {
-      eVars.each(function(clv) {
-        var expr = this.rowExpression(clv);
+      eVars.each(function(cv) {
+        var expr = this.rowExpression(cv);
         if (expr == null) {
-          zRow.addVariable(clv, 
+          zRow.addVariable(cv, 
                            -cn.weight * cn.strength.symbolicWeight.toDouble(),
                            this._objective,
                            this);
@@ -230,7 +230,7 @@ c.SimplexSolver = c.inherit({
     }
     if (c.trace) c.traceprint("Looking to remove var " + marker);
     if (this.rowExpression(marker) == null) {
-      var col = this._columns.get(marker);
+      var col = this.columns.get(marker);
       // console.log("col is:", col, "from marker:", marker);
       if (c.trace) c.traceprint("Must pivot -- columns are " + col);
       var exitVar = null;
@@ -303,8 +303,7 @@ c.SimplexSolver = c.inherit({
     } else if (cn.isEditConstraint) {
       c.Assert(eVars != null, "eVars != null");
       var cei = this._editVarMap.get(cn.variable);
-      var clvEditMinus = cei.clvEditMinus;
-      this.removeColumn(clvEditMinus);
+      this.removeColumn(cei.editMinus);
       this._editVarMap.remove(cn.variable);
     }
 
@@ -354,17 +353,11 @@ c.SimplexSolver = c.inherit({
     if (c.trace) c.fnenterprint("suggestValue(" + v + ", " + x + ")");
     var cei = this._editVarMap.get(v);
     if (cei == null) {
-      // console.log("suggestValue for variable " + v + ", but var is not an edit variable\n");
-      throw new c.Error();
+      throw new c.Error("suggestValue for variable " + v + ", but var is not an edit variable");
     }
-    var i = cei.index;
-
-    var clvEditPlus = cei.clvEditPlus;
-    var clvEditMinus = cei.clvEditMinus;
     var delta = x - cei.prevEditConstant;
-    // console.log("delta: ", delta);
     cei.prevEditConstant = x;
-    this.deltaEditConstant(delta, clvEditPlus, clvEditMinus);
+    this.deltaEditConstant(delta, cei.editPlus, cei.editMinus);
     return this;
   },
 
@@ -377,7 +370,7 @@ c.SimplexSolver = c.inherit({
   },
 
   setEditedValue: function(v /*c.Variable*/, n /*double*/) {
-    if (!this.FContainsVariable(v)) {
+    if (!(this.columnsHasKey(v) || (this.rowExpression(v) != null))) {
       v._value = n;
       return this;
     }
@@ -397,12 +390,8 @@ c.SimplexSolver = c.inherit({
     return this;
   },
 
-  FContainsVariable: function(v /*c.Variable*/) {
-    return this.columnsHasKey(v) || (this.rowExpression(v) != null);
-  },
-
   addVar: function(v /*c.Variable*/) {
-    if (!this.FContainsVariable(v)) {
+    if (!(this.columnsHasKey(v) || (this.rowExpression(v) != null))) {
       try {
         this.addStay(v);
       } catch (e /*c.RequiredFailure*/){
@@ -512,7 +501,7 @@ c.SimplexSolver = c.inherit({
       } else {
         if (v.isRestricted) {
           if (!foundNewRestricted && !v.isDummy && c < 0) {
-            var col = this._columns.get(v);
+            var col = this.columns.get(v);
             if (col == null || (col.size() == 1 && this.columnsHasKey(this._objective))) {
               subject = v;
               foundNewRestricted = true;
@@ -576,7 +565,7 @@ c.SimplexSolver = c.inherit({
       }
       return;
     }
-    var columnVars = this._columns.get(minusErrorVar);
+    var columnVars = this.columns.get(minusErrorVar);
     if (!columnVars) {
       console.log("columnVars is null -- tableau is:\n" + this);
     }
@@ -739,7 +728,7 @@ c.SimplexSolver = c.inherit({
       }
 
       var minRatio = Number.MAX_VALUE;
-      var columnVars = this._columns.get(entryVar);
+      var columnVars = this.columns.get(entryVar);
       var r = 0;
 
       columnVars.each(function(v) {
