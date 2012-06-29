@@ -182,7 +182,7 @@ c.Equation = c.inherit({
     } else if ((a1 instanceof c.AbstractVariable) &&
                (a2 instanceof c.Expression)) {
       var cv = a1, cle = a2, strength = a3, weight = a4;
-      lc.call(this, cle, strength, weight);
+      lc.call(this, cle.clone(), strength, weight);
       this.expression.addVariable(cv, -1);
     } else if ((a1 instanceof c.AbstractVariable) &&
                (typeof(a2) == 'number')) {

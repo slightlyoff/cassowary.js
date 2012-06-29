@@ -249,7 +249,7 @@ c.Expression = c.inherit({
     }
     
     return other instanceof c.Expression && 
-           other.constant == this.constant && 
+           other.constant === this.constant && 
            other.terms.equals(this.terms);
   },
 
