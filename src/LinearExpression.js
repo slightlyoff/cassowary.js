@@ -10,12 +10,12 @@
 (function(c) {
 "use strict";
 
-c.LinearExpression = c.inherit({
+c.Expression = c.inherit({
   /* FIELDS:
      private ClDouble constant
   */
   initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
-    if (c.GC) console.log("new c.LinearExpression");
+    if (c.GC) console.log("new c.Expression");
     this.constant = (typeof constant == "number" && !isNaN(constant)) ? constant : 0;
     this.terms = new c.HashTable();
 
@@ -38,7 +38,7 @@ c.LinearExpression = c.inherit({
       console.log("*******************************");
     }
 
-    if (c.GC) console.log("clone c.LinearExpression");
+    if (c.GC) console.log("clone c.Expression");
     this.constant = constant;
     this.terms = terms.clone();
     return this;
@@ -54,11 +54,11 @@ c.LinearExpression = c.inherit({
   clone: function() {
     if(c.verbose) {
       console.log("*******************************");
-      console.log("clone c.LinearExpression");
+      console.log("clone c.Expression");
       console.log("*******************************");
     }
 
-    var le = new c.LinearExpression();
+    var le = new c.Expression();
     le.initializeFromHash(this.constant, this.terms);
     return le;
   },
@@ -77,16 +77,16 @@ c.LinearExpression = c.inherit({
     }
   },
 
-  plus: function(expr /*c.LinearExpression*/) {
-    if (expr instanceof c.LinearExpression) {
+  plus: function(expr /*c.Expression*/) {
+    if (expr instanceof c.Expression) {
       return this.clone().addExpression(expr, 1);
     } else if (expr instanceof c.Variable) {
       return this.clone().addVariable(expr, 1);
     }
   },
 
-  minus: function(expr /*c.LinearExpression*/) {
-    if (expr instanceof c.LinearExpression) {
+  minus: function(expr /*c.Expression*/) {
+    if (expr instanceof c.Expression) {
       return this.clone().addExpression(expr, -1);
     } else if (expr instanceof c.Variable) {
       return this.clone().addVariable(expr, -1);
@@ -99,7 +99,7 @@ c.LinearExpression = c.inherit({
         throw new c.NonlinearExpression();
       }
       return this.times(1 / x);
-    } else if (x instanceof c.LinearExpression) {
+    } else if (x instanceof c.Expression) {
       if (!x.isConstant()) {
         throw new c.NonlinearExpression();
       }
@@ -107,13 +107,13 @@ c.LinearExpression = c.inherit({
     }
   },
 
-  addExpression: function(expr /*c.LinearExpression*/,
+  addExpression: function(expr /*c.Expression*/,
                           n /*double*/,
                           subject /*c.AbstractVariable*/,
                           solver /*c.Tableau*/) {
 
     if (expr instanceof c.AbstractVariable) {
-      expr = new c.LinearExpression(expr);
+      expr = new c.Expression(expr);
       if(c.trace) console.log("addExpression: Had to cast a var to an expression");
     }
     n = n || 1;
@@ -174,7 +174,7 @@ c.LinearExpression = c.inherit({
   },
   
   substituteOut: function(outvar /*c.AbstractVariable*/,
-                          expr /*c.LinearExpression*/,
+                          expr /*c.Expression*/,
                           subject /*c.AbstractVariable*/,
                           solver /*ClTableau*/) {
     if (c.trace) {
@@ -243,16 +243,16 @@ c.LinearExpression = c.inherit({
     return bstr;
   },
 
-  Plus: function(e1 /*c.LinearExpression*/, e2 /*c.LinearExpression*/) {
+  Plus: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     return e1.plus(e2);
   },
-  Minus: function(e1 /*c.LinearExpression*/, e2 /*c.LinearExpression*/) {
+  Minus: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     return e1.minus(e2);
   },
-  Times: function(e1 /*c.LinearExpression*/, e2 /*c.LinearExpression*/) {
+  Times: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     return e1.times(e2);
   },
-  Divide: function(e1 /*c.LinearExpression*/, e2 /*c.LinearExpression*/) {
+  Divide: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     return e1.divide(e2);
   },
 });

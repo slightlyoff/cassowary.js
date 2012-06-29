@@ -35,19 +35,19 @@ c.SimplexSolver = c.inherit({
 
     this._rows = new c.HashTable(); // clv -> expression
 
-    this._rows.set(this._objective, new c.LinearExpression());
+    this._rows.set(this._objective, new c.Expression());
     this._stkCedcns = [0]; // Stack
     if (c.trace)
       c.traceprint("objective expr == " + this.rowExpression(this._objective));
   },
 
   addLowerBound: function(v /*c.AbstractVariable*/, lower /*double*/) {
-    var cn = new c.LinearInequality(v, c.GEQ, new c.LinearExpression(lower));
+    var cn = new c.LinearInequality(v, c.GEQ, new c.Expression(lower));
     return this.addConstraint(cn);
   },
 
   addUpperBound: function(v /*c.AbstractVariable*/, upper /*double*/) {
-    var cn = new c.LinearInequality(v, c.LEQ, new c.LinearExpression(upper));
+    var cn = new c.LinearInequality(v, c.LEQ, new c.Expression(upper));
     return this.addConstraint(cn);
   },
 
@@ -448,11 +448,11 @@ c.SimplexSolver = c.inherit({
     return this._markerVars;
   },
 
-  addWithArtificialVariable: function(expr /*c.LinearExpression*/) {
+  addWithArtificialVariable: function(expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("addWithArtificialVariable: " + expr);
     var av = new c.SlackVariable(++this._artificialCounter, "a");
     var az = new c.ObjectiveVariable("az");
-    var azRow = /* c.LinearExpression */expr.clone();
+    var azRow = /* c.Expression */expr.clone();
     if (c.trace) c.traceprint("before addRows:\n" + this);
     this.addRow(az, azRow);
     this.addRow(av, expr);
@@ -480,7 +480,7 @@ c.SimplexSolver = c.inherit({
     this.removeRow(az);
   },
 
-  tryAddingDirectly: function(expr /*c.LinearExpression*/) {
+  tryAddingDirectly: function(expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("tryAddingDirectly: " + expr);
     var subject = this.chooseSubject(expr);
     if (subject == null) {
@@ -496,7 +496,7 @@ c.SimplexSolver = c.inherit({
     return true;
   },
 
-  chooseSubject: function(expr /*c.LinearExpression*/) {
+  chooseSubject: function(expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("chooseSubject: " + expr);
     var subject = null;
     var foundUnrestricted = false;
@@ -630,7 +630,7 @@ c.SimplexSolver = c.inherit({
       c.traceprint("cn.isRequired() == " + cn.isRequired());
     }
     var cnExpr = cn.expression;
-    var expr = new c.LinearExpression(cnExpr.constant);
+    var expr = new c.Expression(cnExpr.constant);
     var slackVar = new c.SlackVariable();
     var dummyVar = new c.DummyVariable();
     var eminus = new c.SlackVariable();

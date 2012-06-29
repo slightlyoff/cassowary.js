@@ -158,21 +158,21 @@ scope.c = {
   },
 
   Plus: function(e1, e2) {
-    if (!(e1 instanceof c.LinearExpression)) {
-      e1 = new c.LinearExpression(e1);
+    if (!(e1 instanceof c.Expression)) {
+      e1 = new c.Expression(e1);
     }
-    if (!(e2 instanceof c.LinearExpression)) {
-      e2 = new c.LinearExpression(e2);
+    if (!(e2 instanceof c.Expression)) {
+      e2 = new c.Expression(e2);
     }
     return e1.plus(e2);
   },
   
   Minus: function(e1, e2) {
-    if (!(e1 instanceof c.LinearExpression)) {
-      e1 = new c.LinearExpression(e1);
+    if (!(e1 instanceof c.Expression)) {
+      e1 = new c.Expression(e1);
     }
-    if (!(e2 instanceof c.LinearExpression)) {
-      e2 = new c.LinearExpression(e2);
+    if (!(e2 instanceof c.Expression)) {
+      e2 = new c.Expression(e2);
     }
 
     return e1.minus(e2);
@@ -180,21 +180,21 @@ scope.c = {
 
   Times: function(e1, e2) {
     if (typeof e1 == "number" || e1 instanceof c.Variable) {
-      e1 = new c.LinearExpression(e1);
+      e1 = new c.Expression(e1);
     }
     if (typeof e2 == "number" || e2 instanceof c.Variable) {
-      e2 = new c.LinearExpression(e2);
+      e2 = new c.Expression(e2);
     }
 
     return e1.times(e2);
   },
 
-  Divide: function(e1 /*c.LinearExpression*/, e2 /*c.LinearExpression*/) {
+  Divide: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     if (typeof e1 == "number" || e1 instanceof c.Variable) {
-      e1 = new c.LinearExpression(e1);
+      e1 = new c.Expression(e1);
     }
     if (typeof e2 == "number" || e2 instanceof c.Variable) {
-      e2 = new c.LinearExpression(e2);
+      e2 = new c.Expression(e2);
     }
 
     return e1.divide(e2);

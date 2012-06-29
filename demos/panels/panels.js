@@ -486,7 +486,7 @@ scope.Panel = c.inherit({
   ],
 
   _initConstraints: function() {
-    var Expr = c.LinearExpression;
+    var Expr = c.Expression;
     var Var = c.Variable;
 
     var v = this.v = {};

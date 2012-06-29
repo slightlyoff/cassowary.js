@@ -11,7 +11,7 @@ load("../src/SymbolicWeight.js");
 load("../src/Strength.js");
 load("../src/Variable.js");
 load("../src/Point.js");
-load("../src/LinearExpression.js");
+load("../src/Expression.js");
 load("../src/Constraint.js");
 load("../src/Constraint.js");
 load("../src/EditInfo.js");

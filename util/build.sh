@@ -16,7 +16,6 @@ python post.py ../src/c.js\
                ../src/Point.js\
                ../src/LinearExpression.js\
                ../src/Constraint.js\
-               ../src/LinearConstraint.js\
                ../src/EditInfo.js\
                ../src/Tableau.js\
                ../src/SimplexSolver.js\

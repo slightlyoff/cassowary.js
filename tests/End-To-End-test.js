@@ -15,7 +15,7 @@ doh.add("End-To-End", [
 
     var x = new c.Variable(167);
     var y = new c.Variable(2);
-    var eq = new c.LinearEquation(x, new c.LinearExpression(y));
+    var eq = new c.LinearEquation(x, new c.Expression(y));
 
     solver.addConstraint(eq);
     t.t(x.value() == y.value());
@@ -87,7 +87,7 @@ doh.add("End-To-End", [
       // width = 10
       var width = new c.Variable(10);
       // right = x + width
-      var right = new c.LinearExpression(x).plus(width);
+      var right = new c.Expression(x).plus(width);
       // right >= 100
       var ieq = new c.LinearInequality(right, c.GEQ, 100);
       solver.addStay(width)
@@ -107,7 +107,7 @@ doh.add("End-To-End", [
 
       var x = new c.Variable(10);
       var width = new c.Variable(10);
-      var right = new c.LinearExpression(x).plus(width);
+      var right = new c.Expression(x).plus(width);
       var ieq = new c.LinearInequality(100, c.LEQ, right);
 
       solver.addStay(width)
@@ -128,7 +128,7 @@ doh.add("End-To-End", [
       var x = new c.Variable(10);
       var width = new c.Variable(10);
       var rightMin = new c.Variable(100);
-      var right = new c.LinearExpression(x).plus(width);
+      var right = new c.Expression(x).plus(width);
       var eq = new c.LinearEquation(right, rightMin);
 
       solver.addStay(width)
@@ -150,7 +150,7 @@ doh.add("End-To-End", [
       var x = new c.Variable(10);
       var width = new c.Variable(10);
       var rightMin = new c.Variable(100);
-      var right = new c.LinearExpression(x).plus(width);
+      var right = new c.Expression(x).plus(width);
       var ieq = new c.LinearInequality(right, c.GEQ, rightMin);
 
       solver.addStay(width)
@@ -172,7 +172,7 @@ doh.add("End-To-End", [
       var x = new c.Variable(10);
       var width = new c.Variable(10);
       var rightMin = new c.Variable(100);
-      var right = new c.LinearExpression(x).plus(width);
+      var right = new c.Expression(x).plus(width);
       var ieq = new c.LinearInequality(rightMin, c.LEQ, right);
       solver.addStay(width)
             .addStay(rightMin)
@@ -192,10 +192,10 @@ doh.add("End-To-End", [
 
       var x1 = new c.Variable(10);
       var width1 = new c.Variable(10);
-      var right1 = new c.LinearExpression(x1).plus(width1);
+      var right1 = new c.Expression(x1).plus(width1);
       var x2 = new c.Variable(100);
       var width2 = new c.Variable(10);
-      var right2 = new c.LinearExpression(x2).plus(width2);
+      var right2 = new c.Expression(x2).plus(width2);
       
       var eq = new c.LinearEquation(right1, right2);
 
@@ -220,10 +220,10 @@ doh.add("End-To-End", [
 
       var x1 = new c.Variable(10);
       var width1 = new c.Variable(10);
-      var right1 = new c.LinearExpression(x1).plus(width1);
+      var right1 = new c.Expression(x1).plus(width1);
       var x2 = new c.Variable(100);
       var width2 = new c.Variable(10);
-      var right2 = new c.LinearExpression(x2).plus(width2);
+      var right2 = new c.Expression(x2).plus(width2);
 
       var ieq = new c.LinearInequality(right1, c.GEQ, right2);
 
@@ -246,10 +246,10 @@ doh.add("End-To-End", [
 
       var x1 = new c.Variable(10);
       var width1 = new c.Variable(10);
-      var right1 = new c.LinearExpression(x1).plus(width1);
+      var right1 = new c.Expression(x1).plus(width1);
       var x2 = new c.Variable(100);
       var width2 = new c.Variable(10);
-      var right2 = new c.LinearExpression(x2).plus(width2);
+      var right2 = new c.Expression(x2).plus(width2);
       var ieq = new c.LinearInequality(right2, c.LEQ, right1);
 
       solver.addStay(width1)

@@ -33,7 +33,7 @@ var ts = c.AbstractConstraint.prototype.toString;
 var EditOrStayCtor = function(clv /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
   c.AbstractConstraint.call(this, strength || c.Strength.strong, weight);
   this.variable = clv;
-  this.expression = new c.LinearExpression(clv, -1, clv.value());
+  this.expression = new c.Expression(clv, -1, clv.value());
 };
 
 c.EditConstraint = c.inherit({
@@ -52,7 +52,7 @@ c.StayConstraint = c.inherit({
 
 c.Constraint = c.inherit({
   extends: c.AbstractConstraint,
-  initialize: function(cle /*c.LinearExpression*/, 
+  initialize: function(cle /*c.Expression*/, 
                        strength /*c.Strength*/,
                        weight /*double*/) {
     c.AbstractConstraint.call(this, strength, weight);
@@ -68,7 +68,7 @@ c.LinearInequality = c.inherit({
     if (cle.clone)  {
       return cle.clone();
     } else { 
-      return new c.LinearExpression(cle);
+      return new c.Expression(cle);
     }
   },
 
@@ -78,8 +78,8 @@ c.LinearInequality = c.inherit({
     // 
     // (cle || number), op, clv
     var a1IsExp, a3IsExp, a1IsNum, a3IsNum, a1IsVar, a3IsVar;
-    a1IsExp = a1 instanceof c.LinearExpression;
-    a3IsExp = a3 instanceof c.LinearExpression;
+    a1IsExp = a1 instanceof c.Expression;
+    a3IsExp = a3 instanceof c.Expression;
     a1IsVar = a1 instanceof c.AbstractVariable;
     a3IsVar = a3 instanceof c.AbstractVariable;
     a1IsNum = typeof(a1) == 'number';
@@ -151,12 +151,12 @@ c.LinearInequality = c.inherit({
       return c.Constraint.call(this, a1, a2, a3);    
     // >=
     } else if (a2 == c.GEQ) {
-      c.Constraint.call(this, new c.LinearExpression(a3), a4, a5);
+      c.Constraint.call(this, new c.Expression(a3), a4, a5);
       this.expression.multiplyMe(-1);
       this.expression.addVariable(a1);
     // <=
     } else if (a2 == c.LEQ) {
-      c.Constraint.call(this, new c.LinearExpression(a3), a4, a5);
+      c.Constraint.call(this, new c.Expression(a3), a4, a5);
       this.expression.addVariable(a1,-1);
     // error
     } else {
@@ -178,36 +178,36 @@ c.LinearEquation = c.inherit({
   extends: c.Constraint,
   initialize: function(a1, a2, a3, a4) {
     // FIXME(slightlyoff): this is just a huge mess.
-    if (a1 instanceof c.LinearExpression && !a2 || a2 instanceof c.Strength) {
+    if (a1 instanceof c.Expression && !a2 || a2 instanceof c.Strength) {
       lc.call(this, a1, a2, a3);
     } else if ((a1 instanceof c.AbstractVariable) &&
-               (a2 instanceof c.LinearExpression)) {
+               (a2 instanceof c.Expression)) {
       var clv = a1, cle = a2, strength = a3, weight = a4;
       lc.call(this, cle, strength, weight);
       this.expression.addVariable(clv, -1);
     } else if ((a1 instanceof c.AbstractVariable) &&
                (typeof(a2) == 'number')) {
       var clv = a1, val = a2, strength = a3, weight = a4;
-      lc.call(this, new c.LinearExpression(val), strength, weight);
+      lc.call(this, new c.Expression(val), strength, weight);
       this.expression.addVariable(clv, -1);
-    } else if ((a1 instanceof c.LinearExpression) &&
+    } else if ((a1 instanceof c.Expression) &&
                (a2 instanceof c.AbstractVariable)) {
       var cle = a1, clv = a2, strength = a3, weight = a4;
       lc.call(this, cle.clone(), strength, weight);
       this.expression.addVariable(clv, -1);
-    } else if (((a1 instanceof c.LinearExpression) || (a1 instanceof c.AbstractVariable) ||
+    } else if (((a1 instanceof c.Expression) || (a1 instanceof c.AbstractVariable) ||
                 (typeof(a1) == 'number')) &&
-               ((a2 instanceof c.LinearExpression) || (a2 instanceof c.AbstractVariable) ||
+               ((a2 instanceof c.Expression) || (a2 instanceof c.AbstractVariable) ||
                 (typeof(a2) == 'number'))) {
-      if (a1 instanceof c.LinearExpression) {
+      if (a1 instanceof c.Expression) {
         a1 = a1.clone();
       } else {
-        a1 = new c.LinearExpression(a1);
+        a1 = new c.Expression(a1);
       }
-      if (a2 instanceof c.LinearExpression) {
+      if (a2 instanceof c.Expression) {
         a2 = a2.clone();
       } else {
-        a2 = new c.LinearExpression(a2);
+        a2 = new c.Expression(a2);
       }
       lc.call(this, a1, a3, a4);
       this.expression.addExpression(a2, -1);

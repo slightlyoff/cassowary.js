@@ -6,15 +6,15 @@
 
 "use strict";
 
-doh.add("c.LinearExpression", [
+doh.add("c.Expression", [
   function threeVarCtor(t) {
     var x = new c.Variable("x", 167);
-    var e = new c.LinearExpression(x, 2, 3);
+    var e = new c.Expression(x, 2, 3);
     t.is(e, "3 + 2*[x:167]");
   },
 
   function oneParamCtor(t) {
-    t.is(new c.LinearExpression(4), "4");
+    t.is(new c.Expression(4), "4");
   },
 
   function plus(t) {
@@ -46,20 +46,20 @@ doh.add("c.LinearExpression", [
   },
   
   function zero_args(t) {
-    var exp = new c.LinearExpression;
+    var exp = new c.Expression;
     t.is(0, exp.constant);
     t.is(0, exp.terms.size());
   },
   
   function one_number(t) {
-    var exp = new c.LinearExpression(10);
+    var exp = new c.Expression(10);
     t.is(10, exp.constant);
     t.is(0, exp.terms.size());
   },
   
   function one_variable(t) {
     var v = new c.Variable(10);
-    var exp = new c.LinearExpression(v);
+    var exp = new c.Expression(v);
     t.is(0, exp.constant);
     t.is(1, exp.terms.size());
     t.is(1, exp.terms.get(v));
@@ -67,7 +67,7 @@ doh.add("c.LinearExpression", [
   
   function variable_number(t) {
     var v = new c.Variable(10);
-    var exp = new c.LinearExpression(v, 20);
+    var exp = new c.Expression(v, 20);
     t.is(0, exp.constant);
     t.is(1, exp.terms.size());
     t.is(20, exp.terms.get(v));
@@ -75,7 +75,7 @@ doh.add("c.LinearExpression", [
   
   function variable_number_number(t) {
     var v = new c.Variable(10);
-    var exp = new c.LinearExpression(v, 20, 2);
+    var exp = new c.Expression(v, 20, 2);
     t.is(2, exp.constant);
     t.is(1, exp.terms.size());
     t.is(20, exp.terms.get(v));
@@ -83,7 +83,7 @@ doh.add("c.LinearExpression", [
   
   function clone(t) {
     var v = new c.Variable(10);
-    var exp = new c.LinearExpression(v, 20, 2);
+    var exp = new c.Expression(v, 20, 2);
     var clone = exp.clone();
     
     t.is(clone.constant, exp.constant);
@@ -92,9 +92,9 @@ doh.add("c.LinearExpression", [
   },
   
   function isConstant(t) {
-    var e1 = new c.LinearExpression;
-    var e2 = new c.LinearExpression(10);
-    var e3 = new c.LinearExpression(new c.Variable(10), 20, 2);
+    var e1 = new c.Expression;
+    var e2 = new c.Expression(10);
+    var e3 = new c.Expression(new c.Variable(10), 20, 2);
     
     t.is(true, e1.isConstant());
     t.is(true, e2.isConstant());
@@ -103,7 +103,7 @@ doh.add("c.LinearExpression", [
   
   function multiplyMe(t) {
     var v = new c.Variable(10);
-    var e = new c.LinearExpression(v, 20, 2).multiplyMe(-1);
+    var e = new c.Expression(v, 20, 2).multiplyMe(-1);
 
     t.is(e.constant, -2);
     t.is(v.value(), 10);
@@ -112,7 +112,7 @@ doh.add("c.LinearExpression", [
   
   function times(t) {
     var v = new c.Variable(10);
-    var a = new c.LinearExpression(v, 20, 2);
+    var a = new c.Expression(v, 20, 2);
 
     // times a number
     var e = a.times(10);
@@ -120,12 +120,12 @@ doh.add("c.LinearExpression", [
     t.is(e.terms.get(v), 200);
 
     // times a constant exression
-    var e = a.times(new c.LinearExpression(10))
+    var e = a.times(new c.Expression(10))
     t.is(e.constant, 20);
     t.is(e.terms.get(v), 200);
 
     // constant expression times another expression
-    var e = new c.LinearExpression(10).times(a)
+    var e = new c.Expression(10).times(a)
     t.is(e.constant, 20);
     t.is(e.terms.get(v), 200);
 
@@ -134,7 +134,7 @@ doh.add("c.LinearExpression", [
   },
   
   function addVariable(t) {
-    var a = new c.LinearExpression(new c.Variable(10), 20, 2);
+    var a = new c.Expression(new c.Variable(10), 20, 2);
     var v = new c.Variable(20);
 
     // implicit coefficient of 1
@@ -159,7 +159,7 @@ doh.add("c.LinearExpression", [
   },
   
   function addExpression_variable(t) {
-    var a = new c.LinearExpression(new c.Variable(10), 20, 2);
+    var a = new c.Expression(new c.Variable(10), 20, 2);
     var v = new c.Variable(20);
 
     // should work just like addVariable
@@ -172,23 +172,23 @@ doh.add("c.LinearExpression", [
     var va = new c.Variable(10);
     var vb = new c.Variable(20);
     var vc = new c.Variable(5);
-    var a = new c.LinearExpression(va, 20, 2);
+    var a = new c.Expression(va, 20, 2);
 
     // different variable and implicit coefficient of 1, should make new term
-    a.addExpression(new c.LinearExpression(vb, 10, 5));
+    a.addExpression(new c.Expression(vb, 10, 5));
     t.is(a.terms.size(), 2);
     t.is(a.constant, 7);
     t.is(a.terms.get(vb), 10);
 
     // same variable, should reuse existing term
-    a.addExpression(new c.LinearExpression(vb, 2, 5));
+    a.addExpression(new c.Expression(vb, 2, 5));
     t.is(a.terms.size(), 2);
     t.is(a.constant, 12);
     t.is(a.terms.get(vb), 12);
     
     // another variable and a coefficient, 
     // should multiply the constant and all terms in the new expression
-    a.addExpression(new c.LinearExpression(vc, 1, 2), 2);
+    a.addExpression(new c.Expression(vc, 1, 2), 2);
     t.is(a.terms.size(), 3);
     t.is(a.constant, 16);
     t.is(a.terms.get(vc), 2);
@@ -197,8 +197,8 @@ doh.add("c.LinearExpression", [
   function plus(t) {
     var va = new c.Variable(10);
     var vb = new c.Variable(20);
-    var a = new c.LinearExpression(va, 20, 2);
-    var b = new c.LinearExpression(vb, 10, 5);
+    var a = new c.Expression(va, 20, 2);
+    var b = new c.Expression(vb, 10, 5);
     
     var p = a.plus(b);
     t.assertNotEqual(a, p);
@@ -213,8 +213,8 @@ doh.add("c.LinearExpression", [
   function minus(t) {
     var va = new c.Variable(10);
     var vb = new c.Variable(20);
-    var a = new c.LinearExpression(va, 20, 2);
-    var b = new c.LinearExpression(vb, 10, 5);
+    var a = new c.Expression(va, 20, 2);
+    var b = new c.Expression(vb, 10, 5);
     
     var p = a.minus(b);
     t.assertNotEqual(a, p);
@@ -229,7 +229,7 @@ doh.add("c.LinearExpression", [
   function divide(t) {
     var va = new c.Variable(10);
     var vb = new c.Variable(20);
-    var a = new c.LinearExpression(va, 20, 2);
+    var a = new c.Expression(va, 20, 2);
     
     t.e(c.NonlinearExpression, a, 'divide', [0]);
     
@@ -237,10 +237,10 @@ doh.add("c.LinearExpression", [
     t.is(p.constant, 1);
     t.is(p.terms.get(va), 10);
     
-    t.e(c.NonlinearExpression, a, 'divide', [new c.LinearExpression(vb, 10, 5)]);
-    t.e(c.NonlinearExpression, new c.LinearExpression(vb, 10, 5), 'divide', [a]);
+    t.e(c.NonlinearExpression, a, 'divide', [new c.Expression(vb, 10, 5)]);
+    t.e(c.NonlinearExpression, new c.Expression(vb, 10, 5), 'divide', [a]);
     
-    p = a.divide(new c.LinearExpression(2));
+    p = a.divide(new c.Expression(2));
     t.is(p.constant, 1);
     t.is(p.terms.get(va), 10);
   },
@@ -248,7 +248,7 @@ doh.add("c.LinearExpression", [
   function coefficientFor(t) {
     var va = new c.Variable(10);
     var vb = new c.Variable(20);
-    var a = new c.LinearExpression(va, 20, 2);
+    var a = new c.Expression(va, 20, 2);
     
     t.is(a.coefficientFor(va), 20);
     t.is(a.coefficientFor(vb), 0);
@@ -257,7 +257,7 @@ doh.add("c.LinearExpression", [
   function setVariable(t) {
     var va = new c.Variable(10);
     var vb = new c.Variable(20);
-    var a = new c.LinearExpression(va, 20, 2);
+    var a = new c.Expression(va, 20, 2);
     
     // set existing variable
     a.setVariable(va, 2);
@@ -271,11 +271,11 @@ doh.add("c.LinearExpression", [
   },
   
   function anyPivotableVariable(t) {
-    t.e(c.InternalError, new c.LinearExpression(10), 'anyPivotableVariable');
+    t.e(c.InternalError, new c.Expression(10), 'anyPivotableVariable');
     
     var va = new c.Variable(10);
     var vb = new c.SlackVariable;
-    var a = new c.LinearExpression(va, 20, 2);
+    var a = new c.Expression(va, 20, 2);
     
     t.is(null, a.anyPivotableVariable());
     
@@ -286,17 +286,17 @@ doh.add("c.LinearExpression", [
   function substituteOut(t) {
     var v1 = new c.Variable(20);
     var v2 = new c.Variable(2);
-    var a = new c.LinearExpression(v1, 2, 2); // 2*v1 + 2
+    var a = new c.Expression(v1, 2, 2); // 2*v1 + 2
     
     // new variable
-    a.substituteOut(v1, new c.LinearExpression(v2, 4, 4));
+    a.substituteOut(v1, new c.Expression(v2, 4, 4));
     t.is(a.constant, 10);
     t.is(null, a.terms.get(v1));
     t.is(a.terms.get(v2), 8);
     
     // existing variable
     a.setVariable(v1, 1);
-    a.substituteOut(v2, new c.LinearExpression(v1, 2, 2));
+    a.substituteOut(v2, new c.Expression(v1, 2, 2));
 
     t.is(a.constant, 26);
     t.is(null, a.terms.get(v2));
@@ -305,7 +305,7 @@ doh.add("c.LinearExpression", [
   
   function newSubject(t) {
     var v = new c.Variable(10);
-    var e = new c.LinearExpression(v, 2, 5);
+    var e = new c.Expression(v, 2, 5);
 
     t.is(e.newSubject(v), 1 / 2);
     t.is(e.constant, -2.5);
@@ -316,7 +316,7 @@ doh.add("c.LinearExpression", [
   function changeSubject(t) {
     var va = new c.Variable(10);
     var vb = new c.Variable(5);
-    var e = new c.LinearExpression(va, 2, 5);
+    var e = new c.Expression(va, 2, 5);
 
     e.changeSubject(vb, va);
     t.is(e.constant, -2.5);
@@ -327,10 +327,10 @@ doh.add("c.LinearExpression", [
   function toString(t) {
     var v = new c.Variable('v', 5);
 
-    t.is(new c.LinearExpression(10).toString(), '10');
-    t.is(new c.LinearExpression(v, 0, 10).toString(), '10 + 0*[v:5]');
+    t.is(new c.Expression(10).toString(), '10');
+    t.is(new c.Expression(v, 0, 10).toString(), '10 + 0*[v:5]');
 
-    var e = new c.LinearExpression(v, 2, 10);
+    var e = new c.Expression(v, 2, 10);
     t.is(e.toString(), '10 + 2*[v:5]');
 
     e.setVariable(new c.Variable('b', 2), 4);
