@@ -34,8 +34,8 @@ doh.add("c.Strength", [
     var y = new c.Variable("y");
     var z = new c.Variable("z");
 
-    s.addConstraint(new c.LinearEquation(z, x, c.Strength.weak))
-     .addConstraint(new c.LinearEquation(z, y, c.Strength.strong));
+    s.addConstraint(new c.Equation(z, x, c.Strength.weak))
+     .addConstraint(new c.Equation(z, y, c.Strength.strong));
 
     s.addStay(x)
      .addStay(y)
@@ -57,8 +57,8 @@ doh.add("c.Strength", [
     var y = new c.Variable("y");
     var z = new c.Variable("z");
 
-    s.addConstraint(new c.LinearEquation(z, x, c.Strength.weak))
-     .addConstraint(new c.LinearEquation(z, y, c.Strength.strong));
+    s.addConstraint(new c.Equation(z, x, c.Strength.weak))
+     .addConstraint(new c.Equation(z, y, c.Strength.strong));
 
     s.addStay(x)
      .addStay(y)

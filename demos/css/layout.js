@@ -41,11 +41,11 @@ var strong = c.Strength.strong;
 var required = c.Strength.required;
 
 var eq  = function(a1, a2, strength, w) {
-  return new c.LinearEquation(a1, a2, strength || weak, w||0);
+  return new c.Equation(a1, a2, strength || weak, w||0);
 };
-var neq = function(a1, a2, a3) { return new c.LinearInequality(a1, a2, a3); };
-var geq = function(a1, a2, str, w) { return new c.LinearInequality(a1, c.GEQ, a2, str, w); };
-var leq = function(a1, a2, str, w) { return new c.LinearInequality(a1, c.LEQ, a2, str, w); };
+var neq = function(a1, a2, a3) { return new c.Inequality(a1, a2, a3); };
+var geq = function(a1, a2, str, w) { return new c.Inequality(a1, c.GEQ, a2, str, w); };
+var leq = function(a1, a2, str, w) { return new c.Inequality(a1, c.LEQ, a2, str, w); };
 
 var stay = function(v, strength, weight) { 
   return new c.StayConstraint(v, strength || weak, weight || 1.0);

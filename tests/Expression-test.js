@@ -130,7 +130,7 @@ doh.add("c.Expression", [
     t.is(e.terms.get(v), 200);
 
     // multiplying two non-constant expressions
-    t.e(c.NonlinearExpression, a, 'times', [a]);
+    t.e(c.NonExpression, a, 'times', [a]);
   },
   
   function addVariable(t) {
@@ -231,14 +231,14 @@ doh.add("c.Expression", [
     var vb = new c.Variable(20);
     var a = new c.Expression(va, 20, 2);
     
-    t.e(c.NonlinearExpression, a, 'divide', [0]);
+    t.e(c.NonExpression, a, 'divide', [0]);
     
     var p = a.divide(2);
     t.is(p.constant, 1);
     t.is(p.terms.get(va), 10);
     
-    t.e(c.NonlinearExpression, a, 'divide', [new c.Expression(vb, 10, 5)]);
-    t.e(c.NonlinearExpression, new c.Expression(vb, 10, 5), 'divide', [a]);
+    t.e(c.NonExpression, a, 'divide', [new c.Expression(vb, 10, 5)]);
+    t.e(c.NonExpression, new c.Expression(vb, 10, 5), 'divide', [a]);
     
     p = a.divide(new c.Expression(2));
     t.is(p.constant, 1);
@@ -364,7 +364,7 @@ doh.add("c.Expression", [
     t.is(c.Times(2, 3), '6');
     t.is(c.Times(x, 2), '2*[x:167]');
     t.is(c.Times(3, x), '3*[x:167]');
-    t.e(c.NonlinearExpression, c, 'Times', [x, y]);
+    t.e(c.NonExpression, c, 'Times', [x, y]);
   },
   
   function Divide(t) {
@@ -373,7 +373,7 @@ doh.add("c.Expression", [
 
     t.is(c.Divide(4, 2), '2');
     t.is(c.Divide(x, 2), '0.5*[x:167]');
-    t.e(c.NonlinearExpression, c, 'Divide', [4, x]);
-    t.e(c.NonlinearExpression, c, 'Divide', [x, y]);
+    t.e(c.NonExpression, c, 'Divide', [4, x]);
+    t.e(c.NonExpression, c, 'Divide', [x, y]);
   }
 ]);

@@ -39,9 +39,9 @@ var PerfTest = c.inherit({
         expr.addExpression(c.Times(rgpclv[iclv], coeff));
       }
       if (this.UniformRandomDiscretized() < ineqProb) {
-        rgpcns[j] = new c.LinearInequality(expr);
+        rgpcns[j] = new c.Inequality(expr);
       } else {
-        rgpcns[j] = new c.LinearEquation(expr);
+        rgpcns[j] = new c.Equation(expr);
       }
       if (c.trace) c.traceprint("Constraint " + j + " is " + rgpcns[j]);
     }
@@ -158,9 +158,9 @@ var PerfTest = c.inherit({
         expr.addExpression(c.Times(rgpclv[iclv], coeff));
       }
       if (this.UniformRandomDiscretized() < ineqProb) {
-        rgpcns[j] = new c.LinearInequality(expr);
+        rgpcns[j] = new c.Inequality(expr);
       } else {
-        rgpcns[j] = new c.LinearEquation(expr);
+        rgpcns[j] = new c.Equation(expr);
       }
       if (this.trace) this.traceprint("Constraint " + j + " is " + rgpcns[j]);
     }

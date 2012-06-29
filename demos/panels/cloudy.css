@@ -167,7 +167,7 @@
   border-right: 1px solid #DDD;
   border-radius: 3px 0px 0px 3px;
   background: #EEE;
-  background: -webkit-gradient(linear, left top, left bottom, from(#EEE), to(white));
+  background: -webkit-gradient(, left top, left bottom, from(#EEE), to(white));
 }
 
 #inputto {

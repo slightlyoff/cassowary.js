@@ -42,12 +42,12 @@ c.SimplexSolver = c.inherit({
   },
 
   addLowerBound: function(v /*c.AbstractVariable*/, lower /*double*/) {
-    var cn = new c.LinearInequality(v, c.GEQ, new c.Expression(lower));
+    var cn = new c.Inequality(v, c.GEQ, new c.Expression(lower));
     return this.addConstraint(cn);
   },
 
   addUpperBound: function(v /*c.AbstractVariable*/, upper /*double*/) {
-    var cn = new c.LinearInequality(v, c.LEQ, new c.Expression(upper));
+    var cn = new c.Inequality(v, c.LEQ, new c.Expression(upper));
     return this.addConstraint(cn);
   },
 

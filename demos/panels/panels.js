@@ -74,7 +74,7 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
   }
   this.remove.apply(this, this[ln]);
   this[ln] = toArray(l).map(function(v) {
-    return new c.LinearInequality(this.v[own],
+    return new c.Inequality(this.v[own],
                                   oper,
                                   this._panelOrVariable(v, relativeTo),
                                   strength||weak,
@@ -110,11 +110,11 @@ var valueSetter = function(item, varOrValue, oper, strength, weight) {
   if (oper && oper != "=") {
     if (oper == ">=") oper = c.GEQ;
     if (oper == "<=") oper = c.LEQ;
-    // this[slot] = new c.LinearInequality(this.v[item], oper, varOrValue, strength||weak, weight||1);
-    this[slot] = new c.LinearInequality(this.v[item], oper, varOrValue, strength);
+    // this[slot] = new c.Inequality(this.v[item], oper, varOrValue, strength||weak, weight||1);
+    this[slot] = new c.Inequality(this.v[item], oper, varOrValue, strength);
   } else {
-    // this[slot] = new c.LinearEquation(this.v[item], varOrValue, strength||weak, weight||1);
-    this[slot] = new c.LinearEquation(this.v[item], varOrValue, strength);
+    // this[slot] = new c.Equation(this.v[item], varOrValue, strength||weak, weight||1);
+    this[slot] = new c.Equation(this.v[item], varOrValue, strength);
   }
   this.add(this[slot]);
 };
@@ -130,11 +130,11 @@ var strong = c.Strength.strong;
 var required = c.Strength.required;
 
 var eq  = function(a1, a2, strength, w) {
-  return new c.LinearEquation(a1, a2, strength || weak, w||0);
+  return new c.Equation(a1, a2, strength || weak, w||0);
 };
-var neq = function(a1, a2, a3) { return new c.LinearInequality(a1, a2, a3); };
-var geq = function(a1, a2, str, w) { return new c.LinearInequality(a1, c.GEQ, a2, str, w); };
-var leq = function(a1, a2, str, w) { return new c.LinearInequality(a1, c.LEQ, a2, str, w); };
+var neq = function(a1, a2, a3) { return new c.Inequality(a1, a2, a3); };
+var geq = function(a1, a2, str, w) { return new c.Inequality(a1, c.GEQ, a2, str, w); };
+var leq = function(a1, a2, str, w) { return new c.Inequality(a1, c.LEQ, a2, str, w); };
 
 var stay = function(v, strength, weight) { 
   return new c.StayConstraint(v, strength || weak, weight || 1.0);

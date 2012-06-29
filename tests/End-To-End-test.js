@@ -15,7 +15,7 @@ doh.add("End-To-End", [
 
     var x = new c.Variable(167);
     var y = new c.Variable(2);
-    var eq = new c.LinearEquation(x, new c.Expression(y));
+    var eq = new c.Equation(x, new c.Expression(y));
 
     solver.addConstraint(eq);
     t.t(x.value() == y.value());
@@ -42,7 +42,7 @@ doh.add("End-To-End", [
       var solver = new c.SimplexSolver();
 
       var x = new c.Variable(10);
-      var ieq = new c.LinearInequality(x, c.GEQ, 100);
+      var ieq = new c.Inequality(x, c.GEQ, 100);
       solver.addConstraint(ieq);    
       t.is(x.value(), 100);
     }
@@ -55,7 +55,7 @@ doh.add("End-To-End", [
       var solver = new c.SimplexSolver();
 
       var x = new c.Variable(10);
-      var eq = new c.LinearEquation(100, x);
+      var eq = new c.Equation(100, x);
       solver.addConstraint(eq);    
       t.is(x.value(), 100);
     }
@@ -68,7 +68,7 @@ doh.add("End-To-End", [
       var solver = new c.SimplexSolver();
 
       var x = new c.Variable(10);
-      var ieq = new c.LinearInequality(100, c.LEQ, x);
+      var ieq = new c.Inequality(100, c.LEQ, x);
       solver.addConstraint(ieq);    
 
       t.is(x.value(), 100);
@@ -89,7 +89,7 @@ doh.add("End-To-End", [
       // right = x + width
       var right = new c.Expression(x).plus(width);
       // right >= 100
-      var ieq = new c.LinearInequality(right, c.GEQ, 100);
+      var ieq = new c.Inequality(right, c.GEQ, 100);
       solver.addStay(width)
       solver.addConstraint(ieq);    
 
@@ -108,7 +108,7 @@ doh.add("End-To-End", [
       var x = new c.Variable(10);
       var width = new c.Variable(10);
       var right = new c.Expression(x).plus(width);
-      var ieq = new c.LinearInequality(100, c.LEQ, right);
+      var ieq = new c.Inequality(100, c.LEQ, right);
 
       solver.addStay(width)
             .addConstraint(ieq);    
@@ -129,7 +129,7 @@ doh.add("End-To-End", [
       var width = new c.Variable(10);
       var rightMin = new c.Variable(100);
       var right = new c.Expression(x).plus(width);
-      var eq = new c.LinearEquation(right, rightMin);
+      var eq = new c.Equation(right, rightMin);
 
       solver.addStay(width)
             .addStay(rightMin)
@@ -151,7 +151,7 @@ doh.add("End-To-End", [
       var width = new c.Variable(10);
       var rightMin = new c.Variable(100);
       var right = new c.Expression(x).plus(width);
-      var ieq = new c.LinearInequality(right, c.GEQ, rightMin);
+      var ieq = new c.Inequality(right, c.GEQ, rightMin);
 
       solver.addStay(width)
             .addStay(rightMin)
@@ -173,7 +173,7 @@ doh.add("End-To-End", [
       var width = new c.Variable(10);
       var rightMin = new c.Variable(100);
       var right = new c.Expression(x).plus(width);
-      var ieq = new c.LinearInequality(rightMin, c.LEQ, right);
+      var ieq = new c.Inequality(rightMin, c.LEQ, right);
       solver.addStay(width)
             .addStay(rightMin)
             .addConstraint(ieq);    
@@ -197,7 +197,7 @@ doh.add("End-To-End", [
       var width2 = new c.Variable(10);
       var right2 = new c.Expression(x2).plus(width2);
       
-      var eq = new c.LinearEquation(right1, right2);
+      var eq = new c.Equation(right1, right2);
 
       solver.addStay(width1)
             .addStay(width2)
@@ -225,7 +225,7 @@ doh.add("End-To-End", [
       var width2 = new c.Variable(10);
       var right2 = new c.Expression(x2).plus(width2);
 
-      var ieq = new c.LinearInequality(right1, c.GEQ, right2);
+      var ieq = new c.Inequality(right1, c.GEQ, right2);
 
       solver.addStay(width1)
             .addStay(width2)
@@ -250,7 +250,7 @@ doh.add("End-To-End", [
       var x2 = new c.Variable(100);
       var width2 = new c.Variable(10);
       var right2 = new c.Expression(x2).plus(width2);
-      var ieq = new c.LinearInequality(right2, c.LEQ, right1);
+      var ieq = new c.Inequality(right2, c.LEQ, right1);
 
       solver.addStay(width1)
             .addStay(width2)
@@ -265,11 +265,11 @@ doh.add("End-To-End", [
   function addDelete1(t) {
     var solver = new c.SimplexSolver();
     var x = new c.Variable("x");
-    var cbl = new c.LinearEquation(x, 100, c.Strength.weak);
+    var cbl = new c.Equation(x, 100, c.Strength.weak);
     solver.addConstraint(cbl);
 
-    var c10 = new c.LinearInequality(x, c.LEQ, 10.0);
-    var c20 = new c.LinearInequality(x, c.LEQ, 20.0);
+    var c10 = new c.Inequality(x, c.LEQ, 10.0);
+    var c20 = new c.Inequality(x, c.LEQ, 20.0);
     solver.addConstraint(c10)
           .addConstraint(c20);
     t.t(c.approx(x, 10.0));
@@ -280,7 +280,7 @@ doh.add("End-To-End", [
     solver.removeConstraint(c20);
     t.t(c.approx(x, 100.0));
 
-    var c10again = new c.LinearInequality(x, c.LEQ, 10.0);
+    var c10again = new c.Inequality(x, c.LEQ, 10.0);
     solver.addConstraint(c10)
           .addConstraint(c10again);
     t.t(c.approx(x, 10.0));
@@ -297,10 +297,10 @@ doh.add("End-To-End", [
     var x = new c.Variable("x");
     var y = new c.Variable("y");
 
-    solver.addConstraint(new c.LinearEquation(x, 100.0, c.Strength.weak))
-          .addConstraint(new c.LinearEquation(y, 120.0, c.Strength.strong));
-    var c10 = new c.LinearInequality(x, c.LEQ, 10.0);
-    var c20 = new c.LinearInequality(x, c.LEQ, 20.0);
+    solver.addConstraint(new c.Equation(x, 100.0, c.Strength.weak))
+          .addConstraint(new c.Equation(y, 120.0, c.Strength.strong));
+    var c10 = new c.Inequality(x, c.LEQ, 10.0);
+    var c20 = new c.Inequality(x, c.LEQ, 20.0);
     solver.addConstraint(c10)
           .addConstraint(c20);
     t.t(c.approx(x, 10.0));
@@ -310,7 +310,7 @@ doh.add("End-To-End", [
     t.t(c.approx(x, 20.0));
     t.t(c.approx(y, 120.0));
 
-    var cxy = new c.LinearEquation(c.Times(2.0, x), y);
+    var cxy = new c.Equation(c.Times(2.0, x), y);
     solver.addConstraint(cxy);
     t.t(c.approx(x, 20.0));
     t.t(c.approx(y, 40.0));
@@ -329,10 +329,10 @@ doh.add("End-To-End", [
     var x = new c.Variable("x");
     var y = new c.Variable("y");
 
-    solver.addConstraint(new c.LinearInequality(x, c.LEQ, y))
-          .addConstraint(new c.LinearEquation(y, c.Plus(x, 3.0)))
-          .addConstraint(new c.LinearEquation(x, 10.0, c.Strength.weak))
-          .addConstraint(new c.LinearEquation(y, 10.0, c.Strength.weak));
+    solver.addConstraint(new c.Inequality(x, c.LEQ, y))
+          .addConstraint(new c.Equation(y, c.Plus(x, 3.0)))
+          .addConstraint(new c.Equation(x, 10.0, c.Strength.weak))
+          .addConstraint(new c.Equation(y, 10.0, c.Strength.weak));
 
     t.t(
         (c.approx(x, 10.0) && c.approx(y, 13.0)) ||
@@ -344,19 +344,19 @@ doh.add("End-To-End", [
     var solver = new c.SimplexSolver();
     var x = new c.Variable("x");
     // x = 10
-    solver.addConstraint(new c.LinearEquation(x, 10.0));
+    solver.addConstraint(new c.Equation(x, 10.0));
     // x = 5
     t.e(c.RequiredFailure, solver, "addConstraint", [
-      new c.LinearEquation(x, 5.0)
+      new c.Equation(x, 5.0)
     ]);
   },
 
   function inconsistent2(t) {
     var solver = new c.SimplexSolver();
     var x = new c.Variable("x");
-    solver.addConstraint(new c.LinearInequality(x, c.GEQ, 10.0));
+    solver.addConstraint(new c.Inequality(x, c.GEQ, 10.0));
     t.e(c.RequiredFailure, solver, "addConstraint", [
-      new c.LinearInequality(x, c.LEQ, 5.0)
+      new c.Inequality(x, c.LEQ, 5.0)
     ]);
   },
 
@@ -366,13 +366,13 @@ doh.add("End-To-End", [
     var x = new c.Variable("x");
     var y = new c.Variable("y");
     var z = new c.Variable("z");
-    solver.addConstraint(new c.LinearInequality(w, c.GEQ, 10.0))
-          .addConstraint(new c.LinearInequality(x, c.GEQ, w))
-          .addConstraint(new c.LinearInequality(y, c.GEQ, x))
-          .addConstraint(new c.LinearInequality(z, c.GEQ, y))
-          .addConstraint(new c.LinearInequality(z, c.GEQ, 8.0));
+    solver.addConstraint(new c.Inequality(w, c.GEQ, 10.0))
+          .addConstraint(new c.Inequality(x, c.GEQ, w))
+          .addConstraint(new c.Inequality(y, c.GEQ, x))
+          .addConstraint(new c.Inequality(z, c.GEQ, y))
+          .addConstraint(new c.Inequality(z, c.GEQ, 8.0));
     t.e(c.RequiredFailure, solver, "addConstraint", [
-      new c.LinearInequality(z, c.LEQ, 4.0)
+      new c.Inequality(z, c.LEQ, 4.0)
     ]);
   },
 
@@ -381,12 +381,12 @@ doh.add("End-To-End", [
     var x = new c.Variable("x");
     var y = new c.Variable("y");
     // x = 10
-    solver.addConstraint(new c.LinearEquation(x, 10.0));
+    solver.addConstraint(new c.Equation(x, 10.0));
     // x = y
-    solver.addConstraint(new c.LinearEquation(x, y));
+    solver.addConstraint(new c.Equation(x, y));
     // y = 5. Should fail.
     t.e(c.RequiredFailure, solver, "addConstraint", [
-      new c.LinearEquation(y, 5.0)
+      new c.Equation(y, 5.0)
     ]);
   },
 
@@ -480,7 +480,7 @@ doh.add("End-To-End", [
     var required = c.Strength.required;
 
     var eq  = function(a1, a2, strength, w) {
-      return new c.LinearEquation(a1, a2, strength || weak, w||0);
+      return new c.Equation(a1, a2, strength || weak, w||0);
     };
 
     var v = {
@@ -554,7 +554,7 @@ doh.add("End-To-End", [
     var required = c.Strength.required;
 
     var eq  = function(a1, a2, strength, w) {
-      return new c.LinearEquation(a1, a2, strength || weak, w||0);
+      return new c.Equation(a1, a2, strength || weak, w||0);
     };
 
     var x = new c.Variable("x", 100);
@@ -564,16 +564,16 @@ doh.add("End-To-End", [
     t.is(y.value(), 200);
     t.is(z.value(),  50);
 
-    solver.addConstraint(new c.LinearEquation(z,   x,   weak))
-          .addConstraint(new c.LinearEquation(x,  20,   weak))
-          .addConstraint(new c.LinearEquation(y, 200, strong));
+    solver.addConstraint(new c.Equation(z,   x,   weak))
+          .addConstraint(new c.Equation(x,  20,   weak))
+          .addConstraint(new c.Equation(y, 200, strong));
 
     t.is(x.value(),  20);
     t.is(y.value(), 200);
     t.is(z.value(),  20);
 
     solver.addConstraint(
-      new c.LinearInequality(c.Plus(z, 150), c.LEQ, y, medium)
+      new c.Inequality(c.Plus(z, 150), c.LEQ, y, medium)
     );
 
     t.is(x.value(),  20);

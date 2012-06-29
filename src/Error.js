@@ -33,9 +33,9 @@
   c.InternalError = 
     errorType("c.InternalError");
 
-  c.NonlinearExpression = 
-    errorType("c.NonlinearExpression",
-        "The resulting expression would be nonlinear");
+  c.NonExpression = 
+    errorType("c.NonExpression",
+        "The resulting expression would be non");
 
   c.NotEnoughStays = 
     errorType("c.NotEnoughStays", 

@@ -72,7 +72,7 @@ c.Expression = c.inherit({
       } else if (x.isConstant()) {
         return this.times(x.constant);
       } else {
-        throw new c.NonlinearExpression();
+        throw new c.NonExpression();
       }
     }
   },
@@ -96,12 +96,12 @@ c.Expression = c.inherit({
   divide: function(x) {
     if (typeof x == 'number') {
       if (c.approx(x, 0)) {
-        throw new c.NonlinearExpression();
+        throw new c.NonExpression();
       }
       return this.times(1 / x);
     } else if (x instanceof c.Expression) {
       if (!x.isConstant()) {
-        throw new c.NonlinearExpression();
+        throw new c.NonExpression();
       }
       return this.times(1 / x.constant);
     }

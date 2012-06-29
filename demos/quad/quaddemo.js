@@ -109,78 +109,78 @@ var QuadDemo = c.inherit({
     // Add constraints to keep midpoints at line midpoints
     cle = new c.Expression(db[0].X());
     cle = (cle.plus(db[1].X())).divide(2);
-    cleq = new c.LinearEquation(mp[0].X(), cle);
+    cleq = new c.Equation(mp[0].X(), cle);
 
     solver.addConstraint(cleq);
 
     cle = new c.Expression(db[0].Y());
     cle = (cle.plus(db[1].Y())).divide(2);
-    cleq = new c.LinearEquation(mp[0].Y(), cle);
+    cleq = new c.Equation(mp[0].Y(), cle);
 
     solver.addConstraint(cleq);
     
     cle = new c.Expression(db[1].X());
     cle = (cle.plus(db[2].X())).divide(2);
-    cleq = new c.LinearEquation(mp[1].X(), cle);
+    cleq = new c.Equation(mp[1].X(), cle);
 
     solver.addConstraint(cleq);
     cle = new c.Expression(db[1].Y());
     cle = (cle.plus(db[2].Y())).divide(2);
-    cleq = new c.LinearEquation(mp[1].Y(), cle);
+    cleq = new c.Equation(mp[1].Y(), cle);
 
     solver.addConstraint(cleq);
     
     cle = new c.Expression(db[2].X());
     cle = (cle.plus(db[3].X())).divide(2);
-    cleq = new c.LinearEquation(mp[2].X(), cle);
+    cleq = new c.Equation(mp[2].X(), cle);
 
     solver.addConstraint(cleq);
 
     cle = new c.Expression(db[2].Y());
     cle = (cle.plus(db[3].Y())).divide(2);
-    cleq = new c.LinearEquation(mp[2].Y(), cle);
+    cleq = new c.Equation(mp[2].Y(), cle);
 
     solver.addConstraint(cleq);
     
     cle = new c.Expression(db[3].X());
     cle = (cle.plus(db[0].X())).divide(2);
-    cleq = new c.LinearEquation(mp[3].X(), cle);
+    cleq = new c.Equation(mp[3].X(), cle);
 
     solver.addConstraint(cleq);
 
     cle = new c.Expression(db[3].Y());
     cle = (cle.plus(db[0].Y())).divide(2);
-    cleq = new c.LinearEquation(mp[3].Y(), cle);
+    cleq = new c.Equation(mp[3].Y(), cle);
 
     solver.addConstraint(cleq);
 
     cle = c.Plus(db[0].X(), 20);
 
-    solver.addConstraint(new c.LinearInequality(cle, c.LEQ, db[2].X()))
-          .addConstraint(new c.LinearInequality(cle, c.LEQ, db[3].X()));
+    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[2].X()))
+          .addConstraint(new c.Inequality(cle, c.LEQ, db[3].X()));
     
     cle = c.Plus(db[1].X(), 20);
 
-    solver.addConstraint(new c.LinearInequality(cle, c.LEQ, db[2].X()))
-          .addConstraint(new c.LinearInequality(cle, c.LEQ, db[3].X()));
+    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[2].X()))
+          .addConstraint(new c.Inequality(cle, c.LEQ, db[3].X()));
 
     cle = c.Plus(db[0].Y(), 20);
 
-    solver.addConstraint(new c.LinearInequality(cle, c.LEQ, db[1].Y()))
-          .addConstraint(new c.LinearInequality(cle, c.LEQ, db[2].Y()));
+    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[1].Y()))
+          .addConstraint(new c.Inequality(cle, c.LEQ, db[2].Y()));
 
     cle = c.Plus(db[3].Y(), 20);
 
-    solver.addConstraint(new c.LinearInequality(cle, c.LEQ, db[1].Y()))
-          .addConstraint(new c.LinearInequality(cle, c.LEQ, db[2].Y()));
+    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[1].Y()))
+          .addConstraint(new c.Inequality(cle, c.LEQ, db[2].Y()));
 
     // Add constraints to keep points inside window
     db.forEach(function(p) {
-      solver.addConstraint(new c.LinearInequality(p.X(), c.GEQ, 10));
-      solver.addConstraint(new c.LinearInequality(p.Y(), c.GEQ, 10));
+      solver.addConstraint(new c.Inequality(p.X(), c.GEQ, 10));
+      solver.addConstraint(new c.Inequality(p.Y(), c.GEQ, 10));
 
-      solver.addConstraint(new c.LinearInequality(p.X(), c.LEQ, this.cwidth - 10));
-      solver.addConstraint(new c.LinearInequality(p.Y(), c.LEQ, this.cheight - 10));
+      solver.addConstraint(new c.Inequality(p.X(), c.LEQ, this.cwidth - 10));
+      solver.addConstraint(new c.Inequality(p.Y(), c.LEQ, this.cheight - 10));
     }, this);
     
     //  } catch (e) {

@@ -60,7 +60,7 @@ c.Constraint = c.inherit({
   },
 });
 
-c.LinearInequality = c.inherit({
+c.Inequality = c.inherit({
   extends: c.Constraint,
   
   _cloneOrNewCle: function(cle) {
@@ -74,7 +74,7 @@ c.LinearInequality = c.inherit({
 
   initialize: function(a1, a2, a3, a4, a5) {
     // FIXME(slightlyoff): what a disgusting mess. Should at least add docs.
-    // console.log("c.LinearInequality.initialize(", a1, a2, a3, a4, a5, ")");
+    // console.log("c.Inequality.initialize(", a1, a2, a3, a4, a5, ")");
     // 
     // (cle || number), op, clv
     var a1IsExp, a3IsExp, a1IsNum, a3IsNum, a1IsVar, a3IsVar;
@@ -94,7 +94,7 @@ c.LinearInequality = c.inherit({
       } else if (op == c.GEQ) {
         this.expression.addVariable(clv, -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
+        throw new c.InternalError("Invalid operator in ClInequality constructor");
       }    
     // clv, op, (cle || number)
     } else if (a1IsVar && (a3IsExp || a3IsNum)) {      
@@ -106,7 +106,7 @@ c.LinearInequality = c.inherit({
       } else if (op == c.LEQ) {
         this.expression.addVariable(clv, -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
+        throw new c.InternalError("Invalid operator in ClInequality constructor");
       }    
     // cle, op, num
     } else if (a1IsExp && a3IsNum) {
@@ -118,7 +118,7 @@ c.LinearInequality = c.inherit({
       } else if (op == c.GEQ) {
         this.expression.addExpression(this._cloneOrNewCle(cle2), -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
+        throw new c.InternalError("Invalid operator in ClInequality constructor");
       }
       return this      
     // num, op, cle
@@ -131,7 +131,7 @@ c.LinearInequality = c.inherit({
       } else if (op == c.LEQ) {
         this.expression.addExpression(this._cloneOrNewCle(cle2), -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
+        throw new c.InternalError("Invalid operator in ClInequality constructor");
       }
       return this     
     // cle op cle
@@ -144,7 +144,7 @@ c.LinearInequality = c.inherit({
       } else if (op == c.LEQ) {
         this.expression.addExpression(this._cloneOrNewCle(cle1), -1);
       } else {
-        throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
+        throw new c.InternalError("Invalid operator in ClInequality constructor");
       }       
     // cle
     } else if (a1IsExp) {
@@ -160,21 +160,21 @@ c.LinearInequality = c.inherit({
       this.expression.addVariable(a1,-1);
     // error
     } else {
-      throw new c.InternalError("Invalid operator in ClLinearInequality constructor");
+      throw new c.InternalError("Invalid operator in ClInequality constructor");
     }
   },
 
   isInequality: true,
 
   toString: function() {
-    // return "c.LinearInequality: " + this.hashCode();
+    // return "c.Inequality: " + this.hashCode();
     return c.Constraint.prototype.toString.call(this) + " >= 0 ) id: " + this.hash_code;
   },
 });
 
 var lc = c.Constraint;
 
-c.LinearEquation = c.inherit({
+c.Equation = c.inherit({
   extends: c.Constraint,
   initialize: function(a1, a2, a3, a4) {
     // FIXME(slightlyoff): this is just a huge mess.
@@ -212,7 +212,7 @@ c.LinearEquation = c.inherit({
       lc.call(this, a1, a3, a4);
       this.expression.addExpression(a2, -1);
     } else {
-      throw "Bad initializer to ClLinearEquation";
+      throw "Bad initializer to ClEquation";
     }
     c.Assert(this.strength instanceof c.Strength, "_strength not set");
   },

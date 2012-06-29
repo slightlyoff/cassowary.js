@@ -28,7 +28,7 @@ c.verbose = false;
 doh.squelch = false;
 
 load("Constraint-test.js");
-load("LinearExpression-test.js");
+load("Expression-test.js");
 load("Point-test.js");
 load("SimplexSolver-test.js");
 load("Strength-test.js");
