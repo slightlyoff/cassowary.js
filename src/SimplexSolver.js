@@ -128,7 +128,7 @@ c.SimplexSolver = c.inherit({
   beginEdit: function() {
     c.Assert(this._editVarMap.size() > 0, "_editVarMap.size() > 0");
     this._infeasibleRows.clear();
-    this.resetStayConstants();
+    this._resetStayConstants();
     this._stkCedcns.push(this._editVarMap.size());
     return this;
   },
@@ -203,7 +203,7 @@ c.SimplexSolver = c.inherit({
     if (c.trace) c.fnenterprint("removeConstraint: " + cn);
     if (c.trace) c.traceprint(this.toString());
     this._fNeedsSolving = true;
-    this.resetStayConstants();
+    this._resetStayConstants();
     var zRow = this.rowExpression(this._objective);
     var eVars = /* Set */this._errorVars.get(cn);
     if (c.trace) c.traceprint("eVars == " + c.setToString(eVars));
@@ -346,7 +346,7 @@ c.SimplexSolver = c.inherit({
     this.dualOptimize();
     this.setExternalVariables();
     this._infeasibleRows.clear();
-    this.resetStayConstants();
+    this._resetStayConstants();
   },
 
   suggestValue: function(v /*c.Variable*/, x /*double*/) {
@@ -771,8 +771,8 @@ c.SimplexSolver = c.inherit({
     this.addRow(entryVar, pexpr);
   },
 
-  resetStayConstants: function() {
-    if (c.trace) c.fnenterprint("resetStayConstants");
+  _resetStayConstants: function() {
+    if (c.trace) c.fnenterprint("_resetStayConstants");
     for (var i = 0; i < this._stayPlusErrorVars.length; i++) {
       var expr = this.rowExpression(/* c.AbstractVariable */this._stayPlusErrorVars[i]);
       if (expr == null)
@@ -785,6 +785,7 @@ c.SimplexSolver = c.inherit({
   setExternalVariables: function() {
     if (c.trace) c.fnenterprint("setExternalVariables:");
     if (c.trace) c.traceprint(this.toString());
+
     this._externalParametricVars.each(function(v) {
       if (this.rowExpression(v) != null) {
         console.log("Error: variable" + v + " in _externalParametricVars is basic");
