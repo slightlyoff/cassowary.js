@@ -91,10 +91,10 @@ doh.add("c.Constraint", [
     var v2 = new c.Variable('v2', 5);
     var ieq = new c.Inequality(v1, c.GEQ, v2);
 
-    t.is(ieq.expression, '-1*[v2:5] + 1*[v1:10]');
+    t.is(ieq.expression, '1*[v1:10] + -1*[v2:5]');
     
     ieq = new c.Inequality(v1, c.LEQ, v2);
-    t.is(ieq.expression, '1*[v2:5] + -1*[v1:10]');
+    t.is(ieq.expression, '-1*[v1:10] + 1*[v2:5]');
   },
   
   function inequality_var_op_num(t) {
@@ -123,10 +123,10 @@ doh.add("c.Constraint", [
     var e = new c.Expression(new c.Variable('x', 5), 2, 4);
     var ieq = new c.Inequality(v, c.GEQ, e);
 
-    t.is(ieq.expression, '-4 + -2*[x:5] + 1*[v:10]');
+    t.is(ieq.expression, '-4 + 1*[v:10] + -2*[x:5]');
 
     ieq = new c.Inequality(v, c.LEQ, e);
-    t.is(ieq.expression, '4 + 2*[x:5] + -1*[v:10]');
+    t.is(ieq.expression, '4 + -1*[v:10] + 2*[x:5]');
   },
   
   function inequality_exp_op_var(t) {
@@ -134,9 +134,9 @@ doh.add("c.Constraint", [
     var e = new c.Expression(new c.Variable('x', 5), 2, 4);
     var ieq = new c.Inequality(e, c.GEQ, v);
 
-    t.is(ieq.expression, '4 + 2*[x:5] + -1*[v:10]');
+    t.is(ieq.expression, '4 + -1*[v:10] + 2*[x:5]');
 
     ieq = new c.Inequality(e, c.LEQ, v);
-    t.is(ieq.expression, '-4 + -2*[x:5] + 1*[v:10]');
+    t.is(ieq.expression, '-4 + 1*[v:10] + -2*[x:5]');
   }
 ]);

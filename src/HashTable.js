@@ -29,9 +29,6 @@
  * Additions:
  *
  *     - new "scope" parameter to each() and escapingEach()
- *
- * FIXME(slightlyoff):
- *      - Use Map as the backing storage if it is available.
  */
 
 (function(c) {
@@ -48,7 +45,7 @@ var copyOwn = function(src, dest) {
   });
 };
 
-if (typeof Map != "undefined") {
+if (false && typeof Map != "undefined") {
 
   c.HashTable = c.inherit({
 
