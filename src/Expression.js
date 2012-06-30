@@ -137,7 +137,7 @@ c.Expression = c.inherit({
         if (solver) {
           solver.noteRemovedVariable(v, subject);
         }
-        this.terms.remove(v);
+        this.terms.delete(v);
       } else {
         this.terms.set(v, new_coefficient);
       }
@@ -181,7 +181,8 @@ c.Expression = c.inherit({
       c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
       c.traceprint("this = " + this);
     }
-    var multiplier = this.terms.remove(outvar);
+    var multiplier = this.terms.get(outvar);
+    this.terms.delete(outvar);
     this.constant += (multiplier * expr.constant);
     expr.terms.each(function(clv, coeff) {
       var old_coeff = this.terms.get(clv);
@@ -189,7 +190,7 @@ c.Expression = c.inherit({
         var newCoeff = old_coeff + multiplier * coeff;
         if (c.approx(newCoeff, 0)) {
           solver.noteRemovedVariable(clv, subject);
-          this.terms.remove(clv);
+          this.terms.delete(clv);
         } else {
           this.terms.set(clv, newCoeff);
         }
@@ -209,7 +210,8 @@ c.Expression = c.inherit({
   newSubject: function(subject /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("newSubject:" + subject);
     
-    var reciprocal = 1 / this.terms.remove(subject);
+    var reciprocal = 1 / this.terms.get(subject);
+    this.terms.delete(subject);
     this.multiplyMe(-reciprocal);
     return reciprocal;
   },
@@ -219,7 +221,7 @@ c.Expression = c.inherit({
   },
 
   isConstant: function() {
-    return this.terms.size() == 0;
+    return this.terms.size == 0;
   },
 
   toString: function() {

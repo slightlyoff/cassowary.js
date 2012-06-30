@@ -28,7 +28,7 @@ c.Tableau = c.inherit({
   noteRemovedVariable: function(v /*ClAbstractVariable*/, subject /*ClAbstractVariable*/) {
     if (c.verbose) c.fnenterprint("noteRemovedVariable: " + v + ", " + subject);
     if (subject != null) {
-      this.columns.get(v).remove(subject);
+      this.columns.get(v).delete(subject);
     }
   },
 
@@ -41,13 +41,13 @@ c.Tableau = c.inherit({
 
   getInternalInfo: function() {
     var retstr = "Tableau Information:\n";
-    retstr += "Rows: " + this.rows.size();
-    retstr += " (= " + (this.rows.size() - 1) + " constraints)";
-    retstr += "\nColumns: " + this.columns.size();
-    retstr += "\nInfeasible Rows: " + this._infeasibleRows.size();
-    retstr += "\nExternal basic variables: " + this._externalRows.size();
+    retstr += "Rows: " + this.rows.size;
+    retstr += " (= " + (this.rows.size - 1) + " constraints)";
+    retstr += "\nColumns: " + this.columns.size;
+    retstr += "\nInfeasible Rows: " + this._infeasibleRows.size;
+    retstr += "\nExternal basic variables: " + this._externalRows.size;
     retstr += "\nExternal parametric variables: ";
-    retstr += this._externalParametricVars.size();
+    retstr += this._externalParametricVars.size;
     retstr += "\n";
     return retstr;
   },
@@ -92,7 +92,7 @@ c.Tableau = c.inherit({
   addRow: function(aVar /*ClAbstractVariable*/, expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
     // print("addRow: " + aVar + " (key), " + expr + " (value)");
-    // print(this.rows.size());
+    // print(this.rows.size);
     this.rows.set(aVar, expr);
     expr.terms.each(function(clv, coeff) {
       // print("insertColVar(" + clv + ", " + aVar + ")");
@@ -111,18 +111,19 @@ c.Tableau = c.inherit({
 
   removeColumn: function(aVar /*ClAbstractVariable*/) {
     if (c.trace) c.fnenterprint("removeColumn:" + aVar);
-    var rows = /* Set */ this.columns.remove(aVar);
+    var rows = /* Set */ this.columns.get(aVar);
     if (rows) {
+      this.columns.delete(aVar);
       rows.each(function(clv) {
         var expr = /* c.Expression */this.rows.get(clv);
-        expr.terms.remove(aVar);
+        expr.terms.delete(aVar);
       }, this);
     } else {
       if (c.trace) c.debugprint("Could not find var " + aVar + " in columns");
     }
     if (aVar.isExternal) {
-      this._externalRows.remove(aVar);
-      this._externalParametricVars.remove(aVar);
+      this._externalRows.delete(aVar);
+      this._externalParametricVars.delete(aVar);
     }
   },
 
@@ -134,14 +135,14 @@ c.Tableau = c.inherit({
       var varset = this.columns.get(clv);
       if (varset != null) {
         if (c.trace) c.debugprint("removing from varset " + aVar);
-        varset.remove(aVar);
+        varset.delete(aVar);
       }
     }, this);
-    this._infeasibleRows.remove(aVar);
+    this._infeasibleRows.delete(aVar);
     if (aVar.isExternal) {
-      this._externalRows.remove(aVar);
+      this._externalRows.delete(aVar);
     }
-    this.rows.remove(aVar);
+    this.rows.delete(aVar);
     if (c.trace) c.fnexitprint("returning " + expr);
     return expr;
   },
@@ -161,18 +162,14 @@ c.Tableau = c.inherit({
 
     if (oldVar.isExternal) {
       this._externalRows.add(oldVar);
-      this._externalParametricVars.remove(oldVar);
+      this._externalParametricVars.delete(oldVar);
     }
 
-    this.columns.remove(oldVar);
+    this.columns.delete(oldVar);
   },
 
   columnsHasKey: function(subject /*ClAbstractVariable*/) {
     return (this.columns.get(subject) != null);
-  },
-
-  rowExpression: function(v /*ClAbstractVariable*/) {
-    return /* c.Expression */this.rows.get(v);
   },
 });
 

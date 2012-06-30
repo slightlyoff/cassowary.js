@@ -14,11 +14,13 @@ c.HashSet = c.inherit({
 
   initialize: function() {
     this.storage = [];
+    this.size = 0;
   },
 
   add: function(item) {
     var s = this.storage, io = s.indexOf(item);
     if (s.indexOf(item) == -1) { s.push(item); }
+    this.size = this.storage.length;
   },
 
   values: function() {
@@ -27,18 +29,15 @@ c.HashSet = c.inherit({
     return this.storage;
   },
 
-  remove: function(item) {
+  delete: function(item) {
     var io = this.storage.indexOf(item);
     if (io == -1) { return null; }
-    return this.storage.splice(io, 1)[0];
+    this.storage.splice(io, 1)[0];
+    this.size = this.storage.length;
   },
 
   clear: function() {
     this.storage.length = 0;
-  },
-
-  size: function() {
-    return this.storage.length;
   },
 
   each: function(func, scope) {

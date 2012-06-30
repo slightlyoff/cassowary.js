@@ -48,20 +48,20 @@ doh.add("c.Expression", [
   function zero_args(t) {
     var exp = new c.Expression;
     t.is(0, exp.constant);
-    t.is(0, exp.terms.size());
+    t.is(0, exp.terms.size);
   },
   
   function one_number(t) {
     var exp = new c.Expression(10);
     t.is(10, exp.constant);
-    t.is(0, exp.terms.size());
+    t.is(0, exp.terms.size);
   },
   
   function one_variable(t) {
     var v = new c.Variable(10);
     var exp = new c.Expression(v);
     t.is(0, exp.constant);
-    t.is(1, exp.terms.size());
+    t.is(1, exp.terms.size);
     t.is(1, exp.terms.get(v));
   },
   
@@ -69,7 +69,7 @@ doh.add("c.Expression", [
     var v = new c.Variable(10);
     var exp = new c.Expression(v, 20);
     t.is(0, exp.constant);
-    t.is(1, exp.terms.size());
+    t.is(1, exp.terms.size);
     t.is(20, exp.terms.get(v));
   },
   
@@ -77,7 +77,7 @@ doh.add("c.Expression", [
     var v = new c.Variable(10);
     var exp = new c.Expression(v, 20, 2);
     t.is(2, exp.constant);
-    t.is(1, exp.terms.size());
+    t.is(1, exp.terms.size);
     t.is(20, exp.terms.get(v));
   },
   
@@ -87,7 +87,7 @@ doh.add("c.Expression", [
     var clone = exp.clone();
     
     t.is(clone.constant, exp.constant);
-    t.is(clone.terms.size(), exp.terms.size());
+    t.is(clone.terms.size, exp.terms.size);
     t.is(20, clone.terms.get(v));
   },
   
@@ -139,22 +139,22 @@ doh.add("c.Expression", [
 
     // implicit coefficient of 1
     a.addVariable(v);
-    t.is(a.terms.size(), 2);
+    t.is(a.terms.size, 2);
     t.is(a.terms.get(v), 1);
 
     // add again, with different coefficient
     a.addVariable(v, 2);
-    t.is(a.terms.size(), 2);
+    t.is(a.terms.size, 2);
     t.is(a.terms.get(v), 3);
 
     // add again, with resulting 0 coefficient. should remove the term.
     a.addVariable(v, -3);
-    t.is(a.terms.size(), 1);
+    t.is(a.terms.size, 1);
     t.is(null, a.terms.get(v));
 
     // try adding the removed term back, with 0 coefficient
     a.addVariable(v, 0);
-    t.is(a.terms.size(), 1);
+    t.is(a.terms.size, 1);
     t.is(null, a.terms.get(v));
   },
   
@@ -164,7 +164,7 @@ doh.add("c.Expression", [
 
     // should work just like addVariable
     a.addExpression(v, 2);
-    t.is(a.terms.size(), 2);
+    t.is(a.terms.size, 2);
     t.is(a.terms.get(v), 2);
   },
   
@@ -176,20 +176,20 @@ doh.add("c.Expression", [
 
     // different variable and implicit coefficient of 1, should make new term
     a.addExpression(new c.Expression(vb, 10, 5));
-    t.is(a.terms.size(), 2);
+    t.is(a.terms.size, 2);
     t.is(a.constant, 7);
     t.is(a.terms.get(vb), 10);
 
     // same variable, should reuse existing term
     a.addExpression(new c.Expression(vb, 2, 5));
-    t.is(a.terms.size(), 2);
+    t.is(a.terms.size, 2);
     t.is(a.constant, 12);
     t.is(a.terms.get(vb), 12);
     
     // another variable and a coefficient, 
     // should multiply the constant and all terms in the new expression
     a.addExpression(new c.Expression(vc, 1, 2), 2);
-    t.is(a.terms.size(), 3);
+    t.is(a.terms.size, 3);
     t.is(a.constant, 16);
     t.is(a.terms.get(vc), 2);
   },
@@ -205,7 +205,7 @@ doh.add("c.Expression", [
     t.assertNotEqual(a, b);
 
     t.is(p.constant, 7);
-    t.is(p.terms.size(), 2);
+    t.is(p.terms.size, 2);
     t.is(p.terms.get(va), 20);
     t.is(p.terms.get(vb), 10);
   },
@@ -221,7 +221,7 @@ doh.add("c.Expression", [
     t.assertNotEqual(a, b);
 
     t.is(p.constant, -3);
-    t.is(p.terms.size(), 2);
+    t.is(p.terms.size, 2);
     t.is(p.terms.get(va), 20);
     t.is(p.terms.get(vb), -10);
   },
@@ -261,12 +261,12 @@ doh.add("c.Expression", [
     
     // set existing variable
     a.setVariable(va, 2);
-    t.is(a.terms.size(), 1);
+    t.is(a.terms.size, 1);
     t.is(a.coefficientFor(va), 2);
     
     // set new variable
     a.setVariable(vb, 2);
-    t.is(a.terms.size(), 2);
+    t.is(a.terms.size, 2);
     t.is(a.coefficientFor(vb), 2);
   },
   
