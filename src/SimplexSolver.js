@@ -99,7 +99,7 @@ c.SimplexSolver = c.inherit({
     }
     if (this.autoSolve) {
       this.optimize(this._objective);
-      this.setExternalVariables();
+      this._setExternalVariables();
     }
     return this;
   },
@@ -313,7 +313,7 @@ c.SimplexSolver = c.inherit({
 
     if (this.autoSolve) {
       this.optimize(this._objective);
-      this.setExternalVariables();
+      this._setExternalVariables();
     }
 
     return this;
@@ -344,7 +344,7 @@ c.SimplexSolver = c.inherit({
   resolve: function() {
     if (c.trace) c.fnenterprint("resolve()");
     this.dualOptimize();
-    this.setExternalVariables();
+    this._setExternalVariables();
     this._infeasibleRows.clear();
     this._resetStayConstants();
   },
@@ -364,7 +364,7 @@ c.SimplexSolver = c.inherit({
   solve: function() {
     if (this._fNeedsSolving) {
       this.optimize(this._objective);
-      this.setExternalVariables();
+      this._setExternalVariables();
     }
     return this;
   },
@@ -782,8 +782,8 @@ c.SimplexSolver = c.inherit({
     }
   },
 
-  setExternalVariables: function() {
-    if (c.trace) c.fnenterprint("setExternalVariables:");
+  _setExternalVariables: function() {
+    if (c.trace) c.fnenterprint("_setExternalVariables:");
     if (c.trace) c.traceprint(this.toString());
 
     this._externalParametricVars.each(function(v) {
