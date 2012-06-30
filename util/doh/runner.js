@@ -543,9 +543,6 @@ doh._handleFailure = function(groupName, fixture, e){
 	}
 
   if (!doh.squelch) {
-    if (console && console.trace) {
-      console.trace();
-    }
     throw e;
   }
 

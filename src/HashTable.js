@@ -48,7 +48,7 @@ var copyOwn = function(src, dest) {
   });
 };
 
-if (false && typeof Map != "undefined") {
+if (typeof Map != "undefined") {
 
   c.HashTable = c.inherit({
 
@@ -56,46 +56,51 @@ if (false && typeof Map != "undefined") {
       this.size = 0;
       this._store = new Map();
       this._keys = [];
+      // this.get = this._store.get.bind(this._store);
     },
 
     set: function(key, value) { 
       this._store.set(key, value);
-      this._keys.push(key);
+      if (this._keys.indexOf(key) == -1) {
+        this.size++;
+        // delete this._keys[this._keys.indexOf(key)];
+        this._keys.push(key);
+      } /* else {
+        delete this._keys[this._keys.indexOf(key)];
+        this._keys.push(key);
+      }
+      */
     },
 
     get: function(key) {
-      if(!this.size) { return null; }
-
-      key = keyCode(key);
-
-      var v = this._store[key];
-      if (typeof v != "undefined") {
-        return this._store[key];
-      }
-      return null;
+      return this._store.get(key);
     }, 
 
     clear: function() {
       this.size = 0;
-      this._store = {};
-      this._keyStrMap = {};
+      this._store = new Map();
+      this._keys = [];
     }, 
 
     delete: function(key) {
       // FIXME(slightlyoff):
       //    We should compact they key list if we get some large # of deleted
       //    props.
-      // delete this._keys[key];
 
       if (this._store.delete(key) && this.size > 0) {
+        delete this._keys[this._keys.indexOf(key)];
         this.size--;
       }
     },
 
     each: function(callback, scope) {
       if (!this.size) { return; }
-      Object.keys(this._store).forEach(function(k){
-        callback.call(scope||null, this._keyStrMap[k], this._store[k]);
+      this._keys.forEach(function(k){
+        if (typeof k == "undefined") { return; }
+        var v = this._store.get(k);
+        if (typeof v != "undefined") {
+          callback.call(scope||null, k, v);
+        }
       }, this);
     },
 
@@ -103,21 +108,24 @@ if (false && typeof Map != "undefined") {
       if (!this.size) { return; }
 
       var that = this;
-      var context = defaultContext;
-      var kl = Object.keys(this._store);
-      for (var x = 0; x < kl.length; x++) {
-        (function(v) {
-          if (that._store.hasOwnProperty(v)) {
-            context = callback.call(scope||null, that._keyStrMap[v], that._store[v]);
-          }
-        })(kl[x]);
+      var kl = this._keys.length;
+      var context;
+      for (var x = 0; x < kl; x++) {
+        if (typeof this._keys[x] != "undefined") {
+          (function(k) {
+            var v = that._store.get(k);
+            if (typeof v != "undefined") {
+              context = callback.call(scope||null, k, v);
+            }
+          })(this._keys[x]);
 
-        if (context) {
-          if (context.retval !== undefined) {
-            return context;
-          }
-          if (context.brk) {
-            break;
+          if (context) {
+            if (context.retval !== undefined) {
+              return context;
+            }
+            if (context.brk) {
+              break;
+            }
           }
         }
       }
@@ -126,9 +134,9 @@ if (false && typeof Map != "undefined") {
     clone: function() {
       var n = new c.HashTable();
       if (this.size) {
-        n.size = this.size;
-        copyOwn(this._store, n._store);
-        copyOwn(this._keyStrMap, n._keyStrMap);
+        this.each(function(k, v) {
+          n.set(k, v);
+        });
       }
       return n;
     }
