@@ -154,7 +154,28 @@ c.HashTable = c.inherit({
       copyOwn(this._keyStrMap, n._keyStrMap);
     }
     return n;
+  },
+  
+  equals: function(other) {
+    if (other === this) {
+      return true;
+    }
+    
+    if (!(other instanceof c.HashTable) || other._size !== this._size) {
+      return false;
+    }
+    
+    var codes = Object.keys(this._keyStrMap);
+    for (var i = 0; i < codes.length; i++) {
+      var code = codes[i];
+      if (this._keyStrMap[code] !== other._keyStrMap[code] || this._store[code] !== other._store[code]) {
+        return false;
+      }
+    }
+    
+    return true;
   }
+
 });
 
 })(c);
