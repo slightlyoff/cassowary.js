@@ -244,6 +244,16 @@ c.Expression = c.inherit({
     });
     return bstr;
   },
+  
+  equals: function(other) {
+    if (other === this) {
+      return true;
+    }
+    
+    return other instanceof c.Expression && 
+           other.constant === this.constant && 
+           other.terms.equals(this.terms);
+  },
 
   Plus: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     return e1.plus(e2);

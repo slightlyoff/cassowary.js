@@ -337,6 +337,15 @@ doh.add("c.Expression", [
     t.is(e.toString(), '10 + 2*[v:5] + 4*[b:2]');
   },
   
+  function equals(t) {
+    var v = new c.Variable('v', 5);
+    
+    t.t(new c.Expression(10).equals(new c.Expression(10)));
+    t.f(new c.Expression(10).equals(new c.Expression(1)));
+    t.t(new c.Expression(v, 2, -1).equals(new c.Expression(v, 2, -1)));
+    t.f(new c.Expression(v, -2, 5).equals(new c.Expression(v, 3, 6)));
+  },
+  
   function Plus(t) {
     var x = new c.Variable('x', 167);
     var y = new c.Variable('y', 10);
