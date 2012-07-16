@@ -80,8 +80,7 @@ c.SymbolicWeight = c.inherit({
     return this._dc = sum;
   },
 
-  toString: function() { return '[' + this._values.join(',') + ']'; },
-  cLevels: function() { return 3; }
+  toString: function() { return '[' + this._values.join(',') + ']'; }
 });
 
 c.SymbolicWeight.clsZero = new c.SymbolicWeight(0, 0, 0);
