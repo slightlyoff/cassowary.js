@@ -258,12 +258,15 @@ c.Expression = c.inherit({
   Plus: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     return e1.plus(e2);
   },
+
   Minus: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     return e1.minus(e2);
   },
+
   Times: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     return e1.times(e2);
   },
+
   Divide: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     return e1.divide(e2);
   },
