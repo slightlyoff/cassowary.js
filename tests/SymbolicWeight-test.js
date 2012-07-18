@@ -7,11 +7,15 @@
 "use strict";
 
 doh.add("c.SymbolicWeight", [
-  function addMult(t) {
+  function toJSON(t) {
+    return;
     var c1 = new c.SymbolicWeight(1,1,1);
     var c2 = new c.SymbolicWeight(2,3,4);
-    var c3 = c1.add(c2);
-    t.is(c3, "[3,4,5]");
-    t.is(c3.times(4), "[12,16,20]");
+    t.is(c1.toJSON(), '{"class":"c.SymbolicWeight","args":[1,1,1]}');
+    t.is(c2.toJSON(), '{"class":"c.SymbolicWeight","args":[2,3,4]}');
+  },
+
+  function fromJSON(t) {
+    c.fromJSON('{"class":"c.SymbolicWeight","value":100100100}');
   },
 ]);

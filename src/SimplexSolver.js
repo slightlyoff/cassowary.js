@@ -206,22 +206,22 @@ c.SimplexSolver = c.inherit({
     this._resetStayConstants();
     var zRow = this.rows.get(this._objective);
     var eVars = /* Set */this._errorVars.get(cn);
-    if (c.trace) c.traceprint("eVars == " + c.setToString(eVars));
+    if (c.trace) c.traceprint("eVars == " + eVars);
     if (eVars != null) {
       eVars.each(function(cv) {
         var expr = this.rows.get(cv);
         if (expr == null) {
           zRow.addVariable(cv, 
-                           -cn.weight * cn.strength.symbolicWeight.toDouble(),
+                           -cn.weight * cn.strength.symbolicWeight,
                            this._objective,
                            this);
         } else {
           zRow.addExpression(expr,
-                             -cn.weight * cn.strength.symbolicWeight.toDouble(),
+                             -cn.weight * cn.strength.symbolicWeight,
                              this._objective,
                              this);
         }
-        if (c.trace) c.traceprint("now eVars == " + c.setToString(eVars));
+        if (c.trace) c.traceprint("now eVars == " + eVars);
       }, this);
     }
     var marker = this._markerVars.get(cn);
@@ -429,7 +429,7 @@ c.SimplexSolver = c.inherit({
     bstr += "\n_stayMinusErrorVars: ";
     bstr += '[' + this._stayMinusErrorVars + ']';
     bstr += "\n";
-    bstr += "_editVarMap:\n" + c.hashToString(this._editVarMap);
+    bstr += "_editVarMap:\n" + this._editVarMap;
     bstr += "\n";
     return bstr;
   },
@@ -649,8 +649,7 @@ c.SimplexSolver = c.inherit({
         eminus = new c.SlackVariable(this._slackCounter, "em");
         expr.setVariable(eminus, 1);
         var zRow = this.rows.get(this._objective);
-        var sw = cn.strength.symbolicWeight.times(cn.weight);
-        zRow.setVariable(eminus, sw.toDouble());
+        zRow.setVariable(eminus, cn.strength.symbolicWeight * cn.weight);
         this.insertErrorVar(cn, eminus);
         this.noteAddedVariable(eminus, this._objective);
       }
@@ -672,10 +671,8 @@ c.SimplexSolver = c.inherit({
         this._markerVars.set(cn, eplus);
         var zRow = this.rows.get(this._objective);
         if (c.trace) console.log(zRow);
-        var sw = cn.strength.symbolicWeight.times(cn.weight);
-        var swCoeff = sw.toDouble();
+        var swCoeff = cn.strength.symbolicWeight * cn.weight;
         if (swCoeff == 0) {
-          if (c.trace) c.traceprint("sw == " + sw);
           if (c.trace) c.traceprint("cn == " + cn);
           if (c.trace) c.traceprint("adding " + eplus + " and " + eminus + " with swCoeff == " + swCoeff);
         }

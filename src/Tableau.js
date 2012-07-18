@@ -9,17 +9,8 @@
 
 c.Tableau = c.inherit({
   initialize: function() {
-    /* FIELDS:
-        var columns // c.HashTable of vars -> set of vars
-        var rows // c.HashTable of vars -> expr
-        var _infeasibleRows //Set of vars
-        var _externalRows //Set of vars
-        var _externalParametricVars //Set of vars
-   */
-
     this.columns = new c.HashTable(); // values are sets
     this.rows = new c.HashTable();    // values are c.Expressions
-
     this._infeasibleRows = new c.HashSet();
     this._externalRows = new c.HashSet();
     this._externalParametricVars = new c.HashSet();
@@ -61,13 +52,13 @@ c.Tableau = c.inherit({
       bstr += "\n";
     });
     bstr += "\nColumns:\n";
-    bstr += c.hashToString(this.columns);
+    bstr += this.columns;
     bstr += "\nInfeasible rows: ";
-    bstr += c.setToString(this._infeasibleRows);
+    bstr += this._infeasibleRows;
     bstr += "External basic variables: ";
-    bstr += c.setToString(this._externalRows);
+    bstr += this._externalRows;
     bstr += "External parametric variables: ";
-    bstr += c.setToString(this._externalParametricVars);
+    bstr += this._externalParametricVars;
     return bstr;
   },
 
@@ -81,26 +72,15 @@ c.Tableau = c.inherit({
       this.columns.set(param_var, rowset);
     }
     rowset.add(rowvar);
-
-    /*
-    print("rowvar =" + rowvar);
-    print("rowset = " + c.setToString(rowset));
-    print("this.columns = " + c.hashToString(this.columns));
-    */
   },
 
   addRow: function(aVar /*ClAbstractVariable*/, expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
-    // print("addRow: " + aVar + " (key), " + expr + " (value)");
-    // print(this.rows.size);
     this.rows.set(aVar, expr);
     expr.terms.each(function(clv, coeff) {
-      // print("insertColVar(" + clv + ", " + aVar + ")");
       this.insertColVar(clv, aVar);
       if (clv.isExternal) {
         this._externalParametricVars.add(clv);
-        // print("External parametric variables added to: " + 
-        //       c.setToString(this._externalParametricVars));
       }
     }, this);
     if (aVar.isExternal) {

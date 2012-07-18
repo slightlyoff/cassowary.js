@@ -7,82 +7,39 @@
 (function(c) {
 "use strict";
 
+var multiplier = 1000;
+
 c.SymbolicWeight = c.inherit({
-  initialize: function(w1, w2, w3) {
-    this._values = new Array(w1, w2, w3);
-    this._dc = 0;
-    this.toDouble();
-  },
-
-  times: function(n) {
-    var v = this._values;
-    return new c.SymbolicWeight(v[0] * n,
-                                v[1] * n,
-                                v[2] * n);
-  },
-
-  divideBy: function(n) {
-    var v = this._values;
-    return new c.SymbolicWeight(v[0] / n,
-                                v[1] / n,
-                                v[2] / n);
-  },
-
-  add: function(w) {
-    var v = this._values;
-    var wv = w._values;
-    return new c.SymbolicWeight(v[0] + wv[0],
-                                v[1] + wv[1],
-                                v[2] + wv[2]);
-  },
-
-  subtract: function(w) {
-    var v = this._values;
-    var wv = w._values;
-    return new c.SymbolicWeight(v[0] - wv[0],
-                                v[1] - wv[1],
-                                v[2] - wv[2]);
-  },
-
-  lessThan: function(c) {
-    return this._dc < c._dc;
-  },
-    
-  lessThanOrEqual: function(c) {
-    return this._dc <= c._dc;
-  },
-
-  equal: function(c) {
-    return this._dc == c._dc;
-  },
-
-  greaterThan: function(c) {
-    return !this.lessThanOrEqual(c);
-  },
-
-  greaterThanOrEqual: function(c) {
-    return !this.lessThan(c);
-  },
-
-  isNegative: function() {
-    return this.lessThan(c.SymbolicWeight.clsZero);
-  },
-
-  toDouble: function() {
-    if (this._dc) { return this._dc; }
-    var sum =  0;
+  initialize: function(/*w1, w2, w3*/) {
+    this.value = 0;
     var factor = 1;
-    var multiplier = 1000;
-    for (var i = this._values.length - 1; i >= 0; --i) {
-      sum += this._values[i] * factor;
+    for (var i = arguments.length - 1; i >= 0; --i) {
+      this.value += arguments[i] * factor;
       factor *= multiplier;
     }
-    return this._dc = sum;
   },
 
-  toString: function() { return '[' + this._values.join(',') + ']'; }
+  valueOf: function() {
+    return this.value;
+  },
+
+  toJSON: function() {
+    return JSON.stringify({
+      "class": "c.SymbolicWeight",
+      "value": this.value
+    });
+  },
 });
 
 c.SymbolicWeight.clsZero = new c.SymbolicWeight(0, 0, 0);
+
+var className = "c.SymbolicWeight";
+c._json_receivers[className] = function(obj) {
+  if (obj.value && obj.class == className) {
+    var sw = new c.SymbolicWeight();
+    sw.value = obj.value;
+    return sw;
+  }
+};
 
 })(c);

@@ -218,6 +218,15 @@ scope.c = {
     return function() { return count++; };
   })(0),
 
+  _json_receivers: {},
+
+  fromJSON: function(str) {
+    JSON.parse(str, function(k, v) {
+      if (this["class"]) {
+        // TODO(slightlyoff): revive based on class ref.
+      }
+    });
+  },
 };
 
 })(this);
