@@ -254,7 +254,13 @@ if (false && typeof Map != "undefined") {
       }
       
       return true;
-    }
+    },
+
+    toString: function(h) {
+      var answer = "";
+      this.each(function(k, v) { answer += k + " => " + v + "\n"; });
+      return answer;
+    },
   });
 }
 

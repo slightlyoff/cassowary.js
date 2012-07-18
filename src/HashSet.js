@@ -48,6 +48,21 @@ c.HashSet = c.inherit({
     // FIXME(slightlyoff): actually escape!
     this.storage.forEach(func, scope);
   },
+
+  toString: function() {
+    var answer = this.size + " {";
+    var first = true;
+    this.each(function(e) {
+      if (!first) {
+        answer += ", ";
+      } else {
+        first = false;
+      }
+      answer += e;
+    });
+    answer += "}\n";
+    return answer;
+  },
 });
 
 })(c);

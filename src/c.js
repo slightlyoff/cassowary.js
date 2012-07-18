@@ -214,41 +214,6 @@ scope.c = {
     return (Math.abs(av - bv) < Math.abs(av) * epsilon);
   },
 
-  hashToString: function(h) {
-    // FIXME: why isn't this implemented as a toString on c.HashTable?
-    var answer = "";
-    c.Assert(h instanceof c.HashTable);
-    h.each( function(k,v) {
-      answer += k + " => ";
-      if (v instanceof c.HashTable) {
-        answer += c.hashToString(v);
-      } else if (v instanceof c.HashSet) {
-        answer += c.setToString(v);
-      } else {
-        answer += v + "\n";
-      }
-    });
-    return answer;
-  },
-
-  setToString: function(s) {
-    // FIXME: why isn't this implemented as a toString on c.HashSet?
-    if (!s) return;
-    c.Assert(s instanceof c.HashSet);
-    var answer = s.size() + " {";
-    var first = true;
-    s.each(function(e) {
-      if (!first) {
-        answer += ", ";
-      } else {
-        first = false;
-      }
-      answer += e;
-    });
-    answer += "}\n";
-    return answer;
-  },
-
   _inc: (function(count){
     return function() { return count++; };
   })(0),
