@@ -1,19 +1,25 @@
 Cassowary JS
 ============
 
-This is an updated version of [Greg Badros's
+Cassowary is an algorithm that computing flexible, responsive layouts possible
+without resorting to piles of imperative code. Just describe the preferred
+relationships between values, noting which constraints are more important than
+others, and Cassowary figures out an optimal solution based on the current set
+of inputs.
+
+This repo hosts an improved version of [Greg Badros's
 port](http://www.badros.com/greg/cassowary/js/quaddemo.html "JS Quad Demo") of
 the [Cassowary hierarchial constraint
 toolkit](http://www.cs.washington.edu/research/constraints/cassowary/) to
 [JavaScript](http://cassowary.cvs.sourceforge.net/viewvc/cassowary/cassowary/js/).
 
-This fork dramatically improves the performance of the original translation (8x
-under V8, 5x under Rhino), removes external library dependencies, and improves
-hackability. The solver core can now be used inside web workers and many modern
-browsers (see below for the list of supported runtimes).
+This version dramatically improves the performance of the original translation,
+removes external library dependencies, and improves hackability. The solver
+core can now be used inside web workers, at the command line, and directly in
+modern browsers.
 
-For help using the system and civil discussion of constraint-based layout on
-the web, join the [Overconstrained mailing
+For civil discussion of this port and constraint-based UIs, join the
+[Overconstrained mailing
 list](https://groups.google.com/forum/?fromgroups#!forum/overconstrained).
 
 Constraint Solver? Say What?
