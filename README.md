@@ -1,11 +1,15 @@
 Cassowary JS
 ============
 
-Cassowary is an algorithm that computing flexible, responsive layouts possible
+Cassowary is an algorithm that computes flexible, responsive layouts quickly
 without resorting to piles of imperative code. Just describe the preferred
 relationships between values, noting which constraints are more important than
-others, and Cassowary figures out an optimal solution based on the current set
-of inputs.
+others, and Cassowary figures out an optimal solution based on the current
+inputs. When the inputs or constraints change, Cassowary is particularly
+efficient at computing a new answer quickly based on the last-known solution.
+These properties together make it ideal for use in layout systems -- indeed,
+it's the algorithm at the center of Apple's new automatic layout system for
+Cocoa.
 
 This repo hosts an improved version of [Greg Badros's
 port](http://www.badros.com/greg/cassowary/js/quaddemo.html "JS Quad Demo") of
