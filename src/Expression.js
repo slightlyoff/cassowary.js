@@ -11,9 +11,6 @@
 "use strict";
 
 c.Expression = c.inherit({
-  /* FIELDS:
-     private ClDouble constant
-  */
   initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
     if (c.GC) console.log("new c.Expression");
     this.constant = (typeof constant == "number" && !isNaN(constant)) ? constant : 0;
@@ -22,9 +19,6 @@ c.Expression = c.inherit({
     if (clv instanceof c.AbstractVariable) {
       this.terms.set(clv, typeof value == 'number' ? value : 1);
     } else if (typeof clv == "number") {
-      // FIXME(slighltyoff):
-      //    This isNaN() check slows us down by ~75% on V8 in our synthetic
-      //    perf test!
       if (!isNaN(clv)) {
         this.constant = clv;
       }
@@ -32,7 +26,7 @@ c.Expression = c.inherit({
   },
 
   initializeFromHash: function(constant /*ClDouble*/, terms /*c.Hashtable*/) {
-    if(c.verbose) {
+    if (c.verbose) {
       console.log("*******************************");
       console.log("clone c.initializeFromHash");
       console.log("*******************************");
@@ -52,7 +46,7 @@ c.Expression = c.inherit({
   },
 
   clone: function() {
-    if(c.verbose) {
+    if (c.verbose) {
       console.log("*******************************");
       console.log("clone c.Expression");
       console.log("*******************************");
@@ -173,32 +167,37 @@ c.Expression = c.inherit({
     return null;
   },
   
-  substituteOut: function(outvar /*c.AbstractVariable*/,
-                          expr /*c.Expression*/,
+  substituteOut: function(outvar  /*c.AbstractVariable*/,
+                          expr    /*c.Expression*/,
                           subject /*c.AbstractVariable*/,
-                          solver /*ClTableau*/) {
+                          solver  /*ClTableau*/) {
+
     if (c.trace) {
       c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
       c.traceprint("this = " + this);
     }
-    var multiplier = this.terms.get(outvar);
-    this.terms.delete(outvar);
+
+    var terms = this.terms;
+    var multiplier = terms.get(outvar);
+    terms.delete(outvar);
     this.constant += (multiplier * expr.constant);
     expr.terms.each(function(clv, coeff) {
-      var old_coeff = this.terms.get(clv);
+      var old_coeff = terms.get(clv);
       if (old_coeff) {
         var newCoeff = old_coeff + multiplier * coeff;
         if (c.approx(newCoeff, 0)) {
           solver.noteRemovedVariable(clv, subject);
-          this.terms.delete(clv);
+          terms.delete(clv);
         } else {
-          this.terms.set(clv, newCoeff);
+          terms.set(clv, newCoeff);
         }
       } else {
-        this.terms.set(clv, multiplier * coeff);
-        if (solver) solver.noteAddedVariable(clv, subject);
+        terms.set(clv, multiplier * coeff);
+        if (solver) {
+          solver.noteAddedVariable(clv, subject);
+        }
       }
-    }, this);
+    });
     if (c.trace) c.traceprint("Now this is " + this);
   },
 

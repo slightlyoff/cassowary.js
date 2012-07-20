@@ -140,6 +140,18 @@ var css = function(propertyName, node) {
     debugger;
   }
   */
+  if (typeof propertyName != "string" && propertyName["name"]) {
+    // We got a complex property descriptor. Handle it.
+    var obj = propertyName;
+    propertyName = obj.name;
+    var r;
+    for(var x = 0; x < obj.test.length; x++) {
+      r = css.call(this, obj.test[x], node);
+      if (r.value) { return r; }
+    }
+    return new CSSValue("auto", propertyName);
+  }
+
   if (_localCssProperties.indexOf(propertyName) >= 0) {
     // We don't trust getComputedStyle since it returns used values for these
     // properties, so we instead look to see what the node itself has
@@ -365,11 +377,12 @@ var VarHeavy = function(properties) {
   this.values = {};
   this.vars = {};
   this.value = function(p, v) {
-    var pn = toCamelCase(p);
+    var opn = p["name"]||p;
+    var pn = toCamelCase(opn);
     var val = this.values[pn];
     if (typeof v != "undefined") {
       if (!val) {
-        val = this.values[pn] = new CSSValue(p, v);
+        val = this.values[pn] = new CSSValue(opn, v);
       } else {
         val.value = v;
       }
@@ -377,14 +390,15 @@ var VarHeavy = function(properties) {
     return val;
   };
   this.var = function(p, v) {
-    var pn = toCamelCase(p);
+    var opn = p["name"]||p;
+    var pn = toCamelCase(opn);
     var varv = this.vars[pn];
     if (typeof v != "undefined") {
       if (v instanceof c.Variable) {
         varv = this.vars[pn] = v;
       } else {
         if (!varv) {
-          varv = this.vars[pn] = cv(p, v);
+          varv = this.vars[pn] = cv(opn, v);
         } else {
           varv._value = v;
         }
@@ -458,10 +472,25 @@ var RenderBox = c.inherit({
     "margin-right-width",
     "margin-bottom-width",
     "margin-left-width",
-    "-webkit-margin-before",
-    "-webkit-margin-after",
-    "-webkit-margin-start",
-    "-webkit-margin-end",
+    // FIXME: 
+    //    we shouldn't be falling back to margin-left et al. in RTL. Should be
+    //    fliipped in those cases.
+    {
+      name:"margin-before",
+      test: ["-webkit-margin-before", "-moz-margin-before", "margin-top"],
+    },
+    {
+      name:"margin-after",
+      test: ["-webkit-margin-after", "-moz-margin-after", "margin-bottom"],
+    },
+    {
+      name:"margin-start",
+      test: ["-webkit-margin-start", "-moz-margin-start", "margin-left"],
+    },
+    {
+      name:"margin-end",
+      test: ["-webkit-margin-end", "-moz-margin-end", "margin-right"],
+    },
     "border",
     "border-top",
     "border-right",
@@ -560,17 +589,17 @@ var RenderBox = c.inherit({
       );
     }
 
-    var mt = (vals.marginTop.isAuto && !vals.webkitMarginBefore.isAuto) ?
-                vals.webkitMarginBefore.px : vals.marginTop.px;
+    var mt = (vals.marginTop.isAuto && !vals.marginBefore.isAuto) ?
+                vals.marginBefore.px : vals.marginTop.px;
 
-    var mr = (vals.marginRight.isAuto && !vals.webkitMarginEnd.isAuto) ?
-                vals.webkitMarginEnd.px : vals.marginRight.px;
+    var mr = (vals.marginRight.isAuto && !vals.marginEnd.isAuto) ?
+                vals.marginEnd.px : vals.marginRight.px;
 
-    var mb = (vals.marginBottom.isAuto && !vals.webkitMarginAfter.isAuto) ?
-                vals.webkitMarginAfter.px : vals.marginBottom.px;
+    var mb = (vals.marginBottom.isAuto && !vals.marginAfter.isAuto) ?
+                vals.marginAfter.px : vals.marginBottom.px;
 
-    var ml = (vals.marginLeft.isAuto && !vals.webkitMarginStart.isAuto) ?
-                vals.webkitMarginStart.px : vals.marginLeft.px;
+    var ml = (vals.marginLeft.isAuto && !vals.marginStart.isAuto) ?
+                vals.marginStart.px : vals.marginLeft.px;
 
     constrain(
       eq(c.Minus(ref.border._top, mt),
