@@ -523,6 +523,7 @@ var RenderBox = c.inherit({
   ],
 
   generate: function() {
+    var optimize = false;
     // Constraints for all boxes
     var ref = this.edges.ref;
     var actual = this.edges.actual;
@@ -539,7 +540,7 @@ var RenderBox = c.inherit({
     var _mediumWidth = cv("mediumWidth", DEFULT_MEDIUM_WIDTH);
 
     // Content dimensions are padding plus/minus the corresponding padding.
-    if (vals.padding.isAuto) {
+    if (optimize && vals.padding.isAuto) {
       ref.padding = ref.content;
     } else {
       constrain(
@@ -566,7 +567,7 @@ var RenderBox = c.inherit({
       );
     }
 
-    if (vals.border.isAuto) {
+    if (optimize && vals.border.isAuto) {
       ref.border = ref.padding;
     } else {
       constrain(
@@ -1252,6 +1253,7 @@ var TextBox = c.inherit({
     this._generated = true;
 
     var ref = this.edges.ref;
+    // console.log("TextBox's natural height is:", this.naturalSize.height);
     this.solver.add(
       eq(c.Plus(ref.outer._left, this.naturalSize.width), ref.outer._right, strong),
       eq(c.Plus(ref.outer._top, this.naturalSize.height), ref.outer._bottom, strong)
@@ -1550,21 +1552,20 @@ var _layoutFor = function(id, boxesCallback) {
   // Generate our generic box constraints.
   console.time("generate initial constraints");
   boxes.forEach(function(box) { box.generate(); });
-  solver.resolve();
   console.timeEnd("generate initial constraints");
+  console.time("solve initial constraints");
+  solver.resolve();
+  console.timeEnd("solve initial constraints");
 
   // Genereate constraints to flow all normally-positioned block boxes.
   console.time("flow blocks");
-  // FIXME: should be able to disable auto-solve here!
-  // solver.autoSolve = true;
   blocks.forEach(function(block) {
-    // console.log("flowing children of: " + block);
     block.flow();
-    // solver.resolve();
   });
-  // solver.autoSolve = false;
-  solver.resolve();
   console.timeEnd("flow blocks");
+  console.time("solve heights");
+  solver.resolve();
+  console.timeEnd("solve heights");
 
   // Text layout pass. Once our widths have all been determined, we place each
   // text segment and do wrapping. Once we've
@@ -1587,7 +1588,8 @@ var _layoutFor = function(id, boxesCallback) {
   // boxes.forEach(function(box) { console.log(box+""); });
   // console.log(blocks);
 
-  boxesCallback(boxes);
+  // boxesCallback(boxes);
+  boxesCallback([v]);
 };
 
 scope.layoutFor = function(id, boxesCallback) {

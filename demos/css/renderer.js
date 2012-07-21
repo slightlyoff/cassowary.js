@@ -119,8 +119,10 @@ var fillBoxMargin = function(box, ctx) {
 var paintBorder = function(box, ctx) {
   if (!box.node) return;
   var b = box.edges.actual.border;
-  if (box.css("border-style").raw != "none") {
-    // console.log("painting border:", box._id, box.css("border-width").px, box.css("border-style").raw, box.css("border-color").raw);
+  // Gecko doesn't like giving us "border-width", "border-color",
+  // "border-style", etc., so we default to some edge to grab them from.
+  if (box.css("border-top-style").raw != "none") {
+    // console.log(box.node);
     var btw = box.css("border-top-width").px;
     var top = b.top + btw/2;
     var brw = box.css("border-right-width").px;
@@ -129,7 +131,7 @@ var paintBorder = function(box, ctx) {
     var bottom = b.bottom - bbw / 2;
     var blw = box.css("border-left-width").px;
     var left = b.left + blw / 2;
-    // console.log(b.top, btw);
+    console.log("top:", top, "right:", right, "bottom:", bottom, "left:", left);
     pathWithStyle(
         ctx,
         [
@@ -138,9 +140,9 @@ var paintBorder = function(box, ctx) {
           { x: right, y: bottom },
           { x: left, y: bottom },
         ],
-        box.css("border-color").raw,
-        box.css("border-width").px,
-        box.css("border-style").raw
+        box.css("border-top-color").raw,
+        btw,
+        box.css("border-top-style").raw
     );
   }
 };
