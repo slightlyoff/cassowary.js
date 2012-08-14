@@ -18,7 +18,7 @@ if   [ $D8PATH ]  && [ -x $D8PATH ]; then
 elif [ $JSCPATH ] && [ -x $JSCPATH ]; then
   RUNNER=$JSCPATH;
 elif [ $JPATH ]   && [ -x $JPATH ]; then
-  RUNNER='$JPATH -classpath ../util/js.jar org.mozilla.javascript.tools.shell.Main';
+  RUNNER="$JPATH -classpath ../util/js.jar org.mozilla.javascript.tools.shell.Main";
 else
   echo "FAILED: No JavaScript Runtime Found! Please install Java or the V8 Shell (d8) and add them to your \$PATH"
   exit 1;
