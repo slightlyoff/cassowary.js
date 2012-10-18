@@ -19,8 +19,7 @@ c.Strength = c.inherit({
     }
   },
 
-  // FIXME(slightlyoff): getter
-  isRequired: function() {
+  get required() {
     return (this === c.Strength.required);
   },
 

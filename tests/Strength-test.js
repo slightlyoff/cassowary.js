@@ -14,11 +14,11 @@ doh.add("c.Strength", [
     t.t(c.Strength.weak instanceof c.Strength);
   },
 
-  function isRequired(t) {
-    t.t(c.Strength.required.isRequired());
-    t.f(c.Strength.strong.isRequired());
-    t.f(c.Strength.medium.isRequired());
-    t.f(c.Strength.weak.isRequired());
+  function required(t) {
+    t.t(c.Strength.required.required);
+    t.f(c.Strength.strong.required);
+    t.f(c.Strength.medium.required);
+    t.f(c.Strength.weak.required);
   },
 
   function sane(t) {

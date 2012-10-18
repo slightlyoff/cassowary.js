@@ -617,7 +617,7 @@ c.SimplexSolver = c.inherit({
     if (c.trace) {
       c.fnenterprint("newExpression: " + cn);
       c.traceprint("cn.isInequality == " + cn.isInequality);
-      c.traceprint("cn.isRequired() == " + cn.isRequired());
+      c.traceprint("cn.required == " + cn.required);
     }
 
     var cnExpr = cn.expression;
@@ -644,7 +644,7 @@ c.SimplexSolver = c.inherit({
       slackVar = new c.SlackVariable(this._slackCounter, "s");
       expr.setVariable(slackVar, -1);
       this._markerVars.set(cn, slackVar);
-      if (!cn.isRequired()) {
+      if (!cn.required) {
         ++this._slackCounter;
         eminus = new c.SlackVariable(this._slackCounter, "em");
         expr.setVariable(eminus, 1);
@@ -654,7 +654,7 @@ c.SimplexSolver = c.inherit({
         this.noteAddedVariable(eminus, this._objective);
       }
     } else {
-      if (cn.isRequired()) {
+      if (cn.required) {
         if (c.trace) c.traceprint("Equality, required");
         ++this._dummyCounter;
         dummyVar = new c.DummyVariable(this._dummyCounter, "d");

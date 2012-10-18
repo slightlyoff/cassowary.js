@@ -18,8 +18,9 @@ c.AbstractConstraint = c.inherit({
   isInequality:     false,
   isStayConstraint: false,
   hashCode: function() { return this.hash_code; },
-  // FIXME(slightlyoff): value, at worst a getter
-  isRequired: function() { return this.strength.isRequired(); },
+  get required() {
+    return (this.strength === c.Strength.required);
+  },
 
   toString: function() {
     // this is abstract -- it intentionally leaves the parens unbalanced for
@@ -50,6 +51,7 @@ c.StayConstraint = c.inherit({
   toString: function() { return "stay:" + ts.call(this); },
 });
 
+var lc = 
 c.Constraint = c.inherit({
   extends: c.AbstractConstraint,
   initialize: function(cle /*c.Expression*/, 
@@ -86,7 +88,7 @@ c.Inequality = c.inherit({
     // (cle || number), op, cv
     if ((a1IsExp || a1IsNum) && a3IsVar) {      
       var cle = a1, op = a2, cv = a3, strength = a4, weight = a5;
-      c.Constraint.call(this, this._cloneOrNewCle(cle), strength, weight);
+      lc.call(this, this._cloneOrNewCle(cle), strength, weight);
       if (op == c.LEQ) {
         this.expression.multiplyMe(-1);
         this.expression.addVariable(cv);
@@ -98,7 +100,7 @@ c.Inequality = c.inherit({
     // cv, op, (cle || number)
     } else if (a1IsVar && (a3IsExp || a3IsNum)) {      
       var cle = a3, op = a2, cv = a1, strength = a4, weight = a5;
-      c.Constraint.call(this, this._cloneOrNewCle(cle), strength, weight);
+      lc.call(this, this._cloneOrNewCle(cle), strength, weight);
       if (op == c.GEQ) {
         this.expression.multiplyMe(-1);
         this.expression.addVariable(cv);
@@ -110,7 +112,7 @@ c.Inequality = c.inherit({
     // cle, op, num
     } else if (a1IsExp && a3IsNum) {
       var cle1 = a1, op = a2, cle2 = a3, strength = a4, weight = a5;
-      c.Constraint.call(this, this._cloneOrNewCle(cle1), strength, weight);
+      lc.call(this, this._cloneOrNewCle(cle1), strength, weight);
       if (op == c.LEQ) {
         this.expression.multiplyMe(-1);
         this.expression.addExpression(this._cloneOrNewCle(cle2));
@@ -123,7 +125,7 @@ c.Inequality = c.inherit({
     // num, op, cle
     } else if (a1IsNum && a3IsExp) {
       var cle1 = a3, op = a2, cle2 = a1, strength = a4, weight = a5; 
-      c.Constraint.call(this, this._cloneOrNewCle(cle1), strength, weight);      
+      lc.call(this, this._cloneOrNewCle(cle1), strength, weight);      
       if (op == c.GEQ) {
         this.expression.multiplyMe(-1);
         this.expression.addExpression(this._cloneOrNewCle(cle2));
@@ -136,7 +138,7 @@ c.Inequality = c.inherit({
     // cle op cle
     } else if (a1IsExp && a3IsExp) {
       var cle1 = a1, op = a2, cle2 = a3, strength = a4, weight = a5;
-      c.Constraint.call(this, this._cloneOrNewCle(cle2), strength, weight);
+      lc.call(this, this._cloneOrNewCle(cle2), strength, weight);
       if (op == c.GEQ) {
         this.expression.multiplyMe(-1);
         this.expression.addExpression(this._cloneOrNewCle(cle1));
@@ -147,15 +149,15 @@ c.Inequality = c.inherit({
       }       
     // cle
     } else if (a1IsExp) {
-      return c.Constraint.call(this, a1, a2, a3);    
+      return lc.call(this, a1, a2, a3);    
     // >=
     } else if (a2 == c.GEQ) {
-      c.Constraint.call(this, new c.Expression(a3), a4, a5);
+      lc.call(this, new c.Expression(a3), a4, a5);
       this.expression.multiplyMe(-1);
       this.expression.addVariable(a1);
     // <=
     } else if (a2 == c.LEQ) {
-      c.Constraint.call(this, new c.Expression(a3), a4, a5);
+      lc.call(this, new c.Expression(a3), a4, a5);
       this.expression.addVariable(a1,-1);
     // error
     } else {
@@ -167,11 +169,9 @@ c.Inequality = c.inherit({
 
   toString: function() {
     // return "c.Inequality: " + this.hashCode();
-    return c.Constraint.prototype.toString.call(this) + " >= 0 ) id: " + this.hash_code;
+    return lc.prototype.toString.call(this) + " >= 0 ) id: " + this.hash_code;
   },
 });
-
-var lc = c.Constraint;
 
 c.Equation = c.inherit({
   extends: c.Constraint,
@@ -181,35 +181,45 @@ c.Equation = c.inherit({
       lc.call(this, a1, a2, a3);
     } else if ((a1 instanceof c.AbstractVariable) &&
                (a2 instanceof c.Expression)) {
+
       var cv = a1, cle = a2, strength = a3, weight = a4;
       lc.call(this, cle.clone(), strength, weight);
       this.expression.addVariable(cv, -1);
+
     } else if ((a1 instanceof c.AbstractVariable) &&
                (typeof(a2) == 'number')) {
+
       var cv = a1, val = a2, strength = a3, weight = a4;
       lc.call(this, new c.Expression(val), strength, weight);
       this.expression.addVariable(cv, -1);
+
     } else if ((a1 instanceof c.Expression) &&
                (a2 instanceof c.AbstractVariable)) {
+
       var cle = a1, cv = a2, strength = a3, weight = a4;
       lc.call(this, cle.clone(), strength, weight);
       this.expression.addVariable(cv, -1);
+
     } else if (((a1 instanceof c.Expression) || (a1 instanceof c.AbstractVariable) ||
                 (typeof(a1) == 'number')) &&
                ((a2 instanceof c.Expression) || (a2 instanceof c.AbstractVariable) ||
                 (typeof(a2) == 'number'))) {
+
       if (a1 instanceof c.Expression) {
         a1 = a1.clone();
       } else {
         a1 = new c.Expression(a1);
       }
+
       if (a2 instanceof c.Expression) {
         a2 = a2.clone();
       } else {
         a2 = new c.Expression(a2);
       }
+
       lc.call(this, a1, a3, a4);
       this.expression.addExpression(a2, -1);
+
     } else {
       throw "Bad initializer to c.Equation";
     }
