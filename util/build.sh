@@ -14,9 +14,9 @@ python post.py ../src/c.js\
                ../src/Strength.js\
                ../src/Variable.js\
                ../src/Point.js\
-               ../src/LinearExpression.js\
+               ../src/Expression.js\
                ../src/Constraint.js\
                ../src/EditInfo.js\
                ../src/Tableau.js\
                ../src/SimplexSolver.js\
-               ../src/Timer.js > c.js
+               ../src/Timer.js > ../bin/c.js
