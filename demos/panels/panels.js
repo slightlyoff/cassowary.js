@@ -121,7 +121,7 @@ var valueSetter = function(item, varOrValue, oper, strength, weight) {
 
 var valueGetter = function(item) {
   if(!this["_" + item]) return; // undefined
-  return this.v[item].value();
+  return this.v[item].value;
 };
 
 var weak = c.Strength.weak;
@@ -136,7 +136,7 @@ var neq = function(a1, a2, a3) { return new c.Inequality(a1, a2, a3); };
 var geq = function(a1, a2, str, w) { return new c.Inequality(a1, c.GEQ, a2, str, w); };
 var leq = function(a1, a2, str, w) { return new c.Inequality(a1, c.LEQ, a2, str, w); };
 
-var stay = function(v, strength, weight) { 
+var stay = function(v, strength, weight) {
   return new c.StayConstraint(v, strength || weak, weight || 1.0);
 };
 var weakStay =   function(v, w) { return stay(v, weak, w); };
@@ -255,8 +255,8 @@ scope.Panel = c.inherit({
       var start = this._moveStartLocation;
       start.x = e.pageX;
       start.y = e.pageY;
-      start.left = this.v.left.value();
-      start.top = this.v.top.value();
+      start.left = this.v.left.value;
+      start.top = this.v.top.value;
       s.addEditVar(this.v.left, strong)
        .addEditVar(this.v.top, strong).beginEdit();
       this._moving = true;
@@ -265,8 +265,8 @@ scope.Panel = c.inherit({
 
   _mouseUp: function(e) {
     if (this._moving) {
-      var l = this.v.left.value();
-      var t = this.v.top.value();
+      var l = this.v.left.value;
+      var t = this.v.top.value;
       s.endEdit();
       // Re-set the current value at the default strength (weak) instead of our
       // (strong) edit-time updates to it.
@@ -296,7 +296,7 @@ scope.Panel = c.inherit({
       "left",
       "top" // , "right", "bottom"
     ].forEach(function(name) {
-      var v = this.v[name].value() + "px";
+      var v = this.v[name].value + "px";
       this._debugShadow.style[name] = v;
       s += name + ": " + v + "  <br>";
     }, this);
@@ -306,8 +306,8 @@ scope.Panel = c.inherit({
       "preferredWidth",
       "preferredHeight"
     ].forEach(function(name) {
-      var v = this.v[name].value() + "px";
-      s += name + ": " + this.v[name].value() + "px  <br>";
+      var v = this.v[name].value + "px";
+      s += name + ": " + this.v[name].value + "px  <br>";
     }, this);
 
     this._debugShadow.innerHTML = s;
@@ -368,7 +368,7 @@ scope.Panel = c.inherit({
       }
     });
 
-    // We add our constraints to the solver ONLY when we're 
+    // We add our constraints to the solver ONLY when we're
     s.autoSolve = false;
     this.constraints.forEach(function(cns) { s.addConstraint(cns); });
     s.resolve();
@@ -530,17 +530,17 @@ scope.Panel = c.inherit({
   _updateStyles: function() {
     // NOTE: "bottom" and "right" are assumed to be computed
     [ "width", "height" ].forEach(function(name) {
-      this.style[name] = this.v[name].value() + "px";
+      this.style[name] = this.v[name].value + "px";
     }, this);
 
     // FIXME: caching? invalidation?
     [ "left", "top" ].forEach(function(name) {
-      var v =  this.v[name].value();
+      var v =  this.v[name].value;
       // If we're not direct children of the root, translate top/left to being
       // in the CSS "absolute" coordinate space from our absolutely positioned
       // parents
       if (this.parentNode && this.parentNode != document.body) {
-        v = v - this.parentNode.v[name].value();
+        v = v - this.parentNode.v[name].value;
       }
       this.style[name] = v + "px";
     }, this);
@@ -610,7 +610,7 @@ scope.Panel = c.inherit({
   set left(v)   { valueSetter.call(this, "left",   v, "=", strong); },
   set right(v)  { valueSetter.call(this, "right",  v, "=", strong); },
 
-  get top()     { return valueGetter.call(this, "top"); }, 
+  get top()     { return valueGetter.call(this, "top"); },
   get bottom()  { return valueGetter.call(this, "bottom"); },
   get left()    { return valueGetter.call(this, "left"); },
   get right()   { return valueGetter.call(this, "right"); },
@@ -641,7 +641,7 @@ scope.Panel = c.inherit({
 
   set box(b) {
     this._valueConstraintNames.forEach(function(prop) {
-        if (b.hasOwnProperty(prop)) { this[prop] = b[prop]; } }, this); 
+        if (b.hasOwnProperty(prop)) { this[prop] = b[prop]; } }, this);
 
     this._listConstraintNames.forEach(function(prop) {
         if (b.hasOwnProperty(prop)) { this[prop] = b[prop]; } }, this);
@@ -652,7 +652,7 @@ scope.Panel = c.inherit({
     this._centeredIn = [
       // this.left = other.left + (other.width/2 - this.width/2)
       eq(this.v.left,
-        c.Plus(other.v.left, 
+        c.Plus(other.v.left,
           c.Minus(
             c.Divide(other.v.width, 2),
             c.Divide(this.v.width, 2)
@@ -661,7 +661,7 @@ scope.Panel = c.inherit({
 
       // this.top = other.top + (other.height/2 - this.height/2)
       eq(this.v.top,
-        c.Plus(other.v.top, 
+        c.Plus(other.v.top,
           c.Minus(
             c.Divide(other.v.height, 2),
             c.Divide(this.v.height, 2)
@@ -693,7 +693,7 @@ HTMLElement.register(Panel);
 scope.RootPanel = c.inherit({
   extends: Panel,
   initialize: function() {
-    if (document.rootPanel) { 
+    if (document.rootPanel) {
       throw "Attempting to create multiple roots on the same document!";
     }
 
@@ -725,7 +725,7 @@ scope.RootPanel = c.inherit({
 
     // Propigate viewport size changes.
     var reCalc = function() {
-      
+
       // Measurement should be cheap here.
       var iwv = window.innerWidth;
       var ihv = window.innerHeight;
@@ -742,12 +742,12 @@ scope.RootPanel = c.inherit({
 
       // console.timeEnd("resolve");
 
-      if (iwv != this.v.width.value()) {
+      if (iwv != this.v.width.value) {
         // ZOMGWTFBBQ?
-        console.log("width: suggested:", iwv, "got:", this.v.width.value());
-        console.log("height: suggested:", ihv, "got:", this.v.height.value());
-        console.log("right: suggested:", iwv, "got:", this.v.right.value());
-        console.log("bottom: suggested:", ihv, "got:", this.v.bottom.value());
+        console.log("width: suggested:", iwv, "got:", this.v.width.value);
+        console.log("height: suggested:", ihv, "got:", this.v.height.value);
+        console.log("right: suggested:", iwv, "got:", this.v.right.value);
+        console.log("bottom: suggested:", ihv, "got:", this.v.bottom.value);
       }
     }.bind(this);
 

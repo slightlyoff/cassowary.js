@@ -7,7 +7,7 @@
 (function(c) {
 "use strict";
 
-var av = 
+var av =
 c.AbstractVariable = c.inherit({
   initialize: function(a1, a2) {
     this._name = "";
@@ -21,8 +21,8 @@ c.AbstractVariable = c.inherit({
     }
   },
 
-  hashCode: function() { return this.hash_code; },
-  
+  get hashCode() { return this.hash_code; },
+
   isDummy:      false,
   isExternal:   false,
   isPivotable:  false,
@@ -54,8 +54,7 @@ c.Variable = c.inherit({
   },
   isExternal:     true,
 
-  // FIXME(slightlyoff)
-  value: function() { return this._value; },
+  get value() { return this._value; },
 });
 
 /* static */

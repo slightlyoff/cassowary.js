@@ -10,7 +10,7 @@ var tp = t.prototype;
 var epsilon = 1e-8;
 
 c.SimplexSolver = c.inherit({
-  extends: c.Tableau, 
+  extends: c.Tableau,
   initialize: function(){
 
     c.Tableau.call(this);
@@ -21,7 +21,7 @@ c.SimplexSolver = c.inherit({
 
     this._markerVars = new c.HashTable(); // cn -> Set of cv
 
-    // this._resolve_pair = [0, 0]; 
+    // this._resolve_pair = [0, 0];
     this._objective = new c.ObjectiveVariable("Z");
 
     this._editVarMap = new c.HashTable(); // cv -> c.EditInfo
@@ -90,8 +90,8 @@ c.SimplexSolver = c.inherit({
       if (!cvEminus instanceof c.SlackVariable) {
         console.log("cvEminus not a slack variable = " + cvEminus);
       }
-      // console.log("new c.EditInfo(" + cn + ", " + cvEplus + ", " + 
-      //                               + cvEminus + ", " + prevEConstant + ", " 
+      // console.log("new c.EditInfo(" + cn + ", " + cvEplus + ", " +
+      //                               + cvEminus + ", " + prevEConstant + ", "
       //                               + i +")");
       var ei = new c.EditInfo(cn, cvEplus, cvEminus, prevEConstant, i)
       this._editVarMap.set(cn.variable, ei);
@@ -176,7 +176,7 @@ c.SimplexSolver = c.inherit({
       var clp = a1, weight = a2;
       this.addStay(clp.X(), c.Strength.weak, weight || 1);
       this.addStay(clp.Y(), c.Strength.weak, weight || 1);
-    } else { // 
+    } else { //
       var vx = a1, vy = a2, weight = a3;
       this.addStay(vx, c.Strength.weak, weight || 1);
       this.addStay(vy, c.Strength.weak, weight || 1);
@@ -211,7 +211,7 @@ c.SimplexSolver = c.inherit({
       eVars.each(function(cv) {
         var expr = this.rows.get(cv);
         if (expr == null) {
-          zRow.addVariable(cv, 
+          zRow.addVariable(cv,
                            -cn.weight * cn.strength.symbolicWeight,
                            this._objective,
                            this);
@@ -246,7 +246,7 @@ c.SimplexSolver = c.inherit({
             if (
               exitVar == null ||
               r < minRatio    ||
-              (c.approx(r, minRatio) && v.hashCode() < exitVar.hashCode())
+              (c.approx(r, minRatio) && v.hashCode < exitVar.hashCode)
             ) {
               minRatio = r;
               exitVar = v;
@@ -330,7 +330,7 @@ c.SimplexSolver = c.inherit({
     var l = newEditConstants.length
     this._editVarMap.each(function(v, cei) {
       var i = cei.index;
-      if (i < l) 
+      if (i < l)
         this.suggestValue(v, newEditConstants[i]);
     }, this);
     this.resolve();
@@ -376,7 +376,7 @@ c.SimplexSolver = c.inherit({
       return this;
     }
 
-    if (!c.approx(n, v.value())) {
+    if (!c.approx(n, v.value)) {
       this.addEditVar(v);
       this.beginEdit();
 
@@ -516,12 +516,12 @@ c.SimplexSolver = c.inherit({
     }, this);
     if (rv && rv.retval !== undefined) return rv.retval;
 
-    if (subject != null) 
+    if (subject != null)
       return subject;
 
     var coeff = 0;
 
-    // subject is nil. 
+    // subject is nil.
     // Make one last check -- if all of the variables in expr are dummy
     // variables, then we can pick a dummy variable as the subject
     var rv = terms.escapingEach(function(v,c) {
@@ -544,10 +544,10 @@ c.SimplexSolver = c.inherit({
     return subject;
   },
 
-  deltaEditConstant: function(delta /*double*/, 
-                              plusErrorVar /*c.AbstractVariable*/, 
+  deltaEditConstant: function(delta /*double*/,
+                              plusErrorVar /*c.AbstractVariable*/,
                               minusErrorVar /*c.AbstractVariable*/) {
-    if (c.trace) 
+    if (c.trace)
       c.fnenterprint("deltaEditConstant :" + delta + ", " + plusErrorVar + ", " + minusErrorVar);
 
     var exprPlus = this.rows.get(plusErrorVar);
@@ -597,7 +597,9 @@ c.SimplexSolver = c.inherit({
             if (cd > 0 && v.isPivotable) {
               var zc = zRow.coefficientFor(v);
               r = zc / cd;
-              if (r < ratio || (c.approx(r, ratio) && v.hashCode() < entryVar.hashCode())) {
+              if (r < ratio ||
+                  (c.approx(r, ratio) && v.hashCode < entryVar.hashCode)
+              ) {
                 entryVar = v;
                 ratio = r;
               }
@@ -738,7 +740,8 @@ c.SimplexSolver = c.inherit({
           if (c.trace) c.traceprint("pivotable, coeff = " + coeff);
           if (coeff < 0) {
             r = -expr.constant / coeff;
-            if (r < minRatio || (c.approx(r, minRatio) && v.hashCode() < exitVar.hashCode())) {
+            if (r < minRatio ||
+                (c.approx(r, minRatio) && v.hashCode < exitVar.hashCode)) {
               minRatio = r;
               exitVar = v;
             }

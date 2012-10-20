@@ -81,8 +81,8 @@ var PerfTest = c.inherit({
     timer.Stop();
 
     for (var m = 0; m < nResolves; m++) {
-      solver.resolvePair(rgpclv[e1Index].value() * 1.001, 
-                         rgpclv[e2Index].value() * 1.001);
+      solver.resolvePair(rgpclv[e1Index].value * 1.001,
+                         rgpclv[e2Index].value * 1.001);
     }
     solver.removeConstraint(edit1);
     solver.removeConstraint(edit2);
@@ -225,8 +225,8 @@ var PerfTest = c.inherit({
     timer.Start();
     rgsolvers.forEach(function(solver) {
       for (var m = 0; m < nResolves; m++) {
-        solver.resolvePair(rgpclv[e1Index].value() * 1.001,
-                           rgpclv[e2Index].value() * 1.001);
+        solver.resolvePair(rgpclv[e1Index].value * 1.001,
+                           rgpclv[e2Index].value * 1.001);
       }
     });
     timer.Stop();
@@ -246,8 +246,8 @@ var PerfTest = c.inherit({
     var s = "\n  ";
     var mspersec = 1000;
     print(s +
-          "number of constraints: \t\t" + nCns + s + 
-          "number of solvers: \t\t\t" + nSolvers + s + 
+          "number of constraints: \t\t" + nCns + s +
+          "number of solvers: \t\t\t" + nSolvers + s +
           "numbers of resolves: \t\t\t" + nResolves + s +
           "tests: \t\t\t\t" + testNum + s +
           "time to add (ms): \t\t\t" + tmAdd * mspersec + s +

@@ -16,7 +16,7 @@
  *     - any attempt at back-compat with broken runtimes.
  *
  * APIs removed, mostly for lack of use in Cassowary:
- *     
+ *
  *     - support for custom hashing and equality functions as keys to ctor
  *     - isEmpty() -> check for !ht.size()
  *     - putAll()
@@ -35,7 +35,7 @@
 "use strict";
 
 var keyCode = function(key) {
-  var kc = (typeof key.hashCode == "function") ? key.hashCode() : key.toString();
+  var kc = (!!key.hashCode) ? key.hashCode : key.toString();
   return kc;
 };
 
@@ -56,7 +56,7 @@ if (false && typeof Map != "undefined") {
       // this.get = this._store.get.bind(this._store);
     },
 
-    set: function(key, value) { 
+    set: function(key, value) {
       this._store.set(key, value);
       if (this._keys.indexOf(key) == -1) {
         this.size++;
@@ -71,13 +71,13 @@ if (false && typeof Map != "undefined") {
 
     get: function(key) {
       return this._store.get(key);
-    }, 
+    },
 
     clear: function() {
       this.size = 0;
       this._store = new Map();
       this._keys = [];
-    }, 
+    },
 
     delete: function(key) {
       // FIXME(slightlyoff):
@@ -150,7 +150,7 @@ if (false && typeof Map != "undefined") {
       this._keyStrMap = {};
     },
 
-    set: function(key, value) { 
+    set: function(key, value) {
       var hash = keyCode(key);
 
       var old = null;
@@ -173,13 +173,13 @@ if (false && typeof Map != "undefined") {
         return this._store[key];
       }
       return null;
-    }, 
+    },
 
     clear: function() {
       this.size = 0;
       this._store = {};
       this._keyStrMap = {};
-    }, 
+    },
 
     delete: function(key) {
       key = keyCode(key);
@@ -240,11 +240,11 @@ if (false && typeof Map != "undefined") {
       if (other === this) {
         return true;
       }
-      
+
       if (!(other instanceof c.HashTable) || other._size !== this._size) {
         return false;
       }
-      
+
       var codes = Object.keys(this._keyStrMap);
       for (var i = 0; i < codes.length; i++) {
         var code = codes[i];
@@ -252,7 +252,7 @@ if (false && typeof Map != "undefined") {
           return false;
         }
       }
-      
+
       return true;
     },
 

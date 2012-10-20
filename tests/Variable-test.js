@@ -24,18 +24,18 @@ doh.add("c.Variable", [
     var o = new c.ObjectiveVariable("obj");
     t.is(o, "[obj:obj]");
   },
-  
+
   function Variable(t) {
     var x = new c.Variable('x', 25);
 
-    t.is(x.value(), 25);
+    t.is(x.value, 25);
     t.is(x, '[x:25]');
     t.t(x.isExternal);
     t.f(x.isDummy);
     t.f(x.isPivotable);
     t.f(x.isRestricted);
   },
-  
+
   function DummyVariable(t) {
     var x = new c.DummyVariable('x');
 
@@ -45,7 +45,7 @@ doh.add("c.Variable", [
     t.f(x.isPivotable);
     t.t(x.isRestricted);
   },
-  
+
   function ObjectiveVariable(t) {
     var x = new c.ObjectiveVariable('x');
 
@@ -55,7 +55,7 @@ doh.add("c.Variable", [
     t.f(x.isPivotable);
     t.f(x.isRestricted);
   },
-  
+
   function SlackVariable(t) {
     var x = new c.SlackVariable('x');
 
@@ -65,7 +65,7 @@ doh.add("c.Variable", [
     t.t(x.isPivotable);
     t.t(x.isRestricted);
   },
-  
+
   function approx(t) {
     t.t(c.approx(25, 25));
     t.f(c.approx(25, 26));

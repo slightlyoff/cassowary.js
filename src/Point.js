@@ -50,11 +50,11 @@ c.Point = c.inherit({
   Y: function() { return this.y; },
 
   Xvalue: function() {
-    return this.x.value();
+    return this.x.value;
   },
 
   Yvalue: function() {
-    return this.y.value();
+    return this.y.value;
   },
 
   toString: function() {

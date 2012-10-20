@@ -15,7 +15,7 @@
  *    });
  *
  *  It does not compute the cascade, parse CSS, or
- *  build a DOM to apply it to. 
+ *  build a DOM to apply it to.
  *
  *
  *  Instead, it relies on an existing browser or
@@ -47,7 +47,7 @@ var neq = function(a1, a2, a3) { return new c.Inequality(a1, a2, a3); };
 var geq = function(a1, a2, str, w) { return new c.Inequality(a1, c.GEQ, a2, str, w); };
 var leq = function(a1, a2, str, w) { return new c.Inequality(a1, c.LEQ, a2, str, w); };
 
-var stay = function(v, strength, weight) { 
+var stay = function(v, strength, weight) {
   return new c.StayConstraint(v, strength || weak, weight || 1.0);
 };
 var weakStay     = function(v, w) { return stay(v, weak, w); };
@@ -105,7 +105,7 @@ var CSSValue = c.inherit({
 //    min-height, min-width
 //    padding-bottom, padding-left, padding-right, padding-top
 //    text-indent
-//  
+//
 //  This means that we effectively only support these styles when written as:
 //
 //    <style>
@@ -115,7 +115,7 @@ var CSSValue = c.inherit({
 //        }
 //    </style>
 //    <div id="thinger" style="width: 500px; height 500px;">...</div>
-//  
+//
 //  See also:
 //      https://developer.mozilla.org/en/DOM/window.getComputedStyle
 //      https://developer.mozilla.org/en/CSS/used_value
@@ -308,7 +308,7 @@ var MeasuredBox = c.inherit({
     return "MeasuredBox: { top: "    + this.top +
                 ", right: "  + this.right +
                 ", bottom: " + this.bottom +
-                ", left: "   + this.left + 
+                ", left: "   + this.left +
                 ", width: "  + this.width +
                 ", height: " + this.height + " }";
   },
@@ -321,10 +321,14 @@ var Box = c.inherit({
     this._right =  cv(right||0);
     this._bottom = cv(bottom||0);
   },
-  get top()    { return this._top.value(); },
-  get left()   { return this._left.value(); },
-  get right()  { return this._right.value(); },
-  get bottom() { return this._bottom.value(); },
+  get top()    {
+    // console.log("top:", this._top.value);
+    return this._top.value; },
+  get left()   { return this._left.value; },
+  get right()  { return this._right.value; },
+  get bottom() {
+    // console.log("bottom:", this._bottom.value);
+    return this._bottom.value; },
   get width()  { return this.right - this.left; },
   get height() { return this.bottom - this.top; },
 
@@ -333,7 +337,7 @@ var Box = c.inherit({
     return "Box: { top: "    + this.top +
                 ", right: "  + this.right +
                 ", bottom: " + this.bottom +
-                ", left: "   + this.left + 
+                ", left: "   + this.left +
                 ", width: "  + this.width +
                 ", height: " + this.height + " }";
   },
@@ -436,7 +440,7 @@ var RenderBox = c.inherit({
       Nodey.call(this, node, this.boxProperties);
     }
     this.containingBlock = containingBlock;
- 
+
     this.vars.mediumWidth = cv("mediumWidth", DEFULT_MEDIUM_WIDTH);
     this.naturalSize = contentSize(node);
     this.solver = this.solver || this.containingBlock.solver;
@@ -472,7 +476,7 @@ var RenderBox = c.inherit({
     "margin-right-width",
     "margin-bottom-width",
     "margin-left-width",
-    // FIXME: 
+    // FIXME:
     //    we shouldn't be falling back to margin-left et al. in RTL. Should be
     //    fliipped in those cases.
     {
@@ -536,7 +540,7 @@ var RenderBox = c.inherit({
     //      Need to generate different rules for %-based values!
 
     // Michalowski '98, Section 3.1
-    
+
     var _mediumWidth = cv("mediumWidth", DEFULT_MEDIUM_WIDTH);
 
     // Content dimensions are padding plus/minus the corresponding padding.
@@ -545,12 +549,12 @@ var RenderBox = c.inherit({
     } else {
       constrain(
         eq(
-          ref.content._top, 
+          ref.content._top,
           c.Plus(ref.padding._top, vals.paddingTop.px),
           required
         ),
         eq(
-          ref.content._left, 
+          ref.content._left,
           c.Plus(ref.padding._left, vals.paddingLeft.px),
           required
         ),
@@ -583,8 +587,9 @@ var RenderBox = c.inherit({
           ref.border._right,
           required
         ),
-        eq(c.Plus(ref.padding._bottom, vals.borderBottomWidth.px),
+        eq(
           ref.border._bottom,
+          c.Plus(ref.padding._bottom, vals.borderBottomWidth.px),
           required
         )
       );
@@ -669,7 +674,8 @@ var RenderBox = c.inherit({
       constrain(eq(vars.width, vals.width.px, strong));
     }
 
-    constrain(eq(vars.height, this.naturalSize.height, weak));
+    // console.log("this.naturalSize.height:", this.naturalSize.height, this.node);
+    // constrain(eq(vars.height, this.naturalSize.height, weak));
 
     if (!vals.height.isAuto) {
       constrain(eq(vars.height, vals.height.px, strong));
@@ -691,9 +697,10 @@ var RenderBox = c.inherit({
       vars.borderRight,
       vars.borderBottom,
       vars.borderLeft
-    ].forEach(function(v) { constrain(eq(v, _mediumWidth, weak)); }); 
+    ].forEach(function(v) { constrain(eq(v, _mediumWidth, weak)); });
 
 
+    /*
     if (vals.position == "relative") {
       // Only do this when they could possibly differ.
       ["margin", "border", "padding", "content"].forEach(function(type) {
@@ -705,9 +712,10 @@ var RenderBox = c.inherit({
         });
       });
     } else {
+    */
       this.edges.actual = this.edges.ref;
       actual = ref;
-    }
+    // }
 
     constrain(
       geq(vars.width, 0, required),
@@ -721,6 +729,7 @@ var RenderBox = c.inherit({
       eq(vars.minHeight, 30, strong)
     );
     */
+
     if (!vals.minWidth.isAuto) {
       constrain(
         geq(vars.width, vars.minWidth, required)
@@ -740,12 +749,19 @@ var RenderBox = c.inherit({
       eq(vars.bottom, 0, weak)
     );
 
+    // Some sanity while I figure out what's going on in Gecko.
+    constrain(
+      geq(ref.content._bottom, ref.content._top, required),
+      geq(ref.content._right, ref.content._left, required)
+    );
+
+
     // FIXME(slightlyoff):
     //  Missing 9.5 items for floated boxes
 
     // Michalowski '98, Section 3.3
     // Normally-positioned Block boxes are handed in flow()
-    
+
     // Michalowski '98, Section 3.4
     // Position-based Constraints
     //
@@ -766,7 +782,7 @@ var RenderBox = c.inherit({
       if (!vals.top.isAuto) {
         var topExpr;
         if (vals.top.isPct) {
-          topExpr = c.Plus(posRefBox.margin._top, 
+          topExpr = c.Plus(posRefBox.margin._top,
                            c.Times(
                              c.Minus(posRefBox.border._bottom, posRefBox.border._top),
                              vals.top.pct/100
@@ -781,7 +797,7 @@ var RenderBox = c.inherit({
       if (!vals.left.isAuto) {
         var leftExpr;
         if (vals.left.isPct) {
-          leftExpr = c.Plus(posRefBox.margin._left, 
+          leftExpr = c.Plus(posRefBox.margin._left,
                             c.Times(
                               c.Minus(posRefBox.border._right, posRefBox.border._left),
                               vals.left.pct/100
@@ -796,7 +812,7 @@ var RenderBox = c.inherit({
       if (!vals.right.isAuto) {
         var rightExpr;
         if (vals.right.isPct) {
-          rightExpr = c.Minus(posRefBox.margin._right, 
+          rightExpr = c.Minus(posRefBox.margin._right,
                               c.Times(
                                 c.Minus(posRefBox.border._right, posRefBox.border._left),
                                 vals.right.pct/100
@@ -811,7 +827,7 @@ var RenderBox = c.inherit({
       if (!vals.bottom.isAuto) {
         var bottomExpr;
         if (vals.bottom.isPct) {
-          bottomExpr = c.Minus(posRefBox.margin._bottom, 
+          bottomExpr = c.Minus(posRefBox.margin._bottom,
                                c.Times(
                                  c.Minus(posRefBox.border._bottom, posRefBox.border._top),
                                  vals.bottom.pct/100
@@ -835,7 +851,7 @@ var RenderBox = c.inherit({
 });
 
 var Block = c.inherit({
-  extends: RenderBox, // TODO: Block, 
+  extends: RenderBox, // TODO: Block,
   _className: "Block",
   debugColor: "rgba(82,125,255,1)",
   // debugColor: "yellow",
@@ -892,7 +908,6 @@ var Block = c.inherit({
     //
 
     if (!this._blocks.length) {
-      console.warn("bailing on flow(), no child blocks!");
       return;
     }
 
@@ -902,11 +917,10 @@ var Block = c.inherit({
     var prev = null;
     var last = null;
 
-    this._blocks.forEach(function(child) {
+    this._blocks.forEach(function(child, idx, arr) {
       // console.log("flowing child: " + child);
 
       if (child.node && !isInFlow(child.node)) {
-        // console.warn("not in flow!: " + child);
         return;
       }
 
@@ -918,14 +932,14 @@ var Block = c.inherit({
             eq(child.edges.ref.outer._left, ref.content._left, required),
             eq(child.edges.ref.outer._right, ref.content._right, required)
           );
-          // console.log(" -- our width is:", this.vars.width.value());
-          // console.log(" -- child width is now:", child.vars.width.value());
+          // console.log(" -- our width is:", this.vars.width.value);
+          // console.log(" -- child width is now:", child.vars.width.value);
           constrain(
             leq(child.vars.width, this.vars.width, required),
             leq(child.vars.height, this.vars.height, required)
           );
-          // console.log(" -- child width is now:", child.vars.width.value());
-          // console.log(" -- our width is now:", this.vars.width.value());
+          // console.log(" -- child width is now:", child.vars.width.value);
+          // console.log(" -- our width is now:", this.vars.width.value);
 
           // Next, top is the previous bottom, else containing's content top;
           if (last) {
@@ -938,7 +952,7 @@ var Block = c.inherit({
               eq(child.edges.ref.margin._top, ref.content._top, strong)
             );
             /*
-            // console.log("initial flow child: " + child, "below:", containing.content._top.value());
+            // console.log("initial flow child: " + child, "below:", containing.content._top.value);
             if (true || this.className == "InlineBlock") {
               // console.log("initial flow child: " + child);
               // console.log(" -- inside:", this+"");
@@ -952,6 +966,15 @@ var Block = c.inherit({
           }
           prev = last;
           last = child;
+
+          /*
+          if (idx+1 == arr.length) {
+            console.log("last child is an:", child._className);
+            constrain(
+              eq(child.edges.ref.outer._bottom, this.edges.ref.content._bottom, strong)
+            );
+          }
+          */
 
           // TODO(slightlyoff): margin collapsing!
           break;
@@ -968,7 +991,7 @@ var Block = c.inherit({
 });
 
 var AnonymousBlock = c.inherit({
-  extends: RenderBox, // TODO: Block, 
+  extends: RenderBox, // TODO: Block,
   _className: "AnonymousBlock",
   debugColor: "rgba(255,84,186,1)", // Bright pink.
   initialize: function(cb){
@@ -1027,13 +1050,13 @@ var AnonymousBlock = c.inherit({
     var constrain = this.solver.add.bind(this.solver);
     var vars = this.vars;
     /*
-    console.log("our top is:", ref.outer._top.value());
-    console.log("our container's top is:", containing.outer._top.value());
+    console.log("our top is:", ref.outer._top.value);
+    console.log("our container's top is:", containing.outer._top.value);
     */
 
     // Create at least one line box, fill it with our inlines until their
     // cumulative widths overflow the block, and then keep going. At the very
-    // end, we set our height to be the height of the 
+    // end, we set our height to be the height of the
     var lb = new LineBox(this);
     lb.below(ref.outer._top);
     var inc = 0;
@@ -1051,8 +1074,9 @@ var AnonymousBlock = c.inherit({
       lb.add(i);
     }, this);
 
-    // console.log("Setting AnonymousBlock bottom to:", lb.edges.ref.outer._bottom.value());
+    // console.log("Setting AnonymousBlock bottom to:", lb.edges.ref.outer._bottom.value);
     constrain(eq(ref.content._bottom, lb.edges.ref.outer._bottom, strong));
+    // console.log("bottom:", ref.content.bottom, "top:", ref.content.top, "height:", ref.content.height);
   },
 });
 
@@ -1086,7 +1110,7 @@ var LineBox = c.inherit({
     // Line-box Constraints
 
     // FIXME(slightlyoff): need to add the float constraints back in!
- 
+
     // Basic block model
     this.solver.add(
       geq(vars.width, 0, required),
@@ -1111,23 +1135,23 @@ var LineBox = c.inherit({
     // Set our left/right to our containing's
     this.solver.add(
       eq(vars.width,  this.containingBlock.vars.width, medium),
-      eq(vars.left,  this.containingBlock.vars.left, medium) // ,
-      // eq(ref.outer._right, containing.content._right, medium)
+      eq(vars.left,  this.containingBlock.vars.left, medium),
+      eq(ref.outer._right, containing.content._right, medium)
     );
-    // console.log("fitting LineBox:", this._id, "in width:", this.containingBlock.vars.width.value(), this+"");
+    console.log("fitting LineBox:", this._id, "in width:", this.containingBlock.vars.width.value, this+"", this.containingBlock.containingBlock.naturalSize+"");
   },
   below: function(edge) {
-    // console.log("my top:", this.edges.actual.outer._top.value());
-    // console.log("container new top edge:", edge.value());
+    // console.log("my top:", this.edges.actual.outer._top.value);
+    // console.log("container new top edge:", edge.value);
     this.solver.add(
       eq(this.edges.actual.outer._top, edge, strong)
     );
-    // console.log("my new top:", this.edges.actual.outer._top.value());
+    // console.log("my new top:", this.edges.actual.outer._top.value);
   },
   canAccept: function(inline) {
     var cb = this.containingBlock;
     var io = inline.edges.ref.outer;
-    var outerWidth = cb.vars.width.value();
+    var outerWidth = cb.vars.width.value;
     return (io.width + this.accumulatedWidth <= outerWidth);
   },
   add: function(inline) {
@@ -1137,7 +1161,7 @@ var LineBox = c.inherit({
         c.Plus(this.edges.ref.outer._left, this.accumulatedWidth),
          strong
       ),
-      eq(inline.edges.ref.outer._top, 
+      eq(inline.edges.ref.outer._top,
          this.edges.ref.outer._top,
          strong
       )
@@ -1156,7 +1180,7 @@ var LineBox = c.inherit({
 });
 
 var Viewport = c.inherit({
-  extends: Block, // TODO: Block, 
+  extends: Block, // TODO: Block,
   _className: "Viewport", // for toString()
   debugColor: "rgba(233,250,124,1)",
   initialize: function(width, height, node){
@@ -1175,6 +1199,7 @@ var Viewport = c.inherit({
     var ref = this.edges.ref;
     var constrain = this.solver.add.bind(this.solver);
 
+    /*
     constrain(
       eq(this.vars.width, w, required),
       eq(this.vars.height, h, required),
@@ -1183,15 +1208,15 @@ var Viewport = c.inherit({
       eq(this.vars.right, w, required),
       eq(this.vars.bottom, h, required)
     );
+    */
 
-    ["margin", "border", "padding", "content"].forEach(function(type) {
-      constrain(
-        eq(ref[type]._left, 0, required),
-        eq(ref[type]._top, 0, required),
-        eq(ref[type]._right, w, required),
-        eq(ref[type]._bottom, h, required)
-      );
-    }, this);
+    constrain(
+      eq(ref.outer._left, 0,   required),
+      eq(ref.outer._top, 0,    required),
+      eq(ref.outer._right, w,  required),
+      eq(ref.outer._bottom, h, required)
+    );
+    ref.border = ref.padding = ref.content = ref.margin = ref.outer;
   },
 });
 
@@ -1230,6 +1255,7 @@ var TextBox = c.inherit({
     Nodey.call(this, node, this.boxProperties);
     this.containingBlock = cb;
     this.naturalSize = textSize(node, cs);
+    // console.log(this.naturalSize);
     this.solver = this.solver || this.containingBlock.solver;
 
     this._isInline = true;
@@ -1243,9 +1269,9 @@ var TextBox = c.inherit({
     "font-size", "font-family", "line-height", "color"
   ],
   toString: function() {
-    return RenderBox.prototype.toString.call(this) + 
-      " { width: " + this.vars.width.value() +
-       ", height: " + this.vars.height.value() +
+    return RenderBox.prototype.toString.call(this) +
+      " { width: " + this.vars.width.value +
+       ", height: " + this.vars.height.value +
       " } text: \"" + this.text + "\"";
   },
   generate: function() {
@@ -1316,6 +1342,9 @@ var getMeasureNode = function(doc) {
   var mn = doc.createElement("div");
   mn.style.display = "inline-block";
   mn.style.position = "absolute";
+
+  mn.style.width = "5000px";
+  mn.style.height= "5000px";
   mn.style.left = "-5000px";
   mn.style.top = "-5000px";
   mn.style.visibility = "hidden";
@@ -1353,10 +1382,12 @@ var contentSize = function(node) {
   var c = node.cloneNode(true);
   if (c.nodeType == 1) {
     c.style.width = "auto";
+    c.style.left = "0px";
+    c.style.top = "0px";
     c.style.height = "auto";
   }
   m.appendChild(c);
-  var mb = new MeasuredBox(0, 0, m.scrollWidth, m.scrollHeight);
+  var mb = new MeasuredBox(0, 0, c.scrollWidth, c.scrollHeight);
   return mb;
 };
 
@@ -1477,7 +1508,7 @@ var _layoutFor = function(id, boxesCallback) {
     } else {
       // We're a text node, so create text blocks for the constituent words and
       // add them to our container's inlines list.
- 
+
       //  Could *really* do with access to these right about now:
       //   http://msdn.microsoft.com/en-us/library/windows/desktop/dd319118(v=vs.85).aspx
       //   http://developer.apple.com/library/mac/#documentation/Carbon/Reference/CTLineRef/Reference/reference.html
@@ -1519,7 +1550,7 @@ var _layoutFor = function(id, boxesCallback) {
       var re = /[\s\t]+/g;
       var b;
 
-      while ((match = re.exec(nv)) != null)  {  
+      while ((match = re.exec(nv)) != null)  {
         tail = head.splitText(re.lastIndex - lastSplit);
         lastSplit = re.lastIndex;
         b = new TextBox(head, cb, cs);
@@ -1550,12 +1581,12 @@ var _layoutFor = function(id, boxesCallback) {
   //    other block children.
 
   // Generate our generic box constraints.
-  console.time("generate initial constraints");
+  console.time("add initial constraints");
   boxes.forEach(function(box) { box.generate(); });
-  console.timeEnd("generate initial constraints");
-  console.time("solve initial constraints");
+  console.timeEnd("add initial constraints");
+  console.time("resolve initial constraints");
   solver.resolve();
-  console.timeEnd("solve initial constraints");
+  console.timeEnd("resolve initial constraints");
 
   // Genereate constraints to flow all normally-positioned block boxes.
   console.time("flow blocks");
@@ -1563,9 +1594,9 @@ var _layoutFor = function(id, boxesCallback) {
     block.flow();
   });
   console.timeEnd("flow blocks");
-  console.time("solve heights");
+  console.time("resolve heights");
   solver.resolve();
-  console.timeEnd("solve heights");
+  console.timeEnd("resolve heights");
 
   // Text layout pass. Once our widths have all been determined, we place each
   // text segment and do wrapping. Once we've
@@ -1586,9 +1617,9 @@ var _layoutFor = function(id, boxesCallback) {
   //                    See CSS 2.1 section E.2 for details.
 
   // boxes.forEach(function(box) { console.log(box+""); });
-  // console.log(blocks);
+  // console.log(blocks[0].edges.ref.border);
+  // console.dir(blocks[0].vars);
 
-  // boxesCallback(boxes);
   boxesCallback([v]);
 };
 

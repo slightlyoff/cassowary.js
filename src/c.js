@@ -73,7 +73,7 @@ scope.c = {
 
     var realCtor = ctor || function() { };
 
-    /* 
+    /*
     // NOTE: would happily do this except it's 2x slower. Boo!
     props.__proto__ = parent ? parent.prototype : Object.prototype;
     realCtor.prototype = props;
@@ -166,7 +166,7 @@ scope.c = {
     }
     return e1.plus(e2);
   },
-  
+
   Minus: function(e1, e2) {
     if (!(e1 instanceof c.Expression)) {
       e1 = new c.Expression(e1);
@@ -203,8 +203,8 @@ scope.c = {
   approx: function(a /*double*/, b /*double*/) {
     if (a === b) { return true; }
     var av, bv;
-    av = (a instanceof c.Variable) ? a.value() : a;
-    bv = (b instanceof c.Variable) ? b.value() : b;
+    av = (a instanceof c.Variable) ? a.value : a;
+    bv = (b instanceof c.Variable) ? b.value : b;
     if (av == 0) {
       return (Math.abs(bv) < epsilon);
     }

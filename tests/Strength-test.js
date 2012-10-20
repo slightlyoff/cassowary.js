@@ -29,7 +29,7 @@ doh.add("c.Strength", [
     // z = x (weak)
     // z = y (strong)
     // z == 20
- 
+
     var x = new c.Variable("x");
     var y = new c.Variable("y");
     var z = new c.Variable("z");
@@ -45,9 +45,9 @@ doh.add("c.Strength", [
     s.suggestValue(x, 10)
      .suggestValue(y, 20).resolve();
     s.endEdit();
-    t.t(c.approx(x.value(), 10.0));
-    t.t(c.approx(y.value(), 20.0));
-    t.t(c.approx(z.value(), 20.0));
+    t.t(c.approx(x.value, 10.0));
+    t.t(c.approx(y.value, 20.0));
+    t.t(c.approx(z.value, 20.0));
   },
 
   function stayEachTime(t) {
@@ -69,9 +69,9 @@ doh.add("c.Strength", [
      .suggestValue(y, 20).resolve();
     s.endEdit();
 
-    t.t(c.approx(x.value(), 10.0));
-    t.t(c.approx(y.value(), 20.0));
-    t.t(c.approx(z.value(), 20.0));
+    t.t(c.approx(x.value, 10.0));
+    t.t(c.approx(y.value, 20.0));
+    t.t(c.approx(z.value, 20.0));
 
     s.addEditVar(x)
      .addEditVar(y).beginEdit();
@@ -80,9 +80,9 @@ doh.add("c.Strength", [
      .suggestValue(y, 50).resolve();
     s.endEdit();
 
-    t.t(c.approx(x.value(), 30.0));
-    t.t(c.approx(y.value(), 50.0));
-    t.t(c.approx(z.value(), 50.0));
+    t.t(c.approx(x.value, 30.0));
+    t.t(c.approx(y.value, 50.0));
+    t.t(c.approx(z.value, 50.0));
 
   },
 

@@ -17,10 +17,8 @@ c.AbstractConstraint = c.inherit({
   isEditConstraint: false,
   isInequality:     false,
   isStayConstraint: false,
-  hashCode: function() { return this.hash_code; },
-  get required() {
-    return (this.strength === c.Strength.required);
-  },
+  get hashCode() { return this.hash_code; },
+  get required() { return (this.strength === c.Strength.required); },
 
   toString: function() {
     // this is abstract -- it intentionally leaves the parens unbalanced for
@@ -34,7 +32,7 @@ var ts = c.AbstractConstraint.prototype.toString;
 var EditOrStayCtor = function(cv /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
   c.AbstractConstraint.call(this, strength || c.Strength.strong, weight);
   this.variable = cv;
-  this.expression = new c.Expression(cv, -1, cv.value());
+  this.expression = new c.Expression(cv, -1, cv.value);
 };
 
 c.EditConstraint = c.inherit({
@@ -51,10 +49,10 @@ c.StayConstraint = c.inherit({
   toString: function() { return "stay:" + ts.call(this); },
 });
 
-var lc = 
+var lc =
 c.Constraint = c.inherit({
   extends: c.AbstractConstraint,
-  initialize: function(cle /*c.Expression*/, 
+  initialize: function(cle /*c.Expression*/,
                        strength /*c.Strength*/,
                        weight /*double*/) {
     c.AbstractConstraint.call(this, strength, weight);
@@ -64,12 +62,12 @@ c.Constraint = c.inherit({
 
 c.Inequality = c.inherit({
   extends: c.Constraint,
-  
+
   _cloneOrNewCle: function(cle) {
     // FIXME(D4): move somewhere else?
     if (cle.clone)  {
       return cle.clone();
-    } else { 
+    } else {
       return new c.Expression(cle);
     }
   },
@@ -77,16 +75,16 @@ c.Inequality = c.inherit({
   initialize: function(a1, a2, a3, a4, a5) {
     // FIXME(slightlyoff): what a disgusting mess. Should at least add docs.
     // console.log("c.Inequality.initialize(", a1, a2, a3, a4, a5, ")");
- 
+
     var a1IsExp = a1 instanceof c.Expression,
         a3IsExp = a3 instanceof c.Expression,
         a1IsVar = a1 instanceof c.AbstractVariable,
         a3IsVar = a3 instanceof c.AbstractVariable,
         a1IsNum = typeof(a1) == 'number',
         a3IsNum = typeof(a3) == 'number';
-    
+
     // (cle || number), op, cv
-    if ((a1IsExp || a1IsNum) && a3IsVar) {      
+    if ((a1IsExp || a1IsNum) && a3IsVar) {
       var cle = a1, op = a2, cv = a3, strength = a4, weight = a5;
       lc.call(this, this._cloneOrNewCle(cle), strength, weight);
       if (op == c.LEQ) {
@@ -96,9 +94,9 @@ c.Inequality = c.inherit({
         this.expression.addVariable(cv, -1);
       } else {
         throw new c.InternalError("Invalid operator in c.Inequality constructor");
-      }    
+      }
     // cv, op, (cle || number)
-    } else if (a1IsVar && (a3IsExp || a3IsNum)) {      
+    } else if (a1IsVar && (a3IsExp || a3IsNum)) {
       var cle = a3, op = a2, cv = a1, strength = a4, weight = a5;
       lc.call(this, this._cloneOrNewCle(cle), strength, weight);
       if (op == c.GEQ) {
@@ -108,7 +106,7 @@ c.Inequality = c.inherit({
         this.expression.addVariable(cv, -1);
       } else {
         throw new c.InternalError("Invalid operator in c.Inequality constructor");
-      }    
+      }
     // cle, op, num
     } else if (a1IsExp && a3IsNum) {
       var cle1 = a1, op = a2, cle2 = a3, strength = a4, weight = a5;
@@ -121,11 +119,11 @@ c.Inequality = c.inherit({
       } else {
         throw new c.InternalError("Invalid operator in c.Inequality constructor");
       }
-      return this      
+      return this
     // num, op, cle
     } else if (a1IsNum && a3IsExp) {
-      var cle1 = a3, op = a2, cle2 = a1, strength = a4, weight = a5; 
-      lc.call(this, this._cloneOrNewCle(cle1), strength, weight);      
+      var cle1 = a3, op = a2, cle2 = a1, strength = a4, weight = a5;
+      lc.call(this, this._cloneOrNewCle(cle1), strength, weight);
       if (op == c.GEQ) {
         this.expression.multiplyMe(-1);
         this.expression.addExpression(this._cloneOrNewCle(cle2));
@@ -134,7 +132,7 @@ c.Inequality = c.inherit({
       } else {
         throw new c.InternalError("Invalid operator in c.Inequality constructor");
       }
-      return this     
+      return this
     // cle op cle
     } else if (a1IsExp && a3IsExp) {
       var cle1 = a1, op = a2, cle2 = a3, strength = a4, weight = a5;
@@ -146,10 +144,10 @@ c.Inequality = c.inherit({
         this.expression.addExpression(this._cloneOrNewCle(cle1), -1);
       } else {
         throw new c.InternalError("Invalid operator in c.Inequality constructor");
-      }       
+      }
     // cle
     } else if (a1IsExp) {
-      return lc.call(this, a1, a2, a3);    
+      return lc.call(this, a1, a2, a3);
     // >=
     } else if (a2 == c.GEQ) {
       lc.call(this, new c.Expression(a3), a4, a5);
@@ -168,7 +166,7 @@ c.Inequality = c.inherit({
   isInequality: true,
 
   toString: function() {
-    // return "c.Inequality: " + this.hashCode();
+    // return "c.Inequality: " + this.hashCode;
     return lc.prototype.toString.call(this) + " >= 0 ) id: " + this.hash_code;
   },
 });
