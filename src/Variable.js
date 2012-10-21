@@ -17,7 +17,7 @@ c.AbstractVariable = c.inherit({
   _prefix: "",
 
   toString: function() {
-    return this._prefix + "[" + this._name + ":" + this.value + "]";
+    return this._prefix + "[" + this.name + ":" + this.value + "]";
   },
 });
 
@@ -25,11 +25,11 @@ c.Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(args) {
     this.value = 0;
-    this._name = "";
+    this.name = "";
     this.hashCode = c._inc();
     if (args) {
       if (typeof args.name != "undefined") {
-        this._name = args.name;
+        this.name = args.name;
       }
       if (typeof args.value != "undefined") {
         this.value = args.value;
@@ -42,16 +42,16 @@ c.Variable = c.inherit({
 c._Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, value) {
-    this._name = "";
+    this.name = "";
     this.value = 0;
     this.hashCode = c._inc();
 
     if (typeof name_or_val == "string") {
       var a1t = typeof name_or_val;
       if (a1t == "string" || a1t != "undefined") {
-        this._name = name_or_val || "v" + this.hashCode;
+        this.name = name_or_val || "v" + this.hashCode;
       } else {
-        this._name = name_or_val + value;
+        this.name = name_or_val + value;
       }
       this.value = value || 0;
     } else {
@@ -61,7 +61,7 @@ c._Variable = c.inherit({
     }
     // FIXME: gigantic memory leak?
     var vm = c._Variable._map;
-    if (vm) { vm[this._name] = this; }
+    if (vm) { vm[this.name] = this; }
   },
   isExternal:     true,
 });
@@ -73,7 +73,7 @@ c.DummyVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
     this.hashCode = c._inc();
-    this._name = name_or_val || "v" + this.hashCode;
+    this.name = name_or_val || "v" + this.hashCode;
     this._prefix = (prefix) ? prefix : "";
   },
   isDummy:        true,
@@ -85,7 +85,7 @@ c.ObjectiveVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
     this.hashCode = c._inc();
-    this._name = name_or_val || "v" + this.hashCode;
+    this.name = name_or_val || "v" + this.hashCode;
     this._prefix = (prefix) ? prefix : "";
   },
   value:         "obj",
@@ -95,7 +95,7 @@ c.SlackVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
     this.hashCode = c._inc();
-    this._name = name_or_val || "v" + this.hashCode;
+    this.name = name_or_val || "v" + this.hashCode;
     this._prefix = (prefix) ? prefix : "";
   },
   isPivotable:    true,
