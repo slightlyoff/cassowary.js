@@ -7,7 +7,6 @@
 (function(c) {
 "use strict";
 
-var av =
 c.AbstractVariable = c.inherit({
   isDummy:      false,
   isExternal:   false,
