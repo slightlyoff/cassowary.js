@@ -53,7 +53,6 @@ c.Variable = c.inherit({
     if (vm) { vm[this._name] = this; }
   },
   isExternal:     true,
-
   get value() { return this._value; },
 });
 
