@@ -699,8 +699,8 @@ scope.RootPanel = c.inherit({
 
     Panel.ctor.call(this);
 
-    var iw = new c.Variable("window_innerWidth");
-    var ih = new c.Variable("window_innerHeight");
+    var iw = new c._Variable("window_innerWidth");
+    var ih = new c._Variable("window_innerHeight");
 
     var s = document.solver;
 

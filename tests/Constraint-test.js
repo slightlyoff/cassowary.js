@@ -14,14 +14,14 @@ doh.add("c.Constraint", [
   },
 
   function expressionFromVars(t) {
-    var x = new c.Variable(167);
-    var y = new c.Variable(2);
+    var x = new c._Variable(167);
+    var y = new c._Variable(2);
     var cly = new c.Expression(y);
     cly.addExpression(x);
   },
 
   function equationFromVarAndExpression(t) {
-    var x = new c.Variable('x', 167);
+    var x = new c._Variable('x', 167);
     var cly = new c.Expression(2);
     var eq = new c.Equation(x, cly);
     t.t(eq.expression.equals(cly.minus(x)));
@@ -29,10 +29,10 @@ doh.add("c.Constraint", [
 
   function equationStrengthTest(t) {
     var solver = new c.SimplexSolver();
-    var x = new c.Variable("x", 10);
-    var y = new c.Variable("y", 20);
-    var z = new c.Variable("z", 1);
-    var w = new c.Variable("w", 1);
+    var x = new c._Variable("x", 10);
+    var y = new c._Variable("y", 20);
+    var z = new c._Variable("z", 1);
+    var w = new c._Variable("w", 1);
 
     // Default weights.
     var e0 = new c.Equation(x, y);
@@ -58,14 +58,14 @@ doh.add("c.Constraint", [
   },
 
   function equation_variable_number(t) {
-    var v = new c.Variable('v', 22);
+    var v = new c._Variable('v', 22);
     var eq = new c.Equation(v, 5);
     t.t(eq.expression.equals(c.Minus(5, v)));
   },
 
   function equation_expression_variable(t) {
     var e = new c.Expression(10);
-    var v = new c.Variable('v', 22);
+    var v = new c._Variable('v', 22);
     var eq = new c.Equation(e, v);
 
     t.t(eq.expression.equals(c.Minus(10, v)));
@@ -73,7 +73,7 @@ doh.add("c.Constraint", [
 
   function equation_expression_x2(t) {
     var e1 = new c.Expression(10);
-    var e2 = new c.Expression(new c.Variable('z', 10), 2, 4);
+    var e2 = new c.Expression(new c._Variable('z', 10), 2, 4);
     var eq = new c.Equation(e1, e2);
 
     t.t(eq.expression.equals(e1.minus(e2)));
@@ -87,8 +87,8 @@ doh.add("c.Constraint", [
   },
 
   function inequality_var_op_var(t) {
-    var v1 = new c.Variable('v1', 10);
-    var v2 = new c.Variable('v2', 5);
+    var v1 = new c._Variable('v1', 10);
+    var v2 = new c._Variable('v2', 5);
     var ieq = new c.Inequality(v1, c.GEQ, v2);
 
     t.t(ieq.expression.equals(c.Minus(v1, v2)));
@@ -98,7 +98,7 @@ doh.add("c.Constraint", [
   },
 
   function inequality_var_op_num(t) {
-    var v = new c.Variable('v', 10);
+    var v = new c._Variable('v', 10);
     var ieq = new c.Inequality(v, c.GEQ, 5);
 
     t.t(ieq.expression.equals(c.Minus(v, 5)));
@@ -109,7 +109,7 @@ doh.add("c.Constraint", [
 
   function inequality_expression_x2(t) {
     var e1 = new c.Expression(10);
-    var e2 = new c.Expression(new c.Variable('c', 10), 2, 4);
+    var e2 = new c.Expression(new c._Variable('c', 10), 2, 4);
     var ieq = new c.Inequality(e1, c.GEQ, e2);
 
     t.t(ieq.expression.equals(e1.minus(e2)));
@@ -119,8 +119,8 @@ doh.add("c.Constraint", [
   },
 
   function inequality_var_op_exp(t) {
-    var v = new c.Variable('v', 10);
-    var e = new c.Expression(new c.Variable('x', 5), 2, 4);
+    var v = new c._Variable('v', 10);
+    var e = new c.Expression(new c._Variable('x', 5), 2, 4);
     var ieq = new c.Inequality(v, c.GEQ, e);
 
     t.t(ieq.expression.equals(c.Minus(v, e)));
@@ -130,8 +130,8 @@ doh.add("c.Constraint", [
   },
 
   function inequality_exp_op_var(t) {
-    var v = new c.Variable('v', 10);
-    var e = new c.Expression(new c.Variable('x', 5), 2, 4);
+    var v = new c._Variable('v', 10);
+    var e = new c.Expression(new c._Variable('x', 5), 2, 4);
     var ieq = new c.Inequality(e, c.GEQ, v);
 
     t.t(ieq.expression.equals(e.minus(v)));

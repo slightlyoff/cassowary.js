@@ -16,14 +16,14 @@ c.Tableau = c.inherit({
     this._externalParametricVars = new c.HashSet();
   },
 
-  noteRemovedVariable: function(v /*ClAbstractVariable*/, subject /*ClAbstractVariable*/) {
+  noteRemovedVariable: function(v /*c.AbstractVariable*/, subject /*c.AbstractVariable*/) {
     if (c.verbose) c.fnenterprint("noteRemovedVariable: " + v + ", " + subject);
     if (subject != null) {
       this.columns.get(v).delete(subject);
     }
   },
 
-  noteAddedVariable: function(v /*ClAbstractVariable*/, subject /*ClAbstractVariable*/) {
+  noteAddedVariable: function(v /*c.AbstractVariable*/, subject /*c.AbstractVariable*/) {
     if (c.verbose) c.fnenterprint("noteAddedVariable: " + v + ", " + subject);
     if (subject) {
       this.insertColVar(v, subject);
@@ -74,7 +74,7 @@ c.Tableau = c.inherit({
     rowset.add(rowvar);
   },
 
-  addRow: function(aVar /*ClAbstractVariable*/, expr /*c.Expression*/) {
+  addRow: function(aVar /*c.AbstractVariable*/, expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
     this.rows.set(aVar, expr);
     expr.terms.each(function(clv, coeff) {
@@ -89,7 +89,7 @@ c.Tableau = c.inherit({
     if (c.trace) c.traceprint(this.toString());
   },
 
-  removeColumn: function(aVar /*ClAbstractVariable*/) {
+  removeColumn: function(aVar /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("removeColumn:" + aVar);
     var rows = /* Set */ this.columns.get(aVar);
     if (rows) {
@@ -107,7 +107,7 @@ c.Tableau = c.inherit({
     }
   },
 
-  removeRow: function(aVar /*ClAbstractVariable*/) {
+  removeRow: function(aVar /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("removeRow:" + aVar);
     var expr = /* c.Expression */this.rows.get(aVar);
     c.Assert(expr != null);
@@ -127,7 +127,7 @@ c.Tableau = c.inherit({
     return expr;
   },
 
-  substituteOut: function(oldVar /*ClAbstractVariable*/, expr /*c.Expression*/) {
+  substituteOut: function(oldVar /*c.AbstractVariable*/, expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
     if (c.trace) c.traceprint(this.toString());
 
@@ -148,7 +148,7 @@ c.Tableau = c.inherit({
     this.columns.delete(oldVar);
   },
 
-  columnsHasKey: function(subject /*ClAbstractVariable*/) {
+  columnsHasKey: function(subject /*c.AbstractVariable*/) {
     return (this.columns.get(subject) != null);
   },
 });

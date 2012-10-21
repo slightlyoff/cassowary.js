@@ -37,7 +37,7 @@ c.Expression = c.inherit({
     this.terms = terms.clone();
     return this;
   },
-  
+
   multiplyMe: function(x /*double*/) {
     this.constant *= x;
     var t = this.terms;
@@ -74,7 +74,7 @@ c.Expression = c.inherit({
   plus: function(expr /*c.Expression*/) {
     if (expr instanceof c.Expression) {
       return this.clone().addExpression(expr, 1);
-    } else if (expr instanceof c.Variable) {
+    } else if (expr instanceof c._Variable) {
       return this.clone().addVariable(expr, 1);
     }
   },
@@ -82,7 +82,7 @@ c.Expression = c.inherit({
   minus: function(expr /*c.Expression*/) {
     if (expr instanceof c.Expression) {
       return this.clone().addExpression(expr, -1);
-    } else if (expr instanceof c.Variable) {
+    } else if (expr instanceof c._Variable) {
       return this.clone().addVariable(expr, -1);
     }
   },
@@ -122,7 +122,7 @@ c.Expression = c.inherit({
     if (cd == null) {
       cd = 1;
     }
-    
+
     if (c.trace) c.fnenterprint("CLE: addVariable:" + v + ", " + cd);
     var coeff = this.terms.get(v);
     if (coeff) {
@@ -154,19 +154,19 @@ c.Expression = c.inherit({
   anyPivotableVariable: function() {
     if (this.isConstant()) {
       throw new c.InternalError("anyPivotableVariable called on a constant");
-    } 
-    
+    }
+
     var rv = this.terms.escapingEach(function(clv, c) {
       if (clv.isPivotable) return { retval: clv };
     });
-    
+
     if (rv && rv.retval !== undefined) {
       return rv.retval;
     }
-    
+
     return null;
   },
-  
+
   substituteOut: function(outvar  /*c.AbstractVariable*/,
                           expr    /*c.Expression*/,
                           subject /*c.AbstractVariable*/,
@@ -208,7 +208,7 @@ c.Expression = c.inherit({
 
   newSubject: function(subject /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("newSubject:" + subject);
-    
+
     var reciprocal = 1 / this.terms.get(subject);
     this.terms.delete(subject);
     this.multiplyMe(-reciprocal);
@@ -233,7 +233,7 @@ c.Expression = c.inherit({
       } else {
         needsplus = true;
       }
-    } 
+    }
     this.terms.each( function(clv, coeff) {
       if (needsplus) {
         bstr += " + ";
@@ -243,14 +243,14 @@ c.Expression = c.inherit({
     });
     return bstr;
   },
-  
+
   equals: function(other) {
     if (other === this) {
       return true;
     }
-    
-    return other instanceof c.Expression && 
-           other.constant === this.constant && 
+
+    return other instanceof c.Expression &&
+           other.constant === this.constant &&
            other.terms.equals(this.terms);
   },
 

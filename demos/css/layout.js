@@ -59,7 +59,7 @@ var plus  = function(a1, a2) { return c.Plus(a1, a2); };
 var minus = function(a1, a2) { return c.Minus(a1, a2); };
 var times = function(a1, a2) { return c.Times(a1, a2); };
 var div   = function(a1, a2) { return c.Divide(a1, a2); };
-var cv    = function(n, val) { return new c.Variable(n, val); };
+var cv    = function(n, val) { return new c._Variable(n, val); };
 
 var CSSValue = c.inherit({
   initialize: function(value, name) {

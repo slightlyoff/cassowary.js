@@ -19,7 +19,7 @@ var PerfTest = c.inherit({
     solver.autoSolve = false;
     var rgpclv = [];
     for (var i = 0; i < nVars; i++) {
-      rgpclv[i] = new c.Variable(i, "x");
+      rgpclv[i] = new c._Variable(i, "x");
       solver.addStay(rgpclv[i]);
     }
     var nCnsMade = nCns * 2;
@@ -136,7 +136,7 @@ var PerfTest = c.inherit({
     }
     var rgpclv = new Array(nVars+1);
     for (var i = 0; i < nVars + 1; ++i) {
-      rgpclv[i] = new c.Variable(i, "x");
+      rgpclv[i] = new c._Variable(i, "x");
       for (var is = 0; is < nSolvers + 1; ++is) {
         rgsolvers[is].addStay(rgpclv[i]);
       }
@@ -271,7 +271,6 @@ var PerfTest = c.inherit({
     if (false) {
       fResult = this.addDel(cns, cns, resolves);
       if (!fResult) print("Failed!");
-      if (c.GC) print("Num vars = " + ClAbstractVariable.numCreated());
     }
     this.addDelSolvers(cns, resolves, solvers, testNum);
   },

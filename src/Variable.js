@@ -36,7 +36,7 @@ c.AbstractVariable = c.inherit({
   },
 });
 
-c.Variable = c.inherit({
+c._Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, value) {
     if (typeof name_or_val == "string") {
@@ -49,7 +49,7 @@ c.Variable = c.inherit({
       }
     }
     // FIXME: gigantic memory leak?
-    var vm = c.Variable._map;
+    var vm = c._Variable._map;
     if (vm) { vm[this._name] = this; }
   },
   isExternal:     true,

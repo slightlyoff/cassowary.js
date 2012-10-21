@@ -179,10 +179,10 @@ scope.c = {
   },
 
   Times: function(e1, e2) {
-    if (typeof e1 == "number" || e1 instanceof c.Variable) {
+    if (typeof e1 == "number" || e1 instanceof c._Variable) {
       e1 = new c.Expression(e1);
     }
-    if (typeof e2 == "number" || e2 instanceof c.Variable) {
+    if (typeof e2 == "number" || e2 instanceof c._Variable) {
       e2 = new c.Expression(e2);
     }
 
@@ -190,10 +190,10 @@ scope.c = {
   },
 
   Divide: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
-    if (typeof e1 == "number" || e1 instanceof c.Variable) {
+    if (typeof e1 == "number" || e1 instanceof c._Variable) {
       e1 = new c.Expression(e1);
     }
-    if (typeof e2 == "number" || e2 instanceof c.Variable) {
+    if (typeof e2 == "number" || e2 instanceof c._Variable) {
       e2 = new c.Expression(e2);
     }
 
@@ -203,8 +203,8 @@ scope.c = {
   approx: function(a /*double*/, b /*double*/) {
     if (a === b) { return true; }
     var av, bv;
-    av = (a instanceof c.Variable) ? a.value : a;
-    bv = (b instanceof c.Variable) ? b.value : b;
+    av = (a instanceof c._Variable) ? a.value : a;
+    bv = (b instanceof c._Variable) ? b.value : b;
     if (av == 0) {
       return (Math.abs(bv) < epsilon);
     }
