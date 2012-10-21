@@ -24,7 +24,7 @@ c.Strength = c.inherit({
   },
 
   toString: function() {
-    return this.name + (!this.isRequired() ? (":" + this.symbolicWeight) : "");
+    return this.name + (!this.isRequired ? (":" + this.symbolicWeight) : "");
   },
 });
 

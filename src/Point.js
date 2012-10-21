@@ -7,54 +7,44 @@
 (function(c) {
 "use strict";
 
-// FIXME(slightlyoff):
-//      Half of this file could removed with judicious use of getters/setters
-//      if we can get the perf in the right neighborhood.
-
 c.Point = c.inherit({
   initialize: function(x, y, suffix) {
     if (x instanceof c.Variable) {
-      this.x = x;
+      this._x = x;
     } else {
-      if (suffix != null) {
-        this.x = new c.Variable("x"+suffix, x);
+      if (suffix) {
+        this._x = new c.Variable("x"+suffix, x);
       } else {
-        this.x = new c.Variable(x);
+        this._x = new c.Variable(x);
       }
     }
     if (y instanceof c.Variable) {
-      this.y = y;
+      this._y = y;
     } else {
-      if (suffix != null) {
-        this.y = new c.Variable("y"+suffix, y);
+      if (suffix) {
+        this._y = new c.Variable("y"+suffix, y);
       } else {
-        this.y = new c.Variable(y);
+        this._y = new c.Variable(y);
       }
     }
   },
-  SetXY: function(x, y) {
+
+  get x() { return this._x; },
+  set x(x) {
     if (x instanceof c.Variable) {
-      this.x = x;
+      this._x = x;
     } else {
-      this.x._value = x;
+      this._x._value = x;
     }
+  },
+
+  get y() { return this._y; },
+  set y(y) {
     if (y instanceof c.Variable) {
-      this.y = y;
+      this._y = y;
     } else {
-      this.y._value = y;
+      this._y._value = y;
     }
-  },
-
-  X: function() { return this.x; },
-
-  Y: function() { return this.y; },
-
-  Xvalue: function() {
-    return this.x.value;
-  },
-
-  Yvalue: function() {
-    return this.y.value;
   },
 
   toString: function() {

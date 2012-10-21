@@ -174,8 +174,8 @@ c.SimplexSolver = c.inherit({
   addPointStay: function(a1, a2, a3) {
     if (a1 instanceof c.Point) {
       var clp = a1, weight = a2;
-      this.addStay(clp.X(), c.Strength.weak, weight || 1);
-      this.addStay(clp.Y(), c.Strength.weak, weight || 1);
+      this.addStay(clp.x, c.Strength.weak, weight || 1);
+      this.addStay(clp.y, c.Strength.weak, weight || 1);
     } else { //
       var vx = a1, vy = a2, weight = a3;
       this.addStay(vx, c.Strength.weak, weight || 1);

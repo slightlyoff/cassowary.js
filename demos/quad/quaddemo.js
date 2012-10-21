@@ -4,62 +4,39 @@
 //
 // Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
 
-DraggableBox = c.inherit({
+var DraggableBox = c.inherit({
 
   initialize: function(x, y, w, h) {
     this.width = w || 15;
     this.height = h || 15;
     if (y == null ) {
-      this.center = new c.Point(0, 0, x);
+      this._center = new c.Point(0, 0, x);
     } else {
-      this.center = new c.Point(x, y);
+      this._center = new c.Point(x, y);
     }
-    this.cvt();
   },
 
-  cvt: function() {
-    this.sx = Math.floor(this.center.Xvalue());
-    this.sy = Math.floor(this.center.Yvalue());
+  get center() { return this._center; },
+  set center(v) {
+    this._center.x = v.x;
+    this._center.y = v.y;
   },
+
+  get x() { return this._center.x; },
+  get y() { return this._center.y; },
 
   draw: function(ctx) {
-    this.cvt();
-    ctx.strokeRect(this.sx - (this.width/2), this.sy - (this.height/2), 
+    ctx.strokeRect(this.x.value - (this.width/2),
+                   this.y.value - (this.height/2),
                    this.width, this.height);
   },
 
-  SetCenter: function(x, y) {
-    this.center.SetXY(x, y);
-  },
-
-  SetSize: function(w, h) {
-    this.width = w;
-    this.height = h;
-  }, 
-
-  CenterX: function() {
-    return this.center.Xvalue();
-  },
-
-  CenterY: function() {
-    return this.center.Yvalue();
-  },
-
-  X: function() {
-    return this.center.x;
-  },
-
-  Y: function() {
-    return this.center.y;
-  },
-
-  CenterPt: function() {
-    return this.center;
-  },
-
   Contains: function(x, y) {
-    return ( (x >= this.sx - this.width/2) && (x <= this.sx + this.width/2) &&
-             (y >= this.sy - this.height/2) && (y <= this.sy + this.height/2) );
+    return ( (x >= this.x.value - this.width/2) &&
+             (x <= this.x.value + this.width/2) &&
+             (y >= this.y.value - this.height/2) &&
+             (y <= this.y.value + this.height/2)
+           );
   },
 
   toString: function() {
@@ -74,13 +51,13 @@ var QuadDemo = c.inherit({
     this.cwidth = this.canvas.width;
     this.cheight = this.canvas.height;
     this.g = this.canvas.getContext('2d');
-    
+
     var solver = this.solver = new c.SimplexSolver();
     this.dbDragging = -1;
-    
+
     var db = this.db = new Array(8);   // all of them
     var mp = this.mp = new Array(4);   // midpoints
-    
+
     var a;
 
     for (a = 0; a < 8; ++a) {
@@ -90,99 +67,99 @@ var QuadDemo = c.inherit({
     for (a = 0; a < 4; ++a) {
       mp[a] = db[a+4];
     }
-    
-    db[0].SetCenter(10, 10);
-    db[1].SetCenter(10, 200);
-    db[2].SetCenter(200, 200);
-    db[3].SetCenter(200, 10);
-    
+
+    db[0].center = {x: 10,  y: 10};
+    db[1].center = {x: 10,  y: 200};
+    db[2].center = {x: 200, y: 200};
+    db[3].center = {x: 200, y: 10};
+
     // Add constraints
     //  try {
     // Add stay constraints on line endpoints
-    solver.addPointStays([db[0].CenterPt(),
-                          db[1].CenterPt(),
-                          db[2].CenterPt(),
-                          db[3].CenterPt()]);
-    
+    solver.addPointStays([db[0].center,
+                          db[1].center,
+                          db[2].center,
+                          db[3].center]);
+
     var cle, cleq;
 
     // Add constraints to keep midpoints at line midpoints
-    cle = new c.Expression(db[0].X());
-    cle = (cle.plus(db[1].X())).divide(2);
-    cleq = new c.Equation(mp[0].X(), cle);
+    cle = new c.Expression(db[0].x);
+    cle = (cle.plus(db[1].x)).divide(2);
+    cleq = new c.Equation(mp[0].x, cle);
 
     solver.addConstraint(cleq);
 
-    cle = new c.Expression(db[0].Y());
-    cle = (cle.plus(db[1].Y())).divide(2);
-    cleq = new c.Equation(mp[0].Y(), cle);
-
-    solver.addConstraint(cleq);
-    
-    cle = new c.Expression(db[1].X());
-    cle = (cle.plus(db[2].X())).divide(2);
-    cleq = new c.Equation(mp[1].X(), cle);
-
-    solver.addConstraint(cleq);
-    cle = new c.Expression(db[1].Y());
-    cle = (cle.plus(db[2].Y())).divide(2);
-    cleq = new c.Equation(mp[1].Y(), cle);
-
-    solver.addConstraint(cleq);
-    
-    cle = new c.Expression(db[2].X());
-    cle = (cle.plus(db[3].X())).divide(2);
-    cleq = new c.Equation(mp[2].X(), cle);
+    cle = new c.Expression(db[0].y);
+    cle = (cle.plus(db[1].y)).divide(2);
+    cleq = new c.Equation(mp[0].y, cle);
 
     solver.addConstraint(cleq);
 
-    cle = new c.Expression(db[2].Y());
-    cle = (cle.plus(db[3].Y())).divide(2);
-    cleq = new c.Equation(mp[2].Y(), cle);
+    cle = new c.Expression(db[1].x);
+    cle = (cle.plus(db[2].x)).divide(2);
+    cleq = new c.Equation(mp[1].x, cle);
 
     solver.addConstraint(cleq);
-    
-    cle = new c.Expression(db[3].X());
-    cle = (cle.plus(db[0].X())).divide(2);
-    cleq = new c.Equation(mp[3].X(), cle);
-
-    solver.addConstraint(cleq);
-
-    cle = new c.Expression(db[3].Y());
-    cle = (cle.plus(db[0].Y())).divide(2);
-    cleq = new c.Equation(mp[3].Y(), cle);
+    cle = new c.Expression(db[1].y);
+    cle = (cle.plus(db[2].y)).divide(2);
+    cleq = new c.Equation(mp[1].y, cle);
 
     solver.addConstraint(cleq);
 
-    cle = c.Plus(db[0].X(), 20);
+    cle = new c.Expression(db[2].x);
+    cle = (cle.plus(db[3].x)).divide(2);
+    cleq = new c.Equation(mp[2].x, cle);
 
-    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[2].X()))
-          .addConstraint(new c.Inequality(cle, c.LEQ, db[3].X()));
-    
-    cle = c.Plus(db[1].X(), 20);
+    solver.addConstraint(cleq);
 
-    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[2].X()))
-          .addConstraint(new c.Inequality(cle, c.LEQ, db[3].X()));
+    cle = new c.Expression(db[2].y);
+    cle = (cle.plus(db[3].y)).divide(2);
+    cleq = new c.Equation(mp[2].y, cle);
 
-    cle = c.Plus(db[0].Y(), 20);
+    solver.addConstraint(cleq);
 
-    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[1].Y()))
-          .addConstraint(new c.Inequality(cle, c.LEQ, db[2].Y()));
+    cle = new c.Expression(db[3].x);
+    cle = (cle.plus(db[0].x)).divide(2);
+    cleq = new c.Equation(mp[3].x, cle);
 
-    cle = c.Plus(db[3].Y(), 20);
+    solver.addConstraint(cleq);
 
-    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[1].Y()))
-          .addConstraint(new c.Inequality(cle, c.LEQ, db[2].Y()));
+    cle = new c.Expression(db[3].y);
+    cle = (cle.plus(db[0].y)).divide(2);
+    cleq = new c.Equation(mp[3].y, cle);
+
+    solver.addConstraint(cleq);
+
+    cle = c.Plus(db[0].x, 20);
+
+    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[2].x))
+          .addConstraint(new c.Inequality(cle, c.LEQ, db[3].x));
+
+    cle = c.Plus(db[1].x, 20);
+
+    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[2].x))
+          .addConstraint(new c.Inequality(cle, c.LEQ, db[3].x));
+
+    cle = c.Plus(db[0].y, 20);
+
+    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[1].y))
+          .addConstraint(new c.Inequality(cle, c.LEQ, db[2].y));
+
+    cle = c.Plus(db[3].y, 20);
+
+    solver.addConstraint(new c.Inequality(cle, c.LEQ, db[1].y))
+          .addConstraint(new c.Inequality(cle, c.LEQ, db[2].y));
 
     // Add constraints to keep points inside window
     db.forEach(function(p) {
-      solver.addConstraint(new c.Inequality(p.X(), c.GEQ, 10));
-      solver.addConstraint(new c.Inequality(p.Y(), c.GEQ, 10));
+      solver.addConstraint(new c.Inequality(p.x, c.GEQ, 10));
+      solver.addConstraint(new c.Inequality(p.y, c.GEQ, 10));
 
-      solver.addConstraint(new c.Inequality(p.X(), c.LEQ, this.cwidth - 10));
-      solver.addConstraint(new c.Inequality(p.Y(), c.LEQ, this.cheight - 10));
+      solver.addConstraint(new c.Inequality(p.x, c.LEQ, this.cwidth - 10));
+      solver.addConstraint(new c.Inequality(p.y, c.LEQ, this.cheight - 10));
     }, this);
-    
+
     //  } catch (e) {
     //    print("EXCEPTION: e = " + e);
     //  }
@@ -208,8 +185,8 @@ var QuadDemo = c.inherit({
     if ( this.dbDragging != -1 ) {
       this.draw();
       this.solver
-        .addEditVar(this.db[this.dbDragging].X())
-        .addEditVar(this.db[this.dbDragging].Y())
+        .addEditVar(this.db[this.dbDragging].x)
+        .addEditVar(this.db[this.dbDragging].y)
         .beginEdit();
     }
     return true;
@@ -230,8 +207,8 @@ var QuadDemo = c.inherit({
     var y = ev.pageY - this.canvas.offsetTop;
     if ( this.dbDragging != -1 ) {
       this.solver
-        .suggestValue(this.db[this.dbDragging].X(), x)
-        .suggestValue(this.db[this.dbDragging].Y(), y)
+        .suggestValue(this.db[this.dbDragging].x, x)
+        .suggestValue(this.db[this.dbDragging].y, y)
         .resolve();
       this.draw();
     }
@@ -268,10 +245,10 @@ var QuadDemo = c.inherit({
       document.removeEventListener('mouseup', mouseupHandler);
     }.bind(this);
 
-    this.canvas.addEventListener('mousedown', 
+    this.canvas.addEventListener('mousedown',
       function(ev) {
-       this.mousedown(ev);                                   
-       document.addEventListener('mouseup', mouseupHandler);                                   
+       this.mousedown(ev);
+       document.addEventListener('mouseup', mouseupHandler);
       }.bind(this),
       false
     );
@@ -282,8 +259,8 @@ var QuadDemo = c.inherit({
       this
     );
   },
-  
-  
+
+
   draw: function() {
     var g = this.g;
     var db = this.db;
@@ -293,18 +270,18 @@ var QuadDemo = c.inherit({
     g.strokeStyle = 'black';
 
     g.beginPath();
-    g.moveTo(db[0].CenterX(), db[0].CenterY());
-    g.lineTo(db[1].CenterX(), db[1].CenterY());
-    g.lineTo(db[2].CenterX(), db[2].CenterY());
-    g.lineTo(db[3].CenterX(), db[3].CenterY());
+    g.moveTo(db[0].x.value, db[0].y.value);
+    g.lineTo(db[1].x.value, db[1].y.value);
+    g.lineTo(db[2].x.value, db[2].y.value);
+    g.lineTo(db[3].x.value, db[3].y.value);
     g.closePath();
     g.stroke();
 
     g.beginPath();
-    g.moveTo(mp[0].CenterX(), mp[0].CenterY());
-    g.lineTo(mp[1].CenterX(), mp[1].CenterY());
-    g.lineTo(mp[2].CenterX(), mp[2].CenterY());
-    g.lineTo(mp[3].CenterX(), mp[3].CenterY());
+    g.moveTo(mp[0].x.value, mp[0].y.value);
+    g.lineTo(mp[1].x.value, mp[1].y.value);
+    g.lineTo(mp[2].x.value, mp[2].y.value);
+    g.lineTo(mp[3].x.value, mp[3].y.value);
     g.closePath();
     g.stroke();
 
