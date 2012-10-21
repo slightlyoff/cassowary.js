@@ -9,7 +9,7 @@
 
 c.AbstractConstraint = c.inherit({
   initialize: function(strength /*c.Strength*/, weight /*double*/) {
-    this.hash_code = c._inc();
+    this.hashCode = c._inc();
     this.strength = strength || c.Strength.required;
     this.weight = weight || 1;
   },
@@ -17,7 +17,6 @@ c.AbstractConstraint = c.inherit({
   isEditConstraint: false,
   isInequality:     false,
   isStayConstraint: false,
-  get hashCode() { return this.hash_code; },
   get required() { return (this.strength === c.Strength.required); },
 
   toString: function() {
@@ -167,7 +166,7 @@ c.Inequality = c.inherit({
 
   toString: function() {
     // return "c.Inequality: " + this.hashCode;
-    return lc.prototype.toString.call(this) + " >= 0 ) id: " + this.hash_code;
+    return lc.prototype.toString.call(this) + " >= 0 ) id: " + this.hashCode;
   },
 });
 

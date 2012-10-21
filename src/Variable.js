@@ -9,20 +9,6 @@
 
 var av =
 c.AbstractVariable = c.inherit({
-  initialize: function(a1, a2) {
-    this._name = "";
-    this.hash_code = c._inc();
-
-    var a1t = typeof a1;
-    if (a1t == "string" || a1t != "undefined") {
-      this._name = a1 || "v" + this.hash_code;
-    } else {
-      this._name = a1 + a2;
-    }
-  },
-
-  get hashCode() { return this.hash_code; },
-
   isDummy:      false,
   isExternal:   false,
   isPivotable:  false,
@@ -36,14 +22,39 @@ c.AbstractVariable = c.inherit({
   },
 });
 
+c.Variable = c.inherit({
+  extends: c.AbstractVariable,
+  initialize: function(args) {
+    this._value = 0;
+    /*
+    this._name = "";
+    this.hashCode = c._inc();
+    */
+    if (args) {
+      if (typeof args.name != "undefined") {
+      }
+    }
+  },
+  isExternal:     true,
+  get value() { return this._value; },
+});
+
 c._Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, value) {
+    this._name = "";
+    this._value = 0;
+    this.hashCode = c._inc();
+
     if (typeof name_or_val == "string") {
-      av.call(this, name_or_val);
+      var a1t = typeof name_or_val;
+      if (a1t == "string" || a1t != "undefined") {
+        this._name = name_or_val || "v" + this.hashCode;
+      } else {
+        this._name = name_or_val + value;
+      }
       this._value = value || 0;
     } else {
-      av.call(this);
       if (typeof name_or_val == "number") {
         this._value = name_or_val;
       }
@@ -62,8 +73,9 @@ c._Variable = c.inherit({
 c.DummyVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
-    av.call(this, name_or_val);
-    if (prefix) { this._prefix = prefix; }
+    this.hashCode = c._inc();
+    this._name = name_or_val || "v" + this.hashCode;
+    this._prefix = (prefix) ? prefix : "";
   },
   isDummy:        true,
   isRestricted:   true,
@@ -73,8 +85,9 @@ c.DummyVariable = c.inherit({
 c.ObjectiveVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
-    av.call(this, name_or_val);
-    if (prefix) { this._prefix = prefix; }
+    this.hashCode = c._inc();
+    this._name = name_or_val || "v" + this.hashCode;
+    this._prefix = (prefix) ? prefix : "";
   },
   _value:         "obj",
 });
@@ -82,8 +95,9 @@ c.ObjectiveVariable = c.inherit({
 c.SlackVariable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, prefix) {
-    av.call(this, name_or_val);
-    if (prefix) { this._prefix = prefix; }
+    this.hashCode = c._inc();
+    this._name = name_or_val || "v" + this.hashCode;
+    this._prefix = (prefix) ? prefix : "";
   },
   isPivotable:    true,
   isRestricted:   true,
