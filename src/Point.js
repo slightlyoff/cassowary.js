@@ -34,7 +34,7 @@ c.Point = c.inherit({
     if (x instanceof c._Variable) {
       this._x = x;
     } else {
-      this._x._value = x;
+      this._x.value = x;
     }
   },
 
@@ -43,7 +43,7 @@ c.Point = c.inherit({
     if (y instanceof c._Variable) {
       this._y = y;
     } else {
-      this._y._value = y;
+      this._y.value = y;
     }
   },
 

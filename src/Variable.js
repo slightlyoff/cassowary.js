@@ -14,36 +14,36 @@ c.AbstractVariable = c.inherit({
   isPivotable:  false,
   isRestricted: false,
 
-  _value: "",
   _prefix: "",
 
   toString: function() {
-    return this._prefix + "[" + this._name + ":" + this._value + "]";
+    return this._prefix + "[" + this._name + ":" + this.value + "]";
   },
 });
 
 c.Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(args) {
-    this._value = 0;
-    /*
+    this.value = 0;
     this._name = "";
     this.hashCode = c._inc();
-    */
     if (args) {
       if (typeof args.name != "undefined") {
+        this._name = args.name;
+      }
+      if (typeof args.value != "undefined") {
+        this.value = args.value;
       }
     }
   },
   isExternal:     true,
-  get value() { return this._value; },
 });
 
 c._Variable = c.inherit({
   extends: c.AbstractVariable,
   initialize: function(name_or_val, value) {
     this._name = "";
-    this._value = 0;
+    this.value = 0;
     this.hashCode = c._inc();
 
     if (typeof name_or_val == "string") {
@@ -53,10 +53,10 @@ c._Variable = c.inherit({
       } else {
         this._name = name_or_val + value;
       }
-      this._value = value || 0;
+      this.value = value || 0;
     } else {
       if (typeof name_or_val == "number") {
-        this._value = name_or_val;
+        this.value = name_or_val;
       }
     }
     // FIXME: gigantic memory leak?
@@ -64,7 +64,6 @@ c._Variable = c.inherit({
     if (vm) { vm[this._name] = this; }
   },
   isExternal:     true,
-  get value() { return this._value; },
 });
 
 /* static */
@@ -79,7 +78,7 @@ c.DummyVariable = c.inherit({
   },
   isDummy:        true,
   isRestricted:   true,
-  _value:         "dummy",
+  value:         "dummy",
 });
 
 c.ObjectiveVariable = c.inherit({
@@ -89,7 +88,7 @@ c.ObjectiveVariable = c.inherit({
     this._name = name_or_val || "v" + this.hashCode;
     this._prefix = (prefix) ? prefix : "";
   },
-  _value:         "obj",
+  value:         "obj",
 });
 
 c.SlackVariable = c.inherit({
@@ -101,7 +100,7 @@ c.SlackVariable = c.inherit({
   },
   isPivotable:    true,
   isRestricted:   true,
-  _value:         "slack",
+  value:         "slack",
 });
 
 })(c);

@@ -8,7 +8,7 @@
 "use strict";
 
 c.EditInfo = c.inherit({
-  initialize: function(cn      /*c.Constraint*/, 
+  initialize: function(cn      /*c.Constraint*/,
                        eplus   /*c.SlackVariable*/,
                        eminus  /*c.SlackVariable*/,
                        prevEditConstant /*double*/,

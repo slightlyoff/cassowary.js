@@ -404,7 +404,7 @@ var VarHeavy = function(properties) {
         if (!varv) {
           varv = this.vars[pn] = cv(opn, v);
         } else {
-          varv._value = v;
+          varv.value = v;
         }
       }
     }
@@ -947,7 +947,7 @@ var Block = c.inherit({
               eq(child.edges.ref.outer._top, last.edges.ref.outer._bottom, medium)
             );
           } else {
-            // console.log(" -- setting top to:", ref.content._top._value);
+            // console.log(" -- setting top to:", ref.content._top.value);
             constrain(
               eq(child.edges.ref.margin._top, ref.content._top, strong)
             );

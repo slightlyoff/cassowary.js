@@ -26,19 +26,19 @@
     });
   };
 
-  c.ConstraintNotFound = 
+  c.ConstraintNotFound =
     errorType("c.ConstraintNotFound",
         "Tried to remove a constraint never added to the tableu");
 
-  c.InternalError = 
+  c.InternalError =
     errorType("c.InternalError");
 
-  c.NonExpression = 
+  c.NonExpression =
     errorType("c.NonExpression",
         "The resulting expression would be non");
 
-  c.NotEnoughStays = 
-    errorType("c.NotEnoughStays", 
+  c.NotEnoughStays =
+    errorType("c.NotEnoughStays",
         "There are not enough stays to give specific values to every variable");
 
   c.RequiredFailure =
