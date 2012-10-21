@@ -492,7 +492,7 @@ scope.Panel = c.inherit({
     var v = this.v = {};
 
     this._valueConstraintNames.forEach(function(name) {
-      v[name] = new Var(this.id + "_" + name);
+      v[name] = new Var({ name: this.id + "_" + name });
     }, this);
 
     // Sanity
@@ -699,8 +699,8 @@ scope.RootPanel = c.inherit({
 
     Panel.ctor.call(this);
 
-    var iw = new c._Variable("window_innerWidth");
-    var ih = new c._Variable("window_innerHeight");
+    var iw = new c.Variable({ name: "window_innerWidth" });
+    var ih = new c.Variable({ name: "window_innerHeight" });
 
     var s = document.solver;
 

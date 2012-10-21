@@ -74,7 +74,7 @@ c.Expression = c.inherit({
   plus: function(expr /*c.Expression*/) {
     if (expr instanceof c.Expression) {
       return this.clone().addExpression(expr, 1);
-    } else if (expr instanceof c._Variable) {
+    } else if (expr instanceof c.Variable) {
       return this.clone().addVariable(expr, 1);
     }
   },
@@ -82,7 +82,7 @@ c.Expression = c.inherit({
   minus: function(expr /*c.Expression*/) {
     if (expr instanceof c.Expression) {
       return this.clone().addExpression(expr, -1);
-    } else if (expr instanceof c._Variable) {
+    } else if (expr instanceof c.Variable) {
       return this.clone().addVariable(expr, -1);
     }
   },

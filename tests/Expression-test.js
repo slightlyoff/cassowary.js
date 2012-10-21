@@ -8,7 +8,7 @@
 
 doh.add("c.Expression", [
   function threeVarCtor(t) {
-    var x = new c._Variable("x", 167);
+    var x = new c.Variable({ name: "x", value: 167 });
     var e = new c.Expression(x, 2, 3);
     t.is(e, "3 + 2*[x:167]");
   },
@@ -18,7 +18,7 @@ doh.add("c.Expression", [
   },
 
   function plus(t) {
-    var x = new c._Variable("x", 167);
+    var x = new c.Variable({ name: "x", value: 167 });
     t.is(c.Plus(4,2), "6");
     t.is(c.Plus(x,2), "2 + 1*[x:167]");
     t.is(c.Plus(3,x), "3 + 1*[x:167]");
@@ -26,21 +26,21 @@ doh.add("c.Expression", [
 
   function plus_solve(t) {
     var s = new c.SimplexSolver();
-    var x = new c._Variable("x", 167);
+    var x = new c.Variable({ name: "x", value: 167 });
     t.is(c.Plus(4,2), "6");
     t.is(c.Plus(x,2), "2 + 1*[x:167]");
     t.is(c.Plus(3,x), "3 + 1*[x:167]");
   },
 
   function times(t) {
-    var x = new c._Variable("x", 167);
+    var x = new c.Variable({ name: "x", value: 167 });
     t.is(c.Times(x,3), "3*[x:167]");
     t.is(c.Times(7,x), "7*[x:167]");
   },
 
   function complex(t) {
-    var x = new c._Variable("x", 167);
-    var y = new c._Variable("y", 2);
+    var x = new c.Variable({ name: "x", value: 167 });
+    var y = new c.Variable({ name: "y", value: 2 });
     var ex = c.Plus(4, c.Plus(c.Times(x,3), c.Times(2,y)));
     t.is(ex, "4 + 3*[x:167] + 2*[y:2]");
   },
@@ -58,7 +58,7 @@ doh.add("c.Expression", [
   },
 
   function one_variable(t) {
-    var v = new c._Variable(10);
+    var v = new c.Variable({ value: 10 });
     var exp = new c.Expression(v);
     t.is(0, exp.constant);
     t.is(1, exp.terms.size);
@@ -66,7 +66,7 @@ doh.add("c.Expression", [
   },
 
   function variable_number(t) {
-    var v = new c._Variable(10);
+    var v = new c.Variable({ value: 10 });
     var exp = new c.Expression(v, 20);
     t.is(0, exp.constant);
     t.is(1, exp.terms.size);
@@ -74,7 +74,7 @@ doh.add("c.Expression", [
   },
 
   function variable_number_number(t) {
-    var v = new c._Variable(10);
+    var v = new c.Variable({ value: 10 });
     var exp = new c.Expression(v, 20, 2);
     t.is(2, exp.constant);
     t.is(1, exp.terms.size);
@@ -82,7 +82,7 @@ doh.add("c.Expression", [
   },
 
   function clone(t) {
-    var v = new c._Variable(10);
+    var v = new c.Variable({ value: 10 });
     var exp = new c.Expression(v, 20, 2);
     var clone = exp.clone();
 
@@ -94,7 +94,7 @@ doh.add("c.Expression", [
   function isConstant(t) {
     var e1 = new c.Expression;
     var e2 = new c.Expression(10);
-    var e3 = new c.Expression(new c._Variable(10), 20, 2);
+    var e3 = new c.Expression(new c.Variable({ value: 10 }), 20, 2);
 
     t.is(true, e1.isConstant());
     t.is(true, e2.isConstant());
@@ -102,7 +102,7 @@ doh.add("c.Expression", [
   },
 
   function multiplyMe(t) {
-    var v = new c._Variable(10);
+    var v = new c.Variable({ value: 10 });
     var e = new c.Expression(v, 20, 2).multiplyMe(-1);
 
     t.is(e.constant, -2);
@@ -111,7 +111,7 @@ doh.add("c.Expression", [
   },
 
   function times(t) {
-    var v = new c._Variable(10);
+    var v = new c.Variable({ value: 10 });
     var a = new c.Expression(v, 20, 2);
 
     // times a number
@@ -134,8 +134,8 @@ doh.add("c.Expression", [
   },
 
   function addVariable(t) {
-    var a = new c.Expression(new c._Variable(10), 20, 2);
-    var v = new c._Variable(20);
+    var a = new c.Expression(new c.Variable({ value: 10 }), 20, 2);
+    var v = new c.Variable({ value: 20 });
 
     // implicit coefficient of 1
     a.addVariable(v);
@@ -159,8 +159,8 @@ doh.add("c.Expression", [
   },
 
   function addExpression_variable(t) {
-    var a = new c.Expression(new c._Variable(10), 20, 2);
-    var v = new c._Variable(20);
+    var a = new c.Expression(new c.Variable({ value: 10 }), 20, 2);
+    var v = new c.Variable({ value: 20 });
 
     // should work just like addVariable
     a.addExpression(v, 2);
@@ -169,9 +169,9 @@ doh.add("c.Expression", [
   },
 
   function addExpression(t) {
-    var va = new c._Variable(10);
-    var vb = new c._Variable(20);
-    var vc = new c._Variable(5);
+    var va = new c.Variable({ value: 10 });
+    var vb = new c.Variable({ value: 20 });
+    var vc = new c.Variable({ value: 5 });
     var a = new c.Expression(va, 20, 2);
 
     // different variable and implicit coefficient of 1, should make new term
@@ -195,8 +195,8 @@ doh.add("c.Expression", [
   },
 
   function plus(t) {
-    var va = new c._Variable(10);
-    var vb = new c._Variable(20);
+    var va = new c.Variable({ value: 10 });
+    var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
     var b = new c.Expression(vb, 10, 5);
 
@@ -211,8 +211,8 @@ doh.add("c.Expression", [
   },
 
   function minus(t) {
-    var va = new c._Variable(10);
-    var vb = new c._Variable(20);
+    var va = new c.Variable({ value: 10 });
+    var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
     var b = new c.Expression(vb, 10, 5);
 
@@ -227,8 +227,8 @@ doh.add("c.Expression", [
   },
 
   function divide(t) {
-    var va = new c._Variable(10);
-    var vb = new c._Variable(20);
+    var va = new c.Variable({ value: 10 });
+    var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
 
     t.e(c.NonExpression, a, 'divide', [0]);
@@ -246,8 +246,8 @@ doh.add("c.Expression", [
   },
 
   function coefficientFor(t) {
-    var va = new c._Variable(10);
-    var vb = new c._Variable(20);
+    var va = new c.Variable({ value: 10 });
+    var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
 
     t.is(a.coefficientFor(va), 20);
@@ -255,8 +255,8 @@ doh.add("c.Expression", [
   },
 
   function setVariable(t) {
-    var va = new c._Variable(10);
-    var vb = new c._Variable(20);
+    var va = new c.Variable({ value: 10 });
+    var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
 
     // set existing variable
@@ -273,7 +273,7 @@ doh.add("c.Expression", [
   function anyPivotableVariable(t) {
     t.e(c.InternalError, new c.Expression(10), 'anyPivotableVariable');
 
-    var va = new c._Variable(10);
+    var va = new c.Variable({ value: 10 });
     var vb = new c.SlackVariable;
     var a = new c.Expression(va, 20, 2);
 
@@ -284,8 +284,8 @@ doh.add("c.Expression", [
   },
 
   function substituteOut(t) {
-    var v1 = new c._Variable(20);
-    var v2 = new c._Variable(2);
+    var v1 = new c.Variable({ value: 20 });
+    var v2 = new c.Variable({ value: 2 });
     var a = new c.Expression(v1, 2, 2); // 2*v1 + 2
 
     // new variable
@@ -304,7 +304,7 @@ doh.add("c.Expression", [
   },
 
   function newSubject(t) {
-    var v = new c._Variable(10);
+    var v = new c.Variable({ value: 10 });
     var e = new c.Expression(v, 2, 5);
 
     t.is(e.newSubject(v), 1 / 2);
@@ -314,8 +314,8 @@ doh.add("c.Expression", [
   },
 
   function changeSubject(t) {
-    var va = new c._Variable(10);
-    var vb = new c._Variable(5);
+    var va = new c.Variable({ value: 10 });
+    var vb = new c.Variable({ value: 5 });
     var e = new c.Expression(va, 2, 5);
 
     e.changeSubject(vb, va);
@@ -325,7 +325,7 @@ doh.add("c.Expression", [
   },
 
   function toString(t) {
-    var v = new c._Variable('v', 5);
+    var v = new c.Variable({ name: "v", value: 5 });
 
     t.is(new c.Expression(10).toString(), '10');
     t.is(new c.Expression(v, 0, 10).toString(), '10 + 0*[v:5]');
@@ -333,12 +333,12 @@ doh.add("c.Expression", [
     var e = new c.Expression(v, 2, 10);
     t.is(e.toString(), '10 + 2*[v:5]');
 
-    e.setVariable(new c._Variable('b', 2), 4);
+    e.setVariable(new c.Variable({ name: "b", value: 2 }), 4);
     t.is(e.toString(), '10 + 2*[v:5] + 4*[b:2]');
   },
 
   function equals(t) {
-    var v = new c._Variable('v', 5);
+    var v = new c.Variable({ name: "v", value: 5 });
 
     t.t(new c.Expression(10).equals(new c.Expression(10)));
     t.f(new c.Expression(10).equals(new c.Expression(1)));
@@ -347,8 +347,8 @@ doh.add("c.Expression", [
   },
 
   function Plus(t) {
-    var x = new c._Variable('x', 167);
-    var y = new c._Variable('y', 10);
+    var x = new c.Variable({ name: "x", value: 167 });
+    var y = new c.Variable({ name: "y", value: 10 });
 
     t.is(c.Plus(2, 3), '5');
     t.is(c.Plus(x, 2), '2 + 1*[x:167]');
@@ -357,8 +357,8 @@ doh.add("c.Expression", [
   },
 
   function Minus(t) {
-    var x = new c._Variable('x', 167);
-    var y = new c._Variable('y', 10);
+    var x = new c.Variable({ name: "x", value: 167 });
+    var y = new c.Variable({ name: "y", value: 10 });
 
     t.is(c.Minus(2, 3), '-1');
     t.is(c.Minus(x, 2), '-2 + 1*[x:167]');
@@ -367,8 +367,8 @@ doh.add("c.Expression", [
   },
 
   function Times(t) {
-    var x = new c._Variable('x', 167);
-    var y = new c._Variable('y', 10);
+    var x = new c.Variable({ name: "x", value: 167 });
+    var y = new c.Variable({ name: "y", value: 10 });
 
     t.is(c.Times(2, 3), '6');
     t.is(c.Times(x, 2), '2*[x:167]');
@@ -377,8 +377,8 @@ doh.add("c.Expression", [
   },
 
   function Divide(t) {
-    var x = new c._Variable('x', 167);
-    var y = new c._Variable('y', 10);
+    var x = new c.Variable({ name: "x", value: 167 });
+    var y = new c.Variable({ name: "y", value: 10 });
 
     t.is(c.Divide(4, 2), '2');
     t.is(c.Divide(x, 2), '0.5*[x:167]');

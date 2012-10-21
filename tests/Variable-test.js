@@ -6,13 +6,13 @@
 
 "use strict";
 
-doh.add("c._Variable", [
+doh.add("c.Variable", [
   function ctor(t) {
-    c._Variable._map = [];
+    c.Variable._map = [];
     var x = new c.Variable({name: "x"});
     var y = new c.Variable({name: "y", value: 2});
-    t.is((c._Variable._map)["x"], "[x:0]");
-    t.is((c._Variable._map)["y"], "[y:2]");
+    t.is((c.Variable._map)["x"], "[x:0]");
+    t.is((c.Variable._map)["y"], "[y:2]");
   },
 
   function dummy(t) {
@@ -26,7 +26,7 @@ doh.add("c._Variable", [
   },
 
   function Variable(t) {
-    var x = new c._Variable("x", 25);
+    var x = new c.Variable({ name: "x", value: 25 });
 
     t.is(x.value, 25);
     t.is(x, "[x:25]");
@@ -69,8 +69,8 @@ doh.add("c._Variable", [
   function approx(t) {
     t.t(c.approx(25, 25));
     t.f(c.approx(25, 26));
-    t.t(c.approx(new c._Variable(25), new c._Variable(25)));
-    t.f(c.approx(new c._Variable(25), new c._Variable(26)));
+    t.t(c.approx(new c.Variable({ value: 25 }), new c.Variable({ value: 25 })));
+    t.f(c.approx(new c.Variable({ value: 25 }), new c.Variable({ value: 26 })));
     t.t(c.approx(0, 0.000000001));
     t.f(c.approx(0, 0.00000001));
     t.t(c.approx(0.000000001, 0));

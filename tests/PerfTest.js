@@ -19,7 +19,7 @@ var PerfTest = c.inherit({
     solver.autoSolve = false;
     var rgpclv = [];
     for (var i = 0; i < nVars; i++) {
-      rgpclv[i] = new c._Variable(i, "x");
+      rgpclv[i] = new c.Variable({ name: i, value: "x" });
       solver.addStay(rgpclv[i]);
     }
     var nCnsMade = nCns * 2;
@@ -117,7 +117,10 @@ var PerfTest = c.inherit({
     return Math.floor((this.UniformRandomDiscretized() * (high - low + 1)) + low);
   },
 
-  addDelSolvers: function(nCns /*int*/, nResolves /*int*/, nSolvers /*int*/, testNum /*int*/) {
+  addDelSolvers: function(nCns /*int*/,
+                          nResolves /*int*/,
+                          nSolvers /*int*/,
+                          testNum /*int*/) {
     var totalTimer = new Timer();
     totalTimer.Start();
 
@@ -136,7 +139,7 @@ var PerfTest = c.inherit({
     }
     var rgpclv = new Array(nVars+1);
     for (var i = 0; i < nVars + 1; ++i) {
-      rgpclv[i] = new c._Variable(i, "x");
+      rgpclv[i] = new c.Variable({ name: i, value: "x" });
       for (var is = 0; is < nSolvers + 1; ++is) {
         rgsolvers[is].addStay(rgpclv[i]);
       }

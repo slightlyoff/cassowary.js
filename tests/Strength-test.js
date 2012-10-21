@@ -30,9 +30,9 @@ doh.add("c.Strength", [
     // z = y (strong)
     // z == 20
 
-    var x = new c._Variable("x");
-    var y = new c._Variable("y");
-    var z = new c._Variable("z");
+    var x = new c.Variable({ name: "x" });
+    var y = new c.Variable({ name: "y" });
+    var z = new c.Variable({ name: "z" });
 
     s.addConstraint(new c.Equation(z, x, c.Strength.weak))
      .addConstraint(new c.Equation(z, y, c.Strength.strong));
@@ -53,9 +53,9 @@ doh.add("c.Strength", [
   function stayEachTime(t) {
     var s = new c.SimplexSolver();
 
-    var x = new c._Variable("x");
-    var y = new c._Variable("y");
-    var z = new c._Variable("z");
+    var x = new c.Variable({ name: "x" });
+    var y = new c.Variable({ name: "y" });
+    var z = new c.Variable({ name: "z" });
 
     s.addConstraint(new c.Equation(z, x, c.Strength.weak))
      .addConstraint(new c.Equation(z, y, c.Strength.strong));

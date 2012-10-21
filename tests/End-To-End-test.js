@@ -13,8 +13,8 @@ doh.add("End-To-End", [
   function simple1(t) {
     var solver = new c.SimplexSolver();
 
-    var x = new c._Variable(167);
-    var y = new c._Variable(2);
+    var x = new c.Variable({ value: 167 });
+    var y = new c.Variable({ value: 2 });
     var eq = new c.Equation(x, new c.Expression(y));
 
     solver.addConstraint(eq);
@@ -24,8 +24,8 @@ doh.add("End-To-End", [
   },
 
   function justStay1(t) {
-    var x = new c._Variable(5);
-    var y = new c._Variable(10);
+    var x = new c.Variable({ value: 5 });
+    var y = new c.Variable({ value: 10 });
     var solver = new c.SimplexSolver();
     solver.addStay(x);
     solver.addStay(y);
@@ -41,7 +41,7 @@ doh.add("End-To-End", [
       // x >= 100
       var solver = new c.SimplexSolver();
 
-      var x = new c._Variable(10);
+      var x = new c.Variable({ value: 10 });
       var ieq = new c.Inequality(x, c.GEQ, 100);
       solver.addConstraint(ieq);
       t.is(x.value, 100);
@@ -54,7 +54,7 @@ doh.add("End-To-End", [
       // 100 == var
       var solver = new c.SimplexSolver();
 
-      var x = new c._Variable(10);
+      var x = new c.Variable({ value: 10 });
       var eq = new c.Equation(100, x);
       solver.addConstraint(eq);
       t.is(x.value, 100);
@@ -67,7 +67,7 @@ doh.add("End-To-End", [
       // x >= 100
       var solver = new c.SimplexSolver();
 
-      var x = new c._Variable(10);
+      var x = new c.Variable({ value: 10 });
       var ieq = new c.Inequality(100, c.LEQ, x);
       solver.addConstraint(ieq);
 
@@ -83,9 +83,9 @@ doh.add("End-To-End", [
       var solver = new c.SimplexSolver();
 
       // x = 10
-      var x = new c._Variable(10);
+      var x = new c.Variable({ value: 10 });
       // width = 10
-      var width = new c._Variable(10);
+      var width = new c.Variable({ value: 10 });
       // right = x + width
       var right = new c.Expression(x).plus(width);
       // right >= 100
@@ -105,8 +105,8 @@ doh.add("End-To-End", [
       // 100 <= right
       var solver = new c.SimplexSolver();
 
-      var x = new c._Variable(10);
-      var width = new c._Variable(10);
+      var x = new c.Variable({ value: 10 });
+      var width = new c.Variable({ value: 10 });
       var right = new c.Expression(x).plus(width);
       var ieq = new c.Inequality(100, c.LEQ, right);
 
@@ -125,9 +125,9 @@ doh.add("End-To-End", [
       // right >= rightMin
       var solver = new c.SimplexSolver();
 
-      var x = new c._Variable(10);
-      var width = new c._Variable(10);
-      var rightMin = new c._Variable(100);
+      var x = new c.Variable({ value: 10 });
+      var width = new c.Variable({ value: 10 });
+      var rightMin = new c.Variable({ value: 100 });
       var right = new c.Expression(x).plus(width);
       var eq = new c.Equation(right, rightMin);
 
@@ -147,9 +147,9 @@ doh.add("End-To-End", [
       // right >= rightMin
       var solver = new c.SimplexSolver();
 
-      var x = new c._Variable(10);
-      var width = new c._Variable(10);
-      var rightMin = new c._Variable(100);
+      var x = new c.Variable({ value: 10 });
+      var width = new c.Variable({ value: 10 });
+      var rightMin = new c.Variable({ value: 100 });
       var right = new c.Expression(x).plus(width);
       var ieq = new c.Inequality(right, c.GEQ, rightMin);
 
@@ -169,9 +169,9 @@ doh.add("End-To-End", [
       // right >= rightMin
       var solver = new c.SimplexSolver();
 
-      var x = new c._Variable(10);
-      var width = new c._Variable(10);
-      var rightMin = new c._Variable(100);
+      var x = new c.Variable({ value: 10 });
+      var width = new c.Variable({ value: 10 });
+      var rightMin = new c.Variable({ value: 100 });
       var right = new c.Expression(x).plus(width);
       var ieq = new c.Inequality(rightMin, c.LEQ, right);
       solver.addStay(width)
@@ -190,11 +190,11 @@ doh.add("End-To-End", [
       // right >= rightMin
       var solver = new c.SimplexSolver();
 
-      var x1 = new c._Variable(10);
-      var width1 = new c._Variable(10);
+      var x1 = new c.Variable({ value: 10 });
+      var width1 = new c.Variable({ value: 10 });
       var right1 = new c.Expression(x1).plus(width1);
-      var x2 = new c._Variable(100);
-      var width2 = new c._Variable(10);
+      var x2 = new c.Variable({ value: 100 });
+      var width2 = new c.Variable({ value: 10 });
       var right2 = new c.Expression(x2).plus(width2);
 
       var eq = new c.Equation(right1, right2);
@@ -218,11 +218,11 @@ doh.add("End-To-End", [
       // right >= rightMin
       var solver = new c.SimplexSolver();
 
-      var x1 = new c._Variable(10);
-      var width1 = new c._Variable(10);
+      var x1 = new c.Variable({ value: 10 });
+      var width1 = new c.Variable({ value: 10 });
       var right1 = new c.Expression(x1).plus(width1);
-      var x2 = new c._Variable(100);
-      var width2 = new c._Variable(10);
+      var x2 = new c.Variable({ value: 100 });
+      var width2 = new c.Variable({ value: 10 });
       var right2 = new c.Expression(x2).plus(width2);
 
       var ieq = new c.Inequality(right1, c.GEQ, right2);
@@ -244,11 +244,11 @@ doh.add("End-To-End", [
       // right >= rightMin
       var solver = new c.SimplexSolver();
 
-      var x1 = new c._Variable(10);
-      var width1 = new c._Variable(10);
+      var x1 = new c.Variable({ value: 10 });
+      var width1 = new c.Variable({ value: 10 });
       var right1 = new c.Expression(x1).plus(width1);
-      var x2 = new c._Variable(100);
-      var width2 = new c._Variable(10);
+      var x2 = new c.Variable({ value: 100 });
+      var width2 = new c.Variable({ value: 10 });
       var right2 = new c.Expression(x2).plus(width2);
       var ieq = new c.Inequality(right2, c.LEQ, right1);
 
@@ -264,7 +264,7 @@ doh.add("End-To-End", [
 
   function addDelete1(t) {
     var solver = new c.SimplexSolver();
-    var x = new c._Variable("x");
+    var x = new c.Variable({ name: "x" });
     var cbl = new c.Equation(x, 100, c.Strength.weak);
     solver.addConstraint(cbl);
 
@@ -294,8 +294,8 @@ doh.add("End-To-End", [
 
   function addDelete2(t) {
     var solver = new c.SimplexSolver();
-    var x = new c._Variable("x");
-    var y = new c._Variable("y");
+    var x = new c.Variable({ name: "x" });
+    var y = new c.Variable({ name: "y" });
 
     solver.addConstraint(new c.Equation(x, 100.0, c.Strength.weak))
           .addConstraint(new c.Equation(y, 120.0, c.Strength.strong));
@@ -326,8 +326,8 @@ doh.add("End-To-End", [
 
   function casso1(t) {
     var solver = new c.SimplexSolver();
-    var x = new c._Variable("x");
-    var y = new c._Variable("y");
+    var x = new c.Variable({ name: "x" });
+    var y = new c.Variable({ name: "y" });
 
     solver.addConstraint(new c.Inequality(x, c.LEQ, y))
           .addConstraint(new c.Equation(y, c.Plus(x, 3.0)))
@@ -342,7 +342,7 @@ doh.add("End-To-End", [
 
   function inconsistent1(t) {
     var solver = new c.SimplexSolver();
-    var x = new c._Variable("x");
+    var x = new c.Variable({ name: "x" });
     // x = 10
     solver.addConstraint(new c.Equation(x, 10.0));
     // x = 5
@@ -353,7 +353,7 @@ doh.add("End-To-End", [
 
   function inconsistent2(t) {
     var solver = new c.SimplexSolver();
-    var x = new c._Variable("x");
+    var x = new c.Variable({ name: "x" });
     solver.addConstraint(new c.Inequality(x, c.GEQ, 10.0));
     t.e(c.RequiredFailure, solver, "addConstraint", [
       new c.Inequality(x, c.LEQ, 5.0)
@@ -362,10 +362,10 @@ doh.add("End-To-End", [
 
   function inconsistent3(t) {
     var solver = new c.SimplexSolver();
-    var w = new c._Variable("w");
-    var x = new c._Variable("x");
-    var y = new c._Variable("y");
-    var z = new c._Variable("z");
+    var w = new c.Variable({ name: "w" });
+    var x = new c.Variable({ name: "x" });
+    var y = new c.Variable({ name: "y" });
+    var z = new c.Variable({ name: "z" });
     solver.addConstraint(new c.Inequality(w, c.GEQ, 10.0))
           .addConstraint(new c.Inequality(x, c.GEQ, w))
           .addConstraint(new c.Inequality(y, c.GEQ, x))
@@ -378,8 +378,8 @@ doh.add("End-To-End", [
 
   function inconsistent4(t) {
     var solver = new c.SimplexSolver();
-    var x = new c._Variable("x");
-    var y = new c._Variable("y");
+    var x = new c.Variable({ name: "x" });
+    var y = new c.Variable({ name: "y" });
     // x = 10
     solver.addConstraint(new c.Equation(x, 10.0));
     // x = y
@@ -391,10 +391,10 @@ doh.add("End-To-End", [
   },
 
   function multiedit(t) {
-    var x = new c._Variable("x");
-    var y = new c._Variable("y");
-    var w = new c._Variable("w");
-    var h = new c._Variable("h");
+    var x = new c.Variable({ name: "x" });
+    var y = new c.Variable({ name: "y" });
+    var w = new c.Variable({ name: "w" });
+    var h = new c.Variable({ name: "h" });
     var solver = new c.SimplexSolver();
     solver.addStay(x)
           .addStay(y)
@@ -427,10 +427,10 @@ doh.add("End-To-End", [
   },
 
   function multiedit2(t) {
-    var x = new c._Variable("x");
-    var y = new c._Variable("y");
-    var w = new c._Variable("w");
-    var h = new c._Variable("h");
+    var x = new c.Variable({ name: "x" });
+    var y = new c.Variable({ name: "y" });
+    var w = new c.Variable({ name: "w" });
+    var h = new c.Variable({ name: "h" });
     var solver = new c.SimplexSolver();
     solver.addStay(x)
           .addStay(y)
@@ -484,18 +484,24 @@ doh.add("End-To-End", [
     };
 
     var v = {
-      width: new c._Variable("width"),
-      height: new c._Variable("height"),
-      top: new c._Variable("top"),
-      bottom: new c._Variable("bottom"),
-      left: new c._Variable("left"),
-      right: new c._Variable("right"),
+      width: new c.Variable({ name: "width" }),
+      height: new c.Variable({ name: "height" }),
+      top: new c.Variable({ name: "top" }),
+      bottom: new c.Variable({ name: "bottom" }),
+      left: new c.Variable({ name: "left" }),
+      right: new c.Variable({ name: "right" }),
     };
 
     var solver = new c.SimplexSolver();
 
-    var iw = new c._Variable("window_innerWidth", rand(MAX, MIN));
-    var ih = new c._Variable("window_innerHeight", rand(MAX, MIN));
+    var iw = new c.Variable({
+      name: "window_innerWidth",
+      value: rand(MAX, MIN)
+    });
+    var ih = new c.Variable({
+      name: "window_innerHeight",
+      value: rand(MAX, MIN)
+    });
     var iwStay = new c.StayConstraint(iw);
     var ihStay = new c.StayConstraint(ih);
 
@@ -557,9 +563,9 @@ doh.add("End-To-End", [
       return new c.Equation(a1, a2, strength || weak, w||0);
     };
 
-    var x = new c._Variable("x", 100);
-    var y = new c._Variable("y", 200);
-    var z = new c._Variable("z",  50);
+    var x = new c.Variable({ name: "x", value: 100 });
+    var y = new c.Variable({ name: "y", value: 200 });
+    var z = new c.Variable({ name: "z", value: 50 });
     t.is(x.value, 100);
     t.is(y.value, 200);
     t.is(z.value,  50);
