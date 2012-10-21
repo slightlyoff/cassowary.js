@@ -22,7 +22,7 @@ c.SimplexSolver = c.inherit({
     this._markerVars = new c.HashTable(); // cn -> Set of cv
 
     // this._resolve_pair = [0, 0];
-    this._objective = new c.ObjectiveVariable("Z");
+    this._objective = new c.ObjectiveVariable({ name: "Z" });
 
     this._editVarMap = new c.HashTable(); // cv -> c.EditInfo
     this._editVarList = [];
@@ -440,8 +440,11 @@ c.SimplexSolver = c.inherit({
 
   addWithArtificialVariable: function(expr /*c.Expression*/) {
     if (c.trace) c.fnenterprint("addWithArtificialVariable: " + expr);
-    var av = new c.SlackVariable(++this._artificialCounter, "a");
-    var az = new c.ObjectiveVariable("az");
+    var av = new c.SlackVariable({
+      value: ++this._artificialCounter,
+      prefix: "a"
+    });
+    var az = new c.ObjectiveVariable({ name: "az" });
     var azRow = /* c.Expression */expr.clone();
     if (c.trace) c.traceprint("before addRows:\n" + this);
     this.addRow(az, azRow);
@@ -643,12 +646,18 @@ c.SimplexSolver = c.inherit({
     if (cn.isInequality) {
       if (c.trace) c.traceprint("Inequality, adding slack");
       ++this._slackCounter;
-      slackVar = new c.SlackVariable(this._slackCounter, "s");
+      slackVar = new c.SlackVariable({
+        value: this._slackCounter,
+        prefix: "s"
+      });
       expr.setVariable(slackVar, -1);
       this._markerVars.set(cn, slackVar);
       if (!cn.required) {
         ++this._slackCounter;
-        eminus = new c.SlackVariable(this._slackCounter, "em");
+        eminus = new c.SlackVariable({
+          value: this._slackCounter,
+          prefix: "em"
+        });
         expr.setVariable(eminus, 1);
         var zRow = this.rows.get(this._objective);
         zRow.setVariable(eminus, cn.strength.symbolicWeight * cn.weight);
@@ -659,15 +668,24 @@ c.SimplexSolver = c.inherit({
       if (cn.required) {
         if (c.trace) c.traceprint("Equality, required");
         ++this._dummyCounter;
-        dummyVar = new c.DummyVariable(this._dummyCounter, "d");
+        dummyVar = new c.DummyVariable({
+          value: this._dummyCounter,
+          prefix: "d"
+        });
         expr.setVariable(dummyVar, 1);
         this._markerVars.set(cn, dummyVar);
         if (c.trace) c.traceprint("Adding dummyVar == d" + this._dummyCounter);
       } else {
         if (c.trace) c.traceprint("Equality, not required");
         ++this._slackCounter;
-        eplus = new c.SlackVariable(this._slackCounter, "ep");
-        eminus = new c.SlackVariable(this._slackCounter, "em");
+        eplus = new c.SlackVariable({
+          value: this._slackCounter,
+          prefix: "ep"
+        });
+        eminus = new c.SlackVariable({
+          value: this._slackCounter,
+          prefix: "em"
+        });
         expr.setVariable(eplus, -1);
         expr.setVariable(eminus, 1);
         this._markerVars.set(cn, eplus);

@@ -14,19 +14,10 @@ c.AbstractVariable = c.inherit({
   isPivotable:  false,
   isRestricted: false,
 
-  _prefix: "",
-
-  toString: function() {
-    return this._prefix + "[" + this.name + ":" + this.value + "]";
-  },
-});
-
-c.Variable = c.inherit({
-  extends: c.AbstractVariable,
-  initialize: function(args) {
-    this.value = 0;
-    this.name = "";
+  _init: function(args, varNamePrefix) {
+    // Common mixin initialization.
     this.hashCode = c._inc();
+    this.name = (varNamePrefix||"") + this.hashCode;
     if (args) {
       if (typeof args.name != "undefined") {
         this.name = args.name;
@@ -34,9 +25,19 @@ c.Variable = c.inherit({
       if (typeof args.value != "undefined") {
         this.value = args.value;
       }
+      if (typeof args.prefix != "undefined") {
+        this._prefix = args.prefix;
+      }
     }
   },
-  isExternal:     true,
+
+  _prefix: "",
+  name: "",
+  value: 0,
+
+  toString: function() {
+    return this._prefix + "[" + this.name + ":" + this.value + "]";
+  },
 });
 
 c._Variable = c.inherit({
@@ -61,6 +62,17 @@ c._Variable = c.inherit({
     }
     // FIXME: gigantic memory leak?
     var vm = c._Variable._map;
+    if (vm && this.name) { vm[this.name] = this; }
+  },
+  isExternal:     true,
+});
+
+c.Variable = c.inherit({
+  // extends: c.AbstractVariable,
+  extends: c._Variable,
+  initialize: function(args) {
+    this._init(args, "v");
+    var vm = c._Variable._map;
     if (vm) { vm[this.name] = this; }
   },
   isExternal:     true,
@@ -68,13 +80,12 @@ c._Variable = c.inherit({
 
 /* static */
 // c.Variable._map = [];
+// c._Variable._map = [];
 
 c.DummyVariable = c.inherit({
   extends: c.AbstractVariable,
-  initialize: function(name_or_val, prefix) {
-    this.hashCode = c._inc();
-    this.name = name_or_val || "v" + this.hashCode;
-    this._prefix = (prefix) ? prefix : "";
+  initialize: function(args) {
+    this._init(args, "d");
   },
   isDummy:        true,
   isRestricted:   true,
@@ -83,20 +94,16 @@ c.DummyVariable = c.inherit({
 
 c.ObjectiveVariable = c.inherit({
   extends: c.AbstractVariable,
-  initialize: function(name_or_val, prefix) {
-    this.hashCode = c._inc();
-    this.name = name_or_val || "v" + this.hashCode;
-    this._prefix = (prefix) ? prefix : "";
+  initialize: function(args) {
+    this._init(args, "o");
   },
   value:         "obj",
 });
 
 c.SlackVariable = c.inherit({
   extends: c.AbstractVariable,
-  initialize: function(name_or_val, prefix) {
-    this.hashCode = c._inc();
-    this.name = name_or_val || "v" + this.hashCode;
-    this._prefix = (prefix) ? prefix : "";
+  initialize: function(args) {
+    this._init(args, "s");
   },
   isPivotable:    true,
   isRestricted:   true,

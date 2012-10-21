@@ -9,27 +9,27 @@
 doh.add("c._Variable", [
   function ctor(t) {
     c._Variable._map = [];
-    var x = new c._Variable("x");
-    var y = new c._Variable("y", 2);
-    t.is((c._Variable._map)['x'], "[x:0]");
-    t.is((c._Variable._map)['y'], "[y:2]");
+    var x = new c.Variable({name: "x"});
+    var y = new c.Variable({name: "y", value: 2});
+    t.is((c._Variable._map)["x"], "[x:0]");
+    t.is((c._Variable._map)["y"], "[y:2]");
   },
 
   function dummy(t) {
-    var d = new c.DummyVariable("foo");
+    var d = new c.DummyVariable({ name: "foo" });
     t.is(d, "[foo:dummy]");
   },
 
   function objective(t) {
-    var o = new c.ObjectiveVariable("obj");
+    var o = new c.ObjectiveVariable({ name: "obj" });
     t.is(o, "[obj:obj]");
   },
 
   function Variable(t) {
-    var x = new c._Variable('x', 25);
+    var x = new c._Variable("x", 25);
 
     t.is(x.value, 25);
-    t.is(x, '[x:25]');
+    t.is(x, "[x:25]");
     t.t(x.isExternal);
     t.f(x.isDummy);
     t.f(x.isPivotable);
@@ -37,9 +37,9 @@ doh.add("c._Variable", [
   },
 
   function DummyVariable(t) {
-    var x = new c.DummyVariable('x');
+    var x = new c.DummyVariable({ name: "x" });
 
-    t.is(x, '[x:dummy]');
+    t.is(x, "[x:dummy]");
     t.f(x.isExternal);
     t.t(x.isDummy);
     t.f(x.isPivotable);
@@ -47,9 +47,9 @@ doh.add("c._Variable", [
   },
 
   function ObjectiveVariable(t) {
-    var x = new c.ObjectiveVariable('x');
+    var x = new c.ObjectiveVariable({ name: "x" });
 
-    t.is(x, '[x:obj]');
+    t.is(x, "[x:obj]");
     t.f(x.isExternal);
     t.f(x.isDummy);
     t.f(x.isPivotable);
@@ -57,9 +57,9 @@ doh.add("c._Variable", [
   },
 
   function SlackVariable(t) {
-    var x = new c.SlackVariable('x');
+    var x = new c.SlackVariable({ name: "x" });
 
-    t.is(x, '[x:slack]');
+    t.is(x, "[x:slack]");
     t.f(x.isExternal);
     t.f(x.isDummy);
     t.t(x.isPivotable);
