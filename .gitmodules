@@ -4,3 +4,6 @@
 [submodule "third_party/mutation-summary"]
 	path = third_party/mutation-summary
 	url = https://code.google.com/p/mutation-summary/
+[submodule "third_party/benchmarkjs"]
+	path = third_party/benchmarkjs
+	url = https://github.com/bestiejs/benchmark.js.git
