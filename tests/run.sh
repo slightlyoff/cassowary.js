@@ -5,7 +5,7 @@
 #
 # Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
-DOH='../util/doh/runner.js'
+DOH='../third_party/doh/runner.js'
 JSCPATH='/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Resources/jsc'
 D8PATH=$(type -P d8)
 JPATH=$(type -P java)
