@@ -10,6 +10,7 @@
 var multiplier = 1000;
 
 c.SymbolicWeight = c.inherit({
+  _t: "c.SymbolicWeight",
   initialize: function(/*w1, w2, w3*/) {
     this.value = 0;
     var factor = 1;
@@ -23,23 +24,8 @@ c.SymbolicWeight = c.inherit({
     return this.value;
   },
 
-  toJSON: function() {
-    return JSON.stringify({
-      "class": "c.SymbolicWeight",
-      "value": this.value
-    });
-  },
+  toJSON: function() { return { value: this.value }; },
 });
 
 c.SymbolicWeight.clsZero = new c.SymbolicWeight(0, 0, 0);
-
-var className = "c.SymbolicWeight";
-c._json_receivers[className] = function(obj) {
-  if (obj.value && obj.class == className) {
-    var sw = new c.SymbolicWeight();
-    sw.value = obj.value;
-    return sw;
-  }
-};
-
 })(c);

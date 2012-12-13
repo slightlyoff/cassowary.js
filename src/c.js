@@ -37,6 +37,7 @@ var getTagName = function(proto) {
 };
 var epsilon = 1e-8;
 
+var  _t_map = {};
 // Global
 scope.c = {
   //
@@ -54,12 +55,13 @@ scope.c = {
   GEQ: 1,
   LEQ: 2,
 
+
   //
   // Utility methods
   //
   inherit: function(props) {
     var ctor = null;
-    var parent = null
+    var parent = null;
 
     if (props["extends"]) {
       parent = props["extends"];
@@ -72,6 +74,10 @@ scope.c = {
     }
 
     var realCtor = ctor || function() { };
+
+    if (props["_t"]) {
+      _t_map[props["_t"]] = realCtor;
+    }
 
     /*
     // NOTE: would happily do this except it's 2x slower. Boo!
@@ -218,11 +224,11 @@ scope.c = {
     return function() { return count++; };
   })(0),
 
-  _json_receivers: {},
-
   fromJSON: function(str) {
     JSON.parse(str, function(k, v) {
-      if (this["class"]) {
+      if (k === "") return v;
+      if (this["_t"]) {
+        console.log(k, v, this);
         // TODO(slightlyoff): revive based on class ref.
       }
     });

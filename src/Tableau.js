@@ -62,9 +62,11 @@ c.Tableau = c.inherit({
     return bstr;
   },
 
+  /*
   toJSON: function() {
-    // Creates a serialized object representation of the Tableau
+    // Creates an object representation of the Tableau.
   },
+  */
 
   // Convenience function to insert a variable into
   // the set of rows stored at columns[param_var],
