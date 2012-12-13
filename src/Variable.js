@@ -34,12 +34,34 @@ c.AbstractVariable = c.inherit({
   name: "",
   value: 0,
 
+  toJSON: function() {
+    var o = {};
+    if (this._t) {
+      o._t = this._t;
+    }
+    if (this.name) {
+      o.name = this.name;
+    }
+    if (typeof this.value != "undefined") {
+      o.value = this.value;
+    }
+    if (this._prefix) {
+      o._prefix = this._prefix;
+    }
+    if (this._t) {
+      o._t = this._t;
+    }
+    return o;
+  },
+
   toString: function() {
     return this._prefix + "[" + this.name + ":" + this.value + "]";
   },
+
 });
 
 c.Variable = c.inherit({
+  _t: "c.Variable",
   extends: c.AbstractVariable,
   initialize: function(args) {
     this._init(args, "v");
@@ -53,6 +75,7 @@ c.Variable = c.inherit({
 // c.Variable._map = [];
 
 c.DummyVariable = c.inherit({
+  _t: "c.DummyVariable",
   extends: c.AbstractVariable,
   initialize: function(args) {
     this._init(args, "d");
@@ -63,6 +86,7 @@ c.DummyVariable = c.inherit({
 });
 
 c.ObjectiveVariable = c.inherit({
+  _t: "c.ObjectiveVariable",
   extends: c.AbstractVariable,
   initialize: function(args) {
     this._init(args, "o");
@@ -71,6 +95,7 @@ c.ObjectiveVariable = c.inherit({
 });
 
 c.SlackVariable = c.inherit({
+  _t: "c.SlackVariable",
   extends: c.AbstractVariable,
   initialize: function(args) {
     this._init(args, "s");

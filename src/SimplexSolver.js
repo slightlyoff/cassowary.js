@@ -33,8 +33,6 @@ c.SimplexSolver = c.inherit({
     this.autoSolve = true;
     this._fNeedsSolving = false;
 
-    this.rows = new c.HashTable(); // cv -> expression
-
     this.rows.set(this._objective, new c.Expression());
     this._stkCedcns = [0]; // Stack
     if (c.trace)

@@ -11,6 +11,7 @@
 "use strict";
 
 c.HashSet = c.inherit({
+  _t: "c.HashSet",
 
   initialize: function() {
     this.storage = [];
@@ -62,6 +63,17 @@ c.HashSet = c.inherit({
     });
     answer += "}\n";
     return answer;
+  },
+
+  toJSON: function() {
+    var d = [];
+    this.each(function(e) {
+      d.push(e.toJSON());
+    });
+    return {
+      _t: "c.HashSet",
+      data: d
+    };
   },
 });
 
