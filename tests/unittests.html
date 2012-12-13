@@ -43,7 +43,7 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
       // c.verbose = true;
       // c.trace = true;
     </script>
-    
+
     <script src="../src/HashTable.js"></script>
     <script src="../src/HashSet.js"></script>
     <script src="../src/Error.js"></script>
@@ -60,6 +60,7 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
     <script src="../third_party/doh/runner.js"></script>
     <script>doh.squelch = false;</script>
+    <script src="c-test.js"></script>
     <script src="Constraint-test.js"></script>
     <script src="Expression-test.js"></script>
     <script src="Point-test.js"></script>
@@ -70,7 +71,7 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     <script src="Variable-test.js"></script>
     <script src="End-To-End-test.js"></script>
     <script>doh.run();</script>
-    
+
     <script src="../src/Timer.js"></script>
     <script src="PerfTest.js"></script>
     <script>
@@ -84,7 +85,7 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
       (function(scope) {
         // Load tests in a Worker to verify that they run there as well:
         worker = new Worker("WorkerPerfTest.js");
-        
+
         worker.onmessage = function(e) {
           var d = e.data;
           var type = d[0];
