@@ -54,6 +54,12 @@ c.AbstractVariable = c.inherit({
     return o;
   },
 
+  fromJSON: function(o, Ctor) {
+    var r = new Ctor();
+    c.extend(r, o);
+    return r;
+  },
+
   toString: function() {
     return this._prefix + "[" + this.name + ":" + this.value + "]";
   },

@@ -38,6 +38,27 @@ var getTagName = function(proto) {
 var epsilon = 1e-8;
 
 var  _t_map = {};
+var walkForMethod = function(ctor, name) {
+  if (!ctor || !name) return;
+
+  // Check the class-side first, the look at the prototype, then walk up
+  if (typeof ctor[name] == "function") {
+    return ctor[name];
+  }
+  var p = ctor.prototype;
+  if (p && typeof p[name] == "function") {
+    return p[name];
+  }
+  if (p === Object.prototype ||
+      p === Function.prototype) {
+    return;
+  }
+
+  if (typeof ctor.__super__ == "function") {
+    return walkForMethod(ctor.__super__, name);
+  }
+};
+
 // Global
 scope.c = {
   //
@@ -75,9 +96,20 @@ scope.c = {
 
     var realCtor = ctor || function() { };
 
+    Object.defineProperty(realCtor, "__super__", {
+      value: (parent) ? parent : Object,
+      enumerable: false,
+      configurable: true,
+      writable: false,
+    });
+
     if (props["_t"]) {
       _t_map[props["_t"]] = realCtor;
     }
+
+    // FIXME(slightlyoff): would like to have class-side inheritance!
+    // It's easy enough to do when we have __proto__, but we don't in IE 9/10.
+    //   = (
 
     /*
     // NOTE: would happily do this except it's 2x slower. Boo!
@@ -225,12 +257,20 @@ scope.c = {
   })(0),
 
   fromJSON: function(str) {
-    JSON.parse(str, function(k, v) {
-      if (k === "") return v;
-      if (this["_t"]) {
-        console.log(k, v, this);
-        // TODO(slightlyoff): revive based on class ref.
+    return JSON.parse(str, function(k, v) {
+      if (typeof v != "object" || typeof v["_t"] != "string") {
+        return v;
       }
+      var type = v["_t"];
+      var ctor = _t_map[type];
+      if (type && ctor) {
+        var fromJSON = walkForMethod(ctor, "fromJSON");
+        if (fromJSON) {
+          console.log(v);
+          return fromJSON(v, ctor);
+        }
+      }
+      return v;
     });
   },
 };

@@ -75,6 +75,15 @@ c.HashSet = c.inherit({
       data: d
     };
   },
+
+  fromJSON: function(o) {
+    var r = new c.HashSet();
+    if (o.data) {
+      r.size = o.data.length;
+      r.storage = o.data;
+    }
+    return r;
+  },
 });
 
 })(c);
