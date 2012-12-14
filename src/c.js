@@ -256,7 +256,7 @@ scope.c = {
     return function() { return count++; };
   })(0),
 
-  fromJSON: function(str) {
+  parseJSON: function(str) {
     return JSON.parse(str, function(k, v) {
       if (typeof v != "object" || typeof v["_t"] != "string") {
         return v;

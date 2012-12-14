@@ -137,7 +137,8 @@ doh.add("c", [
 
   function basicJSON(t) {
     var symbolicZeroValue = c.SymbolicWeight.clsZero.value;
-    t.is({ value: symbolicZeroValue }, c.SymbolicWeight.clsZero.toJSON());
+    t.is({ _t: "c.SymbolicWeight", value: symbolicZeroValue },
+         c.SymbolicWeight.clsZero.toJSON());
 
     var solver = new c.SimplexSolver();
 
@@ -163,7 +164,7 @@ doh.add("c", [
     );
 
     // Smoke test
-    var rehydratedER = c.fromJSON(JSON.stringify(solver._externalRows));
+    var rehydratedER = c.parseJSON(JSON.stringify(solver._externalRows));
     // FIXME(slightlyoff):
     //    need to filter out the "hashCode" property for deep equality test
     // t.is(rehydratedER, solver._externalRows);

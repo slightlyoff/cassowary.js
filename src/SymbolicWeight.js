@@ -24,7 +24,12 @@ c.SymbolicWeight = c.inherit({
     return this.value;
   },
 
-  toJSON: function() { return { value: this.value }; },
+  toJSON: function() {
+    return {
+      _t: this._t,
+      value: this.value
+    };
+  },
 });
 
 c.SymbolicWeight.clsZero = new c.SymbolicWeight(0, 0, 0);
