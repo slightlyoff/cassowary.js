@@ -266,7 +266,6 @@ scope.c = {
       if (type && ctor) {
         var fromJSON = walkForMethod(ctor, "fromJSON");
         if (fromJSON) {
-          console.log(v);
           return fromJSON(v, ctor);
         }
       }
