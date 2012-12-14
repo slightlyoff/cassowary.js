@@ -116,7 +116,7 @@ c.Tableau = c.inherit({
   removeRow: function(aVar /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("removeRow:" + aVar);
     var expr = /* c.Expression */this.rows.get(aVar);
-    c.Assert(expr != null);
+    c.assert(expr != null);
     expr.terms.each(function(clv, coeff) {
       var varset = this.columns.get(clv);
       if (varset != null) {

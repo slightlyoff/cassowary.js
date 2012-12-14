@@ -220,7 +220,7 @@ c.Equation = c.inherit({
     } else {
       throw "Bad initializer to c.Equation";
     }
-    c.Assert(this.strength instanceof c.Strength, "_strength not set");
+    c.assert(this.strength instanceof c.Strength, "_strength not set");
   },
 
   toString: function() {

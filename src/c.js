@@ -189,7 +189,7 @@ scope.c = {
 
   fnexitprint: function(s /*String*/) { console.log("- " + s); },
 
-  Assert: function(f /*boolean*/, description /*String*/) {
+  assert: function(f /*boolean*/, description /*String*/) {
     if (!f) {
       throw new c.InternalError("Assertion failed: " + description);
     }

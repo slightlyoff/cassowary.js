@@ -124,7 +124,7 @@ c.SimplexSolver = c.inherit({
   },
 
   beginEdit: function() {
-    c.Assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
+    c.assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
     this._infeasibleRows.clear();
     this._resetStayConstants();
     this._stkCedcns.push(this._editVarMap.size);
@@ -132,7 +132,7 @@ c.SimplexSolver = c.inherit({
   },
 
   endEdit: function() {
-    c.Assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
+    c.assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
     this.resolve();
     this._stkCedcns.pop();
     var n = this._stkCedcns[this._stkCedcns.length - 1]; // top
@@ -153,7 +153,7 @@ c.SimplexSolver = c.inherit({
         }
       }
       this._editVarList.length = n;
-      c.Assert(this._editVarMap.size == n, "_editVarMap.size == n");
+      c.assert(this._editVarMap.size == n, "_editVarMap.size == n");
       return this;
     }
     catch (e /*Exc.ConstraintNotFound*/){
@@ -300,7 +300,7 @@ c.SimplexSolver = c.inherit({
         }
       }
     } else if (cn.isEditConstraint) {
-      c.Assert(eVars != null, "eVars != null");
+      c.assert(eVars != null, "eVars != null");
       var cei = this._editVarMap.get(cn.variable);
       this.removeColumn(cei.editMinus);
       this._editVarMap.delete(cn.variable);
@@ -466,7 +466,7 @@ c.SimplexSolver = c.inherit({
       var entryVar = e.anyPivotableVariable();
       this.pivot(entryVar, av);
     }
-    c.Assert(this.rows.get(av) == null, "rowExpression(av) == null");
+    c.assert(this.rows.get(av) == null, "rowExpression(av) == null");
     this.removeColumn(av);
     this.removeRow(az);
   },
@@ -720,7 +720,7 @@ c.SimplexSolver = c.inherit({
     if (c.trace) c.traceprint(this.toString());
 
     var zRow = this.rows.get(zVar);
-    c.Assert(zRow != null, "zRow != null");
+    c.assert(zRow != null, "zRow != null");
     var entryVar = null;
     var exitVar = null;
 
