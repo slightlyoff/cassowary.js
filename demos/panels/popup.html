@@ -52,7 +52,7 @@
         var geq = function(a1, a2, str, w) { return new c.Inequality(a1, c.GEQ, a2, str, w); };
         var leq = function(a1, a2, str, w) { return new c.Inequality(a1, c.LEQ, a2, str, w); };
 
-        var stay = function(v, strength, weight) { 
+        var stay = function(v, strength, weight) {
           return new c.StayConstraint(v, strength || weak, weight || 1.0);
         };
 
@@ -63,7 +63,7 @@
             root = $("#root"),
             button = $("#button"),
             menus = $$(".menu");
-        
+
         // button.centeredIn = root;
         button.left = 100;
         button.top = 10;
@@ -126,7 +126,7 @@
 
           m.add(
             // leq(m.v.bottom, root.v.bottom, weak)
-            leq(m.v.top, c.Minus(root.v.bottom, m.v.height), weak)
+            leq(m.v.top, c.minus(root.v.bottom, m.v.height), weak)
 
             // geq(m.v.top, root.v.top, weak, 1),
             // geq(m.v.left, root.v.left, weak, 1),
@@ -181,8 +181,8 @@
     <x-panel id="menu"
       minWidth="200" maxWidth="200" minHeight="300" maxHeight="300"
       class="menu">
-      <!-- 
-      left="#button.v.left" top="#button.v.bottom" 
+      <!--
+      left="#button.v.left" top="#button.v.bottom"
       below="#button" -->
       <x-panel preferredHeight="30"
         preferredWidth="#menu.v.width" left="inherit" top="#menu.v.top" id="i1">

@@ -195,7 +195,7 @@ scope.c = {
     }
   },
 
-  Plus: function(e1, e2) {
+  plus: function(e1, e2) {
     if (!(e1 instanceof c.Expression)) {
       e1 = new c.Expression(e1);
     }
@@ -205,7 +205,7 @@ scope.c = {
     return e1.plus(e2);
   },
 
-  Minus: function(e1, e2) {
+  minus: function(e1, e2) {
     if (!(e1 instanceof c.Expression)) {
       e1 = new c.Expression(e1);
     }
@@ -216,7 +216,7 @@ scope.c = {
     return e1.minus(e2);
   },
 
-  Times: function(e1, e2) {
+  times: function(e1, e2) {
     if (typeof e1 == "number" || e1 instanceof c.Variable) {
       e1 = new c.Expression(e1);
     }
@@ -227,7 +227,7 @@ scope.c = {
     return e1.times(e2);
   },
 
-  Divide: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
+  divide: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
     if (typeof e1 == "number" || e1 instanceof c.Variable) {
       e1 = new c.Expression(e1);
     }

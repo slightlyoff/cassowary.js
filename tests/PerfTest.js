@@ -36,7 +36,7 @@ var PerfTest = c.inherit({
       for (k = 0; k < nvs; k++) {
         coeff = this.UniformRandomDiscretized() * 10 - 5;
         var iclv = this.RandomInRange(0, nVars);
-        expr.addExpression(c.Times(rgpclv[iclv], coeff));
+        expr.addExpression(c.times(rgpclv[iclv], coeff));
       }
       if (this.UniformRandomDiscretized() < ineqProb) {
         rgpcns[j] = new c.Inequality(expr);
@@ -158,7 +158,7 @@ var PerfTest = c.inherit({
       for (k = 0; k < nvs; k++) {
         coeff = this.GrainedUniformRandom() * 10 - 5;
         var iclv = this.RandomInRange(0, nVars);
-        expr.addExpression(c.Times(rgpclv[iclv], coeff));
+        expr.addExpression(c.times(rgpclv[iclv], coeff));
       }
       if (this.UniformRandomDiscretized() < ineqProb) {
         rgpcns[j] = new c.Inequality(expr);

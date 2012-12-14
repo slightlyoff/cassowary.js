@@ -19,29 +19,29 @@ doh.add("c.Expression", [
 
   function plus(t) {
     var x = new c.Variable({ name: "x", value: 167 });
-    t.is(c.Plus(4,2), "6");
-    t.is(c.Plus(x,2), "2 + 1*[x:167]");
-    t.is(c.Plus(3,x), "3 + 1*[x:167]");
+    t.is(c.plus(4,2), "6");
+    t.is(c.plus(x,2), "2 + 1*[x:167]");
+    t.is(c.plus(3,x), "3 + 1*[x:167]");
   },
 
   function plus_solve(t) {
     var s = new c.SimplexSolver();
     var x = new c.Variable({ name: "x", value: 167 });
-    t.is(c.Plus(4,2), "6");
-    t.is(c.Plus(x,2), "2 + 1*[x:167]");
-    t.is(c.Plus(3,x), "3 + 1*[x:167]");
+    t.is(c.plus(4,2), "6");
+    t.is(c.plus(x,2), "2 + 1*[x:167]");
+    t.is(c.plus(3,x), "3 + 1*[x:167]");
   },
 
   function times(t) {
     var x = new c.Variable({ name: "x", value: 167 });
-    t.is(c.Times(x,3), "3*[x:167]");
-    t.is(c.Times(7,x), "7*[x:167]");
+    t.is(c.times(x,3), "3*[x:167]");
+    t.is(c.times(7,x), "7*[x:167]");
   },
 
   function complex(t) {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 2 });
-    var ex = c.Plus(4, c.Plus(c.Times(x,3), c.Times(2,y)));
+    var ex = c.plus(4, c.plus(c.times(x,3), c.times(2,y)));
     t.is(ex, "4 + 3*[x:167] + 2*[y:2]");
   },
 
@@ -346,43 +346,43 @@ doh.add("c.Expression", [
     t.f(new c.Expression(v, -2, 5).equals(new c.Expression(v, 3, 6)));
   },
 
-  function Plus(t) {
+  function plus(t) {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 10 });
 
-    t.is(c.Plus(2, 3), '5');
-    t.is(c.Plus(x, 2), '2 + 1*[x:167]');
-    t.is(c.Plus(3, x), '3 + 1*[x:167]');
-    t.is(c.Plus(x, y), '1*[x:167] + 1*[y:10]');
+    t.is(c.plus(2, 3), '5');
+    t.is(c.plus(x, 2), '2 + 1*[x:167]');
+    t.is(c.plus(3, x), '3 + 1*[x:167]');
+    t.is(c.plus(x, y), '1*[x:167] + 1*[y:10]');
   },
 
-  function Minus(t) {
+  function minus(t) {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 10 });
 
-    t.is(c.Minus(2, 3), '-1');
-    t.is(c.Minus(x, 2), '-2 + 1*[x:167]');
-    t.is(c.Minus(3, x), '3 + -1*[x:167]');
-    t.is(c.Minus(x, y), '1*[x:167] + -1*[y:10]');
+    t.is(c.minus(2, 3), '-1');
+    t.is(c.minus(x, 2), '-2 + 1*[x:167]');
+    t.is(c.minus(3, x), '3 + -1*[x:167]');
+    t.is(c.minus(x, y), '1*[x:167] + -1*[y:10]');
   },
 
-  function Times(t) {
+  function times(t) {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 10 });
 
-    t.is(c.Times(2, 3), '6');
-    t.is(c.Times(x, 2), '2*[x:167]');
-    t.is(c.Times(3, x), '3*[x:167]');
-    t.e(c.NonExpression, c, 'Times', [x, y]);
+    t.is(c.times(2, 3), '6');
+    t.is(c.times(x, 2), '2*[x:167]');
+    t.is(c.times(3, x), '3*[x:167]');
+    t.e(c.NonExpression, c, 'times', [x, y]);
   },
 
-  function Divide(t) {
+  function divide(t) {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 10 });
 
-    t.is(c.Divide(4, 2), '2');
-    t.is(c.Divide(x, 2), '0.5*[x:167]');
-    t.e(c.NonExpression, c, 'Divide', [4, x]);
-    t.e(c.NonExpression, c, 'Divide', [x, y]);
+    t.is(c.divide(4, 2), '2');
+    t.is(c.divide(x, 2), '0.5*[x:167]');
+    t.e(c.NonExpression, c, 'divide', [4, x]);
+    t.e(c.NonExpression, c, 'divide', [x, y]);
   }
 ]);

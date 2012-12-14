@@ -131,22 +131,22 @@ var QuadDemo = c.inherit({
 
     solver.addConstraint(cleq);
 
-    cle = c.Plus(db[0].x, 20);
+    cle = c.plus(db[0].x, 20);
 
     solver.addConstraint(new c.Inequality(cle, c.LEQ, db[2].x))
           .addConstraint(new c.Inequality(cle, c.LEQ, db[3].x));
 
-    cle = c.Plus(db[1].x, 20);
+    cle = c.plus(db[1].x, 20);
 
     solver.addConstraint(new c.Inequality(cle, c.LEQ, db[2].x))
           .addConstraint(new c.Inequality(cle, c.LEQ, db[3].x));
 
-    cle = c.Plus(db[0].y, 20);
+    cle = c.plus(db[0].y, 20);
 
     solver.addConstraint(new c.Inequality(cle, c.LEQ, db[1].y))
           .addConstraint(new c.Inequality(cle, c.LEQ, db[2].y));
 
-    cle = c.Plus(db[3].y, 20);
+    cle = c.plus(db[3].y, 20);
 
     solver.addConstraint(new c.Inequality(cle, c.LEQ, db[1].y))
           .addConstraint(new c.Inequality(cle, c.LEQ, db[2].y));

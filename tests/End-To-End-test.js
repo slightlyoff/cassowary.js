@@ -310,7 +310,7 @@ doh.add("End-To-End", [
     t.t(c.approx(x, 20.0));
     t.t(c.approx(y, 120.0));
 
-    var cxy = new c.Equation(c.Times(2.0, x), y);
+    var cxy = new c.Equation(c.times(2.0, x), y);
     solver.addConstraint(cxy);
     t.t(c.approx(x, 20.0));
     t.t(c.approx(y, 40.0));
@@ -330,7 +330,7 @@ doh.add("End-To-End", [
     var y = new c.Variable({ name: "y" });
 
     solver.addConstraint(new c.Inequality(x, c.LEQ, y))
-          .addConstraint(new c.Equation(y, c.Plus(x, 3.0)))
+          .addConstraint(new c.Equation(y, c.plus(x, 3.0)))
           .addConstraint(new c.Equation(x, 10.0, c.Strength.weak))
           .addConstraint(new c.Equation(y, 10.0, c.Strength.weak));
 
@@ -513,9 +513,9 @@ doh.add("End-To-End", [
       heightEQ,
       eq(v.top, 0, weak),
       eq(v.left, 0, weak),
-      eq(v.bottom, c.Plus(v.top, v.height), medium),
+      eq(v.bottom, c.plus(v.top, v.height), medium),
       // Right is at least left + width
-      eq(v.right,  c.Plus(v.left, v.width), medium),
+      eq(v.right,  c.plus(v.left, v.width), medium),
       iwStay,
       ihStay
     ].forEach(function(c) {
@@ -579,7 +579,7 @@ doh.add("End-To-End", [
     t.is(z.value,  20);
 
     solver.addConstraint(
-      new c.Inequality(c.Plus(z, 150), c.LEQ, y, medium)
+      new c.Inequality(c.plus(z, 150), c.LEQ, y, medium)
     );
 
     t.is(x.value,  20);

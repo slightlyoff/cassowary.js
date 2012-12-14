@@ -521,9 +521,9 @@ scope.Panel = c.inherit({
       geq(v.height,        v.contentHeight, medium, 1),
 
       // Bottom is at least top + height
-      eq(v.bottom, c.Plus(v.top, v.height), medium, 10),
+      eq(v.bottom, c.plus(v.top, v.height), medium, 10),
       // Right is at least left + width
-      eq(v.right,  c.Plus(v.left, v.width), medium, 10)
+      eq(v.right,  c.plus(v.left, v.width), medium, 10)
     );
   },
 
@@ -652,19 +652,19 @@ scope.Panel = c.inherit({
     this._centeredIn = [
       // this.left = other.left + (other.width/2 - this.width/2)
       eq(this.v.left,
-        c.Plus(other.v.left,
-          c.Minus(
-            c.Divide(other.v.width, 2),
-            c.Divide(this.v.width, 2)
+        c.plus(other.v.left,
+          c.minus(
+            c.divide(other.v.width, 2),
+            c.divide(this.v.width, 2)
           )
         ), medium, 2),
 
       // this.top = other.top + (other.height/2 - this.height/2)
       eq(this.v.top,
-        c.Plus(other.v.top,
-          c.Minus(
-            c.Divide(other.v.height, 2),
-            c.Divide(this.v.height, 2)
+        c.plus(other.v.top,
+          c.minus(
+            c.divide(other.v.height, 2),
+            c.divide(this.v.height, 2)
           )
         ), medium, 2)
     ];
@@ -716,9 +716,9 @@ scope.RootPanel = c.inherit({
       heightEQ,
       eq(this.v.top, 0, medium),
       eq(this.v.left, 0, medium),
-      eq(this.v.bottom, c.Plus(this.v.top, this.v.height), medium, 2),
+      eq(this.v.bottom, c.plus(this.v.top, this.v.height), medium, 2),
       // Right is at least left + width
-      eq(this.v.right,  c.Plus(this.v.left, this.v.width), medium, 2),
+      eq(this.v.right,  c.plus(this.v.left, this.v.width), medium, 2),
       stay(this.v.right),
       stay(this.v.bottom)
     );

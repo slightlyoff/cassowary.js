@@ -55,10 +55,10 @@ var mediumStay   = function(v, w) { return stay(v, medium, w); };
 var strongStay   = function(v, w) { return stay(v, strong, w); };
 var requiredStay = function(v, w) { return stay(v, required, w); };
 
-var plus  = function(a1, a2) { return c.Plus(a1, a2); };
-var minus = function(a1, a2) { return c.Minus(a1, a2); };
-var times = function(a1, a2) { return c.Times(a1, a2); };
-var div   = function(a1, a2) { return c.Divide(a1, a2); };
+var plus  = function(a1, a2) { return c.plus(a1, a2); };
+var minus = function(a1, a2) { return c.minus(a1, a2); };
+var times = function(a1, a2) { return c.times(a1, a2); };
+var div   = function(a1, a2) { return c.divide(a1, a2); };
 var cv    = function(n, val) {
   return new c.Variable({ name: n, value: val });
 };
@@ -552,22 +552,22 @@ var RenderBox = c.inherit({
       constrain(
         eq(
           ref.content._top,
-          c.Plus(ref.padding._top, vals.paddingTop.px),
+          c.plus(ref.padding._top, vals.paddingTop.px),
           required
         ),
         eq(
           ref.content._left,
-          c.Plus(ref.padding._left, vals.paddingLeft.px),
+          c.plus(ref.padding._left, vals.paddingLeft.px),
           required
         ),
         eq(
           ref.content._right,
-          c.Minus(ref.padding._right, vals.paddingRight.px),
+          c.minus(ref.padding._right, vals.paddingRight.px),
           required
         ),
         eq(
           ref.content._bottom,
-          c.Minus(ref.padding._bottom, vals.paddingBottom.px),
+          c.minus(ref.padding._bottom, vals.paddingBottom.px),
           required
         )
       );
@@ -577,21 +577,21 @@ var RenderBox = c.inherit({
       ref.border = ref.padding;
     } else {
       constrain(
-        eq(c.Minus(ref.padding._top, vals.borderTopWidth.px),
+        eq(c.minus(ref.padding._top, vals.borderTopWidth.px),
           ref.border._top,
           required
         ),
-        eq(c.Minus(ref.padding._left, vals.borderLeftWidth.px),
+        eq(c.minus(ref.padding._left, vals.borderLeftWidth.px),
           ref.border._left,
           required
         ),
-        eq(c.Plus(ref.padding._right, vals.borderRightWidth.px),
+        eq(c.plus(ref.padding._right, vals.borderRightWidth.px),
           ref.border._right,
           required
         ),
         eq(
           ref.border._bottom,
-          c.Plus(ref.padding._bottom, vals.borderBottomWidth.px),
+          c.plus(ref.padding._bottom, vals.borderBottomWidth.px),
           required
         )
       );
@@ -610,19 +610,19 @@ var RenderBox = c.inherit({
                 vals.marginStart.px : vals.marginLeft.px;
 
     constrain(
-      eq(c.Minus(ref.border._top, mt),
+      eq(c.minus(ref.border._top, mt),
         ref.margin._top,
         required
       ),
-      eq(c.Minus(ref.border._left, ml),
+      eq(c.minus(ref.border._left, ml),
         ref.margin._left,
         required
       ),
-      eq(c.Plus(ref.border._right, mr),
+      eq(c.plus(ref.border._right, mr),
         ref.margin._right,
         required
       ),
-      eq(c.Plus(ref.border._bottom, mb),
+      eq(c.plus(ref.border._bottom, mb),
         ref.margin._bottom,
         required
       )
@@ -631,7 +631,7 @@ var RenderBox = c.inherit({
     // FIXME: if %-valued, need to do the obvious thing
     if (!vals.width.isAuto) {
       constrain(
-        eq(c.Plus(ref.content._left, vals.width.px),
+        eq(c.plus(ref.content._left, vals.width.px),
           ref.content._right,
           required
         )
@@ -640,7 +640,7 @@ var RenderBox = c.inherit({
 
     if (!vals.height.isAuto) {
       constrain(
-        eq(c.Plus(ref.content._top, vals.height.px),
+        eq(c.plus(ref.content._top, vals.height.px),
           ref.content._bottom,
           required
         )
@@ -654,12 +654,12 @@ var RenderBox = c.inherit({
     constrain(
       eq(
         vars.width,
-        c.Minus(ref.border._right, ref.border._left),
+        c.minus(ref.border._right, ref.border._left),
         medium
       ),
       eq(
         vars.height,
-        c.Minus(ref.border._bottom, ref.border._top),
+        c.minus(ref.border._bottom, ref.border._top),
         medium
       )
     );
@@ -784,14 +784,14 @@ var RenderBox = c.inherit({
       if (!vals.top.isAuto) {
         var topExpr;
         if (vals.top.isPct) {
-          topExpr = c.Plus(posRefBox.margin._top,
-                           c.Times(
-                             c.Minus(posRefBox.border._bottom, posRefBox.border._top),
+          topExpr = c.plus(posRefBox.margin._top,
+                           c.times(
+                             c.minus(posRefBox.border._bottom, posRefBox.border._top),
                              vals.top.pct/100
                            )
                      );
         } else {
-          topExpr = c.Plus(posRefBox.margin._top, vals.top.px);
+          topExpr = c.plus(posRefBox.margin._top, vals.top.px);
         }
         constrain(eq(actual.border._top, topExpr, required));
       }
@@ -799,14 +799,14 @@ var RenderBox = c.inherit({
       if (!vals.left.isAuto) {
         var leftExpr;
         if (vals.left.isPct) {
-          leftExpr = c.Plus(posRefBox.margin._left,
-                            c.Times(
-                              c.Minus(posRefBox.border._right, posRefBox.border._left),
+          leftExpr = c.plus(posRefBox.margin._left,
+                            c.times(
+                              c.minus(posRefBox.border._right, posRefBox.border._left),
                               vals.left.pct/100
                             )
                      );
         } else {
-          leftExpr = c.Plus(posRefBox.margin._left, vals.left.px);
+          leftExpr = c.plus(posRefBox.margin._left, vals.left.px);
         }
         constrain(eq(actual.border._left, leftExpr, required));
       }
@@ -814,14 +814,14 @@ var RenderBox = c.inherit({
       if (!vals.right.isAuto) {
         var rightExpr;
         if (vals.right.isPct) {
-          rightExpr = c.Minus(posRefBox.margin._right,
-                              c.Times(
-                                c.Minus(posRefBox.border._right, posRefBox.border._left),
+          rightExpr = c.minus(posRefBox.margin._right,
+                              c.times(
+                                c.minus(posRefBox.border._right, posRefBox.border._left),
                                 vals.right.pct/100
                               )
                        );
         } else {
-          rightExpr = c.Minus(posRefBox.content._right, vals.right.px);
+          rightExpr = c.minus(posRefBox.content._right, vals.right.px);
         }
         constrain(eq(actual.border._right, rightExpr, required));
       }
@@ -829,14 +829,14 @@ var RenderBox = c.inherit({
       if (!vals.bottom.isAuto) {
         var bottomExpr;
         if (vals.bottom.isPct) {
-          bottomExpr = c.Minus(posRefBox.margin._bottom,
-                               c.Times(
-                                 c.Minus(posRefBox.border._bottom, posRefBox.border._top),
+          bottomExpr = c.minus(posRefBox.margin._bottom,
+                               c.times(
+                                 c.minus(posRefBox.border._bottom, posRefBox.border._top),
                                  vals.bottom.pct/100
                                )
                        );
         } else {
-          bottomExpr = c.Minus(posRefBox.margin._bottom, vals.bottom.px);
+          bottomExpr = c.minus(posRefBox.margin._bottom, vals.bottom.px);
         }
         constrain(eq(actual.border._bottom, bottomExpr, required));
       }
@@ -1024,12 +1024,12 @@ var AnonymousBlock = c.inherit({
       geq(ref.outer._bottom, ref.outer._top, required),
       geq(ref.outer._right, ref.outer._left, required),
       eq(
-        c.Plus(ref.outer._left, vars.width),
+        c.plus(ref.outer._left, vars.width),
         ref.outer._right,
         strong
       ),
       eq(
-        c.Plus(ref.outer._top, vars.height),
+        c.plus(ref.outer._top, vars.height),
         ref.outer._bottom,
         strong
       ),
@@ -1123,12 +1123,12 @@ var LineBox = c.inherit({
 
     this.solver.add(
       eq(
-        c.Plus(ref.outer._left, vars.width),
+        c.plus(ref.outer._left, vars.width),
         ref.outer._right,
         weak
       ),
       eq(
-        c.Plus(ref.outer._top, vars.height),
+        c.plus(ref.outer._top, vars.height),
         ref.outer._bottom,
         weak
       )
@@ -1160,7 +1160,7 @@ var LineBox = c.inherit({
     this.childBoxes.push(inline);
     this.solver.add(
       eq(inline.edges.ref.outer._left,
-        c.Plus(this.edges.ref.outer._left, this.accumulatedWidth),
+        c.plus(this.edges.ref.outer._left, this.accumulatedWidth),
          strong
       ),
       eq(inline.edges.ref.outer._top,
@@ -1283,8 +1283,8 @@ var TextBox = c.inherit({
     var ref = this.edges.ref;
     // console.log("TextBox's natural height is:", this.naturalSize.height);
     this.solver.add(
-      eq(c.Plus(ref.outer._left, this.naturalSize.width), ref.outer._right, strong),
-      eq(c.Plus(ref.outer._top, this.naturalSize.height), ref.outer._bottom, strong)
+      eq(c.plus(ref.outer._left, this.naturalSize.width), ref.outer._right, strong),
+      eq(c.plus(ref.outer._top, this.naturalSize.height), ref.outer._bottom, strong)
     );
   },
 });
