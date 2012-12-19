@@ -20,10 +20,6 @@ c.SymbolicWeight = c.inherit({
     }
   },
 
-  valueOf: function() {
-    return this.value;
-  },
-
   toJSON: function() {
     return {
       _t: this._t,
