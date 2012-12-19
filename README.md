@@ -61,8 +61,7 @@ This repo pulls in other Git repositories through
 [submodules](http://help.github.com/submodules/). After cloning the repo, run:
 
 ```
-$ git submodule init
-$ git submodule update
+$ git submodule update --init
 ...
 ```
 
@@ -76,10 +75,10 @@ $ ./run.sh
 ...
 ```
 
-If you get an error like: 
+If you get an error like:
 
 ```
-$ ./run.sh 
+$ ./run.sh
 FAILED: No JavaScript Runtime Found! Please install Java or the V8 Shell (d8) and add them to your $PATH
 ```
 
