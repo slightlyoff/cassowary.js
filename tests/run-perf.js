@@ -6,43 +6,8 @@
 
 "use strict";
 
-(function(global) {
-
-  var toString = function(item) {
-    var t = (typeof item);
-    if (t == "undefined") {
-      return "undefined";
-    } else if (t == "string") {
-      return item;
-    } else if (t == "number") {
-      return item + "";
-    } else if (item instanceof Array) {
-      return item + "";
-    }
-    return item + "";
-  }
-
-	// A minimal console
-	var log = function(hint, args){
-    var r = "";
-    var al = args.length;
-		r += ((hint ? hint + ":" : "") + toString(args[0]));
-		for(var i = 1; i < al; i++){
-			r += (" " + toString(args[i]));
-		}
-    print(r);
-	};
-
-  // Intentionally define console in the global namespace
-  global.console = {
-    log:    function() { log(0, Array.prototype.slice.call(arguments, 0)); },
-    error:  function() { log("ERROR", Array.prototype.slice.call(arguments, 0)); },
-    warn:   function() { log("WARN", Array.prototype.slice.call(arguments, 0)); }
-  };
-
-})(this);
-
-load('../src/c.js');
+load("console.js");
+load("../src/c.js");
 
 // Command-line argument processing
 if (this.arguments) {
@@ -56,18 +21,18 @@ if (this.arguments) {
   });
 }
 
-load('../src/HashTable.js');
-load('../src/HashSet.js');
-load('../src/Error.js')
-load('../src/SymbolicWeight.js')
-load('../src/Strength.js')
-load('../src/Variable.js')
-load('../src/Point.js')
-load('../src/Expression.js')
-load('../src/Constraint.js')
-load('../src/EditInfo.js')
-load('../src/Tableau.js')
-load('../src/SimplexSolver.js')
+load("../src/HashTable.js");
+load("../src/HashSet.js");
+load("../src/Error.js");
+load("../src/SymbolicWeight.js");
+load("../src/Strength.js");
+load("../src/Variable.js");
+load("../src/Point.js");
+load("../src/Expression.js");
+load("../src/Constraint.js");
+load("../src/EditInfo.js");
+load("../src/Tableau.js");
+load("../src/SimplexSolver.js");
 
-load('../src/Timer.js')
-load('../tests/PerfTest.js')
+load("../src/Timer.js");
+load("../tests/PerfTest.js");
