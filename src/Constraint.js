@@ -166,7 +166,7 @@ c.Inequality = c.inherit({
 
   toString: function() {
     // return "c.Inequality: " + this.hashCode;
-    return lc.prototype.toString.call(this) + " >= 0 ) id: " + this.hashCode;
+    return lc.prototype.toString.call(this) + " >= 0) id: " + this.hashCode;
   },
 });
 
@@ -224,7 +224,7 @@ c.Equation = c.inherit({
   },
 
   toString: function() {
-    return lc.prototype.toString.call(this) + " = 0 )";
+    return lc.prototype.toString.call(this) + " = 0)";
   },
 });
 
