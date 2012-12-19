@@ -43,11 +43,12 @@ doh.add("c.Constraint", [
 
     // Weak.
     var e1 = new c.Equation(x, z, c.Strength.weak);
+    // console.log("x:", x.value);
+    // c.trace = true;
     solver.addStay(x);
     solver.addConstraint(e1);
     t.t(c.approx(x, 20));
     t.t(c.approx(z, 20));
-    return;
 
     // Strong.
     var e2 = new c.Equation(z, w, c.Strength.strong);
