@@ -41,12 +41,14 @@
 
   // Intentionally define console in the global namespace
   global.console = {
-    log:     makeLogger(""),
-    error:   makeLogger("ERROR"),
-    warn:    makeLogger("WARN"),
-    trace:   makeLogger("TRACE"),
-    time:    function() {},
-    timeEnd: function() {},
+    log:        makeLogger(""),
+    error:      makeLogger("ERROR"),
+    warn:       makeLogger("WARN"),
+    trace:      makeLogger("TRACE"),
+    time:       function() {},
+    timeEnd:    function() {},
+    profile:    function() {},
+    profileEnd: function() {},
   };
 
 })(this);

@@ -38,9 +38,13 @@ this.onerror = function(e) {
   } else {
     var slice = Array.prototype.slice;
     global.console = {
-      log:    function() { log(false, slice.call(arguments, 0)); },
-      error:  function() { log("ERROR", slice.call(arguments, 0)); },
-      warn:   function() { log("WARN", slice.call(arguments, 0)); }
+      log:        function() { log(false, slice.call(arguments, 0)); },
+      error:      function() { log("ERROR", slice.call(arguments, 0)); },
+      warn:       function() { log("WARN", slice.call(arguments, 0)); },
+      time:       function() {},
+      timeEnd:    function() {},
+      profile:    function() {},
+      profileEnd: function() {},
     };
     global.print = function(s) { console.log(s); }
   }
