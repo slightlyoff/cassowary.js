@@ -33,6 +33,8 @@ c.SimplexSolver = c.inherit({
     this.autoSolve = true;
     this._fNeedsSolving = false;
 
+    this._optimizeCount = 0;
+
     this.rows.set(this._objective, new c.Expression());
     this._stkCedcns = [0]; // Stack
     if (c.trace)
@@ -198,7 +200,7 @@ c.SimplexSolver = c.inherit({
 
   removeConstraintInternal: function(cn /*c.Constraint*/) {
     // print("removeConstraintInternal('" + cn + "')");
-    if (c.trace) c.fnenterprint("removeConstraint: " + cn);
+    if (c.trace) c.fnenterprint("removeConstraintInternal: " + cn);
     if (c.trace) c.traceprint(this.toString());
     this._fNeedsSolving = true;
     this._resetStayConstants();
@@ -210,12 +212,12 @@ c.SimplexSolver = c.inherit({
         var expr = this.rows.get(cv);
         if (expr == null) {
           zRow.addVariable(cv,
-                           -cn.weight * cn.strength.symbolicWeight,
+                           -cn.weight * cn.strength.symbolicWeight.value,
                            this._objective,
                            this);
         } else {
           zRow.addExpression(expr,
-                             -cn.weight * cn.strength.symbolicWeight,
+                             -cn.weight * cn.strength.symbolicWeight.value,
                              this._objective,
                              this);
         }
@@ -658,7 +660,7 @@ c.SimplexSolver = c.inherit({
         });
         expr.setVariable(eminus, 1);
         var zRow = this.rows.get(this._objective);
-        zRow.setVariable(eminus, cn.strength.symbolicWeight * cn.weight);
+        zRow.setVariable(eminus, cn.strength.symbolicWeight.value * cn.weight);
         this.insertErrorVar(cn, eminus);
         this.noteAddedVariable(eminus, this._objective);
       }
@@ -689,7 +691,7 @@ c.SimplexSolver = c.inherit({
         this._markerVars.set(cn, eplus);
         var zRow = this.rows.get(this._objective);
         if (c.trace) console.log(zRow);
-        var swCoeff = cn.strength.symbolicWeight * cn.weight;
+        var swCoeff = cn.strength.symbolicWeight.value * cn.weight;
         if (swCoeff == 0) {
           if (c.trace) c.traceprint("cn == " + cn);
           if (c.trace) c.traceprint("adding " + eplus + " and " + eminus + " with swCoeff == " + swCoeff);
@@ -718,6 +720,7 @@ c.SimplexSolver = c.inherit({
   optimize: function(zVar /*c.ObjectiveVariable*/) {
     if (c.trace) c.fnenterprint("optimize: " + zVar);
     if (c.trace) c.traceprint(this.toString());
+    this._optimizeCount++;
 
     var zRow = this.rows.get(zVar);
     c.assert(zRow != null, "zRow != null");
@@ -769,7 +772,9 @@ c.SimplexSolver = c.inherit({
         throw new c.InternalError("Objective function is unbounded in optimize");
       }
 
+      // console.time("SimplexSolver::optimize pivot()");
       this.pivot(entryVar, exitVar);
+      // console.timeEnd("SimplexSolver::optimize pivot()");
 
       if (c.trace) c.traceprint(this.toString());
     }
@@ -777,6 +782,7 @@ c.SimplexSolver = c.inherit({
 
   pivot: function(entryVar /*c.AbstractVariable*/, exitVar /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("pivot: " + entryVar + ", " + exitVar);
+    // console.time(" SimplexSolver::pivot");
     if (entryVar == null) {
       console.warn("pivot: entryVar == null");
     }
@@ -785,8 +791,11 @@ c.SimplexSolver = c.inherit({
     }
     var pexpr = this.removeRow(exitVar);
     pexpr.changeSubject(exitVar, entryVar);
+    // console.time("  substituteOut");
     this.substituteOut(entryVar, pexpr);
+    // console.timeEnd("  substituteOut");
     this.addRow(entryVar, pexpr);
+    // console.timeEnd(" SimplexSolver::pivot");
   },
 
   _resetStayConstants: function() {
@@ -804,18 +813,26 @@ c.SimplexSolver = c.inherit({
     if (c.trace) c.fnenterprint("_setExternalVariables:");
     if (c.trace) c.traceprint(this.toString());
 
+    // console.log("this._externalParametricVars:", this._externalParametricVars);
     this._externalParametricVars.each(function(v) {
       if (this.rows.get(v) != null) {
-        console.log("Error: variable" + v + " in _externalParametricVars is basic");
+        if (c.trace)
+          console.log("Error: variable" + v + " in _externalParametricVars is basic");
       } else {
         v.value = 0;
       }
     }, this);
+    // console.log("this._externalRows:", this._externalRows);
     this._externalRows.each(function(v) {
       var expr = this.rows.get(v);
-      if (c.trace) c.debugprint("v == " + v);
-      if (c.trace) c.debugprint("expr == " + expr);
-      v.value = expr.constant;
+      if (v.value != expr.constant) {
+        // console.log(v.toString(), v.value, expr.constant);
+        v.value = expr.constant;
+        // TODO(slightlyoff):
+        //    collect these into value-change records to be delivered async
+      }
+      // if (c.trace) console.log("v == " + v);
+      // if (c.trace) console.log("expr == " + expr);
     }, this);
     this._fNeedsSolving = false;
     this.onsolved();
@@ -827,15 +844,12 @@ c.SimplexSolver = c.inherit({
 
   insertErrorVar: function(cn /*c.Constraint*/, aVar /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("insertErrorVar:" + cn + ", " + aVar);
-    var cnset = /* Set */this._errorVars.get(aVar);
-    var cnsetRes;
-    if (!cnset) {
-      cnsetRes = new c.HashSet();
-      this._errorVars.set(cn, cnsetRes);
-    } else {
-      cnsetRes = cnset;
+    var constraintSet = /* Set */this._errorVars.get(aVar);
+    if (!constraintSet) {
+      constraintSet = new c.HashSet();
+      this._errorVars.set(cn, constraintSet);
     }
-    cnsetRes.add(aVar);
+    constraintSet.add(aVar);
   },
 });
 })(c);
