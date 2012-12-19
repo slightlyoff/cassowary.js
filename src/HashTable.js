@@ -185,7 +185,7 @@ if (false && typeof Map != "undefined") {
       // console.timeEnd("HashTable::_compact()");
     },
 
-    _compactThreshold: 10,
+    _compactThreshold: 100,
     _perhapsCompact: function() {
       // If we have more properties than V8's fast property lookup limit, don't
       // bother
