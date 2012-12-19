@@ -21,6 +21,8 @@ c.Expression = c.inherit({
     } else if (typeof clv == "number") {
       if (!isNaN(clv)) {
         this.constant = clv;
+      } else {
+        console.trace();
       }
     }
   },
@@ -52,9 +54,9 @@ c.Expression = c.inherit({
       console.log("*******************************");
     }
 
-    var le = new c.Expression();
-    le.initializeFromHash(this.constant, this.terms);
-    return le;
+    var e = new c.Expression();
+    e.initializeFromHash(this.constant, this.terms);
+    return e;
   },
 
   times: function(x) {
@@ -151,9 +153,6 @@ c.Expression = c.inherit({
 
   setVariable: function(v /*c.AbstractVariable*/, c /*double*/) {
     // console.log("terms.set(", v, c, ")");
-    if(isNaN(c)) {
-      console.trace();
-    }
     this.terms.set(v, c);
     return this;
   },
