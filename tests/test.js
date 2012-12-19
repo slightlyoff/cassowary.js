@@ -3,6 +3,8 @@
 //
 // Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
+load("console.js");
+
 load("../src/c.js");
 load("../src/HashTable.js");
 load("../src/HashSet.js");
