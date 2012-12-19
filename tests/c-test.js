@@ -142,8 +142,8 @@ doh.add("c", [
 
     var solver = new c.SimplexSolver();
 
-    var x = new c.Variable({ value: 10 });
-    var width = new c.Variable({ value: 10 });
+    var x = new c.Variable({ name: "x", value: 10 });
+    var width = new c.Variable({ name: "width", value: 10 });
     var right = new c.Expression(x).plus(width);
     var ieq = new c.Inequality(100, c.LEQ, right);
 
@@ -156,8 +156,8 @@ doh.add("c", [
     t.is(
       { _t: "c.HashSet",
         data: [
-                  { _t: "c.Variable", name: "v6", value: 10 },
-                  { _t: "c.Variable", name: "v5", value: 90 }
+                  { _t: "c.Variable", name: "width", value: 10 },
+                  { _t: "c.Variable", name: "x", value: 90 }
         ]
       },
       solver._externalRows.toJSON()
