@@ -80,10 +80,6 @@ if (false && typeof Map != "undefined") {
     },
 
     delete: function(key) {
-      // FIXME(slightlyoff):
-      //    We should compact they key list if we get some large # of deleted
-      //    props.
-
       if (this._store.delete(key) && this.size > 0) {
         delete this._keys[this._keys.indexOf(key)];
         this.size--;
@@ -148,15 +144,15 @@ if (false && typeof Map != "undefined") {
       this.size = 0;
       this._store = {};
       this._keyStrMap = {};
+      this._deleted = 0;
     },
 
     set: function(key, value) {
       var hash = keyCode(key);
 
-      var old = null;
-      if (this._store.hasOwnProperty(hash)) {
-        old = this._store[hash];
-      } else {
+      if (!this._store.hasOwnProperty(hash)) {
+        // FIXME(slightlyoff): if size gooes above the V8 property limit,
+        // compact or go to a tree.
         this.size++;
       }
       this._store[hash] = value;
@@ -181,14 +177,40 @@ if (false && typeof Map != "undefined") {
       this._keyStrMap = {};
     },
 
+    _compact: function() {
+      // console.time("HashTable::_compact()");
+      var ns = {};
+      copyOwn(this._store, ns);
+      this._store = ns;
+      // console.timeEnd("HashTable::_compact()");
+    },
+
+    _compactThreshold: 10,
+    _perhapsCompact: function() {
+      // If we have more properties than V8's fast property lookup limit, don't
+      // bother
+      if (this._size > 64) return;
+      if (this._deleted > this._compactThreshold) {
+        this._compact();
+        this._deleted = 0;
+      }
+    },
+
     delete: function(key) {
       key = keyCode(key);
       if (!this._store.hasOwnProperty(key)) {
-        return null;
+        return;
       }
+      this._deleted++;
 
+      // FIXME(slightlyoff):
+      //    I hate this because it causes these objects to go megamorphic = (
+      //    Sadly, Cassowary is hugely sensitive to iteration order changes, and
+      //    "delete" preserves order when Object.keys() is called later.
       delete this._store[key];
-      delete this._keyStrMap[key];
+      // Note: we don't delete from _keyStrMap because we only get the
+      // Object.keys() from _store, so it's the only one we need to keep up-to-
+      // date.
 
       if (this.size > 0) {
         this.size--;
@@ -197,21 +219,30 @@ if (false && typeof Map != "undefined") {
 
     each: function(callback, scope) {
       if (!this.size) { return; }
+
+      this._perhapsCompact();
+
+      var store = this._store;
+      var keyMap = this._keyStrMap;
       Object.keys(this._store).forEach(function(k){
-        callback.call(scope||null, this._keyStrMap[k], this._store[k]);
+        callback.call(scope||null, keyMap[k], store[k]);
       }, this);
     },
 
     escapingEach: function(callback, scope) {
       if (!this.size) { return; }
 
+      this._perhapsCompact();
+
       var that = this;
+      var store = this._store;
+      var keyMap = this._keyStrMap;
       var context = defaultContext;
-      var kl = Object.keys(this._store);
+      var kl = Object.keys(store);
       for (var x = 0; x < kl.length; x++) {
         (function(v) {
           if (that._store.hasOwnProperty(v)) {
-            context = callback.call(scope||null, that._keyStrMap[v], that._store[v]);
+            context = callback.call(scope||null, keyMap[v], store[v]);
           }
         })(kl[x]);
 
@@ -245,10 +276,11 @@ if (false && typeof Map != "undefined") {
         return false;
       }
 
-      var codes = Object.keys(this._keyStrMap);
+      var codes = Object.keys(this._store);
       for (var i = 0; i < codes.length; i++) {
         var code = codes[i];
-        if (this._keyStrMap[code] !== other._keyStrMap[code] || this._store[code] !== other._store[code]) {
+        if (this._keyStrMap[code] !== other._keyStrMap[code] ||
+            this._store[code] !== other._store[code]) {
           return false;
         }
       }
