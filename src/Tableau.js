@@ -17,14 +17,14 @@ c.Tableau = c.inherit({
   },
 
   noteRemovedVariable: function(v /*c.AbstractVariable*/, subject /*c.AbstractVariable*/) {
-    if (c.verbose) c.fnenterprint("noteRemovedVariable: " + v + ", " + subject);
-    if (subject != null) {
+    // if (c.trace) console.log("c.Tableau::noteRemovedVariable: ", v, subject);
+    if (subject) {
       this.columns.get(v).delete(subject);
     }
   },
 
   noteAddedVariable: function(v /*c.AbstractVariable*/, subject /*c.AbstractVariable*/) {
-    if (c.verbose) c.fnenterprint("noteAddedVariable: " + v + ", " + subject);
+    // if (c.trace) console.log("c.Tableau::noteAddedVariable:", v, subject);
     if (subject) {
       this.insertColVar(v, subject);
     }
@@ -105,7 +105,7 @@ c.Tableau = c.inherit({
         expr.terms.delete(aVar);
       }, this);
     } else {
-      if (c.trace) c.debugprint("Could not find var " + aVar + " in columns");
+      if (c.trace) console.log("Could not find var", aVar, "in columns");
     }
     if (aVar.isExternal) {
       this._externalRows.delete(aVar);
@@ -120,7 +120,7 @@ c.Tableau = c.inherit({
     expr.terms.each(function(clv, coeff) {
       var varset = this.columns.get(clv);
       if (varset != null) {
-        if (c.trace) c.debugprint("removing from varset " + aVar);
+        if (c.trace) console.log("removing from varset:", aVar);
         varset.delete(aVar);
       }
     }, this);

@@ -27,10 +27,17 @@ var inBrowser = (typeof scope["HTMLElement"] != "undefined");
 var getTagName = function(proto) {
   var tn = null;
   while (proto && proto != Object.prototype) {
-    if (proto.tagName) {
-      tn = proto.tagName;
-      break;
+    // try {
+      if (proto.tagName) {
+        tn = proto.tagName;
+        break;
+      }
+    /*
+    } catch(e) {
+      console.log(proto);
+      console.log(e);
     }
+    */
     proto = proto.prototype;
   }
   return tn || "div";
@@ -157,16 +164,20 @@ scope.c = {
   extend: function(obj, props) {
     this.own(props, function(x) {
       var pd = Object.getOwnPropertyDescriptor(props, x);
-      if ( (typeof pd["get"] == "function") ||
-           (typeof pd["set"] == "function") ) {
-        Object.defineProperty(obj, x, pd);
-      } else if (typeof pd["value"] == "function" ||x.charAt(0) === "_") {
-        pd.writable = true;
-        pd.configurable = true;
-        pd.enumerable = false;
-        Object.defineProperty(obj, x, pd);
-      } else {
-        obj[x] = props[x];
+      try {
+        if ( (typeof pd["get"] == "function") ||
+             (typeof pd["set"] == "function") ) {
+          Object.defineProperty(obj, x, pd);
+        } else if (typeof pd["value"] == "function" ||x.charAt(0) === "_") {
+          pd.writable = true;
+          pd.configurable = true;
+          pd.enumerable = false;
+          Object.defineProperty(obj, x, pd);
+        } else {
+            obj[x] = props[x];
+        }
+      } catch(e) {
+        // console.warn("c.extend assignment failed on property", x);
       }
     });
     return obj;
@@ -175,10 +186,6 @@ scope.c = {
   own: function(obj, cb, context) {
     Object.getOwnPropertyNames(obj).forEach(cb, context||scope);
     return obj;
-  },
-
-  debugprint: function(s /*String*/) {
-    if (c.verbose) console.log(s);
   },
 
   traceprint: function(s /*String*/) {
