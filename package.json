@@ -10,13 +10,13 @@
   },
   "scripts": {
     "test": "mocha"
-  }
-  "dependencies" : {
+  },
+  "dependencies": {
   },
   "devDependencies": {
     "pegjs" : "*",
     "mocha":  "*",
-    "should": "*",
+    "should": "*"
   },
   "engines" : { "node" : ">=0.8.x" }
 }

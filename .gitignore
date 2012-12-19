@@ -9,3 +9,4 @@ out
 *.sublime-workspace
 perf/v8.log
 out.prof
+/node_modules/*
