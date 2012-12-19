@@ -59,12 +59,12 @@ var upTo = function(type) {
 };
 
 scope.HTMLElement.register = function(type) {
-  var tn = type.tagName || type.prototype.tagName; 
+  var tn = type.tagName || type.prototype.tagName;
   var upgrade = upTo(type);
 
   tagMap[tn] = type;
 
-  if ((scope.WebKitMutationObserver || scope.MutationObserver) && 
+  if ((scope.WebKitMutationObserver || scope.MutationObserver) &&
       scope.MutationSummary) {
     var ms = new MutationSummary({
       callback: function(summaries) {
@@ -80,10 +80,12 @@ scope.HTMLElement.register = function(type) {
 // created by the initial parse, look for them on startup and run the upgrade
 // if we need to.
 document.addEventListener("root", function(e) {
+  console.time("root");
   Object.keys(tagMap).forEach(function(tn) {
     var elements = document.querySelectorAll(tn);
     Array.prototype.slice.call(elements).forEach(upTo(tagMap[tn]));
   });
+  console.timeEnd("root");
 }, false);
 
 })(window);
