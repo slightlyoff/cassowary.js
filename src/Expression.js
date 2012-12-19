@@ -17,7 +17,7 @@ c.Expression = c.inherit({
     this.terms = new c.HashTable();
 
     if (clv instanceof c.AbstractVariable) {
-      this.terms.set(clv, typeof value == 'number' ? value : 1);
+      this.setVariable(clv, typeof value == 'number' ? value : 1);
     } else if (typeof clv == "number") {
       if (!isNaN(clv)) {
         this.constant = clv;
@@ -106,6 +106,8 @@ c.Expression = c.inherit({
                           subject /*c.AbstractVariable*/,
                           solver /*c.Tableau*/) {
 
+    // console.log("c.Expression::addExpression()", expr, n);
+    // console.trace();
     if (expr instanceof c.AbstractVariable) {
       expr = new c.Expression(expr);
       if(c.trace) console.log("addExpression: Had to cast a var to an expression");
@@ -113,6 +115,7 @@ c.Expression = c.inherit({
     n = n || 1;
     this.constant += (n * expr.constant);
     expr.terms.each(function(clv, coeff) {
+      // console.log("clv:", clv, "coeff:", coeff, "subject:", subject);
       this.addVariable(clv, coeff * n, subject, solver);
     }, this);
     return this;
@@ -123,21 +126,21 @@ c.Expression = c.inherit({
       cd = 1;
     }
 
-    if (c.trace) c.fnenterprint("CLE: addVariable:" + v + ", " + cd);
+    if (c.trace) console.log("c.Expression::addVariable():", v , cd);
     var coeff = this.terms.get(v);
     if (coeff) {
-      var new_coefficient = coeff + cd;
-      if (c.approx(new_coefficient, 0)) {
+      var newCoefficient = coeff + cd;
+      if (newCoefficient == 0 || c.approx(newCoefficient, 0)) {
         if (solver) {
           solver.noteRemovedVariable(v, subject);
         }
         this.terms.delete(v);
       } else {
-        this.terms.set(v, new_coefficient);
+        this.setVariable(v, newCoefficient);
       }
     } else {
       if (!c.approx(cd, 0)) {
-        this.terms.set(v, cd);
+        this.setVariable(v, cd);
         if (solver) {
           solver.noteAddedVariable(v, subject);
         }
@@ -147,6 +150,10 @@ c.Expression = c.inherit({
   },
 
   setVariable: function(v /*c.AbstractVariable*/, c /*double*/) {
+    // console.log("terms.set(", v, c, ")");
+    if(isNaN(c)) {
+      console.trace();
+    }
     this.terms.set(v, c);
     return this;
   },
@@ -177,22 +184,30 @@ c.Expression = c.inherit({
       c.traceprint("this = " + this);
     }
 
+    var setVariable = this.setVariable.bind(this);
     var terms = this.terms;
     var multiplier = terms.get(outvar);
     terms.delete(outvar);
     this.constant += (multiplier * expr.constant);
+    /*
+    console.log("substituteOut:",
+                "\n\toutvar:", outvar,
+                "\n\texpr:", expr.toString(),
+                "\n\tmultiplier:", multiplier,
+                "\n\tterms:", terms);
+    */
     expr.terms.each(function(clv, coeff) {
-      var old_coeff = terms.get(clv);
-      if (old_coeff) {
-        var newCoeff = old_coeff + multiplier * coeff;
-        if (c.approx(newCoeff, 0)) {
+      var oldCoefficient = terms.get(clv);
+      if (oldCoefficient) {
+        var newCoefficient = oldCoefficient + multiplier * coeff;
+        if (c.approx(newCoefficient, 0)) {
           solver.noteRemovedVariable(clv, subject);
           terms.delete(clv);
         } else {
-          terms.set(clv, newCoeff);
+          setVariable(clv, newCoefficient);
         }
       } else {
-        terms.set(clv, multiplier * coeff);
+        setVariable(clv, multiplier * coeff);
         if (solver) {
           solver.noteAddedVariable(clv, subject);
         }
@@ -203,7 +218,7 @@ c.Expression = c.inherit({
 
   changeSubject: function(old_subject /*c.AbstractVariable*/,
                           new_subject /*c.AbstractVariable*/) {
-    this.terms.set(old_subject, this.newSubject(new_subject));
+    this.setVariable(old_subject, this.newSubject(new_subject));
   },
 
   newSubject: function(subject /*c.AbstractVariable*/) {
@@ -215,6 +230,9 @@ c.Expression = c.inherit({
     return reciprocal;
   },
 
+  // Return the coefficient corresponding to variable var, i.e.,
+  // the 'ci' corresponding to the 'vi' that var is:
+  //     v1*c1 + v2*c2 + .. + vn*cn + c
   coefficientFor: function(clv /*c.AbstractVariable*/) {
     return this.terms.get(clv) || 0;
   },
