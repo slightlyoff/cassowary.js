@@ -44,6 +44,7 @@ module.exports = (function(){
         "WhiteSpace": parse_WhiteSpace,
         "LineTerminator": parse_LineTerminator,
         "LineTerminatorSequence": parse_LineTerminatorSequence,
+        "EOS": parse_EOS,
         "Comment": parse_Comment,
         "MultiLineComment": parse_MultiLineComment,
         "MultiLineCommentNoLineTerminator": parse_MultiLineCommentNoLineTerminator,
@@ -303,6 +304,51 @@ module.exports = (function(){
         reportFailures--;
         if (reportFailures === 0 && result0 === null) {
           matchFailed("end of line");
+        }
+        return result0;
+      }
+      
+      function parse_EOS() {
+        var result0, result1;
+        var pos0;
+        
+        pos0 = pos;
+        result0 = parse___();
+        if (result0 !== null) {
+          if (input.charCodeAt(pos) === 59) {
+            result1 = ";";
+            pos++;
+          } else {
+            result1 = null;
+            if (reportFailures === 0) {
+              matchFailed("\";\"");
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos0;
+          }
+        } else {
+          result0 = null;
+          pos = pos0;
+        }
+        if (result0 === null) {
+          pos0 = pos;
+          result0 = parse__();
+          if (result0 !== null) {
+            result1 = parse_LineTerminatorSequence();
+            if (result1 !== null) {
+              result0 = [result0, result1];
+            } else {
+              result0 = null;
+              pos = pos0;
+            }
+          } else {
+            result0 = null;
+            pos = pos0;
+          }
         }
         return result0;
       }
@@ -1128,7 +1174,7 @@ module.exports = (function(){
               var result = head;
               for (var i = 0; i < tail.length; i++) {
                 result = {
-                  type:     "BinaryExpression",
+                  type:     "MultiplicativeExpression",
                   operator: tail[i][1],
                   left:     result,
                   right:    tail[i][3]
@@ -1297,7 +1343,7 @@ module.exports = (function(){
               var result = head;
               for (var i = 0; i < tail.length; i++) {
                 result = {
-                  type:     "BinaryExpression",
+                  type:     "AdditiveExpression",
                   operator: tail[i][1],
                   left:     result,
                   right:    tail[i][3]
@@ -1417,7 +1463,7 @@ module.exports = (function(){
               var result = head;
               for (var i = 0; i < tail.length; i++) {
                 result = {
-                  type:     "BinaryExpression",
+                  type:     "Inequality",
                   operator: tail[i][1],
                   left:     result,
                   right:    tail[i][3]
@@ -1545,7 +1591,13 @@ module.exports = (function(){
             }
           }
           if (result1 !== null) {
-            result0 = [result0, result1];
+            result2 = parse_EOS();
+            if (result2 !== null) {
+              result0 = [result0, result1, result2];
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
           } else {
             result0 = null;
             pos = pos1;
@@ -1559,7 +1611,7 @@ module.exports = (function(){
               var result = head;
               for (var i = 0; i < tail.length; i++) {
                 result = {
-                  type:     "BinaryExpression",
+                  type:     "Equality",
                   operator: tail[i][1],
                   left:     result,
                   right:    tail[i][3]
@@ -1584,17 +1636,6 @@ module.exports = (function(){
           result0 = null;
           if (reportFailures === 0) {
             matchFailed("\"==\"");
-          }
-        }
-        if (result0 === null) {
-          if (input.substr(pos, 3) === "!==") {
-            result0 = "!==";
-            pos += 3;
-          } else {
-            result0 = null;
-            if (reportFailures === 0) {
-              matchFailed("\"!==\"");
-            }
           }
         }
         return result0;

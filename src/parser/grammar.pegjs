@@ -4,7 +4,7 @@
 //    https://github.com/dmajda/pegjs/blob/master/examples/javascript.pegjs
 
 start
-  = Statement+
+  = LinearExpression+
 
 // Separator, Space
 Zs = [\u0020\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000]
@@ -30,6 +30,10 @@ LineTerminatorSequence "end of line"
   / "\r"
   / "\u2028" // line separator
   / "\u2029" // paragraph separator
+
+EOS
+  = __ ";"
+  / _ LineTerminatorSequence
 
 Comment "comment"
   = MultiLineComment
@@ -104,7 +108,7 @@ MultiplicativeExpression
       var result = head;
       for (var i = 0; i < tail.length; i++) {
         result = {
-          type:     "BinaryExpression",
+          type:     "MultiplicativeExpression",
           operator: tail[i][1],
           left:     result,
           right:    tail[i][3]
@@ -122,7 +126,7 @@ AdditiveExpression
       var result = head;
       for (var i = 0; i < tail.length; i++) {
         result = {
-          type:     "BinaryExpression",
+          type:     "AdditiveExpression",
           operator: tail[i][1],
           left:     result,
           right:    tail[i][3]
@@ -140,7 +144,7 @@ InequalityExpression
       var result = head;
       for (var i = 0; i < tail.length; i++) {
         result = {
-          type:     "BinaryExpression",
+          type:     "Inequality",
           operator: tail[i][1],
           left:     result,
           right:    tail[i][3]
@@ -157,11 +161,11 @@ InequalityOperator
 
 LinearExpression
   = head:InequalityExpression
-    tail:(__ EqualityOperator __ InequalityExpression)* {
+    tail:(__ EqualityOperator __ InequalityExpression)* EOS {
       var result = head;
       for (var i = 0; i < tail.length; i++) {
         result = {
-          type:     "BinaryExpression",
+          type:     "Equality",
           operator: tail[i][1],
           left:     result,
           right:    tail[i][3]
@@ -172,7 +176,3 @@ LinearExpression
 
 EqualityOperator
   = "=="
-  / "!=="
-
-Statement
-  = LinearExpression
