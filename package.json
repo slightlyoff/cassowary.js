@@ -9,7 +9,7 @@
     "url" : "https://github.com/slightlyoff/cassowary-js-refactor.git"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "cd tests; mocha test.js"
   },
   "dependencies": {
   },

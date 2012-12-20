@@ -66,64 +66,37 @@ $ git submodule update --init
 ```
 
 To run the tests, point your thorougly modern browser at `tests/unittests.html`
-or `demos/quad/quaddemo.html`. To run from the command line, first, see if they
-already run without any extra work (they should on most Mac or Linux boxes):
+or `demos/quad/quaddemo.html`.
+
+Running tests from the command line requires [Node](http://nodejs.org/). Once
+you've installed Node and some sort of `make` for your platform, run:
 
 ```
-$ cd tests
-$ ./run.sh
+$ npm install
+...
+$ npm test
+cd tests; ../node_modules/.bin/mocha --reporter list test.js
+| 93 tests to run in 10 groups
+| ------------------------------------------------------------
+| GROUP "c" has 5 tests to run
+| _inc
+| own
+| extend
+| inherit
+| basicJSON
+| ------------------------------------------------------------
+| GROUP "c.Constraint" has 13 tests to run
+| equationFromExpression
 ...
 ```
 
-If you get an error like:
-
-```
-$ ./run.sh
-FAILED: No JavaScript Runtime Found! Please install Java or the V8 Shell (d8) and add them to your $PATH
-```
-
-Check out a copy of V8 and building the latest debugging shell:
-
-`scons snapshot=on console=readline objectprint=on d8`
-
-This make take a while and yes, it requires Scons (which implies a Python
-dependency) and a sane C++ compiler in your PATH. Now add the directory with
-the `d8` executable to your PATH for running the unit tests.
-
-Then invoke the command-line test runner from inside the test directory:
-
-```
-$ cd tests
-$ ./run.sh
-...
-done adding 63 constraints [500 attempted, 0 exceptions]
-time = 0.021
-done adding 63 constraints [500 attempted, 0 exceptions]
-time = 0.023
-Editing vars with indices 70, 56
-about to start resolves
-done resolves -- now ending edits
-total time = 0.325
-
-  number of constraints:             100
-  number of solvers:                  10
-  numbers of resolves:                50
-  tests:                               1
-  time to add (ms):                   23
-  time to edit (ms):                   5
-  time to resolve (ms):               62
-  time to edit (ms):                   2
-  add time per solver (ms):        0.023
-  edit time per solver (ms):        0.25
-  resolve time per resolve (ms):   0.124
-  time to end edits per solver (ms): 0.1
-```
-
-If you would like to avoid building V8 but have Java installed, a copy of Rhino
-(`js.jar`) is included in this repo. `run.sh` should detect that `d8` is not in
-your path and attempt to fall back to using Rhino to run the tests. If it's not
-working out of the box, check to ensure that Java is installed and in your
-PATH.
+If you have a working `make`, a Makefile is provided with a `test` target that
+does the same thing. The Makefile also provides a `make build` target which
+generates a new minified `bin/c.js` binary out of the files in `src/`. It
+requires Python and isn't something you should need to do manually as it's not
+reqired to run tests or use the solver. The checked-in binary should always be
+up-to-date (or at some checkpoint which is known-good), so use it in your
+projects instead of the source versions.
 
 Supported Runtimes
 ------------------

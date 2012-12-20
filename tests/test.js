@@ -3,6 +3,22 @@
 //
 // Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
+// "use strict";
+
+var isNode = (typeof require == "function" && typeof load == "undefined");
+if (isNode)  {
+  // We're in Node.
+  var fs = require("fs");
+  var path = require("path");
+
+  var load = function(file) {
+    var source = fs.readFileSync(file, "utf8");
+    ("global", eval)(source);
+  };
+}
+
+load("../third_party/doh/runner.js");
+
 load("console.js");
 
 load("../src/c.js");
@@ -40,3 +56,6 @@ load("Tableau-test.js");
 load("Variable-test.js");
 load("End-To-End-test.js");
 
+if(isNode) {
+  doh.run();
+}
