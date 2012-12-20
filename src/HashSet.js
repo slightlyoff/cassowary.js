@@ -30,6 +30,11 @@ c.HashSet = c.inherit({
     return this.storage;
   },
 
+  has: function(item) {
+    var s = this.storage;
+    return (s.indexOf(item) != -1);
+  },
+
   delete: function(item) {
     var io = this.storage.indexOf(item);
     if (io == -1) { return null; }
