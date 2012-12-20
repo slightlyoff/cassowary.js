@@ -9,17 +9,36 @@
 
 c.Tableau = c.inherit({
   initialize: function() {
+    // columns is a mapping from variables which occur in expressions to the
+    // set of basic variables whose expressions contain them
+    // i.e., it's a mapping from variables in expressions (a column) to the
+    // set of rows that contain them
     this.columns = new c.HashTable(); // values are sets
+
+    // _rows maps basic variables to the expressions for that row in the tableau
     this.rows = new c.HashTable();    // values are c.Expressions
+
+    // the collection of basic variables that have infeasible rows
+    // (used when reoptimizing)
     this._infeasibleRows = new c.HashSet();
+
+    // the set of rows where the basic variable is external this was added to
+    // the C++ version to reduce time in setExternalVariables()
     this._externalRows = new c.HashSet();
+
+    // the set of external variables which are parametric this was added to the
+    // C++ version to reduce time in setExternalVariables()
     this._externalParametricVars = new c.HashSet();
   },
 
+  // Variable v has been removed from an Expression.  If the Expression is in a
+  // tableau the corresponding basic variable is subject (or if subject is nil
+  // then it's in the objective function). Update the column cross-indices.
   noteRemovedVariable: function(v /*c.AbstractVariable*/, subject /*c.AbstractVariable*/) {
-    // if (c.trace) console.log("c.Tableau::noteRemovedVariable: ", v, subject);
-    if (subject) {
-      this.columns.get(v).delete(subject);
+    c.trace && console.log("c.Tableau::noteRemovedVariable: ", v, subject);
+    var column = this.columns.get(v);
+    if (subject && column) {
+      column.delete(subject);
     }
   },
 

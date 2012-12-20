@@ -747,6 +747,9 @@ c.SimplexSolver = c.inherit({
         c.traceprint("entryVar == " + entryVar + ", objectiveCoeff == " + objectiveCoeff);
       }
 
+      // choose which variable to move out of the basis
+      // Only consider pivotable basic variables
+      // (i.e. restricted, non-dummy variables)
       var minRatio = Number.MAX_VALUE;
       var columnVars = this.columns.get(entryVar);
       var r = 0;
@@ -782,20 +785,28 @@ c.SimplexSolver = c.inherit({
 
   pivot: function(entryVar /*c.AbstractVariable*/, exitVar /*c.AbstractVariable*/) {
     if (c.trace) c.fnenterprint("pivot: " + entryVar + ", " + exitVar);
-    // console.time(" SimplexSolver::pivot");
+    var time = false;
+    time && console.time(" SimplexSolver::pivot");
     if (entryVar == null) {
       console.warn("pivot: entryVar == null");
     }
     if (exitVar == null) {
       console.warn("pivot: exitVar == null");
     }
+    // console.log("SimplexSolver::pivot(", entryVar, exitVar, ")")
+    time && console.time("  removeRow");
     var pexpr = this.removeRow(exitVar);
+    time && console.timeEnd("  removeRow");
+    time && console.time("  changeSubject");
     pexpr.changeSubject(exitVar, entryVar);
-    // console.time("  substituteOut");
+    time && console.timeEnd("  changeSubject");
+    time && console.time("  substituteOut");
     this.substituteOut(entryVar, pexpr);
-    // console.timeEnd("  substituteOut");
+    time && console.timeEnd("  substituteOut");
+    time && console.time("  addRow")
     this.addRow(entryVar, pexpr);
-    // console.timeEnd(" SimplexSolver::pivot");
+    time && console.timeEnd("  addRow")
+    time && console.timeEnd(" SimplexSolver::pivot");
   },
 
   _resetStayConstants: function() {
