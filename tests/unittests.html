@@ -35,6 +35,9 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
       print = function(s) { printLog.push(s); }
     </script>
 
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css">
+    <script src="../node_modules/mocha/mocha.js"></script>
+
     <script src="../src/c.js"></script>
 
     <script>
@@ -79,6 +82,8 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
         append(el("h2", "In-page test results:"));
         append(el("pre", printLog.join("\n")));
         printLog.length = 0;
+
+        mocha.run();
       }, false);
     </script>
     <script>
@@ -114,5 +119,6 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
   </head>
   <body>
     <h1>Cassowary Javascript Smoke Tests</h1>
+    <div id="mocha"></div>
   </body>
 </html>
