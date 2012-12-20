@@ -4,10 +4,10 @@
 //    https://github.com/dmajda/pegjs/blob/master/examples/javascript.pegjs
 
 start
-  = LinearExpression+
+  = __ statements:(Statement+) __ { return statements; }
 
-// Separator, Space
-Zs = [\u0020\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000]
+Statement
+  = expression:LinearExpression EOS { return expression; }
 
 SourceCharacter
   = .
@@ -19,7 +19,6 @@ IdentifierStart
 
 WhiteSpace "whitespace"
   = [\t\v\f \u00A0\uFEFF]
-  / Zs
 
 LineTerminator
   = [\n\r\u2028\u2029]
@@ -34,6 +33,10 @@ LineTerminatorSequence "end of line"
 EOS
   = __ ";"
   / _ LineTerminatorSequence
+  / __ EOF
+
+EOF
+  = !.
 
 Comment "comment"
   = MultiLineComment
@@ -118,7 +121,7 @@ MultiplicativeExpression
     }
 
 MultiplicativeOperator
-  = operator:("*" / "/" / "%") !"=" { return operator; }
+  = "*" / "/"
 
 AdditiveExpression
   = head:MultiplicativeExpression
@@ -161,7 +164,7 @@ InequalityOperator
 
 LinearExpression
   = head:InequalityExpression
-    tail:(__ EqualityOperator __ InequalityExpression)* EOS {
+    tail:(__ "==" __ InequalityExpression)* {
       var result = head;
       for (var i = 0; i < tail.length; i++) {
         result = {
@@ -173,6 +176,3 @@ LinearExpression
       }
       return result;
     }
-
-EqualityOperator
-  = "=="
