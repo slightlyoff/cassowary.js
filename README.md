@@ -69,7 +69,7 @@ To run the tests, point your thorougly modern browser at `tests/unittests.html`
 or `demos/quad/quaddemo.html`.
 
 Running tests from the command line requires [Node](http://nodejs.org/). Once
-you've installed Node and some sort of `make` for your platform, run:
+you've installed Node, run:
 
 ```
 $ npm install
