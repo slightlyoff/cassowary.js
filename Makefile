@@ -1,3 +1,5 @@
+all: parser test build
+
 build:
 	cd util; ./build.sh
 
