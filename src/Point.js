@@ -52,4 +52,4 @@ c.Point = c.inherit({
   },
 });
 
-})(this["c"]||module.parent.exports.c);
+})(this["c"]||module.parent.exports);

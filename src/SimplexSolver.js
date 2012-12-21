@@ -863,4 +863,4 @@ c.SimplexSolver = c.inherit({
     constraintSet.add(aVar);
   },
 });
-})(this["c"]||module.parent.exports.c);
+})(this["c"]||module.parent.exports);

@@ -285,6 +285,7 @@ scope.c = {
 
 // For Node...not that I'm bitter. No no, not at all. Not me. Never...
 if (typeof require == "function" && typeof load == "undefined") {
+  module.exports = c;
   require("./HashTable.js");
   require("./HashSet.js");
   require("./Error.js");
@@ -299,9 +300,6 @@ if (typeof require == "function" && typeof load == "undefined") {
   require("./Tableau.js");
   require("./SimplexSolver.js");
   require("./Timer.js");
-  scope.exports = {
-    c: scope.c
-  };
 }
 // ...well, hardly ever.
 

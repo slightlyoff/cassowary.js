@@ -7,7 +7,7 @@
 
 "use strict";
 
-var c = require("../src/c.js").c;
+var c = require("../src/c.js");
 var t = require("assert");
 t.is = t.deepEqual;
 t.t = t;

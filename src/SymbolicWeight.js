@@ -29,4 +29,4 @@ c.SymbolicWeight = c.inherit({
 });
 
 c.SymbolicWeight.clsZero = new c.SymbolicWeight(0, 0, 0);
-})(this["c"]||module.parent.exports.c);
+})(this["c"]||module.parent.exports);
