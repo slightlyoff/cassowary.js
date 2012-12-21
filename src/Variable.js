@@ -111,4 +111,4 @@ c.SlackVariable = c.inherit({
   value:         "slack",
 });
 
-})(c);
+})(this["c"]||module.parent.exports.c);

@@ -288,4 +288,4 @@ c.Expression = c.inherit({
   },
 });
 
-})(c);
+})(this["c"]||module.parent.exports.c);

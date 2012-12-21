@@ -7,14 +7,20 @@
 
 "use strict";
 
-doh.add("c", [
+var c = require("../src/c.js").c;
+var t = require("assert");
+t.is = t.deepEqual;
+t.t = t;
 
-  function _inc(t) {
-    var v = c._inc();
-    t.is(v+1, c._inc());
-  },
+describe("c", function() {
+  describe("_inc", function() {
+    it("should increment monotnically", function() {
+      var v = c._inc();
+      t.is(v+1, c._inc());
+    });
+  });
 
-  function own(t) {
+  describe("own", function() {
     var p = { thinger: true };
     var C = function() {
       this.ownProp = true;
@@ -23,13 +29,13 @@ doh.add("c", [
     var o = new C();
     var count = 0;
     c.own(o, function() { count++; })
-    t.is(1, count);
-  },
+    it("should only have the local property we just set", function() {
+      t.is(1, count);
+    });
+  });
 
-  function extend(t) {
+  describe("extend", function() {
     var o = {};
-    t.is({}, o);
-
     var ctr = 0;
     var props = {
       get foo() {
@@ -44,35 +50,52 @@ doh.add("c", [
       }
     };
 
-    c.extend(o, props);
-    t.is(0, ctr);
-    o.foo = 10;
-    t.is(1, ctr);
-    props.foo = 10;
-    t.is(2, ctr);
+    it("is sane", function() {
+      t.is({}, o);
+    });
 
-    var keyPd = Object.getOwnPropertyDescriptor(o, "key");
-    t.is(true, keyPd.writable);
-    t.is(true, keyPd.configurable);
-    t.is(true, keyPd.enumerable);
-    t.is("string", typeof keyPd.value);
-    t.is("value", keyPd.value);
 
-    var methodPd = Object.getOwnPropertyDescriptor(o, "method");
-    t.is(true, methodPd.writable);
-    t.is(true, methodPd.configurable);
-    t.is(false, methodPd.enumerable);
-    // print(Object.keys(methodPd));
-    t.is("function", typeof methodPd.value);
+    // Ugg...I hate communicating over (possibly async) code bodies like this
+    it ("is setup", function() {
+      c.extend(o, props);
+    });
 
-    var getSetPd = Object.getOwnPropertyDescriptor(o, "foo");
-    t.is("function", typeof getSetPd.set);
-    t.is("function", typeof getSetPd.get);
-    t.is(true, getSetPd.enumerable);
-    t.is(true, getSetPd.configurable);
-  },
+    it("should correctly assign/use getters & setters", function() {
+      t.is(0, ctr);
+      o.foo = 10;
+      t.is(1, ctr);
+      props.foo = 10;
+      t.is(2, ctr);
+    });
 
-  function inherit(t) {
+    it("sets property descriptors correctly", function() {
+      var keyPd = Object.getOwnPropertyDescriptor(o, "key");
+      t.is(true, keyPd.writable);
+      t.is(true, keyPd.configurable);
+      t.is(true, keyPd.enumerable);
+      t.is("string", typeof keyPd.value);
+      t.is("value", keyPd.value);
+    });
+
+    it("sets method descriptors correctly", function() {
+      var methodPd = Object.getOwnPropertyDescriptor(o, "method");
+      t.is(true, methodPd.writable);
+      t.is(true, methodPd.configurable);
+      t.is(false, methodPd.enumerable);
+      // print(Object.keys(methodPd));
+      t.is("function", typeof methodPd.value);
+    });
+
+    it("sets getter/setter descriptors correctly", function() {
+      var getSetPd = Object.getOwnPropertyDescriptor(o, "foo");
+      t.is("function", typeof getSetPd.set);
+      t.is("function", typeof getSetPd.get);
+      t.is(true, getSetPd.enumerable);
+      t.is(true, getSetPd.configurable);
+    });
+  });
+
+  describe("inherit", function() {
     var Classic = function() {
       this.i = c._inc();
     }
@@ -98,25 +121,108 @@ doh.add("c", [
         return this._value;
       },
     };
+
     var C = c.inherit(props);
-    t.is(undefined, props.initialize);
-    t.is(undefined, props.extends);
+
+    it("is sane", function() {
+      t.is("function", typeof C);
+    });
+    it("clobbered initialize", function() {
+      t.is(undefined, props.initialize);
+    });
+    it("clobbered extends", function() {
+      t.is(undefined, props.extends);
+    });
 
     var i = new C();
     var j = new C();
     var v = i.i;
-    t.is(v+1, j.i);
-    t.t(i.superProtoProp);
-    Classic.prototype.superProtoProp = 10;
-    t.is(10, i.superProtoProp);
+    it("is constructor chaining", function() {
+      t.is(v+1, j.i);
+    });
+    it("is mapping protototypes in", function() {
+      t.t(i.superProtoProp);
+      Classic.prototype.superProtoProp = 10;
+      t.is(10, i.superProtoProp);
+    });
 
-    t.is(v+1, i.inc());
-    t.is(v+2, i.inc());
+    it("sets up class-level methods with a sane 'this'", function() {
+      t.is(v+1, i.inc());
+      t.is(v+2, i.inc());
+    });
 
-    i.value = "thinger";
-    t.is("thinger", i.value);
-    t.is("thinger", i._value);
-  },
+    it("assigns setters correctly", function() {
+      i.value = "thinger";
+      t.is("thinger", i.value);
+      t.is("thinger", i._value);
+    });
+  });
+
+  describe("basicJSON", function() {
+    var symbolicZeroValue = c.SymbolicWeight.clsZero.value;
+    it("serializes c.SymbolicWeight instances correctly", function() {
+      t.is({ _t: "c.SymbolicWeight", value: symbolicZeroValue },
+           c.SymbolicWeight.clsZero.toJSON());
+    });
+
+    var solver = new c.SimplexSolver();
+
+    var x = new c.Variable({ name: "x", value: 10 });
+    var width = new c.Variable({ name: "width", value: 10 });
+    var right = new c.Expression(x).plus(width);
+    var ieq = new c.Inequality(100, c.LEQ, right);
+
+    solver.addStay(width)
+          .addConstraint(ieq);
+
+    var ir = solver._infeasibleRows;
+    it("has sane JSON.stringify() behavior for a c.HashSet", function() {
+      t.is('{"_t":"c.HashSet","data":[]}', JSON.stringify(ir));
+    });
+
+    it("handles 2-deep object/type graphs", function() {
+      t.is(
+        { _t: "c.HashSet",
+          data: [
+                    { _t: "c.Variable", name: "width", value: 10 },
+                    { _t: "c.Variable", name: "x", value: 90 }
+          ]
+        },
+        solver._externalRows.toJSON()
+      );
+    });
+
+    // Smoke test
+    it("doesn't blow up on rehydration", function() {
+      var rehydratedER = c.parseJSON(JSON.stringify(solver._externalRows));
+    });
+
+    // FIXME(slightlyoff):
+    //    need to filter out the "hashCode" property for deep equality test
+    // t.is(rehydratedER, solver._externalRows);
+  });
+
+  // TODO(slightlyoff)
+  describe("assert", function() {
+
+  });
+
+  describe("plus", function() {
+
+  });
+
+  describe("minus", function() {
+
+  });
+
+  describe("times", function() {
+
+  });
+
+  describe("divide", function() {
+
+  });
+});
 
   /*
   function fromJSON(t) {
@@ -134,64 +240,12 @@ doh.add("c", [
     t.is(width.value, 10);
   },
   */
-
-  function basicJSON(t) {
-    var symbolicZeroValue = c.SymbolicWeight.clsZero.value;
-    t.is({ _t: "c.SymbolicWeight", value: symbolicZeroValue },
-         c.SymbolicWeight.clsZero.toJSON());
-
-    var solver = new c.SimplexSolver();
-
-    var x = new c.Variable({ name: "x", value: 10 });
-    var width = new c.Variable({ name: "width", value: 10 });
-    var right = new c.Expression(x).plus(width);
-    var ieq = new c.Inequality(100, c.LEQ, right);
-
-    solver.addStay(width)
-          .addConstraint(ieq);
-
-    var ir = solver._infeasibleRows;
-    t.is('{"_t":"c.HashSet","data":[]}', JSON.stringify(ir));
-
-    t.is(
-      { _t: "c.HashSet",
-        data: [
-                  { _t: "c.Variable", name: "width", value: 10 },
-                  { _t: "c.Variable", name: "x", value: 90 }
-        ]
-      },
-      solver._externalRows.toJSON()
-    );
-
-    // Smoke test
-    var rehydratedER = c.parseJSON(JSON.stringify(solver._externalRows));
-    // FIXME(slightlyoff):
-    //    need to filter out the "hashCode" property for deep equality test
-    // t.is(rehydratedER, solver._externalRows);
-  },
-
+/*
+*/
   /*
-  // TODO(slightlyoff)
-  function Assert(t) {
-
-  },
-
-  function Plus(t) {
-
-  },
-
-  function Minus(t) {
-
-  },
-
-  function Times(t) {
-
-  },
-
-  function Divide(t) {
-
-  },
   */
+/*
 ]);
+*/
 
 })();

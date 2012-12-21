@@ -10,11 +10,11 @@
 var PerfTest = c.inherit({
 
   addDel: function(nCns /*int*/, nVars /*int*/, nResolves /*int*/) {
-    var timer = new Timer();
+    var timer = new c.Timer();
     var ineqProb = 0.12;
     var maxVars = 3;
     print("starting timing test. nCns = " + nCns + ", nVars = " + nVars + ", nResolves = " + nResolves);
-    timer.Start();
+    timer.start();
     var solver = new c.SimplexSolver();
     solver.autoSolve = false;
     var rgpclv = [];
@@ -45,11 +45,11 @@ var PerfTest = c.inherit({
       }
       if (c.trace) c.traceprint("Constraint " + j + " is " + rgpcns[j]);
     }
-    timer.Stop();
+    timer.stop();
     print("done building data structures");
-    print("time = " + timer.ElapsedTime());
-    timer.Reset();
-    timer.Start();
+    print("time = " + timer.elapsedTime());
+    timer.reset();
+    timer.start();
     var cExceptions = 0;
     var cCns = 0;
     for (j = 0; j < nCnsMade && cCns < nCns; j++) {
@@ -64,21 +64,21 @@ var PerfTest = c.inherit({
       }
     }
     solver.solve();
-    timer.Stop();
+    timer.stop();
     print("done adding " + cCns + " constraints [" + j + " attempted, " + cExceptions + " exceptions]");
-    print("time = " + timer.ElapsedTime() + "\n");
-    print("time per Add cn = " + timer.ElapsedTime() / cCns);
+    print("time = " + timer.elapsedTime() + "\n");
+    print("time per Add cn = " + timer.elapsedTime() / cCns);
     var e1Index = this.RandomInRange(0, nVars);
     var e2Index = this.RandomInRange(0, nVars);
     print("Editing vars with indices " + e1Index + ", " + e2Index);
     var edit1 = new c.EditConstraint(rgpclv[e1Index], c.Strength.strong);
     var edit2 = new c.EditConstraint(rgpclv[e2Index], c.Strength.strong);
     print("about to start resolves");
-    timer.Reset();
-    timer.Start();
+    timer.reset();
+    timer.start();
     solver.addConstraint(edit1)
           .addConstraint(edit2);
-    timer.Stop();
+    timer.stop();
 
     for (var m = 0; m < nResolves; m++) {
       solver.resolvePair(rgpclv[e1Index].value * 1.001,
@@ -86,19 +86,19 @@ var PerfTest = c.inherit({
     }
     solver.removeConstraint(edit1);
     solver.removeConstraint(edit2);
-    timer.Stop();
+    timer.stop();
     print("done resolves -- now removing constraints");
-    print("time = " + timer.ElapsedTime() + "\n");
-    print("time per Resolve = " + timer.ElapsedTime() / nResolves);
-    timer.Reset();
-    timer.Start();
+    print("time = " + timer.elapsedTime() + "\n");
+    print("time per Resolve = " + timer.elapsedTime() / nResolves);
+    timer.reset();
+    timer.start();
     for (j = 0; j < cCns; j++) {
       solver.removeConstraint(rgpcnsAdded[j]);
     }
-    timer.Stop();
+    timer.stop();
     print("done removing constraints and addDel timing test");
-    print("time = " + timer.ElapsedTime() + "\n");
-    print("time per Remove cn = " + timer.ElapsedTime() / cCns);
+    print("time = " + timer.elapsedTime() + "\n");
+    print("time per Remove cn = " + timer.elapsedTime() / cCns);
     return true;
   },
 
@@ -121,17 +121,17 @@ var PerfTest = c.inherit({
                           nResolves /*int*/,
                           nSolvers /*int*/,
                           testNum /*int*/) {
-    var totalTimer = new Timer();
-    totalTimer.Start();
+    var totalTimer = new c.Timer();
+    totalTimer.start();
 
-    var timer = new Timer();
+    var timer = new c.Timer();
     var tmAddvar, tmEditvar, tmResolvevar, tmEndEdit;
     var tmAdd, tmEdit, tmResolve;
     var ineqProb = 0.12;
     var maxVars = 3;
     var nVars = nCns;
     print("starting timing test. nCns = " + nCns + ", nSolvers = " + nSolvers + ", nResolves = " + nResolves);
-    timer.Start();
+    timer.start();
     var rgsolvers = new Array(nSolvers+1);
     for (var is = 0; is < nSolvers + 1; ++is) {
       rgsolvers[is] = new c.SimplexSolver();
@@ -167,9 +167,9 @@ var PerfTest = c.inherit({
       }
       if (this.trace) this.traceprint("Constraint " + j + " is " + rgpcns[j]);
     }
-    timer.Stop();
+    timer.stop();
     print("done building data structures");
-    print("time = " + timer.ElapsedTime());
+    print("time = " + timer.elapsedTime());
     for (var is = 0; is < nSolvers; ++is) {
       var cCns = 0;
       var cExceptions = 0;
@@ -187,8 +187,8 @@ var PerfTest = c.inherit({
         }
       }
     }
-    timer.Reset();
-    timer.Start();
+    timer.reset();
+    timer.start();
     for (var is = 0; is < nSolvers; ++is) {
       var cCns = 0;
       var cExceptions = 0;
@@ -207,44 +207,42 @@ var PerfTest = c.inherit({
       }
       print("done adding " + cCns + " constraints [" + j + " attempted, " + cExceptions + " exceptions]");
       solver.solve();
-      print("time = " + timer.ElapsedTime());
+      print("time = " + timer.elapsedTime());
     }
-    timer.Stop();
-    tmAdd = timer.ElapsedTime();
+    timer.stop();
+    tmAdd = timer.elapsedTime();
     var e1Index = this.RandomInRange(0, nVars);
     var e2Index = this.RandomInRange(0, nVars);
     print("Editing vars with indices " + e1Index + ", " + e2Index);
     var edit1 = new c.EditConstraint(rgpclv[e1Index], c.Strength.strong);
     var edit2 = new c.EditConstraint(rgpclv[e2Index], c.Strength.strong);
     print("about to start resolves");
-    timer.Reset();
-    timer.Start();
+    timer.reset();
+    timer.start();
     rgsolvers.forEach(function(solver) {
       solver.addConstraint(edit1).addConstraint(edit2);
     });
-    timer.Stop();
-    tmEdit = timer.ElapsedTime();
-    timer.Reset();
-    timer.Start();
+    timer.stop();
+    tmEdit = timer.elapsedTime();
+    timer.reset().start();
     rgsolvers.forEach(function(solver) {
       for (var m = 0; m < nResolves; m++) {
         solver.resolvePair(rgpclv[e1Index].value * 1.001,
                            rgpclv[e2Index].value * 1.001);
       }
     });
-    timer.Stop();
-    tmResolve = timer.ElapsedTime();
+    timer.stop();
+    tmResolve = timer.elapsedTime();
     print("done resolves -- now ending edits");
-    timer.Reset();
-    timer.Start();
+    timer.reset().start();
     for (var is = 0; is < nSolvers; ++is) {
       rgsolvers[is].removeConstraint(edit1).removeConstraint(edit2);
     }
-    timer.Stop();
-    tmEndEdit = timer.ElapsedTime();
+    timer.stop();
+    tmEndEdit = timer.elapsedTime();
 
-    totalTimer.Stop();
-    print("total time = " + totalTimer.ElapsedTime());
+    totalTimer.stop();
+    print("total time = " + totalTimer.elapsedTime());
 
     var s = "\n  ";
     var mspersec = 1000;
@@ -283,4 +281,4 @@ var PerfTest = c.inherit({
 // (new PerfTest()).main(1, 500, 10, 500);
 
 //clt.main(new Array());
-})(c);
+})(this["c"]||module.parent.exports.c);

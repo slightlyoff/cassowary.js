@@ -93,4 +93,4 @@ c.HashSet = c.inherit({
   },
 });
 
-})(c);
+})(this["c"]||module.parent.exports.c);

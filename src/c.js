@@ -67,6 +67,7 @@ var walkForMethod = function(ctor, name) {
 };
 
 // Global
+var c =
 scope.c = {
   //
   // Configuration
@@ -281,4 +282,27 @@ scope.c = {
   },
 };
 
-})(this);
+
+// For Node...not that I'm bitter. No no, not at all. Not me. Never...
+if (typeof require == "function" && typeof load == "undefined") {
+  require("./HashTable.js");
+  require("./HashSet.js");
+  require("./Error.js");
+  require("./SymbolicWeight.js");
+  require("./Strength.js");
+  require("./Variable.js");
+  require("./Point.js");
+  require("./Expression.js");
+  require("./Constraint.js");
+  require("./Constraint.js");
+  require("./EditInfo.js");
+  require("./Tableau.js");
+  require("./SimplexSolver.js");
+  require("./Timer.js");
+  scope.exports = {
+    c: scope.c
+  };
+}
+// ...well, hardly ever.
+
+})(this||module);

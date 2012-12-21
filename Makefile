@@ -2,7 +2,7 @@ build:
 	cd util; ./build.sh
 
 test:
-	cd tests; ../node_modules/.bin/mocha --reporter list test.js
+	npm test
 
 parser:
 	./node_modules/pegjs/bin/pegjs \

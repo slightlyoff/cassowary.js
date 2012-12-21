@@ -4,41 +4,40 @@
 //
 // Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
 
-(function(scope, c) {
+(function(c) {
 "use strict";
 
-scope.Timer = c.inherit({
+c.Timer = c.inherit({
   initialize: function() {
-    this._timerIsRunning = false;
+    this.isRunning = false;
     this._elapsedMs = 0;
   },
 
-  Start: function() {
-    this._timerIsRunning = true;
+  start: function() {
+    this.isRunning = true;
     this._startReading = new Date();
+    return this;
   },
 
-  Stop: function() {
-    this._timerIsRunning = false;
+  stop: function() {
+    this.isRunning = false;
     this._elapsedMs += (new Date()) - this._startReading;
+    return this;
   },
 
-  Reset: function() {
-    this._timerIsRunning = false;
+  reset: function() {
+    this.isRunning = false;
     this._elapsedMs = 0;
-  }, 
-
-  IsRunning : function() {
-    return this._timerIsRunning;
+    return this;
   },
 
-  ElapsedTime : function() {
-    if (!this._timerIsRunning) {
-      return this._elapsedMs/1000;
+  elapsedTime : function() {
+    if (!this.isRunning) {
+      return this._elapsedMs / 1000;
     } else {
-      return (this._elapsedMs+(new Date()-this._startReading))/1000;
+      return (this._elapsedMs + (new Date() - this._startReading)) / 1000;
     }
   },
 });
 
-})(this, c);
+})(this["c"]||module.parent.exports.c);
