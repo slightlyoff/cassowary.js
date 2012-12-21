@@ -36,9 +36,18 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     </script>
 
     <link rel="stylesheet" href="../node_modules/mocha/mocha.css">
+    <script src="../node_modules/chai/chai.js"></script>
     <script src="../node_modules/mocha/mocha.js"></script>
-
     <script src="../src/c.js"></script>
+    <script>
+      mocha.setup("bdd");
+      var require = function(type) {
+        if ( (type == "c") || (type.indexOf("c.js") >= 0) )
+          return c;
+        if (type == "chai")
+          return chai;
+      };
+    </script>
 
     <script>
       // Configuration
@@ -63,7 +72,8 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
     <script src="../third_party/doh/runner.js"></script>
     <script>doh.squelch = false;</script>
-    <script src="c-test.js"></script>
+
+    <!-- DOH tests -->
     <script src="Constraint-test.js"></script>
     <script src="Expression-test.js"></script>
     <script src="Point-test.js"></script>
@@ -75,6 +85,10 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     <script src="End-To-End-test.js"></script>
     <script>doh.run();</script>
 
+    <!-- Mocha tests -->
+    <script src="c-test.js"></script>
+
+    <!-- Perf tests -->
     <script src="../src/Timer.js"></script>
     <script src="PerfTest.js"></script>
     <script>

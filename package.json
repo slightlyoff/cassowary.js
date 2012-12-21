@@ -8,6 +8,18 @@
     "type" : "git",
     "url" : "https://github.com/slightlyoff/cassowary-js-refactor.git"
   },
+  "license": "LGPL",
+  "contributors": [
+    {
+      "name": "Alex Russell",
+      "email": "slightlyoff@chromium.org",
+      "url": "http://infrequently.org"
+    },
+    {
+      "name": "Greg J. Badros",
+      "url": "http://www.badros.com/greg/"
+    }
+  ],
   "scripts": {
     "test": "cd tests; mocha test.js c-test.js"
   },
@@ -16,7 +28,7 @@
   "devDependencies": {
     "pegjs" : "*",
     "mocha":  "*",
-    "should": "*"
+	"chai": "*"
   },
   "engines" : { "node" : ">=0.8.x" }
 }
