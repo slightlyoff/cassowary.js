@@ -4,7 +4,7 @@
 //
 // Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
 
-(function(scope){
+(function(scope, compiled){
 "use strict";
 
 // For Safari 5.x. Go-go-gadget ridiculously long release cycle!
@@ -284,7 +284,7 @@ scope.c = {
 
 
 // For Node...not that I'm bitter. No no, not at all. Not me. Never...
-if (typeof require == "function" && typeof load == "undefined") {
+if (typeof require == "function" && typeof load == "undefined" && !compiled) {
   module.exports = c;
   require("./HashTable.js");
   require("./HashSet.js");
@@ -303,4 +303,4 @@ if (typeof require == "function" && typeof load == "undefined") {
 }
 // ...well, hardly ever.
 
-})(this||module);
+})(this||module, this.compiled);

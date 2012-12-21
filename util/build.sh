@@ -19,4 +19,9 @@ python post.py ../src/c.js\
                ../src/EditInfo.js\
                ../src/Tableau.js\
                ../src/SimplexSolver.js\
-               ../src/Timer.js > ../bin/c.js
+               ../src/Timer.js\
+               ../src/parser/parser.js > out.js
+
+cat preamble.js out.js afterward.js > ../bin/c.js
+
+rm out.js
