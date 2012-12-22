@@ -21,7 +21,7 @@
     }
   ],
   "scripts": {
-    "test": "cd tests; mocha test.js c-test.js Constraint-test.js"
+    "test": "cd tests; mocha test.js c-test.js Constraint-test.js Expression-test.js"
   },
   "dependencies": {
   },

@@ -47,7 +47,7 @@ doh.squelch = false;
 
 // load("c-test.js");
 // load("Constraint-test.js");
-load("Expression-test.js");
+// load("Expression-test.js");
 load("Point-test.js");
 load("SimplexSolver-test.js");
 load("Strength-test.js");

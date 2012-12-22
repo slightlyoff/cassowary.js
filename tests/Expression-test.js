@@ -4,84 +4,94 @@
 //
 // Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
+(function() {
+
 "use strict";
 
-doh.add("c.Expression", [
-  function threeVarCtor(t) {
+var c = require("../src/c.js");
+var t = require("chai").assert;
+t.is = t.deepEqual;
+t.t = t;
+t.f = function(obj, str) {
+  return t.t(!obj, str);
+};
+
+describe("c.Expression", function() {
+  it("is constructable with 3 variables as arguments", function () {
     var x = new c.Variable({ name: "x", value: 167 });
     var e = new c.Expression(x, 2, 3);
-    t.is(e, "3 + 2*[x:167]");
-  },
+    t.is(e.toString(), "3 + 2*[x:167]");
+  });
 
-  function oneParamCtor(t) {
-    t.is(new c.Expression(4), "4");
-  },
+  it("is constructable with one parameter", function() {
+    t.is(new c.Expression(4).toString(), "4");
+  });
 
-  function plus(t) {
+  it("plus", function() {
     var x = new c.Variable({ name: "x", value: 167 });
-    t.is(c.plus(4,2), "6");
-    t.is(c.plus(x,2), "2 + 1*[x:167]");
-    t.is(c.plus(3,x), "3 + 1*[x:167]");
-  },
+    t.is(c.plus(4,2).toString(), "6");
+    t.is(c.plus(x,2).toString(), "2 + 1*[x:167]");
+    t.is(c.plus(3,x).toString(), "3 + 1*[x:167]");
+  });
 
-  function plus_solve(t) {
+  it("plus_solve", function() {
     var s = new c.SimplexSolver();
     var x = new c.Variable({ name: "x", value: 167 });
-    t.is(c.plus(4,2), "6");
-    t.is(c.plus(x,2), "2 + 1*[x:167]");
-    t.is(c.plus(3,x), "3 + 1*[x:167]");
-  },
+    t.is(c.plus(4,2).toString(), "6");
+    t.is(c.plus(x,2).toString(), "2 + 1*[x:167]");
+    t.is(c.plus(3,x).toString(), "3 + 1*[x:167]");
+  });
 
-  function times(t) {
+  it("times", function() {
     var x = new c.Variable({ name: "x", value: 167 });
-    t.is(c.times(x,3), "3*[x:167]");
-    t.is(c.times(7,x), "7*[x:167]");
-  },
+    t.is(c.times(x,3).toString(), "3*[x:167]");
+    t.is(c.times(7,x).toString(), "7*[x:167]");
+  });
 
-  function complex(t) {
+  it("complex", function() {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 2 });
     var ex = c.plus(4, c.plus(c.times(x,3), c.times(2,y)));
-    t.is(ex, "4 + 3*[x:167] + 2*[y:2]");
-  },
+    t.is(ex.toString(), "4 + 3*[x:167] + 2*[y:2]");
+  });
 
-  function zero_args(t) {
+  it("zero_args", function() {
     var exp = new c.Expression;
     t.is(0, exp.constant);
     t.is(0, exp.terms.size);
-  },
+  });
 
-  function one_number(t) {
+  it("one_number", function() {
     var exp = new c.Expression(10);
     t.is(10, exp.constant);
     t.is(0, exp.terms.size);
-  },
+  });
 
-  function one_variable(t) {
+  it("one_variable", function() {
     var v = new c.Variable({ value: 10 });
     var exp = new c.Expression(v);
     t.is(0, exp.constant);
     t.is(1, exp.terms.size);
     t.is(1, exp.terms.get(v));
-  },
+  });
 
-  function variable_number(t) {
+  it("variable_number", function() {
     var v = new c.Variable({ value: 10 });
     var exp = new c.Expression(v, 20);
     t.is(0, exp.constant);
     t.is(1, exp.terms.size);
     t.is(20, exp.terms.get(v));
-  },
+  });
 
-  function variable_number_number(t) {
+  it("variable_number_number", function() {
     var v = new c.Variable({ value: 10 });
     var exp = new c.Expression(v, 20, 2);
     t.is(2, exp.constant);
     t.is(1, exp.terms.size);
     t.is(20, exp.terms.get(v));
-  },
+  });
 
-  function clone(t) {
+  it("clone", function() {
     var v = new c.Variable({ value: 10 });
     var exp = new c.Expression(v, 20, 2);
     var clone = exp.clone();
@@ -89,9 +99,9 @@ doh.add("c.Expression", [
     t.is(clone.constant, exp.constant);
     t.is(clone.terms.size, exp.terms.size);
     t.is(20, clone.terms.get(v));
-  },
+  });
 
-  function isConstant(t) {
+  it("isConstant", function() {
     var e1 = new c.Expression;
     var e2 = new c.Expression(10);
     var e3 = new c.Expression(new c.Variable({ value: 10 }), 20, 2);
@@ -99,18 +109,18 @@ doh.add("c.Expression", [
     t.is(true, e1.isConstant());
     t.is(true, e2.isConstant());
     t.is(false, e3.isConstant());
-  },
+  });
 
-  function multiplyMe(t) {
+  it("multiplyMe", function() {
     var v = new c.Variable({ value: 10 });
     var e = new c.Expression(v, 20, 2).multiplyMe(-1);
 
     t.is(e.constant, -2);
     t.is(v.value, 10);
     t.is(e.terms.get(v), -20);
-  },
+  });
 
-  function times(t) {
+  it("times", function() {
     var v = new c.Variable({ value: 10 });
     var a = new c.Expression(v, 20, 2);
 
@@ -130,10 +140,11 @@ doh.add("c.Expression", [
     t.is(e.terms.get(v), 200);
 
     // multiplying two non-constant expressions
-    t.e(c.NonExpression, a, 'times', [a]);
-  },
+    // t.e(c.NonExpression, a, 'times', [a]);
+    t.throws(a.times.bind(a, a), c.NonExpression);
+  });
 
-  function addVariable(t) {
+  it("addVariable", function() {
     var a = new c.Expression(new c.Variable({ value: 10 }), 20, 2);
     var v = new c.Variable({ value: 20 });
 
@@ -156,9 +167,9 @@ doh.add("c.Expression", [
     a.addVariable(v, 0);
     t.is(a.terms.size, 1);
     t.is(null, a.terms.get(v));
-  },
+  });
 
-  function addExpression_variable(t) {
+  it("addExpression_variable", function() {
     var a = new c.Expression(new c.Variable({ value: 10 }), 20, 2);
     var v = new c.Variable({ value: 20 });
 
@@ -166,9 +177,9 @@ doh.add("c.Expression", [
     a.addExpression(v, 2);
     t.is(a.terms.size, 2);
     t.is(a.terms.get(v), 2);
-  },
+  });
 
-  function addExpression(t) {
+  it("addExpression", function() {
     var va = new c.Variable({ value: 10 });
     var vb = new c.Variable({ value: 20 });
     var vc = new c.Variable({ value: 5 });
@@ -192,69 +203,73 @@ doh.add("c.Expression", [
     t.is(a.terms.size, 3);
     t.is(a.constant, 16);
     t.is(a.terms.get(vc), 2);
-  },
+  });
 
-  function plus(t) {
+  it("plus", function() {
     var va = new c.Variable({ value: 10 });
     var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
     var b = new c.Expression(vb, 10, 5);
 
     var p = a.plus(b);
-    t.assertNotEqual(a, p);
-    t.assertNotEqual(a, b);
+    t.notDeepEqual(a, p);
+    t.notDeepEqual(a, b);
 
     t.is(p.constant, 7);
     t.is(p.terms.size, 2);
     t.is(p.terms.get(va), 20);
     t.is(p.terms.get(vb), 10);
-  },
+  });
 
-  function minus(t) {
+  it("minus", function() {
     var va = new c.Variable({ value: 10 });
     var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
     var b = new c.Expression(vb, 10, 5);
 
     var p = a.minus(b);
-    t.assertNotEqual(a, p);
-    t.assertNotEqual(a, b);
+    t.notDeepEqual(a, p);
+    t.notDeepEqual(a, b);
 
     t.is(p.constant, -3);
     t.is(p.terms.size, 2);
     t.is(p.terms.get(va), 20);
     t.is(p.terms.get(vb), -10);
-  },
+  });
 
-  function divide(t) {
+  it("divide", function() {
     var va = new c.Variable({ value: 10 });
     var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
 
-    t.e(c.NonExpression, a, 'divide', [0]);
+    t.throws(a.divide.bind(a, 0), c.NonExpression);
+    // t.e(c.NonExpression, a, 'divide', [0]);
 
     var p = a.divide(2);
     t.is(p.constant, 1);
     t.is(p.terms.get(va), 10);
 
-    t.e(c.NonExpression, a, 'divide', [new c.Expression(vb, 10, 5)]);
-    t.e(c.NonExpression, new c.Expression(vb, 10, 5), 'divide', [a]);
+    t.throws(a.divide.bind(a, new c.Expression(vb, 10, 5)),
+             c.NonExpression);
+    // t.e(c.NonExpression, a, 'divide', [new c.Expression(vb, 10, 5)]);
+    var ne = new c.Expression(vb, 10, 5);
+    t.throws(ne.divide.bind(ne, a), c.NonExpression);
 
     p = a.divide(new c.Expression(2));
     t.is(p.constant, 1);
     t.is(p.terms.get(va), 10);
-  },
+  });
 
-  function coefficientFor(t) {
+  it("coefficientFor", function() {
     var va = new c.Variable({ value: 10 });
     var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
 
     t.is(a.coefficientFor(va), 20);
     t.is(a.coefficientFor(vb), 0);
-  },
+  });
 
-  function setVariable(t) {
+  it("setVariable", function() {
     var va = new c.Variable({ value: 10 });
     var vb = new c.Variable({ value: 20 });
     var a = new c.Expression(va, 20, 2);
@@ -268,10 +283,14 @@ doh.add("c.Expression", [
     a.setVariable(vb, 2);
     t.is(a.terms.size, 2);
     t.is(a.coefficientFor(vb), 2);
-  },
+  });
 
-  function anyPivotableVariable(t) {
-    t.e(c.InternalError, new c.Expression(10), 'anyPivotableVariable');
+  it("anyPivotableVariable", function() {
+
+    // t.e(c.InternalError, new c.Expression(10), 'anyPivotableVariable');
+    var e = new c.Expression(10);
+    t.throws(e.anyPivotableVariable.bind(e), c.InternalError);
+    // t.e(c.InternalError, new c.Expression(10), 'anyPivotableVariable');
 
     var va = new c.Variable({ value: 10 });
     var vb = new c.SlackVariable;
@@ -281,9 +300,9 @@ doh.add("c.Expression", [
 
     a.setVariable(vb, 2);
     t.is(vb, a.anyPivotableVariable());
-  },
+  });
 
-  function substituteOut(t) {
+  it("substituteOut", function() {
     var v1 = new c.Variable({ value: 20 });
     var v2 = new c.Variable({ value: 2 });
     var a = new c.Expression(v1, 2, 2); // 2*v1 + 2
@@ -301,9 +320,9 @@ doh.add("c.Expression", [
     t.is(a.constant, 26);
     t.is(null, a.terms.get(v2));
     t.is(a.terms.get(v1), 17);
-  },
+  });
 
-  function newSubject(t) {
+  it("newSubject", function() {
     var v = new c.Variable({ value: 10 });
     var e = new c.Expression(v, 2, 5);
 
@@ -311,9 +330,9 @@ doh.add("c.Expression", [
     t.is(e.constant, -2.5);
     t.is(null, e.terms.get(v));
     t.is(true, e.isConstant());
-  },
+  });
 
-  function changeSubject(t) {
+  it("changeSubject", function() {
     var va = new c.Variable({ value: 10 });
     var vb = new c.Variable({ value: 5 });
     var e = new c.Expression(va, 2, 5);
@@ -322,9 +341,9 @@ doh.add("c.Expression", [
     t.is(e.constant, -2.5);
     t.is(null, e.terms.get(va));
     t.is(e.terms.get(vb), 0.5);
-  },
+  });
 
-  function toString(t) {
+  it("toString", function() {
     var v = new c.Variable({ name: "v", value: 5 });
 
     t.is(new c.Expression(10).toString(), '10');
@@ -335,54 +354,55 @@ doh.add("c.Expression", [
 
     e.setVariable(new c.Variable({ name: "b", value: 2 }), 4);
     t.is(e.toString(), '10 + 2*[v:5] + 4*[b:2]');
-  },
+  });
 
-  function equals(t) {
+  it("equals", function() {
     var v = new c.Variable({ name: "v", value: 5 });
 
     t.t(new c.Expression(10).equals(new c.Expression(10)));
     t.f(new c.Expression(10).equals(new c.Expression(1)));
     t.t(new c.Expression(v, 2, -1).equals(new c.Expression(v, 2, -1)));
     t.f(new c.Expression(v, -2, 5).equals(new c.Expression(v, 3, 6)));
-  },
+  });
 
-  function plus(t) {
+  it("plus", function() {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 10 });
 
-    t.is(c.plus(2, 3), '5');
-    t.is(c.plus(x, 2), '2 + 1*[x:167]');
-    t.is(c.plus(3, x), '3 + 1*[x:167]');
-    t.is(c.plus(x, y), '1*[x:167] + 1*[y:10]');
-  },
+    t.is(c.plus(2, 3).toString(), '5');
+    t.is(c.plus(x, 2).toString(), '2 + 1*[x:167]');
+    t.is(c.plus(3, x).toString(), '3 + 1*[x:167]');
+    t.is(c.plus(x, y).toString(), '1*[x:167] + 1*[y:10]');
+  });
 
-  function minus(t) {
+  it("minus", function() {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 10 });
 
-    t.is(c.minus(2, 3), '-1');
-    t.is(c.minus(x, 2), '-2 + 1*[x:167]');
-    t.is(c.minus(3, x), '3 + -1*[x:167]');
-    t.is(c.minus(x, y), '1*[x:167] + -1*[y:10]');
-  },
+    t.is(c.minus(2, 3).toString(), '-1');
+    t.is(c.minus(x, 2).toString(), '-2 + 1*[x:167]');
+    t.is(c.minus(3, x).toString(), '3 + -1*[x:167]');
+    t.is(c.minus(x, y).toString(), '1*[x:167] + -1*[y:10]');
+  });
 
-  function times(t) {
+  it("times", function() {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 10 });
 
-    t.is(c.times(2, 3), '6');
-    t.is(c.times(x, 2), '2*[x:167]');
-    t.is(c.times(3, x), '3*[x:167]');
-    t.e(c.NonExpression, c, 'times', [x, y]);
-  },
+    t.is(c.times(2, 3).toString(), '6');
+    t.is(c.times(x, 2).toString(), '2*[x:167]');
+    t.is(c.times(3, x).toString(), '3*[x:167]');
+    t.throws(c.times.bind(c, x, y), c.NonExpression);
+  });
 
-  function divide(t) {
+  it("divide", function() {
     var x = new c.Variable({ name: "x", value: 167 });
     var y = new c.Variable({ name: "y", value: 10 });
 
-    t.is(c.divide(4, 2), '2');
-    t.is(c.divide(x, 2), '0.5*[x:167]');
-    t.e(c.NonExpression, c, 'divide', [4, x]);
-    t.e(c.NonExpression, c, 'divide', [x, y]);
-  }
-]);
+    t.is(c.divide(4, 2).toString(), '2');
+    t.is(c.divide(x, 2).toString(), '0.5*[x:167]');
+    t.throws(c.divide.bind(c, 4, x), c.NonExpression);
+    t.throws(c.divide.bind(c, x, y), c.NonExpression);
+  });
+});
+})();
