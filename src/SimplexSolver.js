@@ -119,11 +119,8 @@ c.SimplexSolver = c.inherit({
         new c.EditConstraint(v, strength || c.Strength.strong));
   },
 
-  removeEditVar: function(v /*c.Variable*/) {
-    return this.removeConstraint(this._editVarMap.get(v).constraint);
-  },
-
   beginEdit: function() {
+    // FIXME(slightlyoff): we shouldn't throw here. Log instead
     c.assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
     this._infeasibleRows.clear();
     this._resetStayConstants();
@@ -132,6 +129,7 @@ c.SimplexSolver = c.inherit({
   },
 
   endEdit: function() {
+    // FIXME(slightlyoff): we shouldn't throw here. Log instead
     c.assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
     this.resolve();
     this._stkCedcns.pop();
@@ -158,7 +156,9 @@ c.SimplexSolver = c.inherit({
       // not the ones on x,y
       for(var x = n; x < evll; x++) {
         if (this._editVarList[x]) {
-          this.removeEditVar(this._editVarList[x].v);
+          this.removeConstraint(
+            this._editVarMap.get(this._editVarList[x].v).constraint
+          );
         }
       }
       this._editVarList.length = n;
