@@ -8,6 +8,7 @@
 var t = c.Tableau;
 var tp = t.prototype;
 var epsilon = 1e-8;
+var weak = c.Strength.weak;
 
 c.SimplexSolver = c.inherit({
   extends: c.Tableau,
@@ -108,7 +109,7 @@ c.SimplexSolver = c.inherit({
     try {
       this.addConstraint(cn);
       return true;
-    } catch (e /*ExCLRequiredFailure*/){
+    } catch (e /*c.RequiredFailure*/){
       return false;
     }
   },
@@ -164,37 +165,28 @@ c.SimplexSolver = c.inherit({
       this._editVarList.length = n;
       c.assert(this._editVarMap.size == n, "_editVarMap.size == n");
       return this;
-    }
-    catch (e /*Exc.ConstraintNotFound*/){
+    } catch (e /*ConstraintNotFound*/){
       throw new c.InternalError("Constraint not found in removeEditVarsTo");
     }
   },
 
-  addPointStays: function(listOfPoints /*Vector*/) {
-    if (c.trace) c.fnenterprint("addPointStays" + listOfPoints);
-    listOfPoints.forEach(function(p, idx) {
-      this.addPointStay(p, Math.pow(2, idx));
+  // Add weak stays to the x and y parts of each point. These have
+  // increasing weights so that the solver will try to satisfy the x
+  // and y stays on the same point, rather than the x stay on one and
+  // the y stay on another.
+  addPointStays: function(points /*[{ x: .., y: ..}, ...]*/) {
+    c.trace && console.log("addPointStays", points);
+    points.forEach(function(p, idx) {
+      this.addStay(p.x, weak, Math.pow(2, idx));
+      this.addStay(p.y, weak, Math.pow(2, idx));
     }, this);
-    return this;
-  },
-
-  addPointStay: function(a1, a2, a3) {
-    if (a1 instanceof c.Point) {
-      var clp = a1, weight = a2;
-      this.addStay(clp.x, c.Strength.weak, weight || 1);
-      this.addStay(clp.y, c.Strength.weak, weight || 1);
-    } else { //
-      var vx = a1, vy = a2, weight = a3;
-      this.addStay(vx, c.Strength.weak, weight || 1);
-      this.addStay(vy, c.Strength.weak, weight || 1);
-    }
     return this;
   },
 
   addStay: function(v /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
     var cn = new c.StayConstraint(v,
-                                  strength || c.Strength.weak,
-                                  weight || 1);
+                                  strength || weak,
+                                  weight   || 1);
     return this.addConstraint(cn);
   },
 
@@ -234,7 +226,7 @@ c.SimplexSolver = c.inherit({
     var marker = this._markerVars.get(cn);
     this._markerVars.delete(cn);
     if (marker == null) {
-      throw new Exc.ConstraintNotFound();
+      throw new c.InternalError("Constraint not found in removeConstraintInternal");
     }
     if (c.trace) c.traceprint("Looking to remove var " + marker);
     if (this.rows.get(marker) == null) {
@@ -358,9 +350,9 @@ c.SimplexSolver = c.inherit({
   },
 
   suggestValue: function(v /*c.Variable*/, x /*double*/) {
-    if (c.trace) c.fnenterprint("suggestValue(" + v + ", " + x + ")");
+    c.trace && console.log("suggestValue(" + v + ", " + x + ")");
     var cei = this._editVarMap.get(v);
-    if (cei == null) {
+    if (!cei) {
       throw new c.Error("suggestValue for variable " + v + ", but var is not an edit variable");
     }
     var delta = x - cei.prevEditConstant;
@@ -389,7 +381,7 @@ c.SimplexSolver = c.inherit({
 
       try {
         this.suggestValue(v, n);
-      } catch (e /*c.Error*/) {
+      } catch (e) {
         throw new c.InternalError("Error in setEditedValue");
       }
 
@@ -823,8 +815,21 @@ c.SimplexSolver = c.inherit({
     time && console.timeEnd(" SimplexSolver::pivot");
   },
 
+  // Each of the non-required stays will be represented by an equation
+  // of the form
+  //     v = c + eplus - eminus
+  // where v is the variable with the stay, c is the previous value of
+  // v, and eplus and eminus are slack variables that hold the error
+  // in satisfying the stay constraint.  We are about to change
+  // something, and we want to fix the constants in the equations
+  // representing the stays.  If both eplus and eminus are nonbasic
+  // they have value 0 in the current solution, meaning the previous
+  // stay was exactly satisfied.  In this case nothing needs to be
+  // changed.  Otherwise one of them is basic, and the other must
+  // occur only in the Expression for that basic error variable.
+  // Reset the Constant in this Expression to 0.
   _resetStayConstants: function() {
-    if (c.trace) c.fnenterprint("_resetStayConstants");
+    c.trace && console.log("_resetStayConstants");
     for (var i = 0; i < this._stayPlusErrorVars.length; i++) {
       var expr = this.rows.get(/* c.AbstractVariable */this._stayPlusErrorVars[i]);
       if (expr == null)
