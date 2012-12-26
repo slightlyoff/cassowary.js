@@ -582,15 +582,20 @@ c.SimplexSolver = c.inherit({
     }, this);
   },
 
+  // We have set new values for the constants in the edit constraints.
+  // Re-Optimize using the dual simplex algorithm.
   dualOptimize: function() {
     if (c.trace) c.fnenterprint("dualOptimize:");
     var zRow = this.rows.get(this._objective);
+    // need to handle infeasible rows
     while (this._infeasibleRows.size) {
       var exitVar = this._infeasibleRows.values()[0];
       this._infeasibleRows.delete(exitVar);
       var entryVar = null;
       var expr = this.rows.get(exitVar);
-      if (expr != null) {
+      // exitVar might have become basic after some other pivoting
+      // so allow for the case of its not being there any longer
+      if (expr) {
         if (expr.constant < 0) {
           var ratio = Number.MAX_VALUE;
           var r;
@@ -648,6 +653,18 @@ c.SimplexSolver = c.inherit({
     }, this);
 
     if (cn.isInequality) {
+      // cn is an inequality, so Add a slack variable. The original constraint
+      // is expr>=0, so that the resulting equality is expr-slackVar=0. If cn is
+      // also non-required Add a negative error variable, giving:
+      //
+      //    expr - slackVar = -errorVar
+      //
+      // in other words:
+      //
+      //    expr - slackVar + errorVar = 0
+      //
+      // Since both of these variables are newly created we can just Add
+      // them to the Expression (they can't be basic).
       c.trace && c.traceprint("Inequality, adding slack");
       ++this._slackCounter;
       slackVar = new c.SlackVariable({
@@ -655,6 +672,7 @@ c.SimplexSolver = c.inherit({
         prefix: "s"
       });
       expr.setVariable(slackVar, -1);
+
       this._markerVars.set(cn, slackVar);
       if (!cn.required) {
         ++this._slackCounter;
@@ -671,6 +689,9 @@ c.SimplexSolver = c.inherit({
     } else {
       if (cn.required) {
         c.trace && c.traceprint("Equality, required");
+        // Add a dummy variable to the Expression to serve as a marker for this
+        // constraint.  The dummy variable is never allowed to enter the basis
+        // when pivoting.
         ++this._dummyCounter;
         dummyVar = new c.DummyVariable({
           value: this._dummyCounter,
@@ -680,6 +701,12 @@ c.SimplexSolver = c.inherit({
         this._markerVars.set(cn, dummyVar);
         if (c.trace) c.traceprint("Adding dummyVar == d" + this._dummyCounter);
       } else {
+
+        // cn is a non-required equality. Add a positive and a negative error
+        // variable, making the resulting constraint
+        //       expr = eplus - eminus
+        // in other words:
+        //       expr - eplus + eminus = 0
         if (c.trace) c.traceprint("Equality, not required");
         ++this._slackCounter;
         eplus = new c.SlackVariable({
@@ -718,11 +745,15 @@ c.SimplexSolver = c.inherit({
         }
       }
     }
+    // the Constant in the Expression should be non-negative. If necessary
+    // normalize the Expression by multiplying by -1
     if (expr.constant < 0) expr.multiplyMe(-1);
     if (c.trace) c.fnexitprint("returning " + expr);
     return expr;
   },
 
+  // Minimize the value of the objective.  (The tableau should already be
+  // feasible.)
   optimize: function(zVar /*c.ObjectiveVariable*/) {
     if (c.trace) c.fnenterprint("optimize: " + zVar);
     if (c.trace) c.traceprint(this.toString());
@@ -732,11 +763,15 @@ c.SimplexSolver = c.inherit({
     c.assert(zRow != null, "zRow != null");
     var entryVar = null;
     var exitVar = null;
+    var objectiveCoeff, terms;
 
     while (true) {
-      var objectiveCoeff = 0;
-      var terms = zRow.terms;
+      objectiveCoeff = 0;
+      terms = zRow.terms;
 
+      // Find the most negative coefficient in the objective function (ignoring
+      // the non-pivotable dummy variables). If all coefficients are positive
+      // we're done
       terms.escapingEach(function(v, c) {
         if (v.isPivotable && c < objectiveCoeff) {
           objectiveCoeff = c;
@@ -749,9 +784,8 @@ c.SimplexSolver = c.inherit({
       if (objectiveCoeff >= -epsilon)
         return;
 
-      if (c.trace) {
-        c.traceprint("entryVar == " + entryVar + ", objectiveCoeff == " + objectiveCoeff);
-      }
+      c.trace && console.log("entryVar:", entryVar,
+                             "objectiveCoeff:", objectiveCoeff);
 
       // choose which variable to move out of the basis
       // Only consider pivotable basic variables
@@ -766,10 +800,20 @@ c.SimplexSolver = c.inherit({
           var expr = this.rows.get(v);
           var coeff = expr.coefficientFor(entryVar);
           if (c.trace) c.traceprint("pivotable, coeff = " + coeff);
+          // only consider negative coefficients
           if (coeff < 0) {
             r = -expr.constant / coeff;
+            // Bland's anti-cycling rule:
+            // if multiple variables are about the same,
+            // always pick the lowest via some total
+            // ordering -- I use their addresses in memory
+            //    if (r < minRatio ||
+            //              (c.approx(r, minRatio) &&
+            //               v.get_pclv() < exitVar.get_pclv()))
             if (r < minRatio ||
-                (c.approx(r, minRatio) && v.hashCode < exitVar.hashCode)) {
+                (c.approx(r, minRatio) &&
+                 v.hashCode < exitVar.hashCode)
+            ) {
               minRatio = r;
               exitVar = v;
             }
@@ -777,6 +821,10 @@ c.SimplexSolver = c.inherit({
         }
       }, this);
 
+      // If minRatio is still nil at this point, it means that the
+      // objective function is unbounded, i.e. it can become
+      // arbitrarily negative.  This should never happen in this
+      // application.
       if (minRatio == Number.MAX_VALUE) {
         throw new c.InternalError("Objective function is unbounded in optimize");
       }
@@ -789,29 +837,56 @@ c.SimplexSolver = c.inherit({
     }
   },
 
+  // Do a Pivot.  Move entryVar into the basis (i.e. make it a basic variable),
+  // and move exitVar out of the basis (i.e., make it a parametric variable)
   pivot: function(entryVar /*c.AbstractVariable*/, exitVar /*c.AbstractVariable*/) {
-    if (c.trace) c.fnenterprint("pivot: " + entryVar + ", " + exitVar);
+    c.trace && console.log("pivot: ", entryVar, exitVar);
     var time = false;
+
     time && console.time(" SimplexSolver::pivot");
+
+    // the entryVar might be non-pivotable if we're doing a RemoveConstraint --
+    // otherwise it should be a pivotable variable -- enforced at call sites,
+    // hopefully
     if (entryVar == null) {
       console.warn("pivot: entryVar == null");
     }
+
     if (exitVar == null) {
       console.warn("pivot: exitVar == null");
     }
     // console.log("SimplexSolver::pivot(", entryVar, exitVar, ")")
+
+    // expr is the Expression for the exit variable (about to leave the basis) --
+    // so that the old tableau includes the equation:
+    //   exitVar = expr
     time && console.time("  removeRow");
-    var pexpr = this.removeRow(exitVar);
+    var expr = this.removeRow(exitVar);
     time && console.timeEnd("  removeRow");
+
+    // Compute an Expression for the entry variable.  Since expr has
+    // been deleted from the tableau we can destructively modify it to
+    // build this Expression.
     time && console.time("  changeSubject");
-    pexpr.changeSubject(exitVar, entryVar);
+    expr.changeSubject(exitVar, entryVar);
     time && console.timeEnd("  changeSubject");
+
     time && console.time("  substituteOut");
-    this.substituteOut(entryVar, pexpr);
+    this.substituteOut(entryVar, expr);
     time && console.timeEnd("  substituteOut");
+    /*
+    if (entryVar.isExternal) {
+      // entry var is no longer a parametric variable since we're moving
+      // it into the basis
+      console.log("entryVar is external!");
+      this._externalParametricVars.delete(entryVar);
+    }
+    */
+
     time && console.time("  addRow")
-    this.addRow(entryVar, pexpr);
+    this.addRow(entryVar, expr);
     time && console.timeEnd("  addRow")
+
     time && console.timeEnd(" SimplexSolver::pivot");
   },
 
