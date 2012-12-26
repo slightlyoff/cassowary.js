@@ -63,9 +63,9 @@ c.Expression = c.inherit({
     if (typeof x == 'number') {
       return (this.clone()).multiplyMe(x);
     } else {
-      if (this.isConstant()) {
+      if (this.isConstant) {
         return x.times(this.constant);
-      } else if (x.isConstant()) {
+      } else if (x.isConstant) {
         return this.times(x.constant);
       } else {
         throw new c.NonExpression();
@@ -96,7 +96,7 @@ c.Expression = c.inherit({
       }
       return this.times(1 / x);
     } else if (x instanceof c.Expression) {
-      if (!x.isConstant()) {
+      if (!x.isConstant) {
         throw new c.NonExpression();
       }
       return this.times(1 / x.constant);
@@ -158,7 +158,7 @@ c.Expression = c.inherit({
   },
 
   anyPivotableVariable: function() {
-    if (this.isConstant()) {
+    if (this.isConstant) {
       throw new c.InternalError("anyPivotableVariable called on a constant");
     }
 
@@ -236,16 +236,16 @@ c.Expression = c.inherit({
     return this.terms.get(clv) || 0;
   },
 
-  isConstant: function() {
+  get isConstant() {
     return this.terms.size == 0;
   },
 
   toString: function() {
     var bstr = ''; // answer
     var needsplus = false;
-    if (!c.approx(this.constant, 0) || this.isConstant()) {
+    if (!c.approx(this.constant, 0) || this.isConstant) {
       bstr += this.constant;
-      if (this.isConstant()) {
+      if (this.isConstant) {
         return bstr;
       } else {
         needsplus = true;

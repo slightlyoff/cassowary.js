@@ -106,9 +106,9 @@ describe("c.Expression", function() {
     var e2 = new c.Expression(10);
     var e3 = new c.Expression(new c.Variable({ value: 10 }), 20, 2);
 
-    t.is(true, e1.isConstant());
-    t.is(true, e2.isConstant());
-    t.is(false, e3.isConstant());
+    t.is(true, e1.isConstant);
+    t.is(true, e2.isConstant);
+    t.is(false, e3.isConstant);
   });
 
   it("multiplyMe", function() {
@@ -329,7 +329,7 @@ describe("c.Expression", function() {
     t.is(e.newSubject(v), 1 / 2);
     t.is(e.constant, -2.5);
     t.is(null, e.terms.get(v));
-    t.is(true, e.isConstant());
+    t.is(true, e.isConstant);
   });
 
   it("changeSubject", function() {
