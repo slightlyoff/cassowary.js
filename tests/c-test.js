@@ -159,10 +159,10 @@ describe("c", function() {
   });
 
   describe("basicJSON", function() {
-    var symbolicZeroValue = c.SymbolicWeight.clsZero.value;
+    var symbolicZeroValue = new c.SymbolicWeight(0, 0, 0).value;
     it("serializes c.SymbolicWeight instances correctly", function() {
       t.is({ _t: "c.SymbolicWeight", value: symbolicZeroValue },
-           c.SymbolicWeight.clsZero.toJSON());
+           (new c.SymbolicWeight(0, 0, 0)).toJSON());
     });
 
     var solver = new c.SimplexSolver();
