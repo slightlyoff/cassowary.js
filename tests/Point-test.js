@@ -4,12 +4,27 @@
 //
 // Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
+(function() {
+
 "use strict";
 
-doh.add("c.Point", [
-  function ctor(t) {
+var c = require("../src/c.js");
+// DOH compat
+var t = require("chai").assert;
+t.is = t.deepEqual;
+t.t = t;
+t.f = function(obj, str) {
+  return t.t(!obj, str);
+};
+
+
+describe("c.Point", function() {
+
+  it("should be constructable", function() {
     new c.Point(4,7);
     new c.Point(3,5,"1");
-  },
+  });
   // FIXME(slightlyoff): MOAR TESTS
-]);
+});
+
+})();
