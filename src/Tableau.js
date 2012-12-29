@@ -174,7 +174,7 @@ c.Tableau = c.inherit({
   },
 
   columnsHasKey: function(subject /*c.AbstractVariable*/) {
-    return (this.columns.get(subject) != null);
+    return !!this.columns.get(subject);
   },
 });
 

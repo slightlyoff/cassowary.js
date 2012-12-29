@@ -3,12 +3,33 @@
 // COPYING.LGPL file.
 //
 // Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
-
+(function() {
 "use strict";
 
-doh.add("c.Tableau", [
-  function ctor(t) {
-    new c.Tableau();
-  },
+var c = require("../src/c.js");
+// DOH Compat.
+var t = require("chai").assert;
+t.is = t.deepEqual;
+t.t = t;
+t.f = function(obj, str) {
+  return t.t(!obj, str);
+};
+
+describe("c.Tableau", function() {
+  describe("ctor", function() {
+    it("doesn't blow up", function() {
+      new c.Tableau();
+    });
+
+    it("has sane properties", function() {
+      var tab = new c.Tableau();
+      t.is(0, tab.columns.size);
+      t.is(0, tab.rows.size);
+      t.is(0, tab._infeasibleRows.size);
+      t.is(0, tab._externalRows.size);
+      t.is(0, tab._externalParametricVars.size);
+    });
+  });
   // FIXME(slightlyoff): MOAR TESTS
-]);
+});
+})();
