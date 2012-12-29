@@ -202,6 +202,25 @@ describe("c", function() {
     // t.is(rehydratedER, solver._externalRows);
   });
 
+  describe("approx", function() {
+    it("is sane across integers", function() {
+      t.t(c.approx(25, 25));
+      t.f(c.approx(25, 26));
+    });
+    it("handles c.Variables", function() {
+      t.t(c.approx(new c.Variable({ value: 25 }), new c.Variable({ value: 25 })));
+      t.f(c.approx(new c.Variable({ value: 25 }), new c.Variable({ value: 26 })));
+    });
+    it("is correct for small differences", function() {
+      t.t(c.approx(0, 0.000000001));
+      t.f(c.approx(0, 0.00000001));
+      t.t(c.approx(0.000000001, 0));
+      t.f(c.approx(0.00000001, 0));
+      t.t(c.approx(25, 25.000000001));
+      t.f(c.approx(25, 25.000001));
+    });
+  });
+
   // TODO(slightlyoff)
   describe("assert", function() {
 

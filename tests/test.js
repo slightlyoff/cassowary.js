@@ -53,7 +53,7 @@ doh.squelch = false;
 // load("Strength-test.js");
 // load("SymbolicWeight-test.js");
 // load("Tableau-test.js");
-load("Variable-test.js");
+// load("Variable-test.js");
 load("End-To-End-test.js");
 
 if(isNode) {
