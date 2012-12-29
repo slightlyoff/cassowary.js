@@ -3,16 +3,28 @@
 // COPYING.LGPL file.
 //
 // Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
+(function() {
 
 "use strict";
 
-doh.add("c.SimplexSolver", [
-  function ctor(t) {
-    new c.SimplexSolver();
-  },
+var c = require("../src/c.js");
+// DOH Compat.
+var t = require("chai").assert;
+t.is = t.deepEqual;
+t.t = t;
+t.f = function(obj, str) {
+  return t.t(!obj, str);
+};
 
-  function addPointStays(t) {
-  },
+describe("c.SimplexSolver", function() {
+  it("should be constructable without args", function() {
+    new c.SimplexSolver();
+  });
 
   // FIXME(slightlyoff): MOAR TESTS
-]);
+  describe("addPointStays", function() {
+
+  });
+});
+
+})();
