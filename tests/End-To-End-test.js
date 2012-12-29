@@ -5,12 +5,20 @@
 // Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
 (function() {
-
 "use strict";
 
-doh.add("End-To-End", [
+var c = require("../src/c.js");
+// DOH Compat.
+var t = require("chai").assert;
+t.is = t.deepEqual;
+t.t = t;
+t.f = function(obj, str) {
+  return t.t(!obj, str);
+};
 
-  function simple1(t) {
+describe("End-To-End", function() {
+
+  describe("simple1", function() {
     var solver = new c.SimplexSolver();
 
     var x = new c.Variable({ value: 167 });
@@ -21,9 +29,9 @@ doh.add("End-To-End", [
     t.t(x.value == y.value);
     t.is(x.value, 0);
     t.is(y.value, 0);
-  },
+  });
 
-  function justStay1(t) {
+  describe("justStay1", function() {
     var x = new c.Variable({ value: 5 });
     var y = new c.Variable({ value: 10 });
     var solver = new c.SimplexSolver();
@@ -33,11 +41,9 @@ doh.add("End-To-End", [
     t.t(c.approx(y, 10));
     t.is(x.value, 5);
     t.is(y.value, 10);
-  },
+  });
 
-  {
-    name: "var >= num",
-    runTest: function(t) {
+  describe("var >= num", function() {
       // x >= 100
       var solver = new c.SimplexSolver();
 
@@ -45,25 +51,19 @@ doh.add("End-To-End", [
       var ieq = new c.Inequality(x, c.GEQ, 100);
       solver.addConstraint(ieq);
       t.is(x.value, 100);
-    }
-  },
+  });
 
-  {
-    name: "num == var",
-    runTest: function(t) {
-      // 100 == var
-      var solver = new c.SimplexSolver();
+  describe("num == var", function() {
+    // 100 == var
+    var solver = new c.SimplexSolver();
 
-      var x = new c.Variable({ value: 10 });
-      var eq = new c.Equation(100, x);
-      solver.addConstraint(eq);
-      t.is(x.value, 100);
-    }
-  },
+    var x = new c.Variable({ value: 10 });
+    var eq = new c.Equation(100, x);
+    solver.addConstraint(eq);
+    t.is(x.value, 100);
+  });
 
-  {
-    name: "num <= var",
-    runTest: function(t) {
+  describe("num <= var", function() {
       // x >= 100
       var solver = new c.SimplexSolver();
 
@@ -72,12 +72,9 @@ doh.add("End-To-End", [
       solver.addConstraint(ieq);
 
       t.is(x.value, 100);
-    }
-  },
+  });
 
-  {
-    name: "exp >= num",
-    runTest: function(t) {
+  describe("exp >= num", function() {
       // stay width
       // right >= 100
       var solver = new c.SimplexSolver();
@@ -95,12 +92,9 @@ doh.add("End-To-End", [
 
       t.is(x.value, 90);
       t.is(width.value, 10);
-    }
-  },
+  });
 
-  {
-    name: "num <= exp",
-    runTest: function(t) {
+  describe("num <= exp", function() {
       // stay width
       // 100 <= right
       var solver = new c.SimplexSolver();
@@ -115,12 +109,9 @@ doh.add("End-To-End", [
 
       t.is(x.value, 90);
       t.is(width.value, 10);
-    }
-  },
+  });
 
-  {
-    name: "exp == var",
-    runTest: function(t) {
+  describe("exp == var", function() {
       // stay width, rightMin
       // right >= rightMin
       var solver = new c.SimplexSolver();
@@ -137,12 +128,9 @@ doh.add("End-To-End", [
 
       t.is(x.value, 90);
       t.is(width.value, 10);
-    }
-  },
+  });
 
-  {
-    name: "exp >= var",
-    runTest: function(t) {
+  describe("exp >= var", function() {
       // stay width, rightMin
       // right >= rightMin
       var solver = new c.SimplexSolver();
@@ -159,12 +147,9 @@ doh.add("End-To-End", [
 
       t.is(x.value, 90);
       t.is(width.value, 10);
-    }
-  },
+  });
 
-  {
-    name: "var <= exp",
-    runTest: function(t) {
+  describe("var <= exp", function() {
       // stay width
       // right >= rightMin
       var solver = new c.SimplexSolver();
@@ -180,12 +165,9 @@ doh.add("End-To-End", [
 
       t.is(x.value, 90);
       t.is(width.value, 10);
-    }
-  },
+  });
 
-  {
-    name: "exp == exp",
-    runTest: function(t) {
+  describe("exp == exp", function() {
       // stay width, rightMin
       // right >= rightMin
       var solver = new c.SimplexSolver();
@@ -208,12 +190,9 @@ doh.add("End-To-End", [
       t.is(x2.value, 100);
       t.is(width1.value, 10);
       t.is(width2.value, 10);
-    }
-  },
+  });
 
-  {
-    name: "exp >= exp",
-    runTest: function(t) {
+  describe("exp >= exp", function() {
       // stay width, rightMin
       // right >= rightMin
       var solver = new c.SimplexSolver();
@@ -233,13 +212,9 @@ doh.add("End-To-End", [
             .addConstraint(ieq);
 
       t.is(x1.value, 100);
+  });
 
-    }
-  },
-
-  {
-    name: "exp <= exp",
-    runTest: function(t) {
+  describe("exp <= exp", function() {
       // stay width, rightMin
       // right >= rightMin
       var solver = new c.SimplexSolver();
@@ -258,139 +233,134 @@ doh.add("End-To-End", [
             .addConstraint(ieq);
 
       t.is(x1.value, 100);
+  });
 
-    }
-  },
-
-  function addDelete1(t) {
+  describe("addDelete1", function() {
     var solver = new c.SimplexSolver();
     var x = new c.Variable({ name: "x" });
     var cbl = new c.Equation(x, 100, c.Strength.weak);
     solver.addConstraint(cbl);
 
-    var c10 = new c.Inequality(x, c.LEQ, 10.0);
-    var c20 = new c.Inequality(x, c.LEQ, 20.0);
+    var c10 = new c.Inequality(x, c.LEQ, 10);
+    var c20 = new c.Inequality(x, c.LEQ, 20);
     solver.addConstraint(c10)
           .addConstraint(c20);
-    t.t(c.approx(x, 10.0));
+    t.t(c.approx(x, 10));
 
     solver.removeConstraint(c10);
-    t.t(c.approx(x, 20.0));
+    t.t(c.approx(x, 20));
 
     solver.removeConstraint(c20);
-    t.t(c.approx(x, 100.0));
+    t.t(c.approx(x, 100));
 
-    var c10again = new c.Inequality(x, c.LEQ, 10.0);
+    var c10again = new c.Inequality(x, c.LEQ, 10);
     solver.addConstraint(c10)
           .addConstraint(c10again);
-    t.t(c.approx(x, 10.0));
+    t.t(c.approx(x, 10));
 
     solver.removeConstraint(c10);
-    t.t(c.approx(x, 10.0));
+    t.t(c.approx(x, 10));
 
     solver.removeConstraint(c10again);
-    t.t(c.approx(x, 100.0));
-  },
+    t.t(c.approx(x, 100));
+  });
 
-  function addDelete2(t) {
+  describe("addDelete2", function() {
     var solver = new c.SimplexSolver();
     var x = new c.Variable({ name: "x" });
     var y = new c.Variable({ name: "y" });
 
-    solver.addConstraint(new c.Equation(x, 100.0, c.Strength.weak))
-          .addConstraint(new c.Equation(y, 120.0, c.Strength.strong));
-    var c10 = new c.Inequality(x, c.LEQ, 10.0);
-    var c20 = new c.Inequality(x, c.LEQ, 20.0);
+    solver.addConstraint(new c.Equation(x, 100, c.Strength.weak))
+          .addConstraint(new c.Equation(y, 120, c.Strength.strong));
+    var c10 = new c.Inequality(x, c.LEQ, 10);
+    var c20 = new c.Inequality(x, c.LEQ, 20);
     solver.addConstraint(c10)
           .addConstraint(c20);
-    t.t(c.approx(x, 10.0));
-    t.t(c.approx(y, 120.0));
+    t.t(c.approx(x, 10));
+    t.t(c.approx(y, 120));
 
     solver.removeConstraint(c10);
-    t.t(c.approx(x, 20.0));
-    t.t(c.approx(y, 120.0));
+    t.t(c.approx(x, 20));
+    t.t(c.approx(y, 120));
 
-    var cxy = new c.Equation(c.times(2.0, x), y);
+    var cxy = new c.Equation(c.times(2, x), y);
     solver.addConstraint(cxy);
-    t.t(c.approx(x, 20.0));
-    t.t(c.approx(y, 40.0));
+    t.t(c.approx(x, 20));
+    t.t(c.approx(y, 40));
 
     solver.removeConstraint(c20);
-    t.t(c.approx(x, 60.0));
-    t.t(c.approx(y, 120.0));
+    t.t(c.approx(x, 60));
+    t.t(c.approx(y, 120));
 
     solver.removeConstraint(cxy);
-    t.t(c.approx(x, 100.0));
-    t.t(c.approx(y, 120.0));
-  },
+    t.t(c.approx(x, 100));
+    t.t(c.approx(y, 120));
+  });
 
-  function casso1(t) {
+  describe("casso1", function() {
     var solver = new c.SimplexSolver();
     var x = new c.Variable({ name: "x" });
     var y = new c.Variable({ name: "y" });
 
     solver.addConstraint(new c.Inequality(x, c.LEQ, y))
-          .addConstraint(new c.Equation(y, c.plus(x, 3.0)))
-          .addConstraint(new c.Equation(x, 10.0, c.Strength.weak))
-          .addConstraint(new c.Equation(y, 10.0, c.Strength.weak));
+          .addConstraint(new c.Equation(y, c.plus(x, 3)))
+          .addConstraint(new c.Equation(x, 10, c.Strength.weak))
+          .addConstraint(new c.Equation(y, 10, c.Strength.weak));
 
     t.t(
-        (c.approx(x, 10.0) && c.approx(y, 13.0)) ||
-        (c.approx(x,  7.0) && c.approx(y, 10.0))
+        (c.approx(x, 10) && c.approx(y, 13)) ||
+        (c.approx(x,  7) && c.approx(y, 10))
     );
-  },
+  });
 
-  function inconsistent1(t) {
+  describe("inconsistent1", function() {
     var solver = new c.SimplexSolver();
     var x = new c.Variable({ name: "x" });
     // x = 10
-    solver.addConstraint(new c.Equation(x, 10.0));
+    solver.addConstraint(new c.Equation(x, 10));
     // x = 5
-    t.e(c.RequiredFailure, solver, "addConstraint", [
-      new c.Equation(x, 5.0)
-    ]);
-  },
+    t.throws(solver.addConstraint.bind(solver, new c.Equation(x, 5)),
+             c.RequiredFailure);
+  });
 
-  function inconsistent2(t) {
+  describe("inconsistent2", function() {
     var solver = new c.SimplexSolver();
     var x = new c.Variable({ name: "x" });
-    solver.addConstraint(new c.Inequality(x, c.GEQ, 10.0));
-    t.e(c.RequiredFailure, solver, "addConstraint", [
-      new c.Inequality(x, c.LEQ, 5.0)
-    ]);
-  },
+    solver.addConstraint(new c.Inequality(x, c.GEQ, 10));
+    t.throws(solver.addConstraint.bind(solver, new c.Inequality(x, c.LEQ, 5)),
+             c.RequiredFailure);
+  });
 
-  function inconsistent3(t) {
+  describe("inconsistent3", function() {
     var solver = new c.SimplexSolver();
     var w = new c.Variable({ name: "w" });
     var x = new c.Variable({ name: "x" });
     var y = new c.Variable({ name: "y" });
     var z = new c.Variable({ name: "z" });
-    solver.addConstraint(new c.Inequality(w, c.GEQ, 10.0))
+    solver.addConstraint(new c.Inequality(w, c.GEQ, 10))
           .addConstraint(new c.Inequality(x, c.GEQ, w))
           .addConstraint(new c.Inequality(y, c.GEQ, x))
           .addConstraint(new c.Inequality(z, c.GEQ, y))
-          .addConstraint(new c.Inequality(z, c.GEQ, 8.0));
-    t.e(c.RequiredFailure, solver, "addConstraint", [
-      new c.Inequality(z, c.LEQ, 4.0)
-    ]);
-  },
+          .addConstraint(new c.Inequality(z, c.GEQ, 8));
 
-  function inconsistent4(t) {
+    t.throws(solver.addConstraint.bind(solver, new c.Inequality(z, c.LEQ, 4)),
+             c.RequiredFailure);
+  });
+
+  describe("inconsistent4", function() {
     var solver = new c.SimplexSolver();
     var x = new c.Variable({ name: "x" });
     var y = new c.Variable({ name: "y" });
     // x = 10
-    solver.addConstraint(new c.Equation(x, 10.0));
+    solver.addConstraint(new c.Equation(x, 10));
     // x = y
     solver.addConstraint(new c.Equation(x, y));
     // y = 5. Should fail.
-    t.e(c.RequiredFailure, solver, "addConstraint", [
-      new c.Equation(y, 5.0)
-    ]);
-  },
+    t.throws(solver.addConstraint.bind(solver, new c.Equation(y, 5)),
+             c.RequiredFailure);
+  });
 
-  function multiedit(t) {
+  describe("multiedit", function() {
     var x = new c.Variable({ name: "x" });
     var y = new c.Variable({ name: "y" });
     var w = new c.Variable({ name: "w" });
@@ -424,9 +394,9 @@ doh.add("End-To-End", [
     t.t(c.approx(y, 60));
     t.t(c.approx(w, 30));
     t.t(c.approx(h, 40));
-  },
+  });
 
-  function multiedit2(t) {
+  describe("multiedit2", function() {
     var x = new c.Variable({ name: "x" });
     var y = new c.Variable({ name: "y" });
     var w = new c.Variable({ name: "w" });
@@ -463,9 +433,9 @@ doh.add("End-To-End", [
     t.t(c.approx(y, 60));
     t.t(c.approx(w, 30));
     t.t(c.approx(h, 40));
-  },
+  });
 
-  function multiedit3(t) {
+  describe("multiedit3", function() {
     var rand = function(max, min) {
       min = (typeof min != "undefined") ? min : 0;
       max = max || Math.pow(2, 26);
@@ -549,9 +519,9 @@ doh.add("End-To-End", [
     reCalc();
     reCalc();
     reCalc();
-  },
+  });
 
-  function errorWeights(t) {
+  describe("errorWeights", function() {
     var solver = new c.SimplexSolver();
 
     var weak = c.Strength.weak;
@@ -585,7 +555,7 @@ doh.add("End-To-End", [
     t.is(x.value,  20);
     t.is(y.value, 200);
     t.is(z.value,  20);
-  },
-]);
+  });
+});
 
 })();

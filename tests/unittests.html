@@ -35,12 +35,18 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
       print = function(s) { printLog.push(s); }
     </script>
 
+    <!--
+      Digging mocha/chai resources out of node_modules is a gigantic hack, but
+      that's where we are...cause they're shit and don't *really* support
+      working in a browser, they just like claiming they do.
+    -->
     <link rel="stylesheet" href="../node_modules/mocha/mocha.css">
     <script src="../node_modules/chai/chai.js"></script>
     <script src="../node_modules/mocha/mocha.js"></script>
     <script src="../src/c.js"></script>
     <script>
       mocha.setup("bdd");
+      // Hack up a global "require" so that the tests work. *sigh*
       var require = function(type) {
         if ( (type == "c") || (type.indexOf("c.js") >= 0) )
           return c;
@@ -69,14 +75,6 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     <script src="../src/Tableau.js"></script>
     <script src="../src/SimplexSolver.js"></script>
 
-
-    <script src="../third_party/doh/runner.js"></script>
-    <script>doh.squelch = false;</script>
-
-    <!-- DOH tests -->
-    <script src="End-To-End-test.js"></script>
-    <script>doh.run();</script>
-
     <!-- Mocha tests -->
     <script src="c-test.js"></script>
     <script src="Constraint-test.js"></script>
@@ -87,13 +85,14 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     <script src="SymbolicWeight-test.js"></script>
     <script src="Tableau-test.js"></script>
     <script src="Variable-test.js"></script>
+    <script src="End-To-End-test.js"></script>
 
     <!-- Perf tests -->
     <script src="../src/Timer.js"></script>
     <script src="PerfTest.js"></script>
     <script>
       window.addEventListener("load", function() {
-        append(el("h2", "In-page test results:"));
+        append(el("h2", "In-page perf test results:"));
         append(el("pre", printLog.join("\n")));
         printLog.length = 0;
 
@@ -121,10 +120,9 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
           if (type == "logs") { d.slice(1).forEach(dualLog); }
         };
 
-
         // Start the tests
         window.addEventListener("load", function() {
-          append(el("h2", "Test results from WebWorker:"));
+          append(el("h2", "WebWorker perf test results:"));
           // TODO(slightlyoff): pass c.* config to the worker in the init message.
           worker.postMessage(["init"]);
         });
@@ -132,7 +130,7 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     </script>
   </head>
   <body>
-    <h1>Cassowary Javascript Smoke Tests</h1>
+    <h1>Cassowary Unit + Perf Tests</h1>
     <div id="mocha"></div>
   </body>
 </html>
