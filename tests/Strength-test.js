@@ -4,24 +4,41 @@
 //
 // Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
+(function() {
 "use strict";
 
-doh.add("c.Strength", [
-  function constants(t) {
-    t.t(c.Strength.required instanceof c.Strength);
-    t.t(c.Strength.strong instanceof c.Strength);
-    t.t(c.Strength.medium instanceof c.Strength);
-    t.t(c.Strength.weak instanceof c.Strength);
-  },
+var c = require("../src/c.js");
+// DOH Compat.
+var t = require("chai").assert;
+t.is = t.deepEqual;
+t.t = t;
+t.f = function(obj, str) {
+  return t.t(!obj, str);
+};
 
-  function required(t) {
-    t.t(c.Strength.required.required);
-    t.f(c.Strength.strong.required);
-    t.f(c.Strength.medium.required);
-    t.f(c.Strength.weak.required);
-  },
+describe("c.Strength", function() {
+  describe("::statics", function() {
+    it("is an instanceof c.Strength", function(){
+      t.t(c.Strength.required instanceof c.Strength);
+      t.t(c.Strength.strong instanceof c.Strength);
+      t.t(c.Strength.medium instanceof c.Strength);
+      t.t(c.Strength.weak instanceof c.Strength);
+    });
+  });
 
-  function sane(t) {
+  describe("statics required values", function() {
+    it("is true for c.Strength.required", function() {
+      t.t(c.Strength.required.required);
+    });
+    it("is false for all the others", function() {
+      t.f(c.Strength.strong.required);
+      t.f(c.Strength.medium.required);
+      t.f(c.Strength.weak.required);
+    });
+  });
+
+  it("is sane", function() {
+
     var s = new c.SimplexSolver();
 
     // x = 10
@@ -48,9 +65,9 @@ doh.add("c.Strength", [
     t.t(c.approx(x.value, 10.0));
     t.t(c.approx(y.value, 20.0));
     t.t(c.approx(z.value, 20.0));
-  },
+  });
 
-  function stayEachTime(t) {
+  describe("multiple stays/edits", function() {
     var s = new c.SimplexSolver();
 
     var x = new c.Variable({ name: "x" });
@@ -60,32 +77,35 @@ doh.add("c.Strength", [
     s.addConstraint(new c.Equation(z, x, c.Strength.weak))
      .addConstraint(new c.Equation(z, y, c.Strength.strong));
 
-    s.addStay(x)
-     .addStay(y)
-     .addEditVar(x)
-     .addEditVar(y).beginEdit();
+    it("has sane edit behavior", function() {
+      s.addStay(x)
+       .addStay(y)
+       .addEditVar(x)
+       .addEditVar(y).beginEdit();
 
-    s.suggestValue(x, 10)
-     .suggestValue(y, 20).resolve();
-    s.endEdit();
+      s.suggestValue(x, 10)
+       .suggestValue(y, 20).resolve();
+      s.endEdit();
 
-    t.t(c.approx(x.value, 10.0));
-    t.t(c.approx(y.value, 20.0));
-    t.t(c.approx(z.value, 20.0));
+      t.t(c.approx(x.value, 10.0));
+      t.t(c.approx(y.value, 20.0));
+      t.t(c.approx(z.value, 20.0));
+    });
 
-    s.addEditVar(x)
-     .addEditVar(y).beginEdit();
+    it("can edit a second time correctly", function(){
+      s.addEditVar(x)
+       .addEditVar(y).beginEdit();
 
-    s.suggestValue(x, 30)
-     .suggestValue(y, 50).resolve();
-    s.endEdit();
+      s.suggestValue(x, 30)
+       .suggestValue(y, 50).resolve();
+      s.endEdit();
 
-    t.t(c.approx(x.value, 30.0));
-    t.t(c.approx(y.value, 50.0));
-    t.t(c.approx(z.value, 50.0));
-
-  },
+      t.t(c.approx(x.value, 30.0));
+      t.t(c.approx(y.value, 50.0));
+      t.t(c.approx(z.value, 50.0));
+    });
+  });
 
   // FIXME(slightlyoff): MOAR TESTS
-]);
-
+});
+})();

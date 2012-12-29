@@ -4,7 +4,6 @@
 //
 // Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 (function() {
-
 "use strict";
 
 var c = require("../src/c.js");

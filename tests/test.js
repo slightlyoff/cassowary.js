@@ -50,7 +50,7 @@ doh.squelch = false;
 // load("Expression-test.js");
 // load("Point-test.js");
 // load("SimplexSolver-test.js");
-load("Strength-test.js");
+// load("Strength-test.js");
 load("SymbolicWeight-test.js");
 load("Tableau-test.js");
 load("Variable-test.js");
