@@ -63,6 +63,11 @@ var cv    = function(n, val) {
   return new c.Variable({ name: n, value: val });
 };
 
+// IE10 still doesn't have console.time/timeEnd.
+if (!console.time) {
+  console.time = console.timeEnd = function() {};
+}
+
 var CSSValue = c.inherit({
   initialize: function(value, name) {
     this.value = value;
