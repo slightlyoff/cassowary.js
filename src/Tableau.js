@@ -178,4 +178,4 @@ c.Tableau = c.inherit({
   },
 });
 
-})(this["c"]||module.parent.exports);
+})(this["c"]||((typeof module != "undefined") ? module.parent.exports : {}));

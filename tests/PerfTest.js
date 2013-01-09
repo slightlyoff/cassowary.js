@@ -281,4 +281,4 @@ var PerfTest = c.inherit({
 // (new PerfTest()).main(1, 500, 10, 500);
 
 //clt.main(new Array());
-})(this["c"]||module.parent.exports);
+})(this["c"]||((typeof module != "undefined") ? module.parent.exports : {}));

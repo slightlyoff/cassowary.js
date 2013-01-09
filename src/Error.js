@@ -47,4 +47,4 @@
   c.TooDifficult =
     errorType("c.TooDifficult", "The constraints are too difficult to solve");
 
-})(this["c"]||module.parent.exports);
+})(this["c"]||((typeof module != "undefined") ? module.parent.exports : {}));

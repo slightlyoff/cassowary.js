@@ -296,4 +296,4 @@ if (false && typeof Map != "undefined") {
   });
 }
 
-})(this["c"]||module.parent.exports);
+})(this["c"]||((typeof module != "undefined") ? module.parent.exports : {}));
