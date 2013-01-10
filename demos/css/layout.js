@@ -1305,26 +1305,22 @@ var findBoxGenerators = function(element) {
   var generators = [];
   var nf = NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT;
 
-  var tw = doc.createTreeWalker(
-    element,
-    nf,
-    {
-      acceptNode: function(node) {
-        // Filter on elements that have some sort of display
-        if (node.nodeType == 1) {
-          var cs = global.getComputedStyle(node);
-          if (
-            (cs.getPropertyValue("display") == "none") ||
-            (node.id == MEASURE_NODE_ID)
-          ) {
-            return NodeFilter.FILTER_REJECT;
-          }
-        }
-
-        return NodeFilter.FILTER_ACCEPT;
+  var acceptNode = function(node) {
+    // Filter on elements that have some sort of display
+    if (node.nodeType == 1) {
+      var cs = global.getComputedStyle(node);
+      if (
+        (cs.getPropertyValue("display") == "none") ||
+        (node.id == MEASURE_NODE_ID)
+      ) {
+        return NodeFilter.FILTER_REJECT;
       }
-    },
-    false);
+    }
+
+    return NodeFilter.FILTER_ACCEPT;
+  };
+
+  var tw = doc.createTreeWalker(element, nf, acceptNode, false);
 
   while(tw.nextNode()) {
     generators.push(tw.currentNode);
