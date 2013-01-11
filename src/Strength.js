@@ -37,4 +37,4 @@ c.Strength.medium = new c.Strength("medium", 0, 1, 0);
 /* public static final  */
 c.Strength.weak = new c.Strength("weak", 0, 0, 1);
 
-})(this["c"]||((typeof module != "undefined") ? module.parent.exports : {}));
+})(this["c"]||((typeof module != "undefined") ? module.parent.exports.c : {}));

@@ -1,1 +1,4 @@
-}).call({ compiled: true });
+}).call(
+  (typeof module != "undefined") ?
+      (module.compiled = true && module) : this
+);

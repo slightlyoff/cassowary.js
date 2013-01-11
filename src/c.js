@@ -4,7 +4,7 @@
 //
 // Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
 
-(function(scope, compiled){
+(function(scope){
 "use strict";
 
 // For Safari 5.x. Go-go-gadget ridiculously long release cycle!
@@ -282,25 +282,12 @@ scope.c = {
   },
 };
 
-
 // For Node...not that I'm bitter. No no, not at all. Not me. Never...
-if (typeof require == "function" && typeof load == "undefined" && !compiled) {
-  module.exports = c;
-  require("./HashTable.js");
-  require("./HashSet.js");
-  require("./Error.js");
-  require("./SymbolicWeight.js");
-  require("./Strength.js");
-  require("./Variable.js");
-  require("./Point.js");
-  require("./Expression.js");
-  require("./Constraint.js");
-  require("./Constraint.js");
-  require("./EditInfo.js");
-  require("./Tableau.js");
-  require("./SimplexSolver.js");
-  require("./Timer.js");
+if (typeof require == "function" &&
+    typeof module != "undefined" &&
+    typeof load == "undefined") {
+  scope.exports = c;
 }
 // ...well, hardly ever.
 
-})(this||module, this.compiled);
+})(this);

@@ -6,7 +6,7 @@
 (function() {
 "use strict";
 
-var c = require("../src/c.js");
+var c = require("../");
 // DOH Compat.
 var t = require("chai").assert;
 t.is = t.deepEqual;
