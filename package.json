@@ -1,14 +1,15 @@
 {
   "name" : "cassowary",
-  "version" : "0.0.1",
   "description": "A fast, modern JavaScript version of the Cassowary hierarchial linear constraint solver",
   "author": "Alex Russell <slightlyoff@chromium.org>",
+  "version" : "0.0.1",
+  "license": "LGPL",
+  "main": "./bin/c.js",
   "url": "https://github.com/slightlyoff/cassowary-js-refactor",
   "repository" : {
     "type" : "git",
     "url" : "https://github.com/slightlyoff/cassowary-js-refactor.git"
   },
-  "license": "LGPL",
   "contributors": [
     {
       "name": "Alex Russell",
