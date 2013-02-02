@@ -9,7 +9,7 @@ test:
 dist: build
 	rm -rf dist/cassowary/
 	mkdir -p dist/cassowary/
-	cp -r LICENSE bin package.json dist/cassowary/
+	cp -r LICENSE bin package.json README.md dist/cassowary/
 	cd dist; tar -zcf cassowary.tar.gz cassowary
 
 parser:
