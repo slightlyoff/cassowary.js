@@ -54,8 +54,35 @@ Cassowary paper that got me into all of this: ["Constraint Cascading Style
 Sheets for the
 Web"](http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.101.4819)
 
-Getting Started
----------------
+Getting Started Under Node
+--------------------------
+
+Cassowary is ["distributed as an NPM package"](https://npmjs.org/package/cassowary)
+and can be added as a dependency or used under node in the usual way as a
+result. Using Cassowary under node is as simple as:
+
+```js
+// The entire API is exported by the cassowary object
+var c = require("cassowary");
+
+var solver = new c.SimplexSolver();
+var x = new c.Variable({ value: 167 });
+var y = new c.Variable({ value: 2 });
+var eq = new c.Equation(x, new c.Expression(y));
+solver.addConstraint(eq);
+// ...
+```
+
+The current low (sub 0.1) version number reflects the instability of the API.
+Also, note that the NPM pacakage includes no tests or demos. For those, clone
+the github repo.
+
+To make an NPM package from sources, clone the github repo, follow the below
+instructions for installing dependencies, and run `make dist`. This is the same
+process the maintainers use to package NPM releases.
+
+Getting Started From Source
+---------------------------
 
 This repo pulls in other Git repositories through
 [submodules](http://help.github.com/submodules/). After cloning the repo, run:
