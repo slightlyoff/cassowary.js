@@ -160,6 +160,19 @@ c.traceAdded = [ false || true ]; // default false
 c.GC = [ false || true ]; // default false
 ```
 
+Current Build Status
+--------------------
+
+Binary versions of the solver that work in both the browser and under node are
+available in the `bin/` directory and are updated frequently. Tests are run on
+each commit via Travis CI:
+
+[![Build Status](https://travis-ci.org/slightlyoff/cassowary-js-refactor.png?branch=master)](https://travis-ci.org/slightlyoff/cassowary-js-refactor)
+
+Pull requests that do not include tests or break the build will be denied or 
+reverted, respectively.
+
+
 <!--
 TODO(slightlyoff): show how to set configuration information through command line and in the tests.
 
