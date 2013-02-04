@@ -102,19 +102,14 @@ you've installed Node, run:
 $ npm install
 ...
 $ npm test
-cd tests; ../node_modules/.bin/mocha --reporter list test.js
-| 93 tests to run in 10 groups
-| ------------------------------------------------------------
-| GROUP "c" has 5 tests to run
-| _inc
-| own
-| extend
-| inherit
-| basicJSON
-| ------------------------------------------------------------
-| GROUP "c.Constraint" has 13 tests to run
-| equationFromExpression
-...
+
+> cassowary@0.0.1 test /Users/alex/projects/cassowary-js-refactor
+> cd tests; mocha *-test.js
+
+
+  ․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․
+
+  89 tests complete (38 ms)
 ```
 
 If you have a working `make`, a Makefile is provided with a `test` target that
@@ -178,6 +173,11 @@ TODO(slightlyoff): show how to set configuration information through command lin
 
 API
 ---
+
+TODO(slightlyoff)
+
+Make and NPM Targets
+--------------------
 
 TODO(slightlyoff)
 -->
