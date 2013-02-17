@@ -1,8 +1,7 @@
 /**
  * Copyright 2011, Alex Russell <slightlyoff@google.com>
  *
- * Use of this source code is governed by the LGPL, which can be found in the
- * COPYING.LGPL file.
+ * Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
  *
  * API compatible re-implementation of jshashset.js, including only what
  * Cassowary needs. Built for speed, not comfort.

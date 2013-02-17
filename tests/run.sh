@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Use of this source code is governed by the LGPL, which can be found in the
-# COPYING.LGPL file.
+# Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
 #
 # Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
