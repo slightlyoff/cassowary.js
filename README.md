@@ -26,6 +26,12 @@ For civil discussion of this port and constraint-based UIs, join the
 [Overconstrained mailing
 list](https://groups.google.com/forum/?fromgroups#!forum/overconstrained).
 
+License
+-------
+
+Cassowary JS is licensed under the [Apache 2.0 license]
+(http://www.apache.org/licenses/LICENSE-2.0)
+
 Constraint Solver? Say What?
 ----------------------------
 
