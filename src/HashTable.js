@@ -1,8 +1,7 @@
 /**
  * Copyright 2012 Alex Russell <slightlyoff@google.com>.
  *
- * Use of this source code is governed by the LGPL, which can be found in the
- * COPYING.LGPL file.
+ * Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
  *
  * This is an API compatible re-implementation of the subset of jshashtable
  * which Cassowary actually uses.
