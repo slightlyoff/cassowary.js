@@ -4,7 +4,7 @@
 //    https://github.com/dmajda/pegjs/blob/master/examples/javascript.pegjs
 
 start
-  = __ statements:(Statement+) __ { return statements; }
+  = __ statements:(Statement*) __ { return statements; }
 
 Statement
   = expression:LinearExpression EOS { return expression; }
@@ -49,7 +49,8 @@ MultiLineCommentNoLineTerminator
   = "/*" (!("*/" / LineTerminator) SourceCharacter)* "*/"
 
 SingleLineComment
-  = "//" (!LineTerminator SourceCharacter)*
+  = "//" (!LineTerminator SourceCharacter)* (LineTerminator / EOF)
+
 _
   = (WhiteSpace / MultiLineCommentNoLineTerminator / SingleLineComment)*
 

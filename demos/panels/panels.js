@@ -18,6 +18,28 @@
 //      * Move to using mutation observers for append child watching instead of
 //        overriding.
 
+var weak = c.Strength.weak;
+var medium = c.Strength.medium;
+var strong = c.Strength.strong;
+var required = c.Strength.required;
+
+var eq  = function(a1, a2, strength, w) {
+  return new c.Equation(a1, a2, strength || weak, w||0);
+};
+var neq = function(a1, a2, a3) { return new c.Inequality(a1, a2, a3); };
+var geq = function(a1, a2, str, w) { return new c.Inequality(a1, c.GEQ, a2, str, w); };
+var leq = function(a1, a2, str, w) { return new c.Inequality(a1, c.LEQ, a2, str, w); };
+
+var stay = function(v, strength, weight) {
+  return new c.StayConstraint(v, strength||weak, weight||0);
+};
+var weakStay =     function(v, w) { return stay(v, weak,     w||0); };
+var mediumStay =   function(v, w) { return stay(v, medium,   w||0); };
+var strongStay =   function(v, w) { return stay(v, strong,   w||0); };
+var requiredStay = function(v, w) { return stay(v, required, w||0); }
+
+var profile = false;
+
 var fireType = function(type) {
   return function() {
     var e = document.createEvent("UIEvents");
@@ -27,9 +49,15 @@ var fireType = function(type) {
 };
 
 var fireSolved = fireType("solved");
+var preventFireSolved = false;
 
 // Create a global solver
-var s = document.solver = c.extend(new c.SimplexSolver(), { onsolved: fireSolved });
+var s = document.solver = c.extend(new c.SimplexSolver(), {
+  onsolved: function() {
+    if(!preventFireSolved) fireSolved();
+  }
+});
+s.autoSolve = false;
 
 var _idCounter = 0;
 var _vendedIds = [];
@@ -84,6 +112,7 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
 
 var valueSetter = function(item, varOrValue, oper, strength, weight) {
   var slot = "_" + item;
+  console.log("valueSetter:", slot, varOrValue, oper+"", strength+"", weight+"");
   if (typeof varOrValue == "string") {
     if (typeof this[slot] == "boolean") {
       varOrValue = (varOrValue == "true");
@@ -104,17 +133,22 @@ var valueSetter = function(item, varOrValue, oper, strength, weight) {
       varOrValue = parseInt(varOrValue, 10);
     }
   }
+  /*
+  if (this[slot])
+    console.log("removing:", this[slot].toString());
+  */
   this.remove(this[slot]);
   // FIXME(slightlyoff): what's the strength of these?
   if (oper && oper != "=") {
     if (oper == ">=") oper = c.GEQ;
     if (oper == "<=") oper = c.LEQ;
     // this[slot] = new c.Inequality(this.v[item], oper, varOrValue, strength||weak, weight||1);
-    this[slot] = new c.Inequality(this.v[item], oper, varOrValue, strength);
+    this[slot] = new c.Inequality(this.v[item], oper, varOrValue, strength||weak);
   } else {
     // this[slot] = new c.Equation(this.v[item], varOrValue, strength||weak, weight||1);
-    this[slot] = new c.Equation(this.v[item], varOrValue, strength);
+    this[slot] = new c.Equation(this.v[item], varOrValue, strength||weak);
   }
+  // console.log("adding:", this[slot].toString());
   this.add(this[slot]);
 };
 
@@ -122,26 +156,6 @@ var valueGetter = function(item) {
   if(!this["_" + item]) return; // undefined
   return this.v[item].value;
 };
-
-var weak = c.Strength.weak;
-var medium = c.Strength.medium;
-var strong = c.Strength.strong;
-var required = c.Strength.required;
-
-var eq  = function(a1, a2, strength, w) {
-  return new c.Equation(a1, a2, strength || weak, w||0);
-};
-var neq = function(a1, a2, a3) { return new c.Inequality(a1, a2, a3); };
-var geq = function(a1, a2, str, w) { return new c.Inequality(a1, c.GEQ, a2, str, w); };
-var leq = function(a1, a2, str, w) { return new c.Inequality(a1, c.LEQ, a2, str, w); };
-
-var stay = function(v, strength, weight) {
-  return new c.StayConstraint(v, strength || weak, weight || 1.0);
-};
-var weakStay =   function(v, w) { return stay(v, weak, w); };
-var mediumStay =   function(v, w) { return stay(v, medium, w); };
-var strongStay =   function(v, w) { return stay(v, strong, w); };
-var requiredStay = function(v, w) { return stay(v, required, w); }
 
 
 // Global
@@ -256,8 +270,8 @@ scope.Panel = c.inherit({
       start.y = e.pageY;
       start.left = this.v.left.value;
       start.top = this.v.top.value;
-      s.addEditVar(this.v.left, strong)
-       .addEditVar(this.v.top, strong).beginEdit();
+      s.addEditVar(this.v.left, medium)
+       .addEditVar(this.v.top, medium).beginEdit();
       this._moving = true;
     }
   },
@@ -356,6 +370,7 @@ scope.Panel = c.inherit({
   attach: function() {
     if (this._attached) { return this; }
 
+    profile && console.profile("attach");
     this._attached = true;
 
     this.panels.forEach(function(n) {
@@ -368,10 +383,15 @@ scope.Panel = c.inherit({
     });
 
     // We add our constraints to the solver ONLY when we're
-    s.autoSolve = false;
+
+    // s.autoSolve = true;
+    // c.trace = true;
+    preventFireSolved = true;
     this.constraints.forEach(function(cns) { s.addConstraint(cns); });
+    preventFireSolved = false;
+    // c.trace = false;
     s.resolve();
-    s.autoSolve = true;
+    // s.autoSolve = true;
 
     this.debug = this.debug;
 
@@ -381,6 +401,7 @@ scope.Panel = c.inherit({
     //  Connect to the solver's completion here and set style properties in
     //  response.
     document.addEventListener("solved", this._updateStyles, false);
+    profile && console.profileEnd("attach");
     return this;
   },
 
@@ -395,10 +416,10 @@ scope.Panel = c.inherit({
     });
 
     // Remove our constraints from the solver
-    s.autoSolve = false;
+    // s.autoSolve = false;
     this.constraints.forEach(function(c) { s.removeConstraint(c); });
     s.resolve();
-    s.autoSolve = true;
+    // s.autoSolve = true;
 
     this.debug = this.debug;
 
@@ -497,10 +518,10 @@ scope.Panel = c.inherit({
     // Sanity
     this.constraints.push(
       // Positive values only for now
-      geq(v.width,         0, required),
-      geq(v.height,        0, required),
-      geq(v.contentWidth,  0, required),
-      geq(v.contentHeight, 0, required),
+      geq(v.width,         0, medium),
+      geq(v.height,        0, medium),
+      geq(v.contentWidth,  0, medium),
+      geq(v.contentHeight, 0, medium),
 
       leq(v.width,         v.preferredWidth, medium, 10),
       leq(v.height,        v.preferredHeight, medium, 10),
@@ -553,7 +574,8 @@ scope.Panel = c.inherit({
   },
 
   add: function(/* c1, c2, ... */) {
-    s.autoSolve = false;
+    // var as = s.autoSolve;
+    // s.autoSolve = false;
     Array.prototype.slice.call(arguments).forEach(function(cns) {
       if (!cns) return;
       // FIXME(slightlyoff): should we try to prevent double-adding?
@@ -561,14 +583,14 @@ scope.Panel = c.inherit({
       if (this._attached) { s.addConstraint(cns); }
     }, this);
     s.resolve();
-    s.autoSolve = true;
+    // s.autoSolve = as;
     return this;
   },
 
   remove: function(/* c1, c2, ... */) {
     var al = arguments.length;
     if (!al) { return; }
-    s.autoSolve = false;
+    // s.autoSolve = false;
     Array.prototype.slice.call(arguments).forEach(function(cns) {
       if (!cns) return;
       var ci = this.constraints.indexOf(cns);
@@ -580,7 +602,7 @@ scope.Panel = c.inherit({
       }
     }, this);
     s.resolve();
-    s.autoSolve = true;
+    // s.autoSolve = true;
     return this;
   },
 
@@ -604,10 +626,10 @@ scope.Panel = c.inherit({
   // FIXME(slightlyoff):
   //    need to add max* and min* versions of all of the below
 
-  set top(v)    { valueSetter.call(this, "top",    v, "=", strong); },
-  set bottom(v) { valueSetter.call(this, "bottom", v, "=", strong); },
-  set left(v)   { valueSetter.call(this, "left",   v, "=", strong); },
-  set right(v)  { valueSetter.call(this, "right",  v, "=", strong); },
+  set top(v)    { valueSetter.call(this, "top",    v, "=", medium); },
+  set bottom(v) { valueSetter.call(this, "bottom", v, "=", medium); },
+  set left(v)   { valueSetter.call(this, "left",   v, "=", medium); },
+  set right(v)  { valueSetter.call(this, "right",  v, "=", medium); },
 
   get top()     { return valueGetter.call(this, "top"); },
   get bottom()  { return valueGetter.call(this, "bottom"); },
@@ -644,6 +666,17 @@ scope.Panel = c.inherit({
 
     this._listConstraintNames.forEach(function(prop) {
         if (b.hasOwnProperty(prop)) { this[prop] = b[prop]; } }, this);
+  },
+
+  get box() {
+    return {
+      left:     this.v.left.value,
+      right:    this.v.right.value,
+      top:      this.v.top.value,
+      bottom:   this.v.bottom.value,
+      width:    this.v.width.value,
+      height:   this.v.height.value
+    };
   },
 
   set centeredIn(other) {
@@ -703,24 +736,54 @@ scope.RootPanel = c.inherit({
 
     var s = document.solver;
 
-    var widthEQ = eq(this.v.width, iw, medium, 5);
-    var heightEQ = eq(this.v.height, ih, medium, 5);
+    // var widthEQ = eq(this.v.width, iw, medium, 5);
+    var widthEQ = eq(this.v.width, iw, required);
+    // var heightEQ = eq(this.v.height, ih, medium, 5);
+    var heightEQ = eq(this.v.height, ih, required);
+    var zero = window.zeroValueVar = new c.Variable({ name: "zeroValue", value: 0 });
 
     // At this point, we won't be attached but will have had our constraints
     // initialized. We clobber them and add our own.
     this.constraints = [ ];
 
     this.constraints.push(
+      requiredStay(zero),
       widthEQ,
       heightEQ,
-      eq(this.v.top, 0, medium),
-      eq(this.v.left, 0, medium),
-      eq(this.v.bottom, c.plus(this.v.top, this.v.height), medium, 2),
+      eq(this.v.top, zero, required),
+      eq(this.v.left, zero, required),
+      // strongStay(this.v.top),
+      // strongStay(this.v.left),
+      eq(this.v.bottom, c.plus(this.v.top, this.v.height), required, 1),
+      // eq(this.v.bottom, c.plus(this.v.top, this.v.height), strong, 1),
+      // eq(this.v.bottom, ih, medium),
       // Right is at least left + width
-      eq(this.v.right,  c.plus(this.v.left, this.v.width), medium, 2),
-      stay(this.v.right),
-      stay(this.v.bottom)
+      eq(this.v.right,  c.plus(this.v.left, this.v.width), required, 1)
+      // eq(this.v.right, iw, medium) // ,
+      // stay(iw),
+      // stay(ih)
     );
+
+    var timer = null;
+
+    var tryEndReCalcEdit = function() {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(function() {
+        console.log("ending edit");
+        s.endEdit(s);
+        timer = null;
+      }, 200);
+    };
+
+    var tryStartReCalcEdit = function() {
+      if (!timer) {
+        console.log("starting edit");
+        s.addEditVar(iw, weak)
+         .addEditVar(ih, weak).beginEdit();
+      }
+    };
 
     // Propigate viewport size changes.
     var reCalc = function() {
@@ -731,17 +794,17 @@ scope.RootPanel = c.inherit({
 
       // console.time("resolve");
 
-      s.addEditVar(iw)
-       .addEditVar(ih).beginEdit();
+      tryStartReCalcEdit();
 
       s.suggestValue(iw, iwv)
-       .suggestValue(ih, ihv); // .resolve();
+       .suggestValue(ih, ihv).resolve();
 
-      s.endEdit();
+      tryEndReCalcEdit();
 
       // console.timeEnd("resolve");
 
-      if (iwv != this.v.width.value) {
+      if ( (iwv != this.v.width.value) ||
+           (ihv != this.v.height.value) ) {
         // ZOMGWTFBBQ?
         console.log("width: suggested:", iwv, "got:", this.v.width.value);
         console.log("height: suggested:", ihv, "got:", this.v.height.value);
@@ -775,14 +838,16 @@ scope.RootPanel = c.inherit({
 // Install a root panel by default
 var installRoot = function() {
   if (!document.rootPanel && document.body) {
+    profile && console.profile("installRoot");
     var rp = document.body;
     rp.id = rp.id || "root";
     scope.RootPanel.prototype.upgrade(rp);
     document.rootPanel = rp;
     rp.attach();
-    fireSolved();
+    // fireSolved();
     rp._updateStyles();
     fireType("root")();
+    profile && console.profileEnd("installRoot");
   }
 };
 

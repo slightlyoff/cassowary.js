@@ -13,3 +13,5 @@ require("./src/EditInfo.js");
 require("./src/Tableau.js");
 require("./src/SimplexSolver.js");
 require("./src/Timer.js");
+require("./src/parser/parser.js");
+require("./src/parser/api.js");

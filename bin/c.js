@@ -12,8 +12,4568 @@
  */
 
 (function() {
-(function(a){"use strict";try{(function(){}).bind(a)}catch(b){Object.defineProperty(Function.prototype,"bind",{value:function(a){var b=this;return function(){return b.apply(a,arguments)}},enumerable:!1,configurable:!0,writable:!0})}var c=a.HTMLElement!==void 0,d=function(a){for(var b=null;a&&a!=Object.prototype;){if(a.tagName){b=a.tagName;break}a=a.prototype}return b||"div"},e=1e-8,f={},g=function(a,b){if(a&&b){if("function"==typeof a[b])return a[b];var c=a.prototype;if(c&&"function"==typeof c[b])return c[b];if(c!==Object.prototype&&c!==Function.prototype)return"function"==typeof a.__super__?g(a.__super__,b):void 0}},h=a.c={debug:!1,trace:!1,verbose:!1,traceAdded:!1,GC:!1,GEQ:1,LEQ:2,inherit:function(b){var e=null,g=null;b["extends"]&&(g=b["extends"],delete b["extends"]),b.initialize&&(e=b.initialize,delete b.initialize);var h=e||function(){};Object.defineProperty(h,"__super__",{value:g?g:Object,enumerable:!1,configurable:!0,writable:!1}),b._t&&(f[b._t]=h);var i=h.prototype=Object.create(g?g.prototype:Object.prototype);if(this.extend(i,b),c&&g&&g.prototype instanceof a.HTMLElement){var j=h,k=d(i),l=function(a){return a.__proto__=i,j.apply(a,arguments),i.created&&a.created(),i.decorate&&a.decorate(),a};this.extend(i,{upgrade:l}),h=function(){return l(a.document.createElement(k))},h.prototype=i,this.extend(h,{ctor:j})}return h},extend:function(a,b){return this.own(b,function(c){var d=Object.getOwnPropertyDescriptor(b,c);try{"function"==typeof d.get||"function"==typeof d.set?Object.defineProperty(a,c,d):"function"==typeof d.value||"_"===c.charAt(0)?(d.writable=!0,d.configurable=!0,d.enumerable=!1,Object.defineProperty(a,c,d)):a[c]=b[c]}catch(e){}}),a},own:function(b,c,d){return Object.getOwnPropertyNames(b).forEach(c,d||a),b},traceprint:function(a){h.verbose&&console.log(a)},fnenterprint:function(a){console.log("* "+a)},fnexitprint:function(a){console.log("- "+a)},assert:function(a,b){if(!a)throw new h.InternalError("Assertion failed: "+b)},plus:function(a,b){return a instanceof h.Expression||(a=new h.Expression(a)),b instanceof h.Expression||(b=new h.Expression(b)),a.plus(b)},minus:function(a,b){return a instanceof h.Expression||(a=new h.Expression(a)),b instanceof h.Expression||(b=new h.Expression(b)),a.minus(b)},times:function(a,b){return("number"==typeof a||a instanceof h.Variable)&&(a=new h.Expression(a)),("number"==typeof b||b instanceof h.Variable)&&(b=new h.Expression(b)),a.times(b)},divide:function(a,b){return("number"==typeof a||a instanceof h.Variable)&&(a=new h.Expression(a)),("number"==typeof b||b instanceof h.Variable)&&(b=new h.Expression(b)),a.divide(b)},approx:function(a,b){if(a===b)return!0;var c,d;return c=a instanceof h.Variable?a.value:a,d=b instanceof h.Variable?b.value:b,0==c?e>Math.abs(d):0==d?e>Math.abs(c):Math.abs(c-d)<Math.abs(c)*e},_inc:function(a){return function(){return a++}}(0),parseJSON:function(a){return JSON.parse(a,function(a,b){if("object"!=typeof b||"string"!=typeof b._t)return b;var c=b._t,d=f[c];if(c&&d){var e=g(d,"fromJSON");if(e)return e(b,d)}return b})}};"function"==typeof require&&"undefined"!=typeof module&&"undefined"==typeof load&&(a.exports=h)})(this),function(a){"use strict";var b=function(a){var b=a.hashCode?a.hashCode:""+a;return b},c=function(a,b){Object.keys(a).forEach(function(c){b[c]=a[c]})},d={};a.HashTable=a.inherit({initialize:function(){this.size=0,this._store={},this._keyStrMap={},this._deleted=0},set:function(a,c){var d=b(a);this._store.hasOwnProperty(d)||this.size++,this._store[d]=c,this._keyStrMap[d]=a},get:function(a){if(!this.size)return null;a=b(a);var c=this._store[a];return c!==void 0?this._store[a]:null},clear:function(){this.size=0,this._store={},this._keyStrMap={}},_compact:function(){var a={};c(this._store,a),this._store=a},_compactThreshold:100,_perhapsCompact:function(){this._size>64||this._deleted>this._compactThreshold&&(this._compact(),this._deleted=0)},"delete":function(a){a=b(a),this._store.hasOwnProperty(a)&&(this._deleted++,delete this._store[a],this.size>0&&this.size--)},each:function(a,b){if(this.size){this._perhapsCompact();var c=this._store,d=this._keyStrMap;Object.keys(this._store).forEach(function(e){a.call(b||null,d[e],c[e])},this)}},escapingEach:function(a,b){if(this.size){this._perhapsCompact();for(var c=this,e=this._store,f=this._keyStrMap,g=d,h=Object.keys(e),i=0;h.length>i;i++)if(function(d){c._store.hasOwnProperty(d)&&(g=a.call(b||null,f[d],e[d]))}(h[i]),g){if(void 0!==g.retval)return g;if(g.brk)break}}},clone:function(){var b=new a.HashTable;return this.size&&(b.size=this.size,c(this._store,b._store),c(this._keyStrMap,b._keyStrMap)),b},equals:function(b){if(b===this)return!0;if(!(b instanceof a.HashTable)||b._size!==this._size)return!1;for(var c=Object.keys(this._store),d=0;c.length>d;d++){var e=c[d];if(this._keyStrMap[e]!==b._keyStrMap[e]||this._store[e]!==b._store[e])return!1}return!0},toString:function(){var b="";return this.each(function(a,c){b+=a+" => "+c+"\n"}),b}})}(this.c||module.parent.exports||{}),function(a){"use strict";a.HashSet=a.inherit({_t:"c.HashSet",initialize:function(){this.storage=[],this.size=0},add:function(a){var b=this.storage;b.indexOf(a),-1==b.indexOf(a)&&b.push(a),this.size=this.storage.length},values:function(){return this.storage},has:function(a){var b=this.storage;return-1!=b.indexOf(a)},"delete":function(a){var b=this.storage.indexOf(a);return-1==b?null:(this.storage.splice(b,1)[0],this.size=this.storage.length,void 0)},clear:function(){this.storage.length=0},each:function(a,b){this.size&&this.storage.forEach(a,b)},escapingEach:function(a,b){this.size&&this.storage.forEach(a,b)},toString:function(){var a=this.size+" {",b=!0;return this.each(function(c){b?b=!1:a+=", ",a+=c}),a+="}\n"},toJSON:function(){var a=[];return this.each(function(b){a.push(b.toJSON())}),{_t:"c.HashSet",data:a}},fromJSON:function(b){var c=new a.HashSet;return b.data&&(c.size=b.data.length,c.storage=b.data),c}})}(this.c||module.parent.exports||{}),function(a){"use strict";a.Error=a.inherit({initialize:function(a){a&&(this._description=a)},_name:"c.Error",_description:"An error has occured in Cassowary",set description(a){this._description=a},get description(){return"("+this._name+") "+this._description},get message(){return this.description},toString:function(){return this.description}});var b=function(b,c){return a.inherit({"extends":a.Error,initialize:function(){a.Error.apply(this,arguments)},_name:b||"",_description:c||""})};a.ConstraintNotFound=b("c.ConstraintNotFound","Tried to remove a constraint never added to the tableu"),a.InternalError=b("c.InternalError"),a.NonExpression=b("c.NonExpression","The resulting expression would be non"),a.NotEnoughStays=b("c.NotEnoughStays","There are not enough stays to give specific values to every variable"),a.RequiredFailure=b("c.RequiredFailure","A required constraint cannot be satisfied"),a.TooDifficult=b("c.TooDifficult","The constraints are too difficult to solve")}(this.c||module.parent.exports||{}),function(a){"use strict";var b=1e3;a.SymbolicWeight=a.inherit({_t:"c.SymbolicWeight",initialize:function(){this.value=0;for(var a=1,c=arguments.length-1;c>=0;--c)this.value+=arguments[c]*a,a*=b},toJSON:function(){return{_t:this._t,value:this.value}}})}(this.c||module.parent.exports||{}),function(a){a.Strength=a.inherit({initialize:function(b,c,d,e){this.name=b,this.symbolicWeight=c instanceof a.SymbolicWeight?c:new a.SymbolicWeight(c,d,e)},get required(){return this===a.Strength.required},toString:function(){return this.name+(this.isRequired?"":":"+this.symbolicWeight)}}),a.Strength.required=new a.Strength("<Required>",1e3,1e3,1e3),a.Strength.strong=new a.Strength("strong",1,0,0),a.Strength.medium=new a.Strength("medium",0,1,0),a.Strength.weak=new a.Strength("weak",0,0,1)}(this.c||("undefined"!=typeof module?module.parent.exports.c:{})),function(a){"use strict";a.AbstractVariable=a.inherit({isDummy:!1,isExternal:!1,isPivotable:!1,isRestricted:!1,_init:function(b,c){this.hashCode=a._inc(),this.name=(c||"")+this.hashCode,b&&(b.name!==void 0&&(this.name=b.name),b.value!==void 0&&(this.value=b.value),b.prefix!==void 0&&(this._prefix=b.prefix))},_prefix:"",name:"",value:0,toJSON:function(){var a={};return this._t&&(a._t=this._t),this.name&&(a.name=this.name),this.value!==void 0&&(a.value=this.value),this._prefix&&(a._prefix=this._prefix),this._t&&(a._t=this._t),a},fromJSON:function(b,c){var d=new c;return a.extend(d,b),d},toString:function(){return this._prefix+"["+this.name+":"+this.value+"]"}}),a.Variable=a.inherit({_t:"c.Variable","extends":a.AbstractVariable,initialize:function(b){this._init(b,"v");var c=a.Variable._map;c&&(c[this.name]=this)},isExternal:!0}),a.DummyVariable=a.inherit({_t:"c.DummyVariable","extends":a.AbstractVariable,initialize:function(a){this._init(a,"d")},isDummy:!0,isRestricted:!0,value:"dummy"}),a.ObjectiveVariable=a.inherit({_t:"c.ObjectiveVariable","extends":a.AbstractVariable,initialize:function(a){this._init(a,"o")},value:"obj"}),a.SlackVariable=a.inherit({_t:"c.SlackVariable","extends":a.AbstractVariable,initialize:function(a){this._init(a,"s")},isPivotable:!0,isRestricted:!0,value:"slack"})}(this.c||module.parent.exports||{}),function(a){"use strict";a.Point=a.inherit({initialize:function(b,c,d){if(b instanceof a.Variable)this._x=b;else{var e={value:b};d&&(e.name="x"+d),this._x=new a.Variable(e)}if(c instanceof a.Variable)this._y=c;else{var f={value:c};d&&(f.name="y"+d),this._y=new a.Variable(f)}},get x(){return this._x},set x(b){b instanceof a.Variable?this._x=b:this._x.value=b},get y(){return this._y},set y(b){b instanceof a.Variable?this._y=b:this._y.value=b},toString:function(){return"("+this.x+", "+this.y+")"}})}(this.c||module.parent.exports||{}),function(a){"use strict";a.Expression=a.inherit({initialize:function(b,c,d){a.GC&&console.log("new c.Expression"),this.constant="number"!=typeof d||isNaN(d)?0:d,this.terms=new a.HashTable,b instanceof a.AbstractVariable?this.setVariable(b,"number"==typeof c?c:1):"number"==typeof b&&(isNaN(b)?console.trace():this.constant=b)},initializeFromHash:function(b,c){return a.verbose&&(console.log("*******************************"),console.log("clone c.initializeFromHash"),console.log("*******************************")),a.GC&&console.log("clone c.Expression"),this.constant=b,this.terms=c.clone(),this},multiplyMe:function(a){this.constant*=a;var b=this.terms;return b.each(function(c,d){b.set(c,d*a)}),this},clone:function(){a.verbose&&(console.log("*******************************"),console.log("clone c.Expression"),console.log("*******************************"));var b=new a.Expression;return b.initializeFromHash(this.constant,this.terms),b},times:function(b){if("number"==typeof b)return this.clone().multiplyMe(b);if(this.isConstant)return b.times(this.constant);if(b.isConstant)return this.times(b.constant);throw new a.NonExpression},plus:function(b){return b instanceof a.Expression?this.clone().addExpression(b,1):b instanceof a.Variable?this.clone().addVariable(b,1):void 0},minus:function(b){return b instanceof a.Expression?this.clone().addExpression(b,-1):b instanceof a.Variable?this.clone().addVariable(b,-1):void 0},divide:function(b){if("number"==typeof b){if(a.approx(b,0))throw new a.NonExpression;return this.times(1/b)}if(b instanceof a.Expression){if(!b.isConstant)throw new a.NonExpression;return this.times(1/b.constant)}},addExpression:function(b,c,d,e){return b instanceof a.AbstractVariable&&(b=new a.Expression(b),a.trace&&console.log("addExpression: Had to cast a var to an expression")),c=c||1,this.constant+=c*b.constant,b.terms.each(function(a,b){this.addVariable(a,b*c,d,e)},this),this},addVariable:function(b,c,d,e){null==c&&(c=1),a.trace&&console.log("c.Expression::addVariable():",b,c);var f=this.terms.get(b);if(f){var g=f+c;0==g||a.approx(g,0)?(e&&e.noteRemovedVariable(b,d),this.terms.delete(b)):this.setVariable(b,g)}else a.approx(c,0)||(this.setVariable(b,c),e&&e.noteAddedVariable(b,d));return this},setVariable:function(a,b){return this.terms.set(a,b),this},anyPivotableVariable:function(){if(this.isConstant)throw new a.InternalError("anyPivotableVariable called on a constant");var b=this.terms.escapingEach(function(a){return a.isPivotable?{retval:a}:void 0});return b&&void 0!==b.retval?b.retval:null},substituteOut:function(b,c,d,e){a.trace&&(a.fnenterprint("CLE:substituteOut: "+b+", "+c+", "+d+", ..."),a.traceprint("this = "+this));var f=this.setVariable.bind(this),g=this.terms,h=g.get(b);g.delete(b),this.constant+=h*c.constant,c.terms.each(function(b,c){var i=g.get(b);if(i){var j=i+h*c;a.approx(j,0)?(e.noteRemovedVariable(b,d),g.delete(b)):f(b,j)}else f(b,h*c),e&&e.noteAddedVariable(b,d)}),a.trace&&a.traceprint("Now this is "+this)},changeSubject:function(a,b){this.setVariable(a,this.newSubject(b))},newSubject:function(b){a.trace&&a.fnenterprint("newSubject:"+b);var c=1/this.terms.get(b);return this.terms.delete(b),this.multiplyMe(-c),c},coefficientFor:function(a){return this.terms.get(a)||0},get isConstant(){return 0==this.terms.size},toString:function(){var b="",c=!1;if(!a.approx(this.constant,0)||this.isConstant){if(b+=this.constant,this.isConstant)return b;c=!0}return this.terms.each(function(a,d){c&&(b+=" + "),b+=d+"*"+a,c=!0}),b},equals:function(b){return b===this?!0:b instanceof a.Expression&&b.constant===this.constant&&b.terms.equals(this.terms)},Plus:function(a,b){return a.plus(b)},Minus:function(a,b){return a.minus(b)},Times:function(a,b){return a.times(b)},Divide:function(a,b){return a.divide(b)}})}(this.c||module.parent.exports||{}),function(a){"use strict";a.AbstractConstraint=a.inherit({initialize:function(b,c){this.hashCode=a._inc(),this.strength=b||a.Strength.required,this.weight=c||1},isEditConstraint:!1,isInequality:!1,isStayConstraint:!1,get required(){return this.strength===a.Strength.required},toString:function(){return this.strength+" {"+this.weight+"} ("+this.expression+")"}});var b=a.AbstractConstraint.prototype.toString,c=function(b,c,d){a.AbstractConstraint.call(this,c||a.Strength.strong,d),this.variable=b,this.expression=new a.Expression(b,-1,b.value)};a.EditConstraint=a.inherit({"extends":a.AbstractConstraint,initialize:function(){c.apply(this,arguments)},isEditConstraint:!0,toString:function(){return"edit:"+b.call(this)}}),a.StayConstraint=a.inherit({"extends":a.AbstractConstraint,initialize:function(){c.apply(this,arguments)},isStayConstraint:!0,toString:function(){return"stay:"+b.call(this)}});var d=a.Constraint=a.inherit({"extends":a.AbstractConstraint,initialize:function(b,c,d){a.AbstractConstraint.call(this,c,d),this.expression=b}});a.Inequality=a.inherit({"extends":a.Constraint,_cloneOrNewCle:function(b){return b.clone?b.clone():new a.Expression(b)},initialize:function(b,c,e,f,g){var h=b instanceof a.Expression,i=e instanceof a.Expression,j=b instanceof a.AbstractVariable,k=e instanceof a.AbstractVariable,l="number"==typeof b,m="number"==typeof e;if((h||l)&&k){var n=b,o=c,p=e,q=f,r=g;if(d.call(this,this._cloneOrNewCle(n),q,r),o==a.LEQ)this.expression.multiplyMe(-1),this.expression.addVariable(p);else{if(o!=a.GEQ)throw new a.InternalError("Invalid operator in c.Inequality constructor");this.expression.addVariable(p,-1)}}else if(j&&(i||m)){var n=e,o=c,p=b,q=f,r=g;if(d.call(this,this._cloneOrNewCle(n),q,r),o==a.GEQ)this.expression.multiplyMe(-1),this.expression.addVariable(p);else{if(o!=a.LEQ)throw new a.InternalError("Invalid operator in c.Inequality constructor");this.expression.addVariable(p,-1)}}else{if(h&&m){var s=b,o=c,t=e,q=f,r=g;if(d.call(this,this._cloneOrNewCle(s),q,r),o==a.LEQ)this.expression.multiplyMe(-1),this.expression.addExpression(this._cloneOrNewCle(t));else{if(o!=a.GEQ)throw new a.InternalError("Invalid operator in c.Inequality constructor");this.expression.addExpression(this._cloneOrNewCle(t),-1)}return this}if(l&&i){var s=e,o=c,t=b,q=f,r=g;if(d.call(this,this._cloneOrNewCle(s),q,r),o==a.GEQ)this.expression.multiplyMe(-1),this.expression.addExpression(this._cloneOrNewCle(t));else{if(o!=a.LEQ)throw new a.InternalError("Invalid operator in c.Inequality constructor");this.expression.addExpression(this._cloneOrNewCle(t),-1)}return this}if(h&&i){var s=b,o=c,t=e,q=f,r=g;if(d.call(this,this._cloneOrNewCle(t),q,r),o==a.GEQ)this.expression.multiplyMe(-1),this.expression.addExpression(this._cloneOrNewCle(s));else{if(o!=a.LEQ)throw new a.InternalError("Invalid operator in c.Inequality constructor");this.expression.addExpression(this._cloneOrNewCle(s),-1)}}else{if(h)return d.call(this,b,c,e);if(c==a.GEQ)d.call(this,new a.Expression(e),f,g),this.expression.multiplyMe(-1),this.expression.addVariable(b);else{if(c!=a.LEQ)throw new a.InternalError("Invalid operator in c.Inequality constructor");d.call(this,new a.Expression(e),f,g),this.expression.addVariable(b,-1)}}}},isInequality:!0,toString:function(){return d.prototype.toString.call(this)+" >= 0) id: "+this.hashCode}}),a.Equation=a.inherit({"extends":a.Constraint,initialize:function(b,c,e,f){if(b instanceof a.Expression&&!c||c instanceof a.Strength)d.call(this,b,c,e);else if(b instanceof a.AbstractVariable&&c instanceof a.Expression){var g=b,h=c,i=e,j=f;d.call(this,h.clone(),i,j),this.expression.addVariable(g,-1)}else if(b instanceof a.AbstractVariable&&"number"==typeof c){var g=b,k=c,i=e,j=f;d.call(this,new a.Expression(k),i,j),this.expression.addVariable(g,-1)}else if(b instanceof a.Expression&&c instanceof a.AbstractVariable){var h=b,g=c,i=e,j=f;d.call(this,h.clone(),i,j),this.expression.addVariable(g,-1)}else{if(!(b instanceof a.Expression||b instanceof a.AbstractVariable||"number"==typeof b)||!(c instanceof a.Expression||c instanceof a.AbstractVariable||"number"==typeof c))throw"Bad initializer to c.Equation";b=b instanceof a.Expression?b.clone():new a.Expression(b),c=c instanceof a.Expression?c.clone():new a.Expression(c),d.call(this,b,e,f),this.expression.addExpression(c,-1)}a.assert(this.strength instanceof a.Strength,"_strength not set")},toString:function(){return d.prototype.toString.call(this)+" = 0)"}})}(this.c||module.parent.exports||{}),function(a){"use strict";a.EditInfo=a.inherit({initialize:function(a,b,c,d,e){this.constraint=a,this.editPlus=b,this.editMinus=c,this.prevEditConstant=d,this.index=e},toString:function(){return"<cn="+this.constraint+", ep="+this.editPlus+", em="+this.editMinus+", pec="+this.prevEditConstant+", index="+this.index+">"}})}(this.c||module.parent.exports||{}),function(a){"use strict";a.Tableau=a.inherit({initialize:function(){this.columns=new a.HashTable,this.rows=new a.HashTable,this._infeasibleRows=new a.HashSet,this._externalRows=new a.HashSet,this._externalParametricVars=new a.HashSet},noteRemovedVariable:function(b,c){a.trace&&console.log("c.Tableau::noteRemovedVariable: ",b,c);var d=this.columns.get(b);c&&d&&d.delete(c)},noteAddedVariable:function(a,b){b&&this.insertColVar(a,b)},getInternalInfo:function(){var a="Tableau Information:\n";return a+="Rows: "+this.rows.size,a+=" (= "+(this.rows.size-1)+" constraints)",a+="\nColumns: "+this.columns.size,a+="\nInfeasible Rows: "+this._infeasibleRows.size,a+="\nExternal basic variables: "+this._externalRows.size,a+="\nExternal parametric variables: ",a+=this._externalParametricVars.size,a+="\n"},toString:function(){var a="Tableau:\n";return this.rows.each(function(b,c){a+=b,a+=" <==> ",a+=c,a+="\n"}),a+="\nColumns:\n",a+=this.columns,a+="\nInfeasible rows: ",a+=this._infeasibleRows,a+="External basic variables: ",a+=this._externalRows,a+="External parametric variables: ",a+=this._externalParametricVars},insertColVar:function(b,c){var d=this.columns.get(b);d||(d=new a.HashSet,this.columns.set(b,d)),d.add(c)},addRow:function(b,c){a.trace&&a.fnenterprint("addRow: "+b+", "+c),this.rows.set(b,c),c.terms.each(function(a){this.insertColVar(a,b),a.isExternal&&this._externalParametricVars.add(a)},this),b.isExternal&&this._externalRows.add(b),a.trace&&a.traceprint(""+this)},removeColumn:function(b){a.trace&&a.fnenterprint("removeColumn:"+b);var c=this.columns.get(b);c?(this.columns.delete(b),c.each(function(a){var c=this.rows.get(a);c.terms.delete(b)},this)):a.trace&&console.log("Could not find var",b,"in columns"),b.isExternal&&(this._externalRows.delete(b),this._externalParametricVars.delete(b))},removeRow:function(b){a.trace&&a.fnenterprint("removeRow:"+b);var c=this.rows.get(b);return a.assert(null!=c),c.terms.each(function(c){var e=this.columns.get(c);null!=e&&(a.trace&&console.log("removing from varset:",b),e.delete(b))},this),this._infeasibleRows.delete(b),b.isExternal&&this._externalRows.delete(b),this.rows.delete(b),a.trace&&a.fnexitprint("returning "+c),c},substituteOut:function(b,c){a.trace&&a.fnenterprint("substituteOut:"+b+", "+c),a.trace&&a.traceprint(""+this);var d=this.columns.get(b);d.each(function(a){var d=this.rows.get(a);d.substituteOut(b,c,a,this),a.isRestricted&&0>d.constant&&this._infeasibleRows.add(a)},this),b.isExternal&&(this._externalRows.add(b),this._externalParametricVars.delete(b)),this.columns.delete(b)},columnsHasKey:function(a){return!!this.columns.get(a)}})}(this.c||module.parent.exports||{}),function(a){var b=a.Tableau,c=b.prototype,d=1e-8,e=a.Strength.weak;a.SimplexSolver=a.inherit({"extends":a.Tableau,initialize:function(){a.Tableau.call(this),this._stayMinusErrorVars=[],this._stayPlusErrorVars=[],this._errorVars=new a.HashTable,this._markerVars=new a.HashTable,this._objective=new a.ObjectiveVariable({name:"Z"}),this._editVarMap=new a.HashTable,this._editVarList=[],this._slackCounter=0,this._artificialCounter=0,this._dummyCounter=0,this.autoSolve=!0,this._fNeedsSolving=!1,this._optimizeCount=0,this.rows.set(this._objective,new a.Expression),this._stkCedcns=[0],a.trace&&a.traceprint("objective expr == "+this.rows.get(this._objective))},addLowerBound:function(b,c){var d=new a.Inequality(b,a.GEQ,new a.Expression(c));return this.addConstraint(d)},addUpperBound:function(b,c){var d=new a.Inequality(b,a.LEQ,new a.Expression(c));return this.addConstraint(d)},addBounds:function(a,b,c){return this.addLowerBound(a,b),this.addUpperBound(a,c),this},add:function(){for(var a=0;arguments.length>a;a++)this.addConstraint(arguments[a]);return this},addConstraint:function(b){a.trace&&a.fnenterprint("addConstraint: "+b);var c=Array(2),d=Array(1),e=this.newExpression(b,c,d);if(d=d[0],this.tryAddingDirectly(e)||this.addWithArtificialVariable(e),this._fNeedsSolving=!0,b.isEditConstraint){var f=this._editVarMap.size,g=c[0],h=c[1];!g instanceof a.SlackVariable&&console.warn("cvEplus not a slack variable =",g),!h instanceof a.SlackVariable&&console.warn("cvEminus not a slack variable =",h),a.debug&&console.log("new c.EditInfo("+b+", "+g+", "+h+", "+d+", "+f+")");var i=new a.EditInfo(b,g,h,d,f);this._editVarMap.set(b.variable,i),this._editVarList[f]={v:b.variable,info:i}}return this.autoSolve&&(this.optimize(this._objective),this._setExternalVariables()),this},addConstraintNoException:function(b){a.trace&&a.fnenterprint("addConstraintNoException: "+b);try{return this.addConstraint(b),!0}catch(c){return!1}},addEditVar:function(b,c){return a.trace&&a.fnenterprint("addEditVar: "+b+" @ "+c),this.addConstraint(new a.EditConstraint(b,c||a.Strength.strong))},beginEdit:function(){return a.assert(this._editVarMap.size>0,"_editVarMap.size > 0"),this._infeasibleRows.clear(),this._resetStayConstants(),this._stkCedcns.push(this._editVarMap.size),this},endEdit:function(){return a.assert(this._editVarMap.size>0,"_editVarMap.size > 0"),this.resolve(),this._stkCedcns.pop(),this.removeEditVarsTo(this._stkCedcns[this._stkCedcns.length-1]),this},removeAllEditVars:function(){return this.removeEditVarsTo(0)},removeEditVarsTo:function(b){try{for(var c=this._editVarList.length,d=b;c>d;d++)this._editVarList[d]&&this.removeConstraint(this._editVarMap.get(this._editVarList[d].v).constraint);return this._editVarList.length=b,a.assert(this._editVarMap.size==b,"_editVarMap.size == n"),this}catch(e){throw new a.InternalError("Constraint not found in removeEditVarsTo")}},addPointStays:function(b){return a.trace&&console.log("addPointStays",b),b.forEach(function(a,b){this.addStay(a.x,e,Math.pow(2,b)),this.addStay(a.y,e,Math.pow(2,b))},this),this},addStay:function(b,c,d){var f=new a.StayConstraint(b,c||e,d||1);return this.addConstraint(f)},removeConstraint:function(a){return this.removeConstraintInternal(a),this},removeConstraintInternal:function(b){a.trace&&a.fnenterprint("removeConstraintInternal: "+b),a.trace&&a.traceprint(""+this),this._fNeedsSolving=!0,this._resetStayConstants();var c=this.rows.get(this._objective),d=this._errorVars.get(b);a.trace&&a.traceprint("eVars == "+d),null!=d&&d.each(function(e){var f=this.rows.get(e);null==f?c.addVariable(e,-b.weight*b.strength.symbolicWeight.value,this._objective,this):c.addExpression(f,-b.weight*b.strength.symbolicWeight.value,this._objective,this),a.trace&&a.traceprint("now eVars == "+d)},this);var e=this._markerVars.get(b);if(this._markerVars.delete(b),null==e)throw new a.InternalError("Constraint not found in removeConstraintInternal");if(a.trace&&a.traceprint("Looking to remove var "+e),null==this.rows.get(e)){var f=this.columns.get(e);a.trace&&a.traceprint("Must pivot -- columns are "+f);var g=null,h=0;f.each(function(b){if(b.isRestricted){var c=this.rows.get(b),d=c.coefficientFor(e);if(a.trace&&a.traceprint("Marker "+e+"'s coefficient in "+c+" is "+d),0>d){var f=-c.constant/d;(null==g||h>f||a.approx(f,h)&&b.hashCode<g.hashCode)&&(h=f,g=b)}}},this),null==g&&(a.trace&&a.traceprint("exitVar is still null"),f.each(function(a){if(a.isRestricted){var b=this.rows.get(a),c=b.coefficientFor(e),d=b.constant/c;(null==g||h>d)&&(h=d,g=a)}},this)),null==g&&(0==f.size?this.removeColumn(e):f.escapingEach(function(a){return a!=this._objective?(g=a,{brk:!0}):void 0},this)),null!=g&&this.pivot(e,g)}if(null!=this.rows.get(e)&&this.removeRow(e),null!=d&&d.each(function(a){a!=e&&this.removeColumn(a)},this),b.isStayConstraint){if(null!=d)for(var j=0;this._stayPlusErrorVars.length>j;j++)d.delete(this._stayPlusErrorVars[j]),d.delete(this._stayMinusErrorVars[j])}else if(b.isEditConstraint){a.assert(null!=d,"eVars != null");var k=this._editVarMap.get(b.variable);this.removeColumn(k.editMinus),this._editVarMap.delete(b.variable)}return null!=d&&this._errorVars.delete(d),this.autoSolve&&(this.optimize(this._objective),this._setExternalVariables()),this},reset:function(){throw a.trace&&a.fnenterprint("reset"),new a.InternalError("reset not implemented")},resolveArray:function(b){a.trace&&a.fnenterprint("resolveArray"+b);var c=b.length;this._editVarMap.each(function(a,d){var e=d.index;c>e&&this.suggestValue(a,b[e])},this),this.resolve()},resolvePair:function(a,b){this.suggestValue(this._editVarList[0].v,a),this.suggestValue(this._editVarList[1].v,b),this.resolve()},resolve:function(){a.trace&&a.fnenterprint("resolve()"),this.dualOptimize(),this._setExternalVariables(),this._infeasibleRows.clear(),this._resetStayConstants()},suggestValue:function(b,c){a.trace&&console.log("suggestValue("+b+", "+c+")");var d=this._editVarMap.get(b);if(!d)throw new a.Error("suggestValue for variable "+b+", but var is not an edit variable");var e=c-d.prevEditConstant;return d.prevEditConstant=c,this.deltaEditConstant(e,d.editPlus,d.editMinus),this},solve:function(){return this._fNeedsSolving&&(this.optimize(this._objective),this._setExternalVariables()),this},setEditedValue:function(b,c){if(!this.columnsHasKey(b)&&null==this.rows.get(b))return b.value=c,this;if(!a.approx(c,b.value)){this.addEditVar(b),this.beginEdit();try{this.suggestValue(b,c)}catch(d){throw new a.InternalError("Error in setEditedValue")}this.endEdit()}return this},addVar:function(b){if(!this.columnsHasKey(b)&&null==this.rows.get(b)){try{this.addStay(b)}catch(c){throw new a.InternalError("Error in addVar -- required failure is impossible")}a.trace&&a.traceprint("added initial stay on "+b)}return this},getInternalInfo:function(){var a=c.getInternalInfo.call(this);return a+="\nSolver info:\n",a+="Stay Error Variables: ",a+=this._stayPlusErrorVars.length+this._stayMinusErrorVars.length,a+=" ("+this._stayPlusErrorVars.length+" +, ",a+=this._stayMinusErrorVars.length+" -)\n",a+="Edit Variables: "+this._editVarMap.size,a+="\n"},getDebugInfo:function(){return""+this+this.getInternalInfo()+"\n"},toString:function(){var a=c.getInternalInfo.call(this);return a+="\n_stayPlusErrorVars: ",a+="["+this._stayPlusErrorVars+"]",a+="\n_stayMinusErrorVars: ",a+="["+this._stayMinusErrorVars+"]",a+="\n",a+="_editVarMap:\n"+this._editVarMap,a+="\n"},getConstraintMap:function(){return this._markerVars},addWithArtificialVariable:function(b){a.trace&&a.fnenterprint("addWithArtificialVariable: "+b);var c=new a.SlackVariable({value:++this._artificialCounter,prefix:"a"}),d=new a.ObjectiveVariable({name:"az"}),e=b.clone();a.trace&&a.traceprint("before addRows:\n"+this),this.addRow(d,e),this.addRow(c,b),a.trace&&a.traceprint("after addRows:\n"+this),this.optimize(d);var f=this.rows.get(d);if(a.trace&&a.traceprint("azTableauRow.constant == "+f.constant),!a.approx(f.constant,0))throw this.removeRow(d),this.removeColumn(c),new a.RequiredFailure;var g=this.rows.get(c);if(null!=g){if(g.isConstant)return this.removeRow(c),this.removeRow(d),void 0;var h=g.anyPivotableVariable();this.pivot(h,c)}a.assert(null==this.rows.get(c),"rowExpression(av) == null"),this.removeColumn(c),this.removeRow(d)},tryAddingDirectly:function(b){a.trace&&a.fnenterprint("tryAddingDirectly: "+b);var c=this.chooseSubject(b);return null==c?(a.trace&&a.fnexitprint("returning false"),!1):(b.newSubject(c),this.columnsHasKey(c)&&this.substituteOut(c,b),this.addRow(c,b),a.trace&&a.fnexitprint("returning true"),!0)},chooseSubject:function(b){a.trace&&a.fnenterprint("chooseSubject: "+b);var c=null,d=!1,e=!1,f=b.terms,g=f.escapingEach(function(a,b){if(d){if(!a.isRestricted&&!this.columnsHasKey(a))return{retval:a}}else if(a.isRestricted){if(!e&&!a.isDummy&&0>b){var f=this.columns.get(a);(null==f||1==f.size&&this.columnsHasKey(this._objective))&&(c=a,e=!0)}}else c=a,d=!0},this);if(g&&void 0!==g.retval)return g.retval;if(null!=c)return c;var h=0,g=f.escapingEach(function(a,b){return a.isDummy?(this.columnsHasKey(a)||(c=a,h=b),void 0):{retval:null}},this);if(g&&void 0!==g.retval)return g.retval;if(!a.approx(b.constant,0))throw new a.RequiredFailure;return h>0&&b.multiplyMe(-1),c},deltaEditConstant:function(b,c,d){a.trace&&a.fnenterprint("deltaEditConstant :"+b+", "+c+", "+d);var e=this.rows.get(c);if(null!=e)return e.constant+=b,0>e.constant&&this._infeasibleRows.add(c),void 0;var f=this.rows.get(d);if(null!=f)return f.constant+=-b,0>f.constant&&this._infeasibleRows.add(d),void 0;var g=this.columns.get(d);g||console.log("columnVars is null -- tableau is:\n"+this),g.each(function(a){var c=this.rows.get(a),e=c.coefficientFor(d);c.constant+=e*b,a.isRestricted&&0>c.constant&&this._infeasibleRows.add(a)},this)},dualOptimize:function(){a.trace&&a.fnenterprint("dualOptimize:");for(var b=this.rows.get(this._objective);this._infeasibleRows.size;){var c=this._infeasibleRows.values()[0];this._infeasibleRows.delete(c);var d=null,e=this.rows.get(c);if(e&&0>e.constant){var g,f=Number.MAX_VALUE,h=e.terms;if(h.each(function(c,e){if(e>0&&c.isPivotable){var h=b.coefficientFor(c);g=h/e,(f>g||a.approx(g,f)&&c.hashCode<d.hashCode)&&(d=c,f=g)}}),f==Number.MAX_VALUE)throw new a.InternalError("ratio == nil (MAX_VALUE) in dualOptimize");this.pivot(d,c)}}},newExpression:function(b,c,d){a.trace&&(a.fnenterprint("newExpression: "+b),a.traceprint("cn.isInequality == "+b.isInequality),a.traceprint("cn.required == "+b.required));var e=b.expression,f=new a.Expression(e.constant),g=new a.SlackVariable,h=new a.DummyVariable,i=new a.SlackVariable,j=new a.SlackVariable,k=e.terms;if(k.each(function(a,b){var c=this.rows.get(a);c?f.addExpression(c,b):f.addVariable(a,b)},this),b.isInequality){if(a.trace&&a.traceprint("Inequality, adding slack"),++this._slackCounter,g=new a.SlackVariable({value:this._slackCounter,prefix:"s"}),f.setVariable(g,-1),this._markerVars.set(b,g),!b.required){++this._slackCounter,i=new a.SlackVariable({value:this._slackCounter,prefix:"em"}),f.setVariable(i,1);
-var l=this.rows.get(this._objective);l.setVariable(i,b.strength.symbolicWeight.value*b.weight),this.insertErrorVar(b,i),this.noteAddedVariable(i,this._objective)}}else if(b.required)a.trace&&a.traceprint("Equality, required"),++this._dummyCounter,h=new a.DummyVariable({value:this._dummyCounter,prefix:"d"}),f.setVariable(h,1),this._markerVars.set(b,h),a.trace&&a.traceprint("Adding dummyVar == d"+this._dummyCounter);else{a.trace&&a.traceprint("Equality, not required"),++this._slackCounter,j=new a.SlackVariable({value:this._slackCounter,prefix:"ep"}),i=new a.SlackVariable({value:this._slackCounter,prefix:"em"}),f.setVariable(j,-1),f.setVariable(i,1),this._markerVars.set(b,j);var l=this.rows.get(this._objective);a.trace&&console.log(l);var m=b.strength.symbolicWeight.value*b.weight;0==m&&(a.trace&&a.traceprint("cn == "+b),a.trace&&a.traceprint("adding "+j+" and "+i+" with swCoeff == "+m)),l.setVariable(j,m),this.noteAddedVariable(j,this._objective),l.setVariable(i,m),this.noteAddedVariable(i,this._objective),this.insertErrorVar(b,i),this.insertErrorVar(b,j),b.isStayConstraint?(this._stayPlusErrorVars.push(j),this._stayMinusErrorVars.push(i)):b.isEditConstraint&&(c[0]=j,c[1]=i,d[0]=e.constant)}return 0>f.constant&&f.multiplyMe(-1),a.trace&&a.fnexitprint("returning "+f),f},optimize:function(b){a.trace&&a.fnenterprint("optimize: "+b),a.trace&&a.traceprint(""+this),this._optimizeCount++;var c=this.rows.get(b);a.assert(null!=c,"zRow != null");for(var g,h,e=null,f=null;;){if(g=0,h=c.terms,h.escapingEach(function(a,b){return a.isPivotable&&g>b?(g=b,e=a,{brk:1}):void 0},this),g>=-d)return;a.trace&&console.log("entryVar:",e,"objectiveCoeff:",g);var i=Number.MAX_VALUE,j=this.columns.get(e),k=0;if(j.each(function(b){if(a.trace&&a.traceprint("Checking "+b),b.isPivotable){var c=this.rows.get(b),d=c.coefficientFor(e);a.trace&&a.traceprint("pivotable, coeff = "+d),0>d&&(k=-c.constant/d,(i>k||a.approx(k,i)&&b.hashCode<f.hashCode)&&(i=k,f=b))}},this),i==Number.MAX_VALUE)throw new a.InternalError("Objective function is unbounded in optimize");this.pivot(e,f),a.trace&&a.traceprint(""+this)}},pivot:function(b,c){a.trace&&console.log("pivot: ",b,c);var d=!1;d&&console.time(" SimplexSolver::pivot"),null==b&&console.warn("pivot: entryVar == null"),null==c&&console.warn("pivot: exitVar == null"),d&&console.time("  removeRow");var e=this.removeRow(c);d&&console.timeEnd("  removeRow"),d&&console.time("  changeSubject"),e.changeSubject(c,b),d&&console.timeEnd("  changeSubject"),d&&console.time("  substituteOut"),this.substituteOut(b,e),d&&console.timeEnd("  substituteOut"),d&&console.time("  addRow"),this.addRow(b,e),d&&console.timeEnd("  addRow"),d&&console.timeEnd(" SimplexSolver::pivot")},_resetStayConstants:function(){a.trace&&console.log("_resetStayConstants");for(var b=0;this._stayPlusErrorVars.length>b;b++){var c=this.rows.get(this._stayPlusErrorVars[b]);null==c&&(c=this.rows.get(this._stayMinusErrorVars[b])),null!=c&&(c.constant=0)}},_setExternalVariables:function(){a.trace&&a.fnenterprint("_setExternalVariables:"),a.trace&&a.traceprint(""+this),this._externalParametricVars.each(function(b){null!=this.rows.get(b)?a.trace&&console.log("Error: variable"+b+" in _externalParametricVars is basic"):b.value=0},this),this._externalRows.each(function(a){var b=this.rows.get(a);a.value!=b.constant&&(a.value=b.constant)},this),this._fNeedsSolving=!1,this.onsolved()},onsolved:function(){},insertErrorVar:function(b,c){a.trace&&a.fnenterprint("insertErrorVar:"+b+", "+c);var d=this._errorVars.get(c);d||(d=new a.HashSet,this._errorVars.set(b,d)),d.add(c)}})}(this.c||module.parent.exports||{}),function(a){"use strict";a.Timer=a.inherit({initialize:function(){this.isRunning=!1,this._elapsedMs=0},start:function(){return this.isRunning=!0,this._startReading=new Date,this},stop:function(){return this.isRunning=!1,this._elapsedMs+=new Date-this._startReading,this},reset:function(){return this.isRunning=!1,this._elapsedMs=0,this},elapsedTime:function(){return this.isRunning?(this._elapsedMs+(new Date-this._startReading))/1e3:this._elapsedMs/1e3}})}(this.c||module.parent.exports||{}),__cassowary_parser=function(){function a(a){return'"'+a.replace(/\\/g,"\\\\").replace(/"/g,'\\"').replace(/\x08/g,"\\b").replace(/\t/g,"\\t").replace(/\n/g,"\\n").replace(/\f/g,"\\f").replace(/\r/g,"\\r").replace(/[\x00-\x07\x0B\x0E-\x1F\x80-\uFFFF]/g,escape)+'"'}var b={parse:function(b,c){function k(a){g>e||(e>g&&(g=e,h=[]),h.push(a))}function l(){var a,b,c,d,f;if(d=e,f=e,a=z(),null!==a){if(c=m(),null!==c)for(b=[];null!==c;)b.push(c),c=m();else b=null;null!==b?(c=z(),null!==c?a=[a,b,c]:(a=null,e=f)):(a=null,e=f)}else a=null,e=f;return null!==a&&(a=function(a,b){return b}(d,a[1])),null===a&&(e=d),a}function m(){var a,b,c,d;return c=e,d=e,a=P(),null!==a?(b=s(),null!==b?a=[a,b]:(a=null,e=d)):(a=null,e=d),null!==a&&(a=function(a,b){return b}(c,a[0])),null===a&&(e=c),a}function n(){var a;return b.length>e?(a=b.charAt(e),e++):(a=null,0===f&&k("any character")),a}function o(){var a;return/^[a-zA-Z]/.test(b.charAt(e))?(a=b.charAt(e),e++):(a=null,0===f&&k("[a-zA-Z]")),null===a&&(36===b.charCodeAt(e)?(a="$",e++):(a=null,0===f&&k('"$"')),null===a&&(95===b.charCodeAt(e)?(a="_",e++):(a=null,0===f&&k('"_"')))),a}function p(){var a;return f++,/^[\t\x0B\f \xA0\uFEFF]/.test(b.charAt(e))?(a=b.charAt(e),e++):(a=null,0===f&&k("[\\t\\x0B\\f \\xA0\\uFEFF]")),f--,0===f&&null===a&&k("whitespace"),a}function q(){var a;return/^[\n\r\u2028\u2029]/.test(b.charAt(e))?(a=b.charAt(e),e++):(a=null,0===f&&k("[\\n\\r\\u2028\\u2029]")),a}function r(){var a;return f++,10===b.charCodeAt(e)?(a="\n",e++):(a=null,0===f&&k('"\\n"')),null===a&&("\r\n"===b.substr(e,2)?(a="\r\n",e+=2):(a=null,0===f&&k('"\\r\\n"')),null===a&&(13===b.charCodeAt(e)?(a="\r",e++):(a=null,0===f&&k('"\\r"')),null===a&&(8232===b.charCodeAt(e)?(a="\u2028",e++):(a=null,0===f&&k('"\\u2028"')),null===a&&(8233===b.charCodeAt(e)?(a="\u2029",e++):(a=null,0===f&&k('"\\u2029"')))))),f--,0===f&&null===a&&k("end of line"),a}function s(){var a,c,d;return d=e,a=z(),null!==a?(59===b.charCodeAt(e)?(c=";",e++):(c=null,0===f&&k('";"')),null!==c?a=[a,c]:(a=null,e=d)):(a=null,e=d),null===a&&(d=e,a=y(),null!==a?(c=r(),null!==c?a=[a,c]:(a=null,e=d)):(a=null,e=d),null===a&&(d=e,a=z(),null!==a?(c=t(),null!==c?a=[a,c]:(a=null,e=d)):(a=null,e=d))),a}function t(){var a,c;return c=e,f++,b.length>e?(a=b.charAt(e),e++):(a=null,0===f&&k("any character")),f--,null===a?a="":(a=null,e=c),a}function u(){var a;return f++,a=v(),null===a&&(a=x()),f--,0===f&&null===a&&k("comment"),a}function v(){var a,c,d,g,h,i,j;if(h=e,"/*"===b.substr(e,2)?(a="/*",e+=2):(a=null,0===f&&k('"/*"')),null!==a){for(c=[],i=e,j=e,f++,"*/"===b.substr(e,2)?(d="*/",e+=2):(d=null,0===f&&k('"*/"')),f--,null===d?d="":(d=null,e=j),null!==d?(g=n(),null!==g?d=[d,g]:(d=null,e=i)):(d=null,e=i);null!==d;)c.push(d),i=e,j=e,f++,"*/"===b.substr(e,2)?(d="*/",e+=2):(d=null,0===f&&k('"*/"')),f--,null===d?d="":(d=null,e=j),null!==d?(g=n(),null!==g?d=[d,g]:(d=null,e=i)):(d=null,e=i);null!==c?("*/"===b.substr(e,2)?(d="*/",e+=2):(d=null,0===f&&k('"*/"')),null!==d?a=[a,c,d]:(a=null,e=h)):(a=null,e=h)}else a=null,e=h;return a}function w(){var a,c,d,g,h,i,j;if(h=e,"/*"===b.substr(e,2)?(a="/*",e+=2):(a=null,0===f&&k('"/*"')),null!==a){for(c=[],i=e,j=e,f++,"*/"===b.substr(e,2)?(d="*/",e+=2):(d=null,0===f&&k('"*/"')),null===d&&(d=q()),f--,null===d?d="":(d=null,e=j),null!==d?(g=n(),null!==g?d=[d,g]:(d=null,e=i)):(d=null,e=i);null!==d;)c.push(d),i=e,j=e,f++,"*/"===b.substr(e,2)?(d="*/",e+=2):(d=null,0===f&&k('"*/"')),null===d&&(d=q()),f--,null===d?d="":(d=null,e=j),null!==d?(g=n(),null!==g?d=[d,g]:(d=null,e=i)):(d=null,e=i);null!==c?("*/"===b.substr(e,2)?(d="*/",e+=2):(d=null,0===f&&k('"*/"')),null!==d?a=[a,c,d]:(a=null,e=h)):(a=null,e=h)}else a=null,e=h;return a}function x(){var a,c,d,g,h,i,j;if(h=e,"//"===b.substr(e,2)?(a="//",e+=2):(a=null,0===f&&k('"//"')),null!==a){for(c=[],i=e,j=e,f++,d=q(),f--,null===d?d="":(d=null,e=j),null!==d?(g=n(),null!==g?d=[d,g]:(d=null,e=i)):(d=null,e=i);null!==d;)c.push(d),i=e,j=e,f++,d=q(),f--,null===d?d="":(d=null,e=j),null!==d?(g=n(),null!==g?d=[d,g]:(d=null,e=i)):(d=null,e=i);null!==c?a=[a,c]:(a=null,e=h)}else a=null,e=h;return a}function y(){var a,b;for(a=[],b=p(),null===b&&(b=w(),null===b&&(b=x()));null!==b;)a.push(b),b=p(),null===b&&(b=w(),null===b&&(b=x()));return a}function z(){var a,b;for(a=[],b=p(),null===b&&(b=r(),null===b&&(b=u()));null!==b;)a.push(b),b=p(),null===b&&(b=r(),null===b&&(b=u()));return a}function A(){var a,b;return b=e,a=C(),null===a&&(a=B()),null!==a&&(a=function(a,b){return{type:"NumericLiteral",value:b}}(b,a)),null===a&&(e=b),a}function B(){var a,c,d;if(d=e,/^[0-9]/.test(b.charAt(e))?(c=b.charAt(e),e++):(c=null,0===f&&k("[0-9]")),null!==c)for(a=[];null!==c;)a.push(c),/^[0-9]/.test(b.charAt(e))?(c=b.charAt(e),e++):(c=null,0===f&&k("[0-9]"));else a=null;return null!==a&&(a=function(a,b){return parseInt(b.join(""))}(d,a)),null===a&&(e=d),a}function C(){var a,c,d,g,h;return g=e,h=e,a=B(),null!==a?(46===b.charCodeAt(e)?(c=".",e++):(c=null,0===f&&k('"."')),null!==c?(d=B(),null!==d?a=[a,c,d]:(a=null,e=h)):(a=null,e=h)):(a=null,e=h),null!==a&&(a=function(a,b){return parseFloat(b.join(""))}(g,a)),null===a&&(e=g),a}function D(){var a,c,d,g;if(g=e,/^[\-+]/.test(b.charAt(e))?(a=b.charAt(e),e++):(a=null,0===f&&k("[\\-+]")),a=null!==a?a:"",null!==a){if(/^[0-9]/.test(b.charAt(e))?(d=b.charAt(e),e++):(d=null,0===f&&k("[0-9]")),null!==d)for(c=[];null!==d;)c.push(d),/^[0-9]/.test(b.charAt(e))?(d=b.charAt(e),e++):(d=null,0===f&&k("[0-9]"));else c=null;null!==c?a=[a,c]:(a=null,e=g)}else a=null,e=g;return a}function E(){var a,b;return f++,b=e,a=F(),null!==a&&(a=function(a,b){return b}(b,a)),null===a&&(e=b),f--,0===f&&null===a&&k("identifier"),a}function F(){var a,b,c,d,g;if(f++,d=e,g=e,a=o(),null!==a){for(b=[],c=o();null!==c;)b.push(c),c=o();null!==b?a=[a,b]:(a=null,e=g)}else a=null,e=g;return null!==a&&(a=function(a,b,c){return b+c.join("")}(d,a[0],a[1])),null===a&&(e=d),f--,0===f&&null===a&&k("identifier"),a}function G(){var a,c,d,g,h,i,j;return i=e,a=E(),null!==a&&(a=function(a,b){return{type:"Variable",name:b}}(i,a)),null===a&&(e=i),null===a&&(a=A(),null===a&&(i=e,j=e,40===b.charCodeAt(e)?(a="(",e++):(a=null,0===f&&k('"("')),null!==a?(c=z(),null!==c?(d=P(),null!==d?(g=z(),null!==g?(41===b.charCodeAt(e)?(h=")",e++):(h=null,0===f&&k('")"')),null!==h?a=[a,c,d,g,h]:(a=null,e=j)):(a=null,e=j)):(a=null,e=j)):(a=null,e=j)):(a=null,e=j),null!==a&&(a=function(a,b){return b}(i,a[2])),null===a&&(e=i))),a}function H(){var a,b,c,d,f;return a=G(),null===a&&(d=e,f=e,a=I(),null!==a?(b=z(),null!==b?(c=H(),null!==c?a=[a,b,c]:(a=null,e=f)):(a=null,e=f)):(a=null,e=f),null!==a&&(a=function(a,b,c){return{type:"UnaryExpression",operator:b,expression:c}}(d,a[0],a[2])),null===a&&(e=d)),a}function I(){var a;return 43===b.charCodeAt(e)?(a="+",e++):(a=null,0===f&&k('"+"')),null===a&&(45===b.charCodeAt(e)?(a="-",e++):(a=null,0===f&&k('"-"')),null===a&&(33===b.charCodeAt(e)?(a="!",e++):(a=null,0===f&&k('"!"')))),a}function J(){var a,b,c,d,f,g,h,i,j;if(h=e,i=e,a=H(),null!==a){for(b=[],j=e,c=z(),null!==c?(d=K(),null!==d?(f=z(),null!==f?(g=H(),null!==g?c=[c,d,f,g]:(c=null,e=j)):(c=null,e=j)):(c=null,e=j)):(c=null,e=j);null!==c;)b.push(c),j=e,c=z(),null!==c?(d=K(),null!==d?(f=z(),null!==f?(g=H(),null!==g?c=[c,d,f,g]:(c=null,e=j)):(c=null,e=j)):(c=null,e=j)):(c=null,e=j);null!==b?a=[a,b]:(a=null,e=i)}else a=null,e=i;return null!==a&&(a=function(a,b,c){for(var d=b,e=0;c.length>e;e++)d={type:"MultiplicativeExpression",operator:c[e][1],left:d,right:c[e][3]};return d}(h,a[0],a[1])),null===a&&(e=h),a}function K(){var a;return 42===b.charCodeAt(e)?(a="*",e++):(a=null,0===f&&k('"*"')),null===a&&(47===b.charCodeAt(e)?(a="/",e++):(a=null,0===f&&k('"/"'))),a}function L(){var a,b,c,d,f,g,h,i,j;if(h=e,i=e,a=J(),null!==a){for(b=[],j=e,c=z(),null!==c?(d=M(),null!==d?(f=z(),null!==f?(g=J(),null!==g?c=[c,d,f,g]:(c=null,e=j)):(c=null,e=j)):(c=null,e=j)):(c=null,e=j);null!==c;)b.push(c),j=e,c=z(),null!==c?(d=M(),null!==d?(f=z(),null!==f?(g=J(),null!==g?c=[c,d,f,g]:(c=null,e=j)):(c=null,e=j)):(c=null,e=j)):(c=null,e=j);null!==b?a=[a,b]:(a=null,e=i)}else a=null,e=i;return null!==a&&(a=function(a,b,c){for(var d=b,e=0;c.length>e;e++)d={type:"AdditiveExpression",operator:c[e][1],left:d,right:c[e][3]};return d}(h,a[0],a[1])),null===a&&(e=h),a}function M(){var a;return 43===b.charCodeAt(e)?(a="+",e++):(a=null,0===f&&k('"+"')),null===a&&(45===b.charCodeAt(e)?(a="-",e++):(a=null,0===f&&k('"-"'))),a}function N(){var a,b,c,d,f,g,h,i,j;if(h=e,i=e,a=L(),null!==a){for(b=[],j=e,c=z(),null!==c?(d=O(),null!==d?(f=z(),null!==f?(g=L(),null!==g?c=[c,d,f,g]:(c=null,e=j)):(c=null,e=j)):(c=null,e=j)):(c=null,e=j);null!==c;)b.push(c),j=e,c=z(),null!==c?(d=O(),null!==d?(f=z(),null!==f?(g=L(),null!==g?c=[c,d,f,g]:(c=null,e=j)):(c=null,e=j)):(c=null,e=j)):(c=null,e=j);null!==b?a=[a,b]:(a=null,e=i)}else a=null,e=i;return null!==a&&(a=function(a,b,c){for(var d=b,e=0;c.length>e;e++)d={type:"Inequality",operator:c[e][1],left:d,right:c[e][3]};return d}(h,a[0],a[1])),null===a&&(e=h),a}function O(){var a;return"<="===b.substr(e,2)?(a="<=",e+=2):(a=null,0===f&&k('"<="')),null===a&&(">="===b.substr(e,2)?(a=">=",e+=2):(a=null,0===f&&k('">="')),null===a&&(60===b.charCodeAt(e)?(a="<",e++):(a=null,0===f&&k('"<"')),null===a&&(62===b.charCodeAt(e)?(a=">",e++):(a=null,0===f&&k('">"'))))),a}function P(){var a,c,d,g,h,i,j,l,m;if(j=e,l=e,a=N(),null!==a){for(c=[],m=e,d=z(),null!==d?("=="===b.substr(e,2)?(g="==",e+=2):(g=null,0===f&&k('"=="')),null!==g?(h=z(),null!==h?(i=N(),null!==i?d=[d,g,h,i]:(d=null,e=m)):(d=null,e=m)):(d=null,e=m)):(d=null,e=m);null!==d;)c.push(d),m=e,d=z(),null!==d?("=="===b.substr(e,2)?(g="==",e+=2):(g=null,0===f&&k('"=="')),null!==g?(h=z(),null!==h?(i=N(),null!==i?d=[d,g,h,i]:(d=null,e=m)):(d=null,e=m)):(d=null,e=m)):(d=null,e=m);null!==c?a=[a,c]:(a=null,e=l)}else a=null,e=l;return null!==a&&(a=function(a,b,c){for(var d=b,e=0;c.length>e;e++)d={type:"Equality",operator:c[e][1],left:d,right:c[e][3]};return d}(j,a[0],a[1])),null===a&&(e=j),a}function Q(a){a.sort();for(var b=null,c=[],d=0;a.length>d;d++)a[d]!==b&&(c.push(a[d]),b=a[d]);return c}function R(){for(var a=1,c=1,d=!1,f=0;Math.max(e,g)>f;f++){var h=b.charAt(f);"\n"===h?(d||a++,c=1,d=!1):"\r"===h||"\u2028"===h||"\u2029"===h?(a++,c=1,d=!0):(c++,d=!1)}return{line:a,column:c}}var d={start:l,Statement:m,SourceCharacter:n,IdentifierStart:o,WhiteSpace:p,LineTerminator:q,LineTerminatorSequence:r,EOS:s,EOF:t,Comment:u,MultiLineComment:v,MultiLineCommentNoLineTerminator:w,SingleLineComment:x,_:y,__:z,Literal:A,Integer:B,Real:C,SignedInteger:D,Identifier:E,IdentifierName:F,PrimaryExpression:G,UnaryExpression:H,UnaryOperator:I,MultiplicativeExpression:J,MultiplicativeOperator:K,AdditiveExpression:L,AdditiveOperator:M,InequalityExpression:N,InequalityOperator:O,LinearExpression:P};if(void 0!==c){if(void 0===d[c])throw Error("Invalid rule name: "+a(c)+".")}else c="start";var e=0,f=0,g=0,h=[],S=d[c]();if(null===S||e!==b.length){var T=Math.max(e,g),U=b.length>T?b.charAt(T):null,V=R();throw new this.SyntaxError(Q(h),U,T,V.line,V.column)}return S},toSource:function(){return this._source}};return b.SyntaxError=function(b,c,d,e,f){function g(b,c){var d,e;switch(b.length){case 0:d="end of input";break;case 1:d=b[0];break;default:d=b.slice(0,b.length-1).join(", ")+" or "+b[b.length-1]}return e=c?a(c):"end of input","Expected "+d+" but "+e+" found."}this.name="SyntaxError",this.expected=b,this.found=c,this.message=g(b,c),this.offset=d,this.line=e,this.column=f},b.SyntaxError.prototype=Error.prototype,b}();
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
+
+(function(scope){
+"use strict";
+
+// For Safari 5.x. Go-go-gadget ridiculously long release cycle!
+try {
+  (function(){}).bind(scope);
+} catch (e) {
+  Object.defineProperty(Function.prototype, "bind", {
+    value: function(scope) {
+      var f = this;
+      return function() { return f.apply(scope, arguments); }
+    },
+    enumerable: false,
+    configurable: true,
+    writable: true,
+  });
+}
+
+var inBrowser = (typeof scope["HTMLElement"] != "undefined");
+
+var getTagName = function(proto) {
+  var tn = null;
+  while (proto && proto != Object.prototype) {
+      if (proto.tagName) {
+        tn = proto.tagName;
+        break;
+      }
+    proto = proto.prototype;
+  }
+  return tn || "div";
+};
+var epsilon = 1e-8;
+
+var  _t_map = {};
+var walkForMethod = function(ctor, name) {
+  if (!ctor || !name) return;
+
+  // Check the class-side first, the look at the prototype, then walk up
+  if (typeof ctor[name] == "function") {
+    return ctor[name];
+  }
+  var p = ctor.prototype;
+  if (p && typeof p[name] == "function") {
+    return p[name];
+  }
+  if (p === Object.prototype ||
+      p === Function.prototype) {
+    return;
+  }
+
+  if (typeof ctor.__super__ == "function") {
+    return walkForMethod(ctor.__super__, name);
+  }
+};
+
+// Global
+var c = scope.c = function() {
+  if(c._api) {
+    return c._api.apply(this, arguments);
+  }
+};
+
+//
+// Configuration
+//
+c.debug = false;
+c.trace = false;
+c.verbose = false;
+c.traceAdded = false;
+c.GC = false;
+
+//
+// Constants
+//
+c.GEQ = 1;
+c.LEQ = 2;
+
+
+//
+// Utility methods
+//
+c.inherit = function(props) {
+  var ctor = null;
+  var parent = null;
+
+  if (props["extends"]) {
+    parent = props["extends"];
+    delete props["extends"];
+  }
+
+  if (props["initialize"]) {
+    ctor = props["initialize"];
+    delete props["initialize"];
+  }
+
+  var realCtor = ctor || function() { };
+
+  Object.defineProperty(realCtor, "__super__", {
+    value: (parent) ? parent : Object,
+    enumerable: false,
+    configurable: true,
+    writable: false,
+  });
+
+  if (props["_t"]) {
+    _t_map[props["_t"]] = realCtor;
+  }
+
+  // FIXME(slightlyoff): would like to have class-side inheritance!
+  // It's easy enough to do when we have __proto__, but we don't in IE 9/10.
+  //   = (
+
+  /*
+  // NOTE: would happily do this except it's 2x slower. Boo!
+  props.__proto__ = parent ? parent.prototype : Object.prototype;
+  realCtor.prototype = props;
+  */
+
+  var rp = realCtor.prototype = Object.create(
+    ((parent) ? parent.prototype : Object.prototype)
+  );
+
+  c.extend(rp, props);
+
+  // If we're in a browser, we want to support "subclassing" HTML elements.
+  // This needs some magic and we rely on a wrapped constructor hack to make
+  // it happen.
+  if (inBrowser) {
+    if (parent && parent.prototype instanceof scope.HTMLElement) {
+      var intermediateCtor = realCtor;
+      var tn = getTagName(rp);
+      var upgrade = function(el) {
+        el.__proto__ = rp;
+        intermediateCtor.apply(el, arguments);
+        if (rp["created"]) { el.created(); }
+        if (rp["decorate"]) { el.decorate(); }
+        return el;
+      };
+      this.extend(rp, { upgrade: upgrade, });
+
+      realCtor = function() {
+        // We hack the constructor to always return an element with it's
+        // prototype wired to ours. Boo.
+        return upgrade(
+          scope.document.createElement(tn)
+        );
+      }
+      realCtor.prototype = rp;
+      this.extend(realCtor, { ctor: intermediateCtor, }); // HACK!!!
+    }
+  }
+
+  return realCtor;
+};
+
+c.own = function(obj, cb, context) {
+  Object.getOwnPropertyNames(obj).forEach(cb, context||scope);
+  return obj;
+};
+
+c.extend = function(obj, props) {
+  c.own(props, function(x) {
+    var pd = Object.getOwnPropertyDescriptor(props, x);
+    try {
+      if ( (typeof pd["get"] == "function") ||
+           (typeof pd["set"] == "function") ) {
+        Object.defineProperty(obj, x, pd);
+      } else if (typeof pd["value"] == "function" ||x.charAt(0) === "_") {
+        pd.writable = true;
+        pd.configurable = true;
+        pd.enumerable = false;
+        Object.defineProperty(obj, x, pd);
+      } else {
+          obj[x] = props[x];
+      }
+    } catch(e) {
+      // console.warn("c.extend assignment failed on property", x);
+    }
+  });
+  return obj;
+};
+
+// FIXME: legacy API to be removed
+c.traceprint = function(s /*String*/) { if (c.verbose) { console.log(s); } };
+c.fnenterprint = function(s /*String*/) { console.log("* " + s); };
+c.fnexitprint = function(s /*String*/) { console.log("- " + s); };
+
+c.assert = function(f /*boolean*/, description /*String*/) {
+  if (!f) {
+    throw new c.InternalError("Assertion failed: " + description);
+  }
+};
+
+c.plus = function(e1, e2) {
+  if (!(e1 instanceof c.Expression)) {
+    e1 = new c.Expression(e1);
+  }
+  if (!(e2 instanceof c.Expression)) {
+    e2 = new c.Expression(e2);
+  }
+  return e1.plus(e2);
+};
+
+c.minus = function(e1, e2) {
+  if (!(e1 instanceof c.Expression)) {
+    e1 = new c.Expression(e1);
+  }
+  if (!(e2 instanceof c.Expression)) {
+    e2 = new c.Expression(e2);
+  }
+
+  return e1.minus(e2);
+};
+
+c.times = function(e1, e2) {
+  if (typeof e1 == "number" || e1 instanceof c.Variable) {
+    e1 = new c.Expression(e1);
+  }
+  if (typeof e2 == "number" || e2 instanceof c.Variable) {
+    e2 = new c.Expression(e2);
+  }
+
+  return e1.times(e2);
+};
+
+c.divide = function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
+  if (typeof e1 == "number" || e1 instanceof c.Variable) {
+    e1 = new c.Expression(e1);
+  }
+  if (typeof e2 == "number" || e2 instanceof c.Variable) {
+    e2 = new c.Expression(e2);
+  }
+
+  return e1.divide(e2);
+};
+
+c.approx = function(a /*double*/, b /*double*/) {
+  if (a === b) { return true; }
+  var av, bv;
+  av = (a instanceof c.Variable) ? a.value : a;
+  bv = (b instanceof c.Variable) ? b.value : b;
+  if (av == 0) {
+    return (Math.abs(bv) < epsilon);
+  }
+  if (bv == 0) {
+    return (Math.abs(av) < epsilon);
+  }
+  return (Math.abs(av - bv) < Math.abs(av) * epsilon);
+};
+
+var count = 0;
+c._inc = function() { return count++; };
+
+c.parseJSON = function(str) {
+  return JSON.parse(str, function(k, v) {
+    if (typeof v != "object" || typeof v["_t"] != "string") {
+      return v;
+    }
+    var type = v["_t"];
+    var ctor = _t_map[type];
+    if (type && ctor) {
+      var fromJSON = walkForMethod(ctor, "fromJSON");
+      if (fromJSON) {
+        return fromJSON(v, ctor);
+      }
+    }
+    return v;
+  });
+};
+
+// For Node...not that I'm bitter. No no, not at all. Not me. Never...
+if (typeof require == "function" &&
+    typeof module != "undefined" &&
+    typeof load == "undefined") {
+  scope.exports = c;
+}
+// ...well, hardly ever.
+
+})(this);
+/**
+ * Copyright 2012 Alex Russell <slightlyoff@google.com>.
+ *
+ * Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * This is an API compatible re-implementation of the subset of jshashtable
+ * which Cassowary actually uses.
+ *
+ * Features removed:
+ *
+ *     - multiple values per key
+ *     - error tollerent hashing of any variety
+ *     - overly careful (or lazy) size counting, etc.
+ *     - Crockford's "class" pattern. We use the system from c.js.
+ *     - any attempt at back-compat with broken runtimes.
+ *
+ * APIs removed, mostly for lack of use in Cassowary:
+ *
+ *     - support for custom hashing and equality functions as keys to ctor
+ *     - isEmpty() -> check for !ht.size()
+ *     - putAll()
+ *     - entries()
+ *     - containsKey()
+ *     - containsValue()
+ *     - keys()
+ *     - values()
+ *
+ * Additions:
+ *
+ *     - new "scope" parameter to each() and escapingEach()
+ */
+
+(function(c) {
+"use strict";
+
+var keyCode = function(key) {
+  var kc = (!!key.hashCode) ? key.hashCode : key.toString();
+  return kc;
+};
+
+var copyOwn = function(src, dest) {
+  Object.keys(src).forEach(function(x) {
+    dest[x] = src[x];
+  });
+};
+
+if (false && typeof Map != "undefined") {
+
+  c.HashTable = c.inherit({
+
+    initialize: function() {
+      this.size = 0;
+      this._store = new Map();
+      this._keys = [];
+      // this.get = this._store.get.bind(this._store);
+    },
+
+    set: function(key, value) {
+      this._store.set(key, value);
+      if (this._keys.indexOf(key) == -1) {
+        this.size++;
+        // delete this._keys[this._keys.indexOf(key)];
+        this._keys.push(key);
+      } /* else {
+        delete this._keys[this._keys.indexOf(key)];
+        this._keys.push(key);
+      }
+      */
+    },
+
+    get: function(key) {
+      return this._store.get(key);
+    },
+
+    clear: function() {
+      this.size = 0;
+      this._store = new Map();
+      this._keys = [];
+    },
+
+    delete: function(key) {
+      if (this._store.delete(key) && this.size > 0) {
+        delete this._keys[this._keys.indexOf(key)];
+        this.size--;
+      }
+    },
+
+    each: function(callback, scope) {
+      if (!this.size) { return; }
+      this._keys.forEach(function(k){
+        if (typeof k == "undefined") { return; }
+        var v = this._store.get(k);
+        if (typeof v != "undefined") {
+          callback.call(scope||null, k, v);
+        }
+      }, this);
+    },
+
+    escapingEach: function(callback, scope) {
+      if (!this.size) { return; }
+
+      var that = this;
+      var kl = this._keys.length;
+      var context;
+      for (var x = 0; x < kl; x++) {
+        if (typeof this._keys[x] != "undefined") {
+          (function(k) {
+            var v = that._store.get(k);
+            if (typeof v != "undefined") {
+              context = callback.call(scope||null, k, v);
+            }
+          })(this._keys[x]);
+
+          if (context) {
+            if (context.retval !== undefined) {
+              return context;
+            }
+            if (context.brk) {
+              break;
+            }
+          }
+        }
+      }
+    },
+
+    clone: function() {
+      var n = new c.HashTable();
+      if (this.size) {
+        this.each(function(k, v) {
+          n.set(k, v);
+        });
+      }
+      return n;
+    }
+  });
+} else {
+  // For escapingEach
+  var defaultContext = {};
+
+  c.HashTable = c.inherit({
+
+    initialize: function() {
+      this.size = 0;
+      this._store = {};
+      this._keyStrMap = {};
+      this._deleted = 0;
+    },
+
+    set: function(key, value) {
+      var hash = keyCode(key);
+
+      if (!this._store.hasOwnProperty(hash)) {
+        // FIXME(slightlyoff): if size gooes above the V8 property limit,
+        // compact or go to a tree.
+        this.size++;
+      }
+      this._store[hash] = value;
+      this._keyStrMap[hash] = key;
+    },
+
+    get: function(key) {
+      if(!this.size) { return null; }
+
+      key = keyCode(key);
+
+      var v = this._store[key];
+      if (typeof v != "undefined") {
+        return this._store[key];
+      }
+      return null;
+    },
+
+    clear: function() {
+      this.size = 0;
+      this._store = {};
+      this._keyStrMap = {};
+    },
+
+    _compact: function() {
+      // console.time("HashTable::_compact()");
+      var ns = {};
+      copyOwn(this._store, ns);
+      this._store = ns;
+      // console.timeEnd("HashTable::_compact()");
+    },
+
+    _compactThreshold: 100,
+    _perhapsCompact: function() {
+      // If we have more properties than V8's fast property lookup limit, don't
+      // bother
+      if (this._size > 64) return;
+      if (this._deleted > this._compactThreshold) {
+        this._compact();
+        this._deleted = 0;
+      }
+    },
+
+    delete: function(key) {
+      key = keyCode(key);
+      if (!this._store.hasOwnProperty(key)) {
+        return;
+      }
+      this._deleted++;
+
+      // FIXME(slightlyoff):
+      //    I hate this because it causes these objects to go megamorphic = (
+      //    Sadly, Cassowary is hugely sensitive to iteration order changes, and
+      //    "delete" preserves order when Object.keys() is called later.
+      delete this._store[key];
+      // Note: we don't delete from _keyStrMap because we only get the
+      // Object.keys() from _store, so it's the only one we need to keep up-to-
+      // date.
+
+      if (this.size > 0) {
+        this.size--;
+      }
+    },
+
+    each: function(callback, scope) {
+      if (!this.size) { return; }
+
+      this._perhapsCompact();
+
+      var store = this._store;
+      var keyMap = this._keyStrMap;
+      Object.keys(this._store).forEach(function(k){
+        callback.call(scope||null, keyMap[k], store[k]);
+      }, this);
+    },
+
+    escapingEach: function(callback, scope) {
+      if (!this.size) { return; }
+
+      this._perhapsCompact();
+
+      var that = this;
+      var store = this._store;
+      var keyMap = this._keyStrMap;
+      var context = defaultContext;
+      var kl = Object.keys(store);
+      for (var x = 0; x < kl.length; x++) {
+        (function(v) {
+          if (that._store.hasOwnProperty(v)) {
+            context = callback.call(scope||null, keyMap[v], store[v]);
+          }
+        })(kl[x]);
+
+        if (context) {
+          if (context.retval !== undefined) {
+            return context;
+          }
+          if (context.brk) {
+            break;
+          }
+        }
+      }
+    },
+
+    clone: function() {
+      var n = new c.HashTable();
+      if (this.size) {
+        n.size = this.size;
+        copyOwn(this._store, n._store);
+        copyOwn(this._keyStrMap, n._keyStrMap);
+      }
+      return n;
+    },
+
+    equals: function(other) {
+      if (other === this) {
+        return true;
+      }
+
+      if (!(other instanceof c.HashTable) || other._size !== this._size) {
+        return false;
+      }
+
+      var codes = Object.keys(this._store);
+      for (var i = 0; i < codes.length; i++) {
+        var code = codes[i];
+        if (this._keyStrMap[code] !== other._keyStrMap[code] ||
+            this._store[code] !== other._store[code]) {
+          return false;
+        }
+      }
+
+      return true;
+    },
+
+    toString: function(h) {
+      var answer = "";
+      this.each(function(k, v) { answer += k + " => " + v + "\n"; });
+      return answer;
+    },
+  });
+}
+
+})(this["c"]||module.parent.exports||{});
+/**
+ * Copyright 2011, Alex Russell <slightlyoff@google.com>
+ *
+ * Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * API compatible re-implementation of jshashset.js, including only what
+ * Cassowary needs. Built for speed, not comfort.
+ */
+(function(c) {
+"use strict";
+
+c.HashSet = c.inherit({
+  _t: "c.HashSet",
+
+  initialize: function() {
+    this.storage = [];
+    this.size = 0;
+  },
+
+  add: function(item) {
+    var s = this.storage, io = s.indexOf(item);
+    if (s.indexOf(item) == -1) { s.push(item); }
+    this.size = this.storage.length;
+  },
+
+  values: function() {
+    // FIXME(slightlyoff): is it safe to assume we won't be mutated by our caller?
+    //                     if not, return this.storage.slice(0);
+    return this.storage;
+  },
+
+  has: function(item) {
+    var s = this.storage;
+    return (s.indexOf(item) != -1);
+  },
+
+  delete: function(item) {
+    var io = this.storage.indexOf(item);
+    if (io == -1) { return null; }
+    this.storage.splice(io, 1)[0];
+    this.size = this.storage.length;
+  },
+
+  clear: function() {
+    this.storage.length = 0;
+  },
+
+  each: function(func, scope) {
+    if(this.size)
+      this.storage.forEach(func, scope);
+  },
+
+  escapingEach: function(func, scope) {
+    // FIXME(slightlyoff): actually escape!
+    if (this.size)
+      this.storage.forEach(func, scope);
+  },
+
+  toString: function() {
+    var answer = this.size + " {";
+    var first = true;
+    this.each(function(e) {
+      if (!first) {
+        answer += ", ";
+      } else {
+        first = false;
+      }
+      answer += e;
+    });
+    answer += "}\n";
+    return answer;
+  },
+
+  toJSON: function() {
+    var d = [];
+    this.each(function(e) {
+      d.push(e.toJSON());
+    });
+    return {
+      _t: "c.HashSet",
+      data: d
+    };
+  },
+
+  fromJSON: function(o) {
+    var r = new c.HashSet();
+    if (o.data) {
+      r.size = o.data.length;
+      r.storage = o.data;
+    }
+    return r;
+  },
+});
+
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
+
+(function(c){
+  "use strict";
+
+  c.Error = c.inherit({
+    // extends: Error,
+    initialize: function(s /*String*/) { if (s) { this._description = s; } },
+    _name: "c.Error",
+    _description: "An error has occured in Cassowary",
+    set description(v)   { this._description = v; },
+    get description()    { return "(" + this._name + ") " + this._description; },
+    get message()        { return this.description; },
+    toString: function() { return this.description; },
+  });
+
+  var errorType = function(name, error) {
+    return c.inherit({
+      extends: c.Error,
+      initialize: function() { c.Error.apply(this, arguments); },
+      _name: name||"", _description: error||""
+    });
+  };
+
+  c.ConstraintNotFound =
+    errorType("c.ConstraintNotFound",
+        "Tried to remove a constraint never added to the tableu");
+
+  c.InternalError =
+    errorType("c.InternalError");
+
+  c.NonExpression =
+    errorType("c.NonExpression",
+        "The resulting expression would be non");
+
+  c.NotEnoughStays =
+    errorType("c.NotEnoughStays",
+        "There are not enough stays to give specific values to every variable");
+
+  c.RequiredFailure =
+    errorType("c.RequiredFailure", "A required constraint cannot be satisfied");
+
+  c.TooDifficult =
+    errorType("c.TooDifficult", "The constraints are too difficult to solve");
+
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
+
+(function(c) {
+"use strict";
+
+var multiplier = 1000;
+
+c.SymbolicWeight = c.inherit({
+  _t: "c.SymbolicWeight",
+  initialize: function(/*w1, w2, w3*/) {
+    this.value = 0;
+    var factor = 1;
+    for (var i = arguments.length - 1; i >= 0; --i) {
+      this.value += arguments[i] * factor;
+      factor *= multiplier;
+    }
+  },
+
+  toJSON: function() {
+    return {
+      _t: this._t,
+      value: this.value
+    };
+  },
+});
+
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
+
+// FILE: EDU.Washington.grad.gjb.cassowary
+// package EDU.Washington.grad.gjb.cassowary;
+
+(function(c) {
+
+c.Strength = c.inherit({
+  initialize: function(name /*String*/, symbolicWeight, w2, w3) {
+    this.name = name;
+    if (symbolicWeight instanceof c.SymbolicWeight) {
+      this.symbolicWeight = symbolicWeight;
+    } else {
+      this.symbolicWeight = new c.SymbolicWeight(symbolicWeight, w2, w3);
+    }
+  },
+
+  get required() {
+    return (this === c.Strength.required);
+  },
+
+  toString: function() {
+    return this.name + (!this.isRequired ? (":" + this.symbolicWeight) : "");
+  },
+});
+
+/* public static final */
+c.Strength.required = new c.Strength("<Required>", 1000, 1000, 1000);
+/* public static final  */
+c.Strength.strong = new c.Strength("strong", 1, 0, 0);
+/* public static final  */
+c.Strength.medium = new c.Strength("medium", 0, 1, 0);
+/* public static final  */
+c.Strength.weak = new c.Strength("weak", 0, 0, 1);
+
+})(this["c"]||((typeof module != "undefined") ? module.parent.exports.c : {}));
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
+
+(function(c) {
+"use strict";
+
+c.AbstractVariable = c.inherit({
+  isDummy:      false,
+  isExternal:   false,
+  isPivotable:  false,
+  isRestricted: false,
+
+  _init: function(args, varNamePrefix) {
+    // Common mixin initialization.
+    this.hashCode = c._inc();
+    this.name = (varNamePrefix||"") + this.hashCode;
+    if (args) {
+      if (typeof args.name != "undefined") {
+        this.name = args.name;
+      }
+      if (typeof args.value != "undefined") {
+        this.value = args.value;
+      }
+      if (typeof args.prefix != "undefined") {
+        this._prefix = args.prefix;
+      }
+    }
+  },
+
+  _prefix: "",
+  name: "",
+  value: 0,
+
+  toJSON: function() {
+    var o = {};
+    if (this._t) {
+      o._t = this._t;
+    }
+    if (this.name) {
+      o.name = this.name;
+    }
+    if (typeof this.value != "undefined") {
+      o.value = this.value;
+    }
+    if (this._prefix) {
+      o._prefix = this._prefix;
+    }
+    if (this._t) {
+      o._t = this._t;
+    }
+    return o;
+  },
+
+  fromJSON: function(o, Ctor) {
+    var r = new Ctor();
+    c.extend(r, o);
+    return r;
+  },
+
+  toString: function() {
+    return this._prefix + "[" + this.name + ":" + this.value + "]";
+  },
+
+});
+
+c.Variable = c.inherit({
+  _t: "c.Variable",
+  extends: c.AbstractVariable,
+  initialize: function(args) {
+    this._init(args, "v");
+    var vm = c.Variable._map;
+    if (vm) { vm[this.name] = this; }
+  },
+  isExternal:     true,
+});
+
+/* static */
+// c.Variable._map = [];
+
+c.DummyVariable = c.inherit({
+  _t: "c.DummyVariable",
+  extends: c.AbstractVariable,
+  initialize: function(args) {
+    this._init(args, "d");
+  },
+  isDummy:        true,
+  isRestricted:   true,
+  value:         "dummy",
+});
+
+c.ObjectiveVariable = c.inherit({
+  _t: "c.ObjectiveVariable",
+  extends: c.AbstractVariable,
+  initialize: function(args) {
+    this._init(args, "o");
+  },
+  value:         "obj",
+});
+
+c.SlackVariable = c.inherit({
+  _t: "c.SlackVariable",
+  extends: c.AbstractVariable,
+  initialize: function(args) {
+    this._init(args, "s");
+  },
+  isPivotable:    true,
+  isRestricted:   true,
+  value:         "slack",
+});
+
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
+
+(function(c) {
+"use strict";
+
+c.Point = c.inherit({
+  initialize: function(x, y, suffix) {
+    if (x instanceof c.Variable) {
+      this._x = x;
+    } else {
+      var xArgs = { value: x };
+      if (suffix) {
+        xArgs.name = "x" + suffix;
+      }
+      this._x = new c.Variable(xArgs);
+    }
+    if (y instanceof c.Variable) {
+      this._y = y;
+    } else {
+      var yArgs = { value: y };
+      if (suffix) {
+        yArgs.name = "y" + suffix;
+      }
+      this._y = new c.Variable(yArgs);
+    }
+  },
+
+  get x() { return this._x; },
+  set x(x) {
+    if (x instanceof c.Variable) {
+      this._x = x;
+    } else {
+      this._x.value = x;
+    }
+  },
+
+  get y() { return this._y; },
+  set y(y) {
+    if (y instanceof c.Variable) {
+      this._y = y;
+    } else {
+      this._y.value = y;
+    }
+  },
+
+  toString: function() {
+    return "(" + this.x + ", " + this.y + ")";
+  },
+});
+
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
+
+// FILE: EDU.Washington.grad.gjb.cassowary
+// package EDU.Washington.grad.gjb.cassowary;
+
+(function(c) {
+"use strict";
+
+c.Expression = c.inherit({
+  initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
+    if (c.GC) console.log("new c.Expression");
+    this.constant = (typeof constant == "number" && !isNaN(constant)) ? constant : 0;
+    this.terms = new c.HashTable();
+
+    if (clv instanceof c.AbstractVariable) {
+      this.setVariable(clv, typeof value == 'number' ? value : 1);
+    } else if (typeof clv == "number") {
+      if (!isNaN(clv)) {
+        this.constant = clv;
+      } else {
+        console.trace();
+      }
+    }
+  },
+
+  initializeFromHash: function(constant /*ClDouble*/, terms /*c.Hashtable*/) {
+    if (c.verbose) {
+      console.log("*******************************");
+      console.log("clone c.initializeFromHash");
+      console.log("*******************************");
+    }
+
+    if (c.GC) console.log("clone c.Expression");
+    this.constant = constant;
+    this.terms = terms.clone();
+    return this;
+  },
+
+  multiplyMe: function(x /*double*/) {
+    this.constant *= x;
+    var t = this.terms;
+    t.each(function(clv, coeff) { t.set(clv, coeff * x); });
+    return this;
+  },
+
+  clone: function() {
+    if (c.verbose) {
+      console.log("*******************************");
+      console.log("clone c.Expression");
+      console.log("*******************************");
+    }
+
+    var e = new c.Expression();
+    e.initializeFromHash(this.constant, this.terms);
+    return e;
+  },
+
+  times: function(x) {
+    if (typeof x == 'number') {
+      return (this.clone()).multiplyMe(x);
+    } else {
+      if (this.isConstant) {
+        return x.times(this.constant);
+      } else if (x.isConstant) {
+        return this.times(x.constant);
+      } else {
+        throw new c.NonExpression();
+      }
+    }
+  },
+
+  plus: function(expr /*c.Expression*/) {
+    if (expr instanceof c.Expression) {
+      return this.clone().addExpression(expr, 1);
+    } else if (expr instanceof c.Variable) {
+      return this.clone().addVariable(expr, 1);
+    }
+  },
+
+  minus: function(expr /*c.Expression*/) {
+    if (expr instanceof c.Expression) {
+      return this.clone().addExpression(expr, -1);
+    } else if (expr instanceof c.Variable) {
+      return this.clone().addVariable(expr, -1);
+    }
+  },
+
+  divide: function(x) {
+    if (typeof x == 'number') {
+      if (c.approx(x, 0)) {
+        throw new c.NonExpression();
+      }
+      return this.times(1 / x);
+    } else if (x instanceof c.Expression) {
+      if (!x.isConstant) {
+        throw new c.NonExpression();
+      }
+      return this.times(1 / x.constant);
+    }
+  },
+
+  addExpression: function(expr /*c.Expression*/,
+                          n /*double*/,
+                          subject /*c.AbstractVariable*/,
+                          solver /*c.Tableau*/) {
+
+    // console.log("c.Expression::addExpression()", expr, n);
+    // console.trace();
+    if (expr instanceof c.AbstractVariable) {
+      expr = new c.Expression(expr);
+      if(c.trace) console.log("addExpression: Had to cast a var to an expression");
+    }
+    n = n || 1;
+    this.constant += (n * expr.constant);
+    expr.terms.each(function(clv, coeff) {
+      // console.log("clv:", clv, "coeff:", coeff, "subject:", subject);
+      this.addVariable(clv, coeff * n, subject, solver);
+    }, this);
+    return this;
+  },
+
+  addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
+    if (cd == null) {
+      cd = 1;
+    }
+
+    if (c.trace) console.log("c.Expression::addVariable():", v , cd);
+    var coeff = this.terms.get(v);
+    if (coeff) {
+      var newCoefficient = coeff + cd;
+      if (newCoefficient == 0 || c.approx(newCoefficient, 0)) {
+        if (solver) {
+          solver.noteRemovedVariable(v, subject);
+        }
+        this.terms.delete(v);
+      } else {
+        this.setVariable(v, newCoefficient);
+      }
+    } else {
+      if (!c.approx(cd, 0)) {
+        this.setVariable(v, cd);
+        if (solver) {
+          solver.noteAddedVariable(v, subject);
+        }
+      }
+    }
+    return this;
+  },
+
+  setVariable: function(v /*c.AbstractVariable*/, c /*double*/) {
+    // console.log("terms.set(", v, c, ")");
+    this.terms.set(v, c);
+    return this;
+  },
+
+  anyPivotableVariable: function() {
+    if (this.isConstant) {
+      throw new c.InternalError("anyPivotableVariable called on a constant");
+    }
+
+    var rv = this.terms.escapingEach(function(clv, c) {
+      if (clv.isPivotable) return { retval: clv };
+    });
+
+    if (rv && rv.retval !== undefined) {
+      return rv.retval;
+    }
+
+    return null;
+  },
+
+  substituteOut: function(outvar  /*c.AbstractVariable*/,
+                          expr    /*c.Expression*/,
+                          subject /*c.AbstractVariable*/,
+                          solver  /*ClTableau*/) {
+
+    if (c.trace) {
+      c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
+      c.traceprint("this = " + this);
+    }
+
+    var setVariable = this.setVariable.bind(this);
+    var terms = this.terms;
+    var multiplier = terms.get(outvar);
+    terms.delete(outvar);
+    this.constant += (multiplier * expr.constant);
+    /*
+    console.log("substituteOut:",
+                "\n\toutvar:", outvar,
+                "\n\texpr:", expr.toString(),
+                "\n\tmultiplier:", multiplier,
+                "\n\tterms:", terms);
+    */
+    expr.terms.each(function(clv, coeff) {
+      var oldCoefficient = terms.get(clv);
+      if (oldCoefficient) {
+        var newCoefficient = oldCoefficient + multiplier * coeff;
+        if (c.approx(newCoefficient, 0)) {
+          solver.noteRemovedVariable(clv, subject);
+          terms.delete(clv);
+        } else {
+          setVariable(clv, newCoefficient);
+        }
+      } else {
+        setVariable(clv, multiplier * coeff);
+        if (solver) {
+          solver.noteAddedVariable(clv, subject);
+        }
+      }
+    });
+    if (c.trace) c.traceprint("Now this is " + this);
+  },
+
+  changeSubject: function(old_subject /*c.AbstractVariable*/,
+                          new_subject /*c.AbstractVariable*/) {
+    this.setVariable(old_subject, this.newSubject(new_subject));
+  },
+
+  newSubject: function(subject /*c.AbstractVariable*/) {
+    if (c.trace) c.fnenterprint("newSubject:" + subject);
+
+    var reciprocal = 1 / this.terms.get(subject);
+    this.terms.delete(subject);
+    this.multiplyMe(-reciprocal);
+    return reciprocal;
+  },
+
+  // Return the coefficient corresponding to variable var, i.e.,
+  // the 'ci' corresponding to the 'vi' that var is:
+  //     v1*c1 + v2*c2 + .. + vn*cn + c
+  coefficientFor: function(clv /*c.AbstractVariable*/) {
+    return this.terms.get(clv) || 0;
+  },
+
+  get isConstant() {
+    return this.terms.size == 0;
+  },
+
+  toString: function() {
+    var bstr = ''; // answer
+    var needsplus = false;
+    if (!c.approx(this.constant, 0) || this.isConstant) {
+      bstr += this.constant;
+      if (this.isConstant) {
+        return bstr;
+      } else {
+        needsplus = true;
+      }
+    }
+    this.terms.each( function(clv, coeff) {
+      if (needsplus) {
+        bstr += " + ";
+      }
+      bstr += coeff + "*" + clv;
+      needsplus = true;
+    });
+    return bstr;
+  },
+
+  equals: function(other) {
+    if (other === this) {
+      return true;
+    }
+
+    return other instanceof c.Expression &&
+           other.constant === this.constant &&
+           other.terms.equals(this.terms);
+  },
+
+  Plus: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
+    return e1.plus(e2);
+  },
+
+  Minus: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
+    return e1.minus(e2);
+  },
+
+  Times: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
+    return e1.times(e2);
+  },
+
+  Divide: function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
+    return e1.divide(e2);
+  },
+});
+
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
+
+(function(c) {
+"use strict";
+
+c.AbstractConstraint = c.inherit({
+  initialize: function(strength /*c.Strength*/, weight /*double*/) {
+    this.hashCode = c._inc();
+    this.strength = strength || c.Strength.required;
+    this.weight = weight || 1;
+  },
+
+  isEditConstraint: false,
+  isInequality:     false,
+  isStayConstraint: false,
+  get required() { return (this.strength === c.Strength.required); },
+
+  toString: function() {
+    // this is abstract -- it intentionally leaves the parens unbalanced for
+    // the subclasses to complete (e.g., with ' = 0', etc.
+    return this.strength + " {" + this.weight + "} (" + this.expression +")";
+  },
+});
+
+var ts = c.AbstractConstraint.prototype.toString;
+
+var EditOrStayCtor = function(cv /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
+  c.AbstractConstraint.call(this, strength || c.Strength.strong, weight);
+  this.variable = cv;
+  this.expression = new c.Expression(cv, -1, cv.value);
+};
+
+c.EditConstraint = c.inherit({
+  extends: c.AbstractConstraint,
+  initialize: function() { EditOrStayCtor.apply(this, arguments); },
+  isEditConstraint: true,
+  toString: function() { return "edit:" + ts.call(this); },
+});
+
+c.StayConstraint = c.inherit({
+  extends: c.AbstractConstraint,
+  initialize: function() { EditOrStayCtor.apply(this, arguments); },
+  isStayConstraint: true,
+  toString: function() { return "stay:" + ts.call(this); },
+});
+
+var lc =
+c.Constraint = c.inherit({
+  extends: c.AbstractConstraint,
+  initialize: function(cle /*c.Expression*/,
+                       strength /*c.Strength*/,
+                       weight /*double*/) {
+    c.AbstractConstraint.call(this, strength, weight);
+    this.expression = cle;
+  },
+});
+
+c.Inequality = c.inherit({
+  extends: c.Constraint,
+
+  _cloneOrNewCle: function(cle) {
+    // FIXME(D4): move somewhere else?
+    if (cle.clone)  {
+      return cle.clone();
+    } else {
+      return new c.Expression(cle);
+    }
+  },
+
+  initialize: function(a1, a2, a3, a4, a5) {
+    // FIXME(slightlyoff): what a disgusting mess. Should at least add docs.
+    // console.log("c.Inequality.initialize(", a1, a2, a3, a4, a5, ")");
+
+    var a1IsExp = a1 instanceof c.Expression,
+        a3IsExp = a3 instanceof c.Expression,
+        a1IsVar = a1 instanceof c.AbstractVariable,
+        a3IsVar = a3 instanceof c.AbstractVariable,
+        a1IsNum = typeof(a1) == 'number',
+        a3IsNum = typeof(a3) == 'number';
+
+    // (cle || number), op, cv
+    if ((a1IsExp || a1IsNum) && a3IsVar) {
+      var cle = a1, op = a2, cv = a3, strength = a4, weight = a5;
+      lc.call(this, this._cloneOrNewCle(cle), strength, weight);
+      if (op == c.LEQ) {
+        this.expression.multiplyMe(-1);
+        this.expression.addVariable(cv);
+      } else if (op == c.GEQ) {
+        this.expression.addVariable(cv, -1);
+      } else {
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
+      }
+    // cv, op, (cle || number)
+    } else if (a1IsVar && (a3IsExp || a3IsNum)) {
+      var cle = a3, op = a2, cv = a1, strength = a4, weight = a5;
+      lc.call(this, this._cloneOrNewCle(cle), strength, weight);
+      if (op == c.GEQ) {
+        this.expression.multiplyMe(-1);
+        this.expression.addVariable(cv);
+      } else if (op == c.LEQ) {
+        this.expression.addVariable(cv, -1);
+      } else {
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
+      }
+    // cle, op, num
+    } else if (a1IsExp && a3IsNum) {
+      var cle1 = a1, op = a2, cle2 = a3, strength = a4, weight = a5;
+      lc.call(this, this._cloneOrNewCle(cle1), strength, weight);
+      if (op == c.LEQ) {
+        this.expression.multiplyMe(-1);
+        this.expression.addExpression(this._cloneOrNewCle(cle2));
+      } else if (op == c.GEQ) {
+        this.expression.addExpression(this._cloneOrNewCle(cle2), -1);
+      } else {
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
+      }
+      return this
+    // num, op, cle
+    } else if (a1IsNum && a3IsExp) {
+      var cle1 = a3, op = a2, cle2 = a1, strength = a4, weight = a5;
+      lc.call(this, this._cloneOrNewCle(cle1), strength, weight);
+      if (op == c.GEQ) {
+        this.expression.multiplyMe(-1);
+        this.expression.addExpression(this._cloneOrNewCle(cle2));
+      } else if (op == c.LEQ) {
+        this.expression.addExpression(this._cloneOrNewCle(cle2), -1);
+      } else {
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
+      }
+      return this
+    // cle op cle
+    } else if (a1IsExp && a3IsExp) {
+      var cle1 = a1, op = a2, cle2 = a3, strength = a4, weight = a5;
+      lc.call(this, this._cloneOrNewCle(cle2), strength, weight);
+      if (op == c.GEQ) {
+        this.expression.multiplyMe(-1);
+        this.expression.addExpression(this._cloneOrNewCle(cle1));
+      } else if (op == c.LEQ) {
+        this.expression.addExpression(this._cloneOrNewCle(cle1), -1);
+      } else {
+        throw new c.InternalError("Invalid operator in c.Inequality constructor");
+      }
+    // cle
+    } else if (a1IsExp) {
+      return lc.call(this, a1, a2, a3);
+    // >=
+    } else if (a2 == c.GEQ) {
+      lc.call(this, new c.Expression(a3), a4, a5);
+      this.expression.multiplyMe(-1);
+      this.expression.addVariable(a1);
+    // <=
+    } else if (a2 == c.LEQ) {
+      lc.call(this, new c.Expression(a3), a4, a5);
+      this.expression.addVariable(a1,-1);
+    // error
+    } else {
+      throw new c.InternalError("Invalid operator in c.Inequality constructor");
+    }
+  },
+
+  isInequality: true,
+
+  toString: function() {
+    // return "c.Inequality: " + this.hashCode;
+    return lc.prototype.toString.call(this) + " >= 0) id: " + this.hashCode;
+  },
+});
+
+c.Equation = c.inherit({
+  extends: c.Constraint,
+  initialize: function(a1, a2, a3, a4) {
+    // FIXME(slightlyoff): this is just a huge mess.
+    if (a1 instanceof c.Expression && !a2 || a2 instanceof c.Strength) {
+      lc.call(this, a1, a2, a3);
+    } else if ((a1 instanceof c.AbstractVariable) &&
+               (a2 instanceof c.Expression)) {
+
+      var cv = a1, cle = a2, strength = a3, weight = a4;
+      lc.call(this, cle.clone(), strength, weight);
+      this.expression.addVariable(cv, -1);
+
+    } else if ((a1 instanceof c.AbstractVariable) &&
+               (typeof(a2) == 'number')) {
+
+      var cv = a1, val = a2, strength = a3, weight = a4;
+      lc.call(this, new c.Expression(val), strength, weight);
+      this.expression.addVariable(cv, -1);
+
+    } else if ((a1 instanceof c.Expression) &&
+               (a2 instanceof c.AbstractVariable)) {
+
+      var cle = a1, cv = a2, strength = a3, weight = a4;
+      lc.call(this, cle.clone(), strength, weight);
+      this.expression.addVariable(cv, -1);
+
+    } else if (((a1 instanceof c.Expression) || (a1 instanceof c.AbstractVariable) ||
+                (typeof(a1) == 'number')) &&
+               ((a2 instanceof c.Expression) || (a2 instanceof c.AbstractVariable) ||
+                (typeof(a2) == 'number'))) {
+
+      if (a1 instanceof c.Expression) {
+        a1 = a1.clone();
+      } else {
+        a1 = new c.Expression(a1);
+      }
+
+      if (a2 instanceof c.Expression) {
+        a2 = a2.clone();
+      } else {
+        a2 = new c.Expression(a2);
+      }
+
+      lc.call(this, a1, a3, a4);
+      this.expression.addExpression(a2, -1);
+
+    } else {
+      throw "Bad initializer to c.Equation";
+    }
+    c.assert(this.strength instanceof c.Strength, "_strength not set");
+  },
+
+  toString: function() {
+    return lc.prototype.toString.call(this) + " = 0)";
+  },
+});
+
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
+
+(function(c) {
+"use strict";
+
+c.EditInfo = c.inherit({
+  initialize: function(cn      /*c.Constraint*/,
+                       eplus   /*c.SlackVariable*/,
+                       eminus  /*c.SlackVariable*/,
+                       prevEditConstant /*double*/,
+                       i /*int*/) {
+    this.constraint = cn;
+    this.editPlus = eplus;
+    this.editMinus = eminus;
+    this.prevEditConstant = prevEditConstant;
+    this.index = i;
+  },
+  toString: function() {
+    return "<cn=" + this.constraint +
+           ", ep=" + this.editPlus +
+           ", em=" + this.editMinus +
+           ", pec=" + this.prevEditConstant +
+           ", index=" + this.index + ">";
+  }
+});
+
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
+
+(function(c) {
+"use strict";
+
+c.Tableau = c.inherit({
+  initialize: function() {
+    // columns is a mapping from variables which occur in expressions to the
+    // set of basic variables whose expressions contain them
+    // i.e., it's a mapping from variables in expressions (a column) to the
+    // set of rows that contain them
+    this.columns = new c.HashTable(); // values are sets
+
+    // _rows maps basic variables to the expressions for that row in the tableau
+    this.rows = new c.HashTable();    // values are c.Expressions
+
+    // the collection of basic variables that have infeasible rows
+    // (used when reoptimizing)
+    this._infeasibleRows = new c.HashSet();
+
+    // the set of rows where the basic variable is external this was added to
+    // the C++ version to reduce time in setExternalVariables()
+    this._externalRows = new c.HashSet();
+
+    // the set of external variables which are parametric this was added to the
+    // C++ version to reduce time in setExternalVariables()
+    this._externalParametricVars = new c.HashSet();
+  },
+
+  // Variable v has been removed from an Expression.  If the Expression is in a
+  // tableau the corresponding basic variable is subject (or if subject is nil
+  // then it's in the objective function). Update the column cross-indices.
+  noteRemovedVariable: function(v /*c.AbstractVariable*/, subject /*c.AbstractVariable*/) {
+    c.trace && console.log("c.Tableau::noteRemovedVariable: ", v, subject);
+    var column = this.columns.get(v);
+    if (subject && column) {
+      column.delete(subject);
+    }
+  },
+
+  noteAddedVariable: function(v /*c.AbstractVariable*/, subject /*c.AbstractVariable*/) {
+    // if (c.trace) console.log("c.Tableau::noteAddedVariable:", v, subject);
+    if (subject) {
+      this.insertColVar(v, subject);
+    }
+  },
+
+  getInternalInfo: function() {
+    var retstr = "Tableau Information:\n";
+    retstr += "Rows: " + this.rows.size;
+    retstr += " (= " + (this.rows.size - 1) + " constraints)";
+    retstr += "\nColumns: " + this.columns.size;
+    retstr += "\nInfeasible Rows: " + this._infeasibleRows.size;
+    retstr += "\nExternal basic variables: " + this._externalRows.size;
+    retstr += "\nExternal parametric variables: ";
+    retstr += this._externalParametricVars.size;
+    retstr += "\n";
+    return retstr;
+  },
+
+  toString: function() {
+    var bstr = "Tableau:\n";
+    this.rows.each(function(clv, expr) {
+      bstr += clv;
+      bstr += " <==> ";
+      bstr += expr;
+      bstr += "\n";
+    });
+    bstr += "\nColumns:\n";
+    bstr += this.columns;
+    bstr += "\nInfeasible rows: ";
+    bstr += this._infeasibleRows;
+    bstr += "External basic variables: ";
+    bstr += this._externalRows;
+    bstr += "External parametric variables: ";
+    bstr += this._externalParametricVars;
+    return bstr;
+  },
+
+  /*
+  toJSON: function() {
+    // Creates an object representation of the Tableau.
+  },
+  */
+
+  // Convenience function to insert a variable into
+  // the set of rows stored at columns[param_var],
+  // creating a new set if needed
+  insertColVar: function(param_var /*Variable*/, rowvar /*Variable*/) {
+    var rowset = /* Set */ this.columns.get(param_var);
+    if (!rowset) {
+      rowset = new c.HashSet();
+      this.columns.set(param_var, rowset);
+    }
+    rowset.add(rowvar);
+  },
+
+  addRow: function(aVar /*c.AbstractVariable*/, expr /*c.Expression*/) {
+    if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
+    this.rows.set(aVar, expr);
+    expr.terms.each(function(clv, coeff) {
+      this.insertColVar(clv, aVar);
+      if (clv.isExternal) {
+        this._externalParametricVars.add(clv);
+      }
+    }, this);
+    if (aVar.isExternal) {
+      this._externalRows.add(aVar);
+    }
+    if (c.trace) c.traceprint(this.toString());
+  },
+
+  removeColumn: function(aVar /*c.AbstractVariable*/) {
+    if (c.trace) c.fnenterprint("removeColumn:" + aVar);
+    var rows = /* Set */ this.columns.get(aVar);
+    if (rows) {
+      this.columns.delete(aVar);
+      rows.each(function(clv) {
+        var expr = /* c.Expression */this.rows.get(clv);
+        expr.terms.delete(aVar);
+      }, this);
+    } else {
+      if (c.trace) console.log("Could not find var", aVar, "in columns");
+    }
+    if (aVar.isExternal) {
+      this._externalRows.delete(aVar);
+      this._externalParametricVars.delete(aVar);
+    }
+  },
+
+  removeRow: function(aVar /*c.AbstractVariable*/) {
+    if (c.trace) c.fnenterprint("removeRow:" + aVar);
+    var expr = /* c.Expression */this.rows.get(aVar);
+    c.assert(expr != null);
+    expr.terms.each(function(clv, coeff) {
+      var varset = this.columns.get(clv);
+      if (varset != null) {
+        if (c.trace) console.log("removing from varset:", aVar);
+        varset.delete(aVar);
+      }
+    }, this);
+    this._infeasibleRows.delete(aVar);
+    if (aVar.isExternal) {
+      this._externalRows.delete(aVar);
+    }
+    this.rows.delete(aVar);
+    if (c.trace) c.fnexitprint("returning " + expr);
+    return expr;
+  },
+
+  substituteOut: function(oldVar /*c.AbstractVariable*/, expr /*c.Expression*/) {
+    if (c.trace) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
+    if (c.trace) c.traceprint(this.toString());
+
+    var varset = this.columns.get(oldVar);
+    varset.each(function(v) {
+      var row = this.rows.get(v);
+      row.substituteOut(oldVar, expr, v, this);
+      if (v.isRestricted && row.constant < 0) {
+        this._infeasibleRows.add(v);
+      }
+    }, this);
+
+    if (oldVar.isExternal) {
+      this._externalRows.add(oldVar);
+      this._externalParametricVars.delete(oldVar);
+    }
+
+    this.columns.delete(oldVar);
+  },
+
+  columnsHasKey: function(subject /*c.AbstractVariable*/) {
+    return !!this.columns.get(subject);
+  },
+});
+
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
+
+(function(c) {
+var t = c.Tableau;
+var tp = t.prototype;
+var epsilon = 1e-8;
+var weak = c.Strength.weak;
+
+c.SimplexSolver = c.inherit({
+  extends: c.Tableau,
+  initialize: function(){
+
+    c.Tableau.call(this);
+    this._stayMinusErrorVars = [];
+    this._stayPlusErrorVars = [];
+
+    this._errorVars = new c.HashTable(); // cn -> Set of cv
+
+    this._markerVars = new c.HashTable(); // cn -> Set of cv
+
+    // this._resolve_pair = [0, 0];
+    this._objective = new c.ObjectiveVariable({ name: "Z" });
+
+    this._editVarMap = new c.HashTable(); // cv -> c.EditInfo
+    this._editVarList = [];
+
+    this._slackCounter = 0;
+    this._artificialCounter = 0;
+    this._dummyCounter = 0;
+    this.autoSolve = true;
+    this._fNeedsSolving = false;
+
+    this._optimizeCount = 0;
+
+    this.rows.set(this._objective, new c.Expression());
+    this._stkCedcns = [0]; // Stack
+    if (c.trace)
+      c.traceprint("objective expr == " + this.rows.get(this._objective));
+  },
+
+  addLowerBound: function(v /*c.AbstractVariable*/, lower /*double*/) {
+    var cn = new c.Inequality(v, c.GEQ, new c.Expression(lower));
+    return this.addConstraint(cn);
+  },
+
+  addUpperBound: function(v /*c.AbstractVariable*/, upper /*double*/) {
+    var cn = new c.Inequality(v, c.LEQ, new c.Expression(upper));
+    return this.addConstraint(cn);
+  },
+
+  addBounds: function(v /*c.AbstractVariable*/, lower /*double*/, upper /*double*/) {
+    this.addLowerBound(v, lower);
+    this.addUpperBound(v, upper);
+    return this;
+  },
+
+  add: function(/*c.Constraint, ...*/) {
+    for (var x = 0; x < arguments.length; x++) {
+      this.addConstraint(arguments[x]);
+    }
+    return this;
+  },
+
+  addConstraint: function(cn /*c.Constraint*/) {
+    // console.log("addConstraint: " + cn);
+    if (c.trace) c.fnenterprint("addConstraint: " + cn);
+    var eplus_eminus = new Array(2);
+    var prevEConstant = new Array(1); // so it can be output to
+    var expr = this.newExpression(cn, /*output to*/ eplus_eminus, prevEConstant);
+    prevEConstant = prevEConstant[0];
+
+    if (!this.tryAddingDirectly(expr)) {
+      this.addWithArtificialVariable(expr);
+    }
+
+
+    this._fNeedsSolving = true;
+    if (cn.isEditConstraint) {
+      var i = this._editVarMap.size;
+      var cvEplus = /* c.SlackVariable */eplus_eminus[0];
+      var cvEminus = /* c.SlackVariable */eplus_eminus[1];
+      if (!cvEplus instanceof c.SlackVariable) {
+        console.warn("cvEplus not a slack variable =", cvEplus);
+      }
+      if (!cvEminus instanceof c.SlackVariable) {
+        console.warn("cvEminus not a slack variable =", cvEminus);
+      }
+      c.debug && console.log("new c.EditInfo(" + cn + ", " + cvEplus + ", " +
+                                  cvEminus + ", " + prevEConstant + ", " +
+                                  i +")");
+      var ei = new c.EditInfo(cn, cvEplus, cvEminus, prevEConstant, i)
+      this._editVarMap.set(cn.variable, ei);
+      this._editVarList[i] = { v: cn.variable, info: ei };
+    }
+    if (this.autoSolve) {
+      this.optimize(this._objective);
+      this._setExternalVariables();
+    }
+    return this;
+  },
+
+  addConstraintNoException: function(cn /*c.Constraint*/) {
+    if (c.trace) c.fnenterprint("addConstraintNoException: " + cn);
+    // FIXME(slightlyoff): change this to enable chaining
+    try {
+      this.addConstraint(cn);
+      return true;
+    } catch (e /*c.RequiredFailure*/){
+      return false;
+    }
+  },
+
+  addEditVar: function(v /*c.Variable*/, strength /*c.Strength*/) {
+    c.trace && c.fnenterprint("addEditVar: " + v + " @ " + strength);
+    return this.addConstraint(
+        new c.EditConstraint(v, strength || c.Strength.strong));
+  },
+
+  beginEdit: function() {
+    // FIXME(slightlyoff): we shouldn't throw here. Log instead
+    c.assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
+    this._infeasibleRows.clear();
+    this._resetStayConstants();
+    this._stkCedcns.push(this._editVarMap.size);
+    return this;
+  },
+
+  endEdit: function() {
+    // FIXME(slightlyoff): we shouldn't throw here. Log instead
+    c.assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
+    this.resolve();
+    this._stkCedcns.pop();
+    this.removeEditVarsTo(
+      this._stkCedcns[this._stkCedcns.length - 1]
+    );
+    return this;
+  },
+
+  removeAllEditVars: function() {
+    return this.removeEditVarsTo(0);
+  },
+
+  removeEditVarsTo: function(n /*int*/) {
+    try {
+      var evll = this._editVarList.length;
+      // only remove the variable if it's not in the set of variable
+      // from a previous nested outer edit
+      // e.g., if I do:
+      // Edit x,y
+      // Edit w,h,x,y
+      // EndEdit
+      // The end edit needs to only get rid of the edits on w,h
+      // not the ones on x,y
+      for(var x = n; x < evll; x++) {
+        if (this._editVarList[x]) {
+          this.removeConstraint(
+            this._editVarMap.get(this._editVarList[x].v).constraint
+          );
+        }
+      }
+      this._editVarList.length = n;
+      c.assert(this._editVarMap.size == n, "_editVarMap.size == n");
+      return this;
+    } catch (e /*ConstraintNotFound*/){
+      throw new c.InternalError("Constraint not found in removeEditVarsTo");
+    }
+  },
+
+  // Add weak stays to the x and y parts of each point. These have
+  // increasing weights so that the solver will try to satisfy the x
+  // and y stays on the same point, rather than the x stay on one and
+  // the y stay on another.
+  addPointStays: function(points /*[{ x: .., y: ..}, ...]*/) {
+    c.trace && console.log("addPointStays", points);
+    points.forEach(function(p, idx) {
+      this.addStay(p.x, weak, Math.pow(2, idx));
+      this.addStay(p.y, weak, Math.pow(2, idx));
+    }, this);
+    return this;
+  },
+
+  addStay: function(v /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
+    var cn = new c.StayConstraint(v,
+                                  strength || weak,
+                                  weight   || 1);
+    return this.addConstraint(cn);
+  },
+
+  // FIXME(slightlyoff): need a removeStay!
+
+  removeConstraint: function(cn /*c.Constraint*/) {
+    this.removeConstraintInternal(cn);
+    return this;
+  },
+
+  removeConstraintInternal: function(cn /*c.Constraint*/) {
+    // print("removeConstraintInternal('" + cn + "')");
+    if (c.trace) c.fnenterprint("removeConstraintInternal: " + cn);
+    if (c.trace) c.traceprint(this.toString());
+    this._fNeedsSolving = true;
+    this._resetStayConstants();
+    var zRow = this.rows.get(this._objective);
+    var eVars = /* Set */this._errorVars.get(cn);
+    if (c.trace) c.traceprint("eVars == " + eVars);
+    if (eVars != null) {
+      eVars.each(function(cv) {
+        var expr = this.rows.get(cv);
+        if (expr == null) {
+          zRow.addVariable(cv,
+                           -cn.weight * cn.strength.symbolicWeight.value,
+                           this._objective,
+                           this);
+        } else {
+          zRow.addExpression(expr,
+                             -cn.weight * cn.strength.symbolicWeight.value,
+                             this._objective,
+                             this);
+        }
+        if (c.trace) c.traceprint("now eVars == " + eVars);
+      }, this);
+    }
+    var marker = this._markerVars.get(cn);
+    this._markerVars.delete(cn);
+    if (marker == null) {
+      throw new c.InternalError("Constraint not found in removeConstraintInternal");
+    }
+    if (c.trace) c.traceprint("Looking to remove var " + marker);
+    if (this.rows.get(marker) == null) {
+      var col = this.columns.get(marker);
+      // console.log("col is:", col, "from marker:", marker);
+      if (c.trace) c.traceprint("Must pivot -- columns are " + col);
+      var exitVar = null;
+      var minRatio = 0;
+      col.each(function(v) {
+        if (v.isRestricted) {
+          var expr = this.rows.get(v);
+          var coeff = expr.coefficientFor(marker);
+          if (c.trace) c.traceprint("Marker " + marker + "'s coefficient in " + expr + " is " + coeff);
+          if (coeff < 0) {
+            var r = -expr.constant / coeff;
+            if (
+              exitVar == null ||
+              r < minRatio    ||
+              (c.approx(r, minRatio) && v.hashCode < exitVar.hashCode)
+            ) {
+              minRatio = r;
+              exitVar = v;
+            }
+          }
+        }
+      }, this);
+      if (exitVar == null) {
+        if (c.trace) c.traceprint("exitVar is still null");
+        col.each(function(v) {
+          if (v.isRestricted) {
+            var expr = this.rows.get(v);
+            var coeff = expr.coefficientFor(marker);
+            var r = expr.constant / coeff;
+            if (exitVar == null || r < minRatio) {
+              minRatio = r;
+              exitVar = v;
+            }
+          }
+        }, this);
+      }
+      if (exitVar == null) {
+        if (col.size == 0) {
+          this.removeColumn(marker);
+        } else {
+          col.escapingEach(function(v) {
+            if (v != this._objective) {
+              exitVar = v;
+              return {brk:true};
+            }
+          }, this);
+        }
+      }
+      if (exitVar != null) {
+        this.pivot(marker, exitVar);
+      }
+    }
+    if (this.rows.get(marker) != null) {
+      var expr = this.removeRow(marker);
+    }
+
+    if (eVars != null) {
+      eVars.each(function(v) {
+        if (v != marker) { this.removeColumn(v); }
+      }, this);
+    }
+
+    if (cn.isStayConstraint) {
+      if (eVars != null) {
+        for (var i = 0; i < this._stayPlusErrorVars.length; i++) {
+          eVars.delete(this._stayPlusErrorVars[i]);
+          eVars.delete(this._stayMinusErrorVars[i]);
+        }
+      }
+    } else if (cn.isEditConstraint) {
+      c.assert(eVars != null, "eVars != null");
+      var cei = this._editVarMap.get(cn.variable);
+      this.removeColumn(cei.editMinus);
+      this._editVarMap.delete(cn.variable);
+    }
+
+    if (eVars != null) {
+      this._errorVars.delete(eVars);
+    }
+
+    if (this.autoSolve) {
+      this.optimize(this._objective);
+      this._setExternalVariables();
+    }
+
+    return this;
+  },
+
+  reset: function() {
+    if (c.trace) c.fnenterprint("reset");
+    throw new c.InternalError("reset not implemented");
+  },
+
+  resolveArray: function(newEditConstants) {
+    if (c.trace) c.fnenterprint("resolveArray" + newEditConstants);
+    var l = newEditConstants.length
+    this._editVarMap.each(function(v, cei) {
+      var i = cei.index;
+      if (i < l)
+        this.suggestValue(v, newEditConstants[i]);
+    }, this);
+    this.resolve();
+  },
+
+  resolvePair: function(x /*double*/, y /*double*/) {
+    this.suggestValue(this._editVarList[0].v, x);
+    this.suggestValue(this._editVarList[1].v, y);
+    this.resolve();
+  },
+
+  resolve: function() {
+    if (c.trace) c.fnenterprint("resolve()");
+    this.dualOptimize();
+    this._setExternalVariables();
+    this._infeasibleRows.clear();
+    this._resetStayConstants();
+  },
+
+  suggestValue: function(v /*c.Variable*/, x /*double*/) {
+    c.trace && console.log("suggestValue(" + v + ", " + x + ")");
+    var cei = this._editVarMap.get(v);
+    if (!cei) {
+      throw new c.Error("suggestValue for variable " + v + ", but var is not an edit variable");
+    }
+    var delta = x - cei.prevEditConstant;
+    cei.prevEditConstant = x;
+    this.deltaEditConstant(delta, cei.editPlus, cei.editMinus);
+    return this;
+  },
+
+  solve: function() {
+    if (this._fNeedsSolving) {
+      this.optimize(this._objective);
+      this._setExternalVariables();
+    }
+    return this;
+  },
+
+  setEditedValue: function(v /*c.Variable*/, n /*double*/) {
+    if (!(this.columnsHasKey(v) || (this.rows.get(v) != null))) {
+      v.value = n;
+      return this;
+    }
+
+    if (!c.approx(n, v.value)) {
+      this.addEditVar(v);
+      this.beginEdit();
+
+      try {
+        this.suggestValue(v, n);
+      } catch (e) {
+        throw new c.InternalError("Error in setEditedValue");
+      }
+
+      this.endEdit();
+    }
+    return this;
+  },
+
+  addVar: function(v /*c.Variable*/) {
+    if (!(this.columnsHasKey(v) || (this.rows.get(v) != null))) {
+      try {
+        this.addStay(v);
+      } catch (e /*c.RequiredFailure*/){
+        throw new c.InternalError("Error in addVar -- required failure is impossible");
+      }
+
+      if (c.trace) {
+        c.traceprint("added initial stay on " + v);
+      }
+    }
+    return this;
+  },
+
+  getInternalInfo: function() {
+    var retstr = tp.getInternalInfo.call(this);
+    retstr += "\nSolver info:\n";
+    retstr += "Stay Error Variables: ";
+    retstr += this._stayPlusErrorVars.length + this._stayMinusErrorVars.length;
+    retstr += " (" + this._stayPlusErrorVars.length + " +, ";
+    retstr += this._stayMinusErrorVars.length + " -)\n";
+    retstr += "Edit Variables: " + this._editVarMap.size;
+    retstr += "\n";
+    return retstr;
+  },
+
+  getDebugInfo: function() {
+    return this.toString() + this.getInternalInfo() + "\n";
+  },
+
+  toString: function() {
+    var bstr = tp.getInternalInfo.call(this);
+    bstr += "\n_stayPlusErrorVars: ";
+    bstr += '[' + this._stayPlusErrorVars + ']';
+    bstr += "\n_stayMinusErrorVars: ";
+    bstr += '[' + this._stayMinusErrorVars + ']';
+    bstr += "\n";
+    bstr += "_editVarMap:\n" + this._editVarMap;
+    bstr += "\n";
+    return bstr;
+  },
+
+  getConstraintMap: function() {
+    return this._markerVars;
+  },
+
+  addWithArtificialVariable: function(expr /*c.Expression*/) {
+    if (c.trace) c.fnenterprint("addWithArtificialVariable: " + expr);
+    var av = new c.SlackVariable({
+      value: ++this._artificialCounter,
+      prefix: "a"
+    });
+    var az = new c.ObjectiveVariable({ name: "az" });
+    var azRow = /* c.Expression */expr.clone();
+    if (c.trace) c.traceprint("before addRows:\n" + this);
+    this.addRow(az, azRow);
+    this.addRow(av, expr);
+    if (c.trace) c.traceprint("after addRows:\n" + this);
+    this.optimize(az);
+    var azTableauRow = this.rows.get(az);
+    if (c.trace) c.traceprint("azTableauRow.constant == " + azTableauRow.constant);
+    if (!c.approx(azTableauRow.constant, 0)) {
+      this.removeRow(az);
+      this.removeColumn(av);
+      throw new c.RequiredFailure();
+    }
+    var e = this.rows.get(av);
+    if (e != null) {
+      if (e.isConstant) {
+        this.removeRow(av);
+        this.removeRow(az);
+        return;
+      }
+      var entryVar = e.anyPivotableVariable();
+      this.pivot(entryVar, av);
+    }
+    c.assert(this.rows.get(av) == null, "rowExpression(av) == null");
+    this.removeColumn(av);
+    this.removeRow(az);
+  },
+
+  tryAddingDirectly: function(expr /*c.Expression*/) {
+    c.trace && c.fnenterprint("tryAddingDirectly: " + expr);
+    var subject = this.chooseSubject(expr);
+    if (subject == null) {
+      c.trace && c.fnexitprint("returning false");
+      return false;
+    }
+    expr.newSubject(subject);
+    if (this.columnsHasKey(subject)) {
+      this.substituteOut(subject, expr);
+    }
+    this.addRow(subject, expr);
+    c.trace && c.fnexitprint("returning true");
+    return true;
+  },
+
+  chooseSubject: function(expr /*c.Expression*/) {
+    if (c.trace) c.fnenterprint("chooseSubject: " + expr);
+    var subject = null;
+    var foundUnrestricted = false;
+    var foundNewRestricted = false;
+    var terms = expr.terms;
+    var rv = terms.escapingEach(function(v, c) {
+      if (foundUnrestricted) {
+        if (!v.isRestricted) {
+          if (!this.columnsHasKey(v)) {
+            return {retval: v};
+          }
+        }
+      } else {
+        if (v.isRestricted) {
+          if (!foundNewRestricted && !v.isDummy && c < 0) {
+            var col = this.columns.get(v);
+            if (col == null || (col.size == 1 && this.columnsHasKey(this._objective))) {
+              subject = v;
+              foundNewRestricted = true;
+            }
+          }
+        } else {
+          subject = v;
+          foundUnrestricted = true;
+        }
+      }
+    }, this);
+    if (rv && rv.retval !== undefined) return rv.retval;
+
+    if (subject != null)
+      return subject;
+
+    var coeff = 0;
+
+    // subject is nil.
+    // Make one last check -- if all of the variables in expr are dummy
+    // variables, then we can pick a dummy variable as the subject
+    var rv = terms.escapingEach(function(v,c) {
+      if (!v.isDummy)  {
+        return {retval:null};
+      }
+      if (!this.columnsHasKey(v)) {
+        subject = v;
+        coeff = c;
+      }
+    }, this);
+    if (rv && rv.retval !== undefined) return rv.retval;
+
+    if (!c.approx(expr.constant, 0)) {
+      throw new c.RequiredFailure();
+    }
+    if (coeff > 0) {
+      expr.multiplyMe(-1);
+    }
+    return subject;
+  },
+
+  deltaEditConstant: function(delta /*double*/,
+                              plusErrorVar /*c.AbstractVariable*/,
+                              minusErrorVar /*c.AbstractVariable*/) {
+    if (c.trace)
+      c.fnenterprint("deltaEditConstant :" + delta + ", " + plusErrorVar + ", " + minusErrorVar);
+
+    var exprPlus = this.rows.get(plusErrorVar);
+    if (exprPlus != null) {
+      exprPlus.constant += delta;
+      if (exprPlus.constant < 0) {
+        this._infeasibleRows.add(plusErrorVar);
+      }
+      return;
+    }
+    var exprMinus = this.rows.get(minusErrorVar);
+    if (exprMinus != null) {
+      exprMinus.constant += -delta;
+      if (exprMinus.constant < 0) {
+        this._infeasibleRows.add(minusErrorVar);
+      }
+      return;
+    }
+    var columnVars = this.columns.get(minusErrorVar);
+    if (!columnVars) {
+      console.log("columnVars is null -- tableau is:\n" + this);
+    }
+    columnVars.each(function(basicVar) {
+      var expr = this.rows.get(basicVar);
+      var c = expr.coefficientFor(minusErrorVar);
+      expr.constant += (c * delta);
+      if (basicVar.isRestricted && expr.constant < 0) {
+        this._infeasibleRows.add(basicVar);
+      }
+    }, this);
+  },
+
+  // We have set new values for the constants in the edit constraints.
+  // Re-Optimize using the dual simplex algorithm.
+  dualOptimize: function() {
+    if (c.trace) c.fnenterprint("dualOptimize:");
+    var zRow = this.rows.get(this._objective);
+    // need to handle infeasible rows
+    while (this._infeasibleRows.size) {
+      var exitVar = this._infeasibleRows.values()[0];
+      this._infeasibleRows.delete(exitVar);
+      var entryVar = null;
+      var expr = this.rows.get(exitVar);
+      // exitVar might have become basic after some other pivoting
+      // so allow for the case of its not being there any longer
+      if (expr) {
+        if (expr.constant < 0) {
+          var ratio = Number.MAX_VALUE;
+          var r;
+          var terms = expr.terms;
+          terms.each(function(v, cd) {
+            if (cd > 0 && v.isPivotable) {
+              var zc = zRow.coefficientFor(v);
+              r = zc / cd;
+              if (r < ratio ||
+                  (c.approx(r, ratio) && v.hashCode < entryVar.hashCode)
+              ) {
+                entryVar = v;
+                ratio = r;
+              }
+            }
+          });
+          if (ratio == Number.MAX_VALUE) {
+            throw new c.InternalError("ratio == nil (MAX_VALUE) in dualOptimize");
+          }
+          this.pivot(entryVar, exitVar);
+        }
+      }
+    }
+  },
+
+  // Make a new linear Expression representing the constraint cn,
+  // replacing any basic variables with their defining expressions.
+  // Normalize if necessary so that the Constant is non-negative.  If
+  // the constraint is non-required give its error variables an
+  // appropriate weight in the objective function.
+  newExpression: function(cn /*c.Constraint*/, /** outputs to **/
+                          eplus_eminus /*Vector*/, prevEConstant /*ClDouble*/) {
+    if (c.trace) {
+      c.fnenterprint("newExpression: " + cn);
+      c.traceprint("cn.isInequality == " + cn.isInequality);
+      c.traceprint("cn.required == " + cn.required);
+    }
+
+    var cnExpr = cn.expression;
+    var expr = new c.Expression(cnExpr.constant);
+    var slackVar = new c.SlackVariable();
+    var dummyVar = new c.DummyVariable();
+    var eminus = new c.SlackVariable();
+    var eplus = new c.SlackVariable();
+    var cnTerms = cnExpr.terms;
+    // console.log(cnTerms.size);
+
+    cnTerms.each(function(v, c) {
+      var e = this.rows.get(v);
+      if (!e) {
+        expr.addVariable(v, c);
+      } else {
+        expr.addExpression(e, c);
+      }
+    }, this);
+
+    if (cn.isInequality) {
+      // cn is an inequality, so Add a slack variable. The original constraint
+      // is expr>=0, so that the resulting equality is expr-slackVar=0. If cn is
+      // also non-required Add a negative error variable, giving:
+      //
+      //    expr - slackVar = -errorVar
+      //
+      // in other words:
+      //
+      //    expr - slackVar + errorVar = 0
+      //
+      // Since both of these variables are newly created we can just Add
+      // them to the Expression (they can't be basic).
+      c.trace && c.traceprint("Inequality, adding slack");
+      ++this._slackCounter;
+      slackVar = new c.SlackVariable({
+        value: this._slackCounter,
+        prefix: "s"
+      });
+      expr.setVariable(slackVar, -1);
+
+      this._markerVars.set(cn, slackVar);
+      if (!cn.required) {
+        ++this._slackCounter;
+        eminus = new c.SlackVariable({
+          value: this._slackCounter,
+          prefix: "em"
+        });
+        expr.setVariable(eminus, 1);
+        var zRow = this.rows.get(this._objective);
+        zRow.setVariable(eminus, cn.strength.symbolicWeight.value * cn.weight);
+        this.insertErrorVar(cn, eminus);
+        this.noteAddedVariable(eminus, this._objective);
+      }
+    } else {
+      if (cn.required) {
+        c.trace && c.traceprint("Equality, required");
+        // Add a dummy variable to the Expression to serve as a marker for this
+        // constraint.  The dummy variable is never allowed to enter the basis
+        // when pivoting.
+        ++this._dummyCounter;
+        dummyVar = new c.DummyVariable({
+          value: this._dummyCounter,
+          prefix: "d"
+        });
+        expr.setVariable(dummyVar, 1);
+        this._markerVars.set(cn, dummyVar);
+        if (c.trace) c.traceprint("Adding dummyVar == d" + this._dummyCounter);
+      } else {
+
+        // cn is a non-required equality. Add a positive and a negative error
+        // variable, making the resulting constraint
+        //       expr = eplus - eminus
+        // in other words:
+        //       expr - eplus + eminus = 0
+        if (c.trace) c.traceprint("Equality, not required");
+        ++this._slackCounter;
+        eplus = new c.SlackVariable({
+          value: this._slackCounter,
+          prefix: "ep"
+        });
+        eminus = new c.SlackVariable({
+          value: this._slackCounter,
+          prefix: "em"
+        });
+        expr.setVariable(eplus, -1);
+        expr.setVariable(eminus, 1);
+        this._markerVars.set(cn, eplus);
+        var zRow = this.rows.get(this._objective);
+        if (c.trace) console.log(zRow);
+        var swCoeff = cn.strength.symbolicWeight.value * cn.weight;
+        if (swCoeff == 0) {
+          if (c.trace) c.traceprint("cn == " + cn);
+          if (c.trace) c.traceprint("adding " + eplus + " and " + eminus + " with swCoeff == " + swCoeff);
+        }
+        zRow.setVariable(eplus, swCoeff);
+        this.noteAddedVariable(eplus, this._objective);
+        zRow.setVariable(eminus, swCoeff);
+        this.noteAddedVariable(eminus, this._objective);
+
+        this.insertErrorVar(cn, eminus);
+        this.insertErrorVar(cn, eplus);
+
+        if (cn.isStayConstraint) {
+          this._stayPlusErrorVars.push(eplus);
+          this._stayMinusErrorVars.push(eminus);
+        } else if (cn.isEditConstraint) {
+          eplus_eminus[0] = eplus;
+          eplus_eminus[1] = eminus;
+          prevEConstant[0] = cnExpr.constant;
+        }
+      }
+    }
+    // the Constant in the Expression should be non-negative. If necessary
+    // normalize the Expression by multiplying by -1
+    if (expr.constant < 0) expr.multiplyMe(-1);
+    if (c.trace) c.fnexitprint("returning " + expr);
+    return expr;
+  },
+
+  // Minimize the value of the objective.  (The tableau should already be
+  // feasible.)
+  optimize: function(zVar /*c.ObjectiveVariable*/) {
+    if (c.trace) c.fnenterprint("optimize: " + zVar);
+    if (c.trace) c.traceprint(this.toString());
+    this._optimizeCount++;
+
+    var zRow = this.rows.get(zVar);
+    c.assert(zRow != null, "zRow != null");
+    var entryVar = null;
+    var exitVar = null;
+    var objectiveCoeff, terms;
+
+    while (true) {
+      objectiveCoeff = 0;
+      terms = zRow.terms;
+
+      // Find the most negative coefficient in the objective function (ignoring
+      // the non-pivotable dummy variables). If all coefficients are positive
+      // we're done
+      terms.escapingEach(function(v, c) {
+        if (v.isPivotable && c < objectiveCoeff) {
+          objectiveCoeff = c;
+          entryVar = v;
+          // Break on success
+          return { brk: 1 };
+        }
+      }, this);
+
+      if (objectiveCoeff >= -epsilon)
+        return;
+
+      c.trace && console.log("entryVar:", entryVar,
+                             "objectiveCoeff:", objectiveCoeff);
+
+      // choose which variable to move out of the basis
+      // Only consider pivotable basic variables
+      // (i.e. restricted, non-dummy variables)
+      var minRatio = Number.MAX_VALUE;
+      var columnVars = this.columns.get(entryVar);
+      var r = 0;
+
+      columnVars.each(function(v) {
+        if (c.trace) c.traceprint("Checking " + v);
+        if (v.isPivotable) {
+          var expr = this.rows.get(v);
+          var coeff = expr.coefficientFor(entryVar);
+          if (c.trace) c.traceprint("pivotable, coeff = " + coeff);
+          // only consider negative coefficients
+          if (coeff < 0) {
+            r = -expr.constant / coeff;
+            // Bland's anti-cycling rule:
+            // if multiple variables are about the same,
+            // always pick the lowest via some total
+            // ordering -- I use their addresses in memory
+            //    if (r < minRatio ||
+            //              (c.approx(r, minRatio) &&
+            //               v.get_pclv() < exitVar.get_pclv()))
+            if (r < minRatio ||
+                (c.approx(r, minRatio) &&
+                 v.hashCode < exitVar.hashCode)
+            ) {
+              minRatio = r;
+              exitVar = v;
+            }
+          }
+        }
+      }, this);
+
+      // If minRatio is still nil at this point, it means that the
+      // objective function is unbounded, i.e. it can become
+      // arbitrarily negative.  This should never happen in this
+      // application.
+      if (minRatio == Number.MAX_VALUE) {
+        throw new c.InternalError("Objective function is unbounded in optimize");
+      }
+
+      // console.time("SimplexSolver::optimize pivot()");
+      this.pivot(entryVar, exitVar);
+      // console.timeEnd("SimplexSolver::optimize pivot()");
+
+      if (c.trace) c.traceprint(this.toString());
+    }
+  },
+
+  // Do a Pivot.  Move entryVar into the basis (i.e. make it a basic variable),
+  // and move exitVar out of the basis (i.e., make it a parametric variable)
+  pivot: function(entryVar /*c.AbstractVariable*/, exitVar /*c.AbstractVariable*/) {
+    c.trace && console.log("pivot: ", entryVar, exitVar);
+    var time = false;
+
+    time && console.time(" SimplexSolver::pivot");
+
+    // the entryVar might be non-pivotable if we're doing a RemoveConstraint --
+    // otherwise it should be a pivotable variable -- enforced at call sites,
+    // hopefully
+    if (entryVar == null) {
+      console.warn("pivot: entryVar == null");
+    }
+
+    if (exitVar == null) {
+      console.warn("pivot: exitVar == null");
+    }
+    // console.log("SimplexSolver::pivot(", entryVar, exitVar, ")")
+
+    // expr is the Expression for the exit variable (about to leave the basis) --
+    // so that the old tableau includes the equation:
+    //   exitVar = expr
+    time && console.time("  removeRow");
+    var expr = this.removeRow(exitVar);
+    time && console.timeEnd("  removeRow");
+
+    // Compute an Expression for the entry variable.  Since expr has
+    // been deleted from the tableau we can destructively modify it to
+    // build this Expression.
+    time && console.time("  changeSubject");
+    expr.changeSubject(exitVar, entryVar);
+    time && console.timeEnd("  changeSubject");
+
+    time && console.time("  substituteOut");
+    this.substituteOut(entryVar, expr);
+    time && console.timeEnd("  substituteOut");
+    /*
+    if (entryVar.isExternal) {
+      // entry var is no longer a parametric variable since we're moving
+      // it into the basis
+      console.log("entryVar is external!");
+      this._externalParametricVars.delete(entryVar);
+    }
+    */
+
+    time && console.time("  addRow")
+    this.addRow(entryVar, expr);
+    time && console.timeEnd("  addRow")
+
+    time && console.timeEnd(" SimplexSolver::pivot");
+  },
+
+  // Each of the non-required stays will be represented by an equation
+  // of the form
+  //     v = c + eplus - eminus
+  // where v is the variable with the stay, c is the previous value of
+  // v, and eplus and eminus are slack variables that hold the error
+  // in satisfying the stay constraint.  We are about to change
+  // something, and we want to fix the constants in the equations
+  // representing the stays.  If both eplus and eminus are nonbasic
+  // they have value 0 in the current solution, meaning the previous
+  // stay was exactly satisfied.  In this case nothing needs to be
+  // changed.  Otherwise one of them is basic, and the other must
+  // occur only in the Expression for that basic error variable.
+  // Reset the Constant in this Expression to 0.
+  _resetStayConstants: function() {
+    c.trace && console.log("_resetStayConstants");
+    for (var i = 0; i < this._stayPlusErrorVars.length; i++) {
+      var expr = this.rows.get(/* c.AbstractVariable */this._stayPlusErrorVars[i]);
+      if (expr == null)
+        expr = this.rows.get(/* c.AbstractVariable */this._stayMinusErrorVars[i]);
+      if (expr != null)
+        expr.constant = 0;
+    }
+  },
+
+  _setExternalVariables: function() {
+    if (c.trace) c.fnenterprint("_setExternalVariables:");
+    if (c.trace) c.traceprint(this.toString());
+
+    // console.log("this._externalParametricVars:", this._externalParametricVars);
+    this._externalParametricVars.each(function(v) {
+      if (this.rows.get(v) != null) {
+        if (c.trace)
+          console.log("Error: variable" + v + " in _externalParametricVars is basic");
+      } else {
+        v.value = 0;
+      }
+    }, this);
+    // console.log("this._externalRows:", this._externalRows);
+    this._externalRows.each(function(v) {
+      var expr = this.rows.get(v);
+      if (v.value != expr.constant) {
+        // console.log(v.toString(), v.value, expr.constant);
+        v.value = expr.constant;
+        // TODO(slightlyoff):
+        //    collect these into value-change records to be delivered async
+      }
+      // if (c.trace) console.log("v == " + v);
+      // if (c.trace) console.log("expr == " + expr);
+    }, this);
+    this._fNeedsSolving = false;
+    this.onsolved();
+  },
+
+  onsolved: function() {
+    // Lifecycle stub. Here for dirty, dirty monkey patching.
+  },
+
+  insertErrorVar: function(cn /*c.Constraint*/, aVar /*c.AbstractVariable*/) {
+    if (c.trace) c.fnenterprint("insertErrorVar:" + cn + ", " + aVar);
+    var constraintSet = /* Set */this._errorVars.get(aVar);
+    if (!constraintSet) {
+      constraintSet = new c.HashSet();
+      this._errorVars.set(cn, constraintSet);
+    }
+    constraintSet.add(aVar);
+  },
+});
+})(this["c"]||module.parent.exports||{});
+// Copyright (C) 1998-2000 Greg J. Badros
+// Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
+//
+// Parts Copyright (C) 2011, Alex Russell (slightlyoff@chromium.org)
+
+(function(c) {
+"use strict";
+
+c.Timer = c.inherit({
+  initialize: function() {
+    this.isRunning = false;
+    this._elapsedMs = 0;
+  },
+
+  start: function() {
+    this.isRunning = true;
+    this._startReading = new Date();
+    return this;
+  },
+
+  stop: function() {
+    this.isRunning = false;
+    this._elapsedMs += (new Date()) - this._startReading;
+    return this;
+  },
+
+  reset: function() {
+    this.isRunning = false;
+    this._elapsedMs = 0;
+    return this;
+  },
+
+  elapsedTime : function() {
+    if (!this.isRunning) {
+      return this._elapsedMs / 1000;
+    } else {
+      return (this._elapsedMs + (new Date() - this._startReading)) / 1000;
+    }
+  },
+});
+
+})(this["c"]||module.parent.exports||{});
+this.c.parser = (function(){
+  /*
+   * Generated by PEG.js 0.7.0.
+   *
+   * http://pegjs.majda.cz/
+   */
+  
+  function quote(s) {
+    /*
+     * ECMA-262, 5th ed., 7.8.4: All characters may appear literally in a
+     * string literal except for the closing quote character, backslash,
+     * carriage return, line separator, paragraph separator, and line feed.
+     * Any character may appear in the form of an escape sequence.
+     *
+     * For portability, we also escape escape all control and non-ASCII
+     * characters. Note that "\0" and "\v" escape sequences are not used
+     * because JSHint does not like the first and IE the second.
+     */
+     return '"' + s
+      .replace(/\\/g, '\\\\')  // backslash
+      .replace(/"/g, '\\"')    // closing quote character
+      .replace(/\x08/g, '\\b') // backspace
+      .replace(/\t/g, '\\t')   // horizontal tab
+      .replace(/\n/g, '\\n')   // line feed
+      .replace(/\f/g, '\\f')   // form feed
+      .replace(/\r/g, '\\r')   // carriage return
+      .replace(/[\x00-\x07\x0B\x0E-\x1F\x80-\uFFFF]/g, escape)
+      + '"';
+  }
+  
+  var result = {
+    /*
+     * Parses the input with a generated parser. If the parsing is successfull,
+     * returns a value explicitly or implicitly specified by the grammar from
+     * which the parser was generated (see |PEG.buildParser|). If the parsing is
+     * unsuccessful, throws |PEG.parser.SyntaxError| describing the error.
+     */
+    parse: function(input, startRule) {
+      var parseFunctions = {
+        "start": parse_start,
+        "Statement": parse_Statement,
+        "SourceCharacter": parse_SourceCharacter,
+        "IdentifierStart": parse_IdentifierStart,
+        "WhiteSpace": parse_WhiteSpace,
+        "LineTerminator": parse_LineTerminator,
+        "LineTerminatorSequence": parse_LineTerminatorSequence,
+        "EOS": parse_EOS,
+        "EOF": parse_EOF,
+        "Comment": parse_Comment,
+        "MultiLineComment": parse_MultiLineComment,
+        "MultiLineCommentNoLineTerminator": parse_MultiLineCommentNoLineTerminator,
+        "SingleLineComment": parse_SingleLineComment,
+        "_": parse__,
+        "__": parse___,
+        "Literal": parse_Literal,
+        "Integer": parse_Integer,
+        "Real": parse_Real,
+        "SignedInteger": parse_SignedInteger,
+        "Identifier": parse_Identifier,
+        "IdentifierName": parse_IdentifierName,
+        "PrimaryExpression": parse_PrimaryExpression,
+        "UnaryExpression": parse_UnaryExpression,
+        "UnaryOperator": parse_UnaryOperator,
+        "MultiplicativeExpression": parse_MultiplicativeExpression,
+        "MultiplicativeOperator": parse_MultiplicativeOperator,
+        "AdditiveExpression": parse_AdditiveExpression,
+        "AdditiveOperator": parse_AdditiveOperator,
+        "InequalityExpression": parse_InequalityExpression,
+        "InequalityOperator": parse_InequalityOperator,
+        "LinearExpression": parse_LinearExpression
+      };
+      
+      if (startRule !== undefined) {
+        if (parseFunctions[startRule] === undefined) {
+          throw new Error("Invalid rule name: " + quote(startRule) + ".");
+        }
+      } else {
+        startRule = "start";
+      }
+      
+      var pos = 0;
+      var reportFailures = 0;
+      var rightmostFailuresPos = 0;
+      var rightmostFailuresExpected = [];
+      
+      function padLeft(input, padding, length) {
+        var result = input;
+        
+        var padLength = length - input.length;
+        for (var i = 0; i < padLength; i++) {
+          result = padding + result;
+        }
+        
+        return result;
+      }
+      
+      function escape(ch) {
+        var charCode = ch.charCodeAt(0);
+        var escapeChar;
+        var length;
+        
+        if (charCode <= 0xFF) {
+          escapeChar = 'x';
+          length = 2;
+        } else {
+          escapeChar = 'u';
+          length = 4;
+        }
+        
+        return '\\' + escapeChar + padLeft(charCode.toString(16).toUpperCase(), '0', length);
+      }
+      
+      function matchFailed(failure) {
+        if (pos < rightmostFailuresPos) {
+          return;
+        }
+        
+        if (pos > rightmostFailuresPos) {
+          rightmostFailuresPos = pos;
+          rightmostFailuresExpected = [];
+        }
+        
+        rightmostFailuresExpected.push(failure);
+      }
+      
+      function parse_start() {
+        var result0, result1, result2;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse___();
+        if (result0 !== null) {
+          result2 = parse_Statement();
+          if (result2 !== null) {
+            result1 = [];
+            while (result2 !== null) {
+              result1.push(result2);
+              result2 = parse_Statement();
+            }
+          } else {
+            result1 = null;
+          }
+          if (result1 !== null) {
+            result2 = parse___();
+            if (result2 !== null) {
+              result0 = [result0, result1, result2];
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, statements) { return statements; })(pos0, result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_Statement() {
+        var result0, result1;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_LinearExpression();
+        if (result0 !== null) {
+          result1 = parse_EOS();
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, expression) { return expression; })(pos0, result0[0]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_SourceCharacter() {
+        var result0;
+        
+        if (input.length > pos) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("any character");
+          }
+        }
+        return result0;
+      }
+      
+      function parse_IdentifierStart() {
+        var result0;
+        
+        if (/^[a-zA-Z]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[a-zA-Z]");
+          }
+        }
+        if (result0 === null) {
+          if (input.charCodeAt(pos) === 36) {
+            result0 = "$";
+            pos++;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"$\"");
+            }
+          }
+          if (result0 === null) {
+            if (input.charCodeAt(pos) === 95) {
+              result0 = "_";
+              pos++;
+            } else {
+              result0 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"_\"");
+              }
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_WhiteSpace() {
+        var result0;
+        
+        reportFailures++;
+        if (/^[\t\x0B\f \xA0\uFEFF]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[\\t\\x0B\\f \\xA0\\uFEFF]");
+          }
+        }
+        reportFailures--;
+        if (reportFailures === 0 && result0 === null) {
+          matchFailed("whitespace");
+        }
+        return result0;
+      }
+      
+      function parse_LineTerminator() {
+        var result0;
+        
+        if (/^[\n\r\u2028\u2029]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[\\n\\r\\u2028\\u2029]");
+          }
+        }
+        return result0;
+      }
+      
+      function parse_LineTerminatorSequence() {
+        var result0;
+        
+        reportFailures++;
+        if (input.charCodeAt(pos) === 10) {
+          result0 = "\n";
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"\\n\"");
+          }
+        }
+        if (result0 === null) {
+          if (input.substr(pos, 2) === "\r\n") {
+            result0 = "\r\n";
+            pos += 2;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"\\r\\n\"");
+            }
+          }
+          if (result0 === null) {
+            if (input.charCodeAt(pos) === 13) {
+              result0 = "\r";
+              pos++;
+            } else {
+              result0 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"\\r\"");
+              }
+            }
+            if (result0 === null) {
+              if (input.charCodeAt(pos) === 8232) {
+                result0 = "\u2028";
+                pos++;
+              } else {
+                result0 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\"\\u2028\"");
+                }
+              }
+              if (result0 === null) {
+                if (input.charCodeAt(pos) === 8233) {
+                  result0 = "\u2029";
+                  pos++;
+                } else {
+                  result0 = null;
+                  if (reportFailures === 0) {
+                    matchFailed("\"\\u2029\"");
+                  }
+                }
+              }
+            }
+          }
+        }
+        reportFailures--;
+        if (reportFailures === 0 && result0 === null) {
+          matchFailed("end of line");
+        }
+        return result0;
+      }
+      
+      function parse_EOS() {
+        var result0, result1;
+        var pos0;
+        
+        pos0 = pos;
+        result0 = parse___();
+        if (result0 !== null) {
+          if (input.charCodeAt(pos) === 59) {
+            result1 = ";";
+            pos++;
+          } else {
+            result1 = null;
+            if (reportFailures === 0) {
+              matchFailed("\";\"");
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos0;
+          }
+        } else {
+          result0 = null;
+          pos = pos0;
+        }
+        if (result0 === null) {
+          pos0 = pos;
+          result0 = parse__();
+          if (result0 !== null) {
+            result1 = parse_LineTerminatorSequence();
+            if (result1 !== null) {
+              result0 = [result0, result1];
+            } else {
+              result0 = null;
+              pos = pos0;
+            }
+          } else {
+            result0 = null;
+            pos = pos0;
+          }
+          if (result0 === null) {
+            pos0 = pos;
+            result0 = parse___();
+            if (result0 !== null) {
+              result1 = parse_EOF();
+              if (result1 !== null) {
+                result0 = [result0, result1];
+              } else {
+                result0 = null;
+                pos = pos0;
+              }
+            } else {
+              result0 = null;
+              pos = pos0;
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_EOF() {
+        var result0;
+        var pos0;
+        
+        pos0 = pos;
+        reportFailures++;
+        if (input.length > pos) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("any character");
+          }
+        }
+        reportFailures--;
+        if (result0 === null) {
+          result0 = "";
+        } else {
+          result0 = null;
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_Comment() {
+        var result0;
+        
+        reportFailures++;
+        result0 = parse_MultiLineComment();
+        if (result0 === null) {
+          result0 = parse_SingleLineComment();
+        }
+        reportFailures--;
+        if (reportFailures === 0 && result0 === null) {
+          matchFailed("comment");
+        }
+        return result0;
+      }
+      
+      function parse_MultiLineComment() {
+        var result0, result1, result2, result3;
+        var pos0, pos1, pos2;
+        
+        pos0 = pos;
+        if (input.substr(pos, 2) === "/*") {
+          result0 = "/*";
+          pos += 2;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"/*\"");
+          }
+        }
+        if (result0 !== null) {
+          result1 = [];
+          pos1 = pos;
+          pos2 = pos;
+          reportFailures++;
+          if (input.substr(pos, 2) === "*/") {
+            result2 = "*/";
+            pos += 2;
+          } else {
+            result2 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"*/\"");
+            }
+          }
+          reportFailures--;
+          if (result2 === null) {
+            result2 = "";
+          } else {
+            result2 = null;
+            pos = pos2;
+          }
+          if (result2 !== null) {
+            result3 = parse_SourceCharacter();
+            if (result3 !== null) {
+              result2 = [result2, result3];
+            } else {
+              result2 = null;
+              pos = pos1;
+            }
+          } else {
+            result2 = null;
+            pos = pos1;
+          }
+          while (result2 !== null) {
+            result1.push(result2);
+            pos1 = pos;
+            pos2 = pos;
+            reportFailures++;
+            if (input.substr(pos, 2) === "*/") {
+              result2 = "*/";
+              pos += 2;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"*/\"");
+              }
+            }
+            reportFailures--;
+            if (result2 === null) {
+              result2 = "";
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+            if (result2 !== null) {
+              result3 = parse_SourceCharacter();
+              if (result3 !== null) {
+                result2 = [result2, result3];
+              } else {
+                result2 = null;
+                pos = pos1;
+              }
+            } else {
+              result2 = null;
+              pos = pos1;
+            }
+          }
+          if (result1 !== null) {
+            if (input.substr(pos, 2) === "*/") {
+              result2 = "*/";
+              pos += 2;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"*/\"");
+              }
+            }
+            if (result2 !== null) {
+              result0 = [result0, result1, result2];
+            } else {
+              result0 = null;
+              pos = pos0;
+            }
+          } else {
+            result0 = null;
+            pos = pos0;
+          }
+        } else {
+          result0 = null;
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_MultiLineCommentNoLineTerminator() {
+        var result0, result1, result2, result3;
+        var pos0, pos1, pos2;
+        
+        pos0 = pos;
+        if (input.substr(pos, 2) === "/*") {
+          result0 = "/*";
+          pos += 2;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"/*\"");
+          }
+        }
+        if (result0 !== null) {
+          result1 = [];
+          pos1 = pos;
+          pos2 = pos;
+          reportFailures++;
+          if (input.substr(pos, 2) === "*/") {
+            result2 = "*/";
+            pos += 2;
+          } else {
+            result2 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"*/\"");
+            }
+          }
+          if (result2 === null) {
+            result2 = parse_LineTerminator();
+          }
+          reportFailures--;
+          if (result2 === null) {
+            result2 = "";
+          } else {
+            result2 = null;
+            pos = pos2;
+          }
+          if (result2 !== null) {
+            result3 = parse_SourceCharacter();
+            if (result3 !== null) {
+              result2 = [result2, result3];
+            } else {
+              result2 = null;
+              pos = pos1;
+            }
+          } else {
+            result2 = null;
+            pos = pos1;
+          }
+          while (result2 !== null) {
+            result1.push(result2);
+            pos1 = pos;
+            pos2 = pos;
+            reportFailures++;
+            if (input.substr(pos, 2) === "*/") {
+              result2 = "*/";
+              pos += 2;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"*/\"");
+              }
+            }
+            if (result2 === null) {
+              result2 = parse_LineTerminator();
+            }
+            reportFailures--;
+            if (result2 === null) {
+              result2 = "";
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+            if (result2 !== null) {
+              result3 = parse_SourceCharacter();
+              if (result3 !== null) {
+                result2 = [result2, result3];
+              } else {
+                result2 = null;
+                pos = pos1;
+              }
+            } else {
+              result2 = null;
+              pos = pos1;
+            }
+          }
+          if (result1 !== null) {
+            if (input.substr(pos, 2) === "*/") {
+              result2 = "*/";
+              pos += 2;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"*/\"");
+              }
+            }
+            if (result2 !== null) {
+              result0 = [result0, result1, result2];
+            } else {
+              result0 = null;
+              pos = pos0;
+            }
+          } else {
+            result0 = null;
+            pos = pos0;
+          }
+        } else {
+          result0 = null;
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_SingleLineComment() {
+        var result0, result1, result2, result3;
+        var pos0, pos1, pos2;
+        
+        pos0 = pos;
+        if (input.substr(pos, 2) === "//") {
+          result0 = "//";
+          pos += 2;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"//\"");
+          }
+        }
+        if (result0 !== null) {
+          result1 = [];
+          pos1 = pos;
+          pos2 = pos;
+          reportFailures++;
+          result2 = parse_LineTerminator();
+          reportFailures--;
+          if (result2 === null) {
+            result2 = "";
+          } else {
+            result2 = null;
+            pos = pos2;
+          }
+          if (result2 !== null) {
+            result3 = parse_SourceCharacter();
+            if (result3 !== null) {
+              result2 = [result2, result3];
+            } else {
+              result2 = null;
+              pos = pos1;
+            }
+          } else {
+            result2 = null;
+            pos = pos1;
+          }
+          while (result2 !== null) {
+            result1.push(result2);
+            pos1 = pos;
+            pos2 = pos;
+            reportFailures++;
+            result2 = parse_LineTerminator();
+            reportFailures--;
+            if (result2 === null) {
+              result2 = "";
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+            if (result2 !== null) {
+              result3 = parse_SourceCharacter();
+              if (result3 !== null) {
+                result2 = [result2, result3];
+              } else {
+                result2 = null;
+                pos = pos1;
+              }
+            } else {
+              result2 = null;
+              pos = pos1;
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos0;
+          }
+        } else {
+          result0 = null;
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse__() {
+        var result0, result1;
+        
+        result0 = [];
+        result1 = parse_WhiteSpace();
+        if (result1 === null) {
+          result1 = parse_MultiLineCommentNoLineTerminator();
+          if (result1 === null) {
+            result1 = parse_SingleLineComment();
+          }
+        }
+        while (result1 !== null) {
+          result0.push(result1);
+          result1 = parse_WhiteSpace();
+          if (result1 === null) {
+            result1 = parse_MultiLineCommentNoLineTerminator();
+            if (result1 === null) {
+              result1 = parse_SingleLineComment();
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse___() {
+        var result0, result1;
+        
+        result0 = [];
+        result1 = parse_WhiteSpace();
+        if (result1 === null) {
+          result1 = parse_LineTerminatorSequence();
+          if (result1 === null) {
+            result1 = parse_Comment();
+          }
+        }
+        while (result1 !== null) {
+          result0.push(result1);
+          result1 = parse_WhiteSpace();
+          if (result1 === null) {
+            result1 = parse_LineTerminatorSequence();
+            if (result1 === null) {
+              result1 = parse_Comment();
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_Literal() {
+        var result0;
+        var pos0;
+        
+        pos0 = pos;
+        result0 = parse_Real();
+        if (result0 === null) {
+          result0 = parse_Integer();
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, val) {
+            return {
+              type: "NumericLiteral",
+              value: val
+            }
+          })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_Integer() {
+        var result0, result1;
+        var pos0;
+        
+        pos0 = pos;
+        if (/^[0-9]/.test(input.charAt(pos))) {
+          result1 = input.charAt(pos);
+          pos++;
+        } else {
+          result1 = null;
+          if (reportFailures === 0) {
+            matchFailed("[0-9]");
+          }
+        }
+        if (result1 !== null) {
+          result0 = [];
+          while (result1 !== null) {
+            result0.push(result1);
+            if (/^[0-9]/.test(input.charAt(pos))) {
+              result1 = input.charAt(pos);
+              pos++;
+            } else {
+              result1 = null;
+              if (reportFailures === 0) {
+                matchFailed("[0-9]");
+              }
+            }
+          }
+        } else {
+          result0 = null;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, digits) {
+            return parseInt(digits.join(""));
+          })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_Real() {
+        var result0, result1, result2;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_Integer();
+        if (result0 !== null) {
+          if (input.charCodeAt(pos) === 46) {
+            result1 = ".";
+            pos++;
+          } else {
+            result1 = null;
+            if (reportFailures === 0) {
+              matchFailed("\".\"");
+            }
+          }
+          if (result1 !== null) {
+            result2 = parse_Integer();
+            if (result2 !== null) {
+              result0 = [result0, result1, result2];
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, digits) {
+            return parseFloat(digits.join(""));
+          })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_SignedInteger() {
+        var result0, result1, result2;
+        var pos0;
+        
+        pos0 = pos;
+        if (/^[\-+]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[\\-+]");
+          }
+        }
+        result0 = result0 !== null ? result0 : "";
+        if (result0 !== null) {
+          if (/^[0-9]/.test(input.charAt(pos))) {
+            result2 = input.charAt(pos);
+            pos++;
+          } else {
+            result2 = null;
+            if (reportFailures === 0) {
+              matchFailed("[0-9]");
+            }
+          }
+          if (result2 !== null) {
+            result1 = [];
+            while (result2 !== null) {
+              result1.push(result2);
+              if (/^[0-9]/.test(input.charAt(pos))) {
+                result2 = input.charAt(pos);
+                pos++;
+              } else {
+                result2 = null;
+                if (reportFailures === 0) {
+                  matchFailed("[0-9]");
+                }
+              }
+            }
+          } else {
+            result1 = null;
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos0;
+          }
+        } else {
+          result0 = null;
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_Identifier() {
+        var result0;
+        var pos0;
+        
+        reportFailures++;
+        pos0 = pos;
+        result0 = parse_IdentifierName();
+        if (result0 !== null) {
+          result0 = (function(offset, name) { return name; })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        reportFailures--;
+        if (reportFailures === 0 && result0 === null) {
+          matchFailed("identifier");
+        }
+        return result0;
+      }
+      
+      function parse_IdentifierName() {
+        var result0, result1, result2;
+        var pos0, pos1;
+        
+        reportFailures++;
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_IdentifierStart();
+        if (result0 !== null) {
+          result1 = [];
+          result2 = parse_IdentifierStart();
+          while (result2 !== null) {
+            result1.push(result2);
+            result2 = parse_IdentifierStart();
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, start, parts) {
+              return start + parts.join("");
+            })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        reportFailures--;
+        if (reportFailures === 0 && result0 === null) {
+          matchFailed("identifier");
+        }
+        return result0;
+      }
+      
+      function parse_PrimaryExpression() {
+        var result0, result1, result2, result3, result4;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        result0 = parse_Identifier();
+        if (result0 !== null) {
+          result0 = (function(offset, name) { return { type: "Variable", name: name }; })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        if (result0 === null) {
+          result0 = parse_Literal();
+          if (result0 === null) {
+            pos0 = pos;
+            pos1 = pos;
+            if (input.charCodeAt(pos) === 40) {
+              result0 = "(";
+              pos++;
+            } else {
+              result0 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"(\"");
+              }
+            }
+            if (result0 !== null) {
+              result1 = parse___();
+              if (result1 !== null) {
+                result2 = parse_LinearExpression();
+                if (result2 !== null) {
+                  result3 = parse___();
+                  if (result3 !== null) {
+                    if (input.charCodeAt(pos) === 41) {
+                      result4 = ")";
+                      pos++;
+                    } else {
+                      result4 = null;
+                      if (reportFailures === 0) {
+                        matchFailed("\")\"");
+                      }
+                    }
+                    if (result4 !== null) {
+                      result0 = [result0, result1, result2, result3, result4];
+                    } else {
+                      result0 = null;
+                      pos = pos1;
+                    }
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+            if (result0 !== null) {
+              result0 = (function(offset, expression) { return expression; })(pos0, result0[2]);
+            }
+            if (result0 === null) {
+              pos = pos0;
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_UnaryExpression() {
+        var result0, result1, result2;
+        var pos0, pos1;
+        
+        result0 = parse_PrimaryExpression();
+        if (result0 === null) {
+          pos0 = pos;
+          pos1 = pos;
+          result0 = parse_UnaryOperator();
+          if (result0 !== null) {
+            result1 = parse___();
+            if (result1 !== null) {
+              result2 = parse_UnaryExpression();
+              if (result2 !== null) {
+                result0 = [result0, result1, result2];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+          if (result0 !== null) {
+            result0 = (function(offset, operator, expression) {
+                return {
+                  type:       "UnaryExpression",
+                  operator:   operator,
+                  expression: expression
+                };
+              })(pos0, result0[0], result0[2]);
+          }
+          if (result0 === null) {
+            pos = pos0;
+          }
+        }
+        return result0;
+      }
+      
+      function parse_UnaryOperator() {
+        var result0;
+        
+        if (input.charCodeAt(pos) === 43) {
+          result0 = "+";
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"+\"");
+          }
+        }
+        if (result0 === null) {
+          if (input.charCodeAt(pos) === 45) {
+            result0 = "-";
+            pos++;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"-\"");
+            }
+          }
+          if (result0 === null) {
+            if (input.charCodeAt(pos) === 33) {
+              result0 = "!";
+              pos++;
+            } else {
+              result0 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"!\"");
+              }
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_MultiplicativeExpression() {
+        var result0, result1, result2, result3, result4, result5;
+        var pos0, pos1, pos2;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_UnaryExpression();
+        if (result0 !== null) {
+          result1 = [];
+          pos2 = pos;
+          result2 = parse___();
+          if (result2 !== null) {
+            result3 = parse_MultiplicativeOperator();
+            if (result3 !== null) {
+              result4 = parse___();
+              if (result4 !== null) {
+                result5 = parse_UnaryExpression();
+                if (result5 !== null) {
+                  result2 = [result2, result3, result4, result5];
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          } else {
+            result2 = null;
+            pos = pos2;
+          }
+          while (result2 !== null) {
+            result1.push(result2);
+            pos2 = pos;
+            result2 = parse___();
+            if (result2 !== null) {
+              result3 = parse_MultiplicativeOperator();
+              if (result3 !== null) {
+                result4 = parse___();
+                if (result4 !== null) {
+                  result5 = parse_UnaryExpression();
+                  if (result5 !== null) {
+                    result2 = [result2, result3, result4, result5];
+                  } else {
+                    result2 = null;
+                    pos = pos2;
+                  }
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, head, tail) {
+              var result = head;
+              for (var i = 0; i < tail.length; i++) {
+                result = {
+                  type:     "MultiplicativeExpression",
+                  operator: tail[i][1],
+                  left:     result,
+                  right:    tail[i][3]
+                };
+              }
+              return result;
+            })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_MultiplicativeOperator() {
+        var result0;
+        
+        if (input.charCodeAt(pos) === 42) {
+          result0 = "*";
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"*\"");
+          }
+        }
+        if (result0 === null) {
+          if (input.charCodeAt(pos) === 47) {
+            result0 = "/";
+            pos++;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"/\"");
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_AdditiveExpression() {
+        var result0, result1, result2, result3, result4, result5;
+        var pos0, pos1, pos2;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_MultiplicativeExpression();
+        if (result0 !== null) {
+          result1 = [];
+          pos2 = pos;
+          result2 = parse___();
+          if (result2 !== null) {
+            result3 = parse_AdditiveOperator();
+            if (result3 !== null) {
+              result4 = parse___();
+              if (result4 !== null) {
+                result5 = parse_MultiplicativeExpression();
+                if (result5 !== null) {
+                  result2 = [result2, result3, result4, result5];
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          } else {
+            result2 = null;
+            pos = pos2;
+          }
+          while (result2 !== null) {
+            result1.push(result2);
+            pos2 = pos;
+            result2 = parse___();
+            if (result2 !== null) {
+              result3 = parse_AdditiveOperator();
+              if (result3 !== null) {
+                result4 = parse___();
+                if (result4 !== null) {
+                  result5 = parse_MultiplicativeExpression();
+                  if (result5 !== null) {
+                    result2 = [result2, result3, result4, result5];
+                  } else {
+                    result2 = null;
+                    pos = pos2;
+                  }
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, head, tail) {
+              var result = head;
+              for (var i = 0; i < tail.length; i++) {
+                result = {
+                  type:     "AdditiveExpression",
+                  operator: tail[i][1],
+                  left:     result,
+                  right:    tail[i][3]
+                };
+              }
+              return result;
+            })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_AdditiveOperator() {
+        var result0;
+        
+        if (input.charCodeAt(pos) === 43) {
+          result0 = "+";
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"+\"");
+          }
+        }
+        if (result0 === null) {
+          if (input.charCodeAt(pos) === 45) {
+            result0 = "-";
+            pos++;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"-\"");
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_InequalityExpression() {
+        var result0, result1, result2, result3, result4, result5;
+        var pos0, pos1, pos2;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_AdditiveExpression();
+        if (result0 !== null) {
+          result1 = [];
+          pos2 = pos;
+          result2 = parse___();
+          if (result2 !== null) {
+            result3 = parse_InequalityOperator();
+            if (result3 !== null) {
+              result4 = parse___();
+              if (result4 !== null) {
+                result5 = parse_AdditiveExpression();
+                if (result5 !== null) {
+                  result2 = [result2, result3, result4, result5];
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          } else {
+            result2 = null;
+            pos = pos2;
+          }
+          while (result2 !== null) {
+            result1.push(result2);
+            pos2 = pos;
+            result2 = parse___();
+            if (result2 !== null) {
+              result3 = parse_InequalityOperator();
+              if (result3 !== null) {
+                result4 = parse___();
+                if (result4 !== null) {
+                  result5 = parse_AdditiveExpression();
+                  if (result5 !== null) {
+                    result2 = [result2, result3, result4, result5];
+                  } else {
+                    result2 = null;
+                    pos = pos2;
+                  }
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, head, tail) {
+              var result = head;
+              for (var i = 0; i < tail.length; i++) {
+                result = {
+                  type:     "Inequality",
+                  operator: tail[i][1],
+                  left:     result,
+                  right:    tail[i][3]
+                };
+              }
+              return result;
+            })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_InequalityOperator() {
+        var result0;
+        
+        if (input.substr(pos, 2) === "<=") {
+          result0 = "<=";
+          pos += 2;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"<=\"");
+          }
+        }
+        if (result0 === null) {
+          if (input.substr(pos, 2) === ">=") {
+            result0 = ">=";
+            pos += 2;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\">=\"");
+            }
+          }
+          if (result0 === null) {
+            if (input.charCodeAt(pos) === 60) {
+              result0 = "<";
+              pos++;
+            } else {
+              result0 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"<\"");
+              }
+            }
+            if (result0 === null) {
+              if (input.charCodeAt(pos) === 62) {
+                result0 = ">";
+                pos++;
+              } else {
+                result0 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\">\"");
+                }
+              }
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_LinearExpression() {
+        var result0, result1, result2, result3, result4, result5;
+        var pos0, pos1, pos2;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_InequalityExpression();
+        if (result0 !== null) {
+          result1 = [];
+          pos2 = pos;
+          result2 = parse___();
+          if (result2 !== null) {
+            if (input.substr(pos, 2) === "==") {
+              result3 = "==";
+              pos += 2;
+            } else {
+              result3 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"==\"");
+              }
+            }
+            if (result3 !== null) {
+              result4 = parse___();
+              if (result4 !== null) {
+                result5 = parse_InequalityExpression();
+                if (result5 !== null) {
+                  result2 = [result2, result3, result4, result5];
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          } else {
+            result2 = null;
+            pos = pos2;
+          }
+          while (result2 !== null) {
+            result1.push(result2);
+            pos2 = pos;
+            result2 = parse___();
+            if (result2 !== null) {
+              if (input.substr(pos, 2) === "==") {
+                result3 = "==";
+                pos += 2;
+              } else {
+                result3 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\"==\"");
+                }
+              }
+              if (result3 !== null) {
+                result4 = parse___();
+                if (result4 !== null) {
+                  result5 = parse_InequalityExpression();
+                  if (result5 !== null) {
+                    result2 = [result2, result3, result4, result5];
+                  } else {
+                    result2 = null;
+                    pos = pos2;
+                  }
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, head, tail) {
+              var result = head;
+              for (var i = 0; i < tail.length; i++) {
+                result = {
+                  type:     "Equality",
+                  operator: tail[i][1],
+                  left:     result,
+                  right:    tail[i][3]
+                };
+              }
+              return result;
+            })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      
+      function cleanupExpected(expected) {
+        expected.sort();
+        
+        var lastExpected = null;
+        var cleanExpected = [];
+        for (var i = 0; i < expected.length; i++) {
+          if (expected[i] !== lastExpected) {
+            cleanExpected.push(expected[i]);
+            lastExpected = expected[i];
+          }
+        }
+        return cleanExpected;
+      }
+      
+      function computeErrorPosition() {
+        /*
+         * The first idea was to use |String.split| to break the input up to the
+         * error position along newlines and derive the line and column from
+         * there. However IE's |split| implementation is so broken that it was
+         * enough to prevent it.
+         */
+        
+        var line = 1;
+        var column = 1;
+        var seenCR = false;
+        
+        for (var i = 0; i < Math.max(pos, rightmostFailuresPos); i++) {
+          var ch = input.charAt(i);
+          if (ch === "\n") {
+            if (!seenCR) { line++; }
+            column = 1;
+            seenCR = false;
+          } else if (ch === "\r" || ch === "\u2028" || ch === "\u2029") {
+            line++;
+            column = 1;
+            seenCR = true;
+          } else {
+            column++;
+            seenCR = false;
+          }
+        }
+        
+        return { line: line, column: column };
+      }
+      
+      
+      var result = parseFunctions[startRule]();
+      
+      /*
+       * The parser is now in one of the following three states:
+       *
+       * 1. The parser successfully parsed the whole input.
+       *
+       *    - |result !== null|
+       *    - |pos === input.length|
+       *    - |rightmostFailuresExpected| may or may not contain something
+       *
+       * 2. The parser successfully parsed only a part of the input.
+       *
+       *    - |result !== null|
+       *    - |pos < input.length|
+       *    - |rightmostFailuresExpected| may or may not contain something
+       *
+       * 3. The parser did not successfully parse any part of the input.
+       *
+       *   - |result === null|
+       *   - |pos === 0|
+       *   - |rightmostFailuresExpected| contains at least one failure
+       *
+       * All code following this comment (including called functions) must
+       * handle these states.
+       */
+      if (result === null || pos !== input.length) {
+        var offset = Math.max(pos, rightmostFailuresPos);
+        var found = offset < input.length ? input.charAt(offset) : null;
+        var errorPosition = computeErrorPosition();
+        
+        throw new this.SyntaxError(
+          cleanupExpected(rightmostFailuresExpected),
+          found,
+          offset,
+          errorPosition.line,
+          errorPosition.column
+        );
+      }
+      
+      return result;
+    },
+    
+    /* Returns the parser source code. */
+    toSource: function() { return this._source; }
+  };
+  
+  /* Thrown when a parser encounters a syntax error. */
+  
+  result.SyntaxError = function(expected, found, offset, line, column) {
+    function buildMessage(expected, found) {
+      var expectedHumanized, foundHumanized;
+      
+      switch (expected.length) {
+        case 0:
+          expectedHumanized = "end of input";
+          break;
+        case 1:
+          expectedHumanized = expected[0];
+          break;
+        default:
+          expectedHumanized = expected.slice(0, expected.length - 1).join(", ")
+            + " or "
+            + expected[expected.length - 1];
+      }
+      
+      foundHumanized = found ? quote(found) : "end of input";
+      
+      return "Expected " + expectedHumanized + " but " + foundHumanized + " found.";
+    }
+    
+    this.name = "SyntaxError";
+    this.expected = expected;
+    this.found = found;
+    this.message = buildMessage(expected, found);
+    this.offset = offset;
+    this.line = line;
+    this.column = column;
+  };
+  
+  result.SyntaxError.prototype = Error.prototype;
+  
+  return result;
+})();
+// Copyright (C) 2013, Alex Russell <slightlyoff@chromium.org>
+// Use of this source code is governed by
+//    http://www.apache.org/licenses/LICENSE-2.0
+
+(function(c){
+"use strict";
+
+var solver = new c.SimplexSolver();
+var vars = {};
+var exprs = {};
+
+var weak = c.Strength.weak;
+var medium = c.Strength.medium;
+var strong = c.Strength.strong;
+var required = c.Strength.required;
+
+var _c = function(expr) {
+  if (exprs[expr]) {
+    return exprs[expr];
+  }
+  switch(expr.type) {
+    case "Inequality":
+      var op = (expr.operator == "<=") ? c.LEQ : c.GEQ;
+      var i = new c.Inequality(_c(expr.left), op, _c(expr.right), weak);
+      solver.addConstraint(i);
+      return i;
+    case "Equality":
+      var i = new c.Equation(_c(expr.left), _c(expr.right), weak);
+      solver.addConstraint(i);
+      return i;
+    case "MultiplicativeExpression":
+      var i = c.times(_c(expr.left), _c(expr.right));
+      solver.addConstraint(i);
+      return i;
+    case "AdditiveExpression":
+      if (expr.operator == "+") {
+        return c.plus(_c(expr.left), _c(expr.right));
+      } else {
+        return c.minus(_c(expr.left), _c(expr.right));
+      }
+    case "NumericLiteral":
+      return new c.Expression(expr.value);
+    case "Variable":
+      // console.log(expr);
+      if(!vars[expr.name]) {
+        vars[expr.name] = new c.Variable({ name: expr.name });
+      }
+      return vars[expr.name];
+    case "UnaryExpression":
+      console.log("UnaryExpression...WTF?");
+      break;
+  }
+};
+
+var compile = function(expressions) {
+  return expressions.map(_c);
+};
+
+// Global API entrypoint
+c._api = function() {
+  var args = Array.prototype.slice.call(arguments);
+  if (args.length == 1) {
+    if(typeof args[0] == "string") {
+      // Parse and execute it
+      var r = c.parser.parse(args[0]);
+      return compile(r);
+    }
+  }
+};
+
+})(this["c"]||module.parent.exports||{});
 }).call(
   (typeof module != "undefined") ?
       (module.compiled = true && module) : this

@@ -12,9 +12,10 @@
     <link href="panels.css" rel="stylesheet" type="text/css">
     <link href="cloudy.css" rel="stylesheet" type="text/css">
 
-    <script defer="defer" src="../../bin/c.js"></script>
-
     <!--
+    <script defer="defer" src="../../bin/c.js"></script>
+    -->
+
     <script defer="defer" src="../../src/c.js"></script>
     <script defer="defer" src="../../src/HashTable.js"></script>
     <script defer="defer" src="../../src/HashSet.js"></script>
@@ -29,7 +30,6 @@
     <script defer="defer" src="../../src/Tableau.js"></script>
     <script defer="defer" src="../../src/SimplexSolver.js"></script>
     <script defer="defer" src="../../src/Timer.js"></script>
-    -->
 
     <script defer="defer" src="../../third_party/mutation-summary/mutation_summary.js"></script>
     <script defer="defer" src="domutil.js"></script>
@@ -48,16 +48,19 @@
           }
         };
 
-        [ "discussion", "channels", "contacts" ].forEach(function(id) {
+        // [ "discussion", "channels", "contacts" ].forEach(function(id) {
+        [ "channels" ].forEach(function(id) {
           var ipsum = document.getElementById("ipsum").cloneNode(true);
           ipsum.id = "";
           randomizeChildren(ipsum);
           document.getElementById(id).appendChild(ipsum);
         });
+        /*
+        */
       }, false);
     </script>
   </head>
-  <body debug="false" id="root" class="cloudy">
+  <body debug="true" id="root" class="cloudy">
     <!--
       Layout is roughly:
 
@@ -84,7 +87,7 @@
       right="inherit" top="inherit" bottom="inherit"
       preferredWidth="200"
       minWidth="100" maxWidth="300"
-      debug="false">
+      debug="true">
     </x-panel>
 
     <x-panel id="masthead"
@@ -94,8 +97,8 @@
       minHeight="50" height="50" maxHeight="100"
       debug="false">
       <div>
-        <span class="logo">&#9729;</span> 
-          Cloudy<span style="color: rgb(24,63,141);">Chat</span> 
+        <span class="logo">&#9729;</span>
+          Cloudy<span style="color: rgb(24,63,141);">Chat</span>
           <span style="font-size: 30px; line-height: 20px;">&#736;</span>
           <span style="font-size: 0.8em;">Very Probably The <em>Best</em> Way To Waste Time</span>
       </div>
@@ -132,7 +135,7 @@
       top="#chatter.v.bottom"
       minHeight="0" maxHeight="26"
       debug="false">
-      Friday, March 30th, 2012 
+      Friday, March 30th, 2012
         ...
         <!--
         <span style="line-height: 1em; font-size: 2em;">&#9202;</span>

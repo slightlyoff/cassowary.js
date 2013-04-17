@@ -2,7 +2,7 @@
   "name" : "cassowary",
   "description": "A fast, modern JavaScript version of the Cassowary hierarchial linear constraint solver",
   "author": "Alex Russell <slightlyoff@chromium.org>",
-  "version" : "0.0.1",
+  "version" : "0.0.2",
   "licenses": [
     {
       "type": "Apache-2.0",
@@ -27,7 +27,7 @@
     }
   ],
   "scripts": {
-    "test": "cd tests; mocha *-test.js"
+    "test": "cd tests; mocha *-test.js; cd parser; mocha *test.js"
   },
   "dependencies": {
   },

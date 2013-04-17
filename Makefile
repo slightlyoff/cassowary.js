@@ -3,6 +3,9 @@ all: parser test build
 build:
 	cd util; ./build.sh
 
+debug:
+	cd util; DEBUG=1 ./build.sh
+
 test:
 	npm test
 
@@ -14,7 +17,7 @@ dist: build
 
 parser:
 	./node_modules/pegjs/bin/pegjs \
-		-e "__cassowary_parser" \
+		-e "this.c.parser" \
 		src/parser/grammar.pegjs src/parser/parser.js
 
 .PHONY: test

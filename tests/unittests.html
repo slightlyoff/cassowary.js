@@ -43,14 +43,13 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     <script src="../node_modules/chai/chai.js"></script>
     <script src="../node_modules/mocha/mocha.js"></script>
     <script src="../src/c.js"></script>
+
     <script>
       mocha.setup("bdd");
       // Hack up a global "require" so that the tests work. *sigh*
-      var require = function(type) {
-        if ( (type == "c") || (type.indexOf("c.js") >= 0) )
-          return c;
-        if (type == "chai")
-          return chai;
+      var require = function(src) {
+        if (src == "chai") { return chai; }
+        return c;
       };
     </script>
 
@@ -73,6 +72,8 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     <script src="../src/EditInfo.js"></script>
     <script src="../src/Tableau.js"></script>
     <script src="../src/SimplexSolver.js"></script>
+    <script src="../src/parser/parser.js"></script>
+    <script src="../src/parser/api.js"></script>
 
     <!-- Mocha tests -->
     <script src="c-test.js"></script>
@@ -85,6 +86,7 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
     <script src="Tableau-test.js"></script>
     <script src="Variable-test.js"></script>
     <script src="End-To-End-test.js"></script>
+    <script src="parser/smoketest.js"></script>
 
     <!-- Perf tests -->
     <script src="../src/Timer.js"></script>

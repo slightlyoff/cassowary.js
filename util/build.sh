@@ -27,7 +27,8 @@ $COMMAND ../src/c.js\
          ../src/Tableau.js\
          ../src/SimplexSolver.js\
          ../src/Timer.js\
-         ../src/parser/parser.js > out.js
+         ../src/parser/parser.js \
+         ../src/parser/api.js > out.js
 
 cat preamble.js out.js afterward.js > ../bin/c.js
 
