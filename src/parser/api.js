@@ -30,7 +30,6 @@ var _c = function(expr) {
       return i;
     case "MultiplicativeExpression":
       var i = c.times(_c(expr.left), _c(expr.right));
-      solver.addConstraint(i);
       return i;
     case "AdditiveExpression":
       if (expr.operator == "+") {

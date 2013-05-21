@@ -71,6 +71,10 @@ describe('with a valid expression', function () {
       });
     });
   });
+
+  it("can parse a multiplication", function() {
+    t.t(typeof c("10*a==30") == "object");
+  });
 });
 
 })();
