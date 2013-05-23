@@ -17,15 +17,15 @@ t.f = function(obj, str) {
 describe("parser smoketests", function() {
   it("should have a meaningful c._api", function() {
     t.t(typeof c._api == "function");
-  })
+  });
 
   it("can parse an empty string", function() {
     c("");
-  })
+  });
 
   it("returns a parse object", function() {
     t.t(typeof c("") == "object");
-  })
+  });
 });
 
 })();
