@@ -112,10 +112,9 @@ $ npm test
 > cassowary@0.0.1 test /Users/alex/projects/cassowary-js-refactor
 > cd tests; mocha *-test.js
 
+  ...
 
-  ․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․
-
-  89 tests complete (38 ms)
+  116/116 tests passed
 ```
 
 If you have a working `make`, a Makefile is provided with a `test` target that

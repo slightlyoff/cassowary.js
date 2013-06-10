@@ -1,34 +1,34 @@
+/* global c */
+
 // Copyright (C) 1998-2000 Greg J. Badros
 // Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
 //
 // Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
-(function() {
-"use strict";
 
-var c = require("../");
-// DOH Compat.
-var t = require("chai").assert;
-t.is = t.deepEqual;
-t.t = t;
-t.f = function(obj, str) {
-  return t.t(!obj, str);
-};
+define([
+	'intern!bdd',
+	'intern/chai!assert',
+	'dojo/has!host-node?./deps'
+], function (bdd, assert) {
+	'use strict';
 
-describe("c.Tableau", function() {
-  describe("ctor", function() {
-    it("doesn't blow up", function() {
-      new c.Tableau();
-    });
+	var describe = bdd.describe,
+		it = bdd.it;
 
-    it("has sane properties", function() {
-      var tab = new c.Tableau();
-      t.is(0, tab.columns.size);
-      t.is(0, tab.rows.size);
-      t.is(0, tab._infeasibleRows.size);
-      t.is(0, tab._externalRows.size);
-      t.is(0, tab._externalParametricVars.size);
-    });
-  });
-  // FIXME(slightlyoff): MOAR TESTS
+	describe('c.Tableau', function () {
+		describe('ctor', function () {
+			it('doesn\'t blow up', function () {
+				new c.Tableau();
+			});
+
+			it('has sane properties', function () {
+				var tab = new c.Tableau();
+				assert.deepEqual(0, tab.columns.size);
+				assert.deepEqual(0, tab.rows.size);
+				assert.deepEqual(0, tab._infeasibleRows.size);
+				assert.deepEqual(0, tab._externalRows.size);
+				assert.deepEqual(0, tab._externalParametricVars.size);
+			});
+		});
+	});
 });
-})();
