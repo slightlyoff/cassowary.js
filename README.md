@@ -98,8 +98,7 @@ $ git submodule update --init
 ...
 ```
 
-To run the tests, point your thorougly modern browser at `tests/unittests.html?config=tests/intern`
-or `demos/quad/quaddemo.html`.
+To run the tests, point your thorougly modern browser at `tests/unittests.html?config=tests/intern` and view the console. You can also check out `demos/quad/quaddemo.html`.
 
 Running tests from the command line requires [Node](http://nodejs.org/). Once
 you've installed Node, run:
