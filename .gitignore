@@ -12,3 +12,4 @@ out.prof
 /node_modules/*
 /dist/*
 lcov.info
+sauce_connect.log*

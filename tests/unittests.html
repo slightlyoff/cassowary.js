@@ -12,85 +12,64 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 		<meta charset="utf-8">
 		<title>Cassowary Javascript Tests</title>
 		<script src="../node_modules/intern/node_modules/dojo/dojo.js"></script>
-
-		<!-- Utility code to log results to the page. -->
 		<script>
-			var append = function(n, h) { (h||document.body).appendChild(n); return n; };
-			var t = function(text) { return document.createTextNode(text); };
-			var el = function(type, html, text) {
-				var node = document.createElement(type);
-				if (html) { node.innerHTML = html; }
-				if (text) { node.appendChild(t(text)); }
-				return node;
-			};
-			var domLog = function() {
-				var al = arguments.length;
-				var pre = append(el("pre"));
-				for(var x = 0; x < al; x++) {
-					append(t(arguments[x]), pre);
-					append(t("\n"), pre);
-				}
-			};
-			var printLog = [];
-			print = function(s) { printLog.push(s); }
-    	</script>
-
-    	<!-- Regular unit tests and performance tests -->
-		<script>
-			window.addEventListener("load", function() {
-		    	append(el("h2", "In-page perf test results:"));
-		    	append(el("pre", printLog.join("\n")));
-		    	printLog.length = 0;
-			}, false);
-			
 			(function () {
+				// Utility code to log results to the page.
+				var printLog = [];
+
+				window.append = function (n, h) {
+					(h || document.body).appendChild(n);
+					return n;
+				};
+
+				window.t = function (text) {
+					return document.createTextNode(text);
+				};
+
+				window.el = function (type, html, text) {
+					var node = document.createElement(type);
+					if (html) { node.innerHTML = html; }
+					if (text) { node.appendChild(t(text)); }
+					return node;
+				};
+
+				window.domLog = function () {
+					var al = arguments.length;
+					var pre = append(el("pre"));
+					for(var x = 0; x < al; x++) {
+						append(t(arguments[x]), pre);
+						append(t("\n"), pre);
+					}
+				};
+
+				window.print = function (s) { 
+					printLog.push(s); 
+				};
+
+				window.addEventListener("load", function() {
+			    	append(el("h2", "In-page perf test results:"));
+			    	append(el("pre", printLog.join("\n")));
+			    	printLog.length = 0;
+				}, false);
+
+				// Basic AMD config for Intern. Normally, we could just use Intern's included browser runner instead
+				// of doing this manually, but we want to include extra information on this page, such as perf tests.
 				require({
 					baseUrl: '../',
-					packages: [
-						{ name: 'intern', location: 'node_modules/intern' }
-					],
+					packages: [{ name: 'intern', location: 'node_modules/intern' }],
 					map: {
 						intern: {
 							dojo: 'intern/node_modules/dojo',
 							chai: 'intern/node_modules/chai/chai'
 						}
 					}
-				}, [ 'tests/deps', 'intern/client' ], function () {
-					require(['tests/PerfTest']);
-				});
-			})();
-		</script>
-
-		<!-- Worker performance tests -->
-    	<script>
-	    	(function(scope) {
-		        // Load tests in a Worker to verify that they run there as well:
-		        worker = new Worker("WorkerPerfTest.js");
-
-		        worker.onmessage = function(e) {
-		        	var d = e.data;
-		        	var type = d[0];
-
-		        	var dualLog = function(content) {
-		        		console.log.apply(console, content);
-		        		domLog.apply(null, content);
-		        	};
-
-		        	if (type == "log") {
-		        		d.unshift();
-		        		dualLog(d.slice(1));
-		        	}
-		        	if (type == "logs") { d.slice(1).forEach(dualLog); }
-		        };
-
-		        // Start the tests
-		        window.addEventListener("load", function() {
-		        	append(el("h2", "WebWorker perf test results:"));
-		          	// TODO(slightlyoff): pass c.* config to the worker in the init message.
-		          	worker.postMessage(["init"]);
+				// Load cassowary deps
+				}, [ 'tests/deps' ], function () {
+					// Load Intern's client runner, kicking off the unit tests, and also load performance tests
+					require(['intern/client', 'tests/PerfTest', 'tests/WorkerPerfTest']);
 				});
 			})(this);
-    	</script>
+		</script>
 	</head>
 	<body>
 		<h1>Cassowary Unit + Perf Tests</h1>
