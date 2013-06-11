@@ -11,8 +11,10 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 	<head>
 		<meta charset="utf-8">
 		<title>Cassowary Javascript Tests</title>
+		<script src="../node_modules/intern/node_modules/dojo/dojo.js"></script>
+
+		<!-- Utility code to log results to the page. -->
 		<script>
-			// Utility code to log results to the page.
 			var append = function(n, h) { (h||document.body).appendChild(n); return n; };
 			var t = function(text) { return document.createTextNode(text); };
 			var el = function(type, html, text) {
@@ -29,43 +31,37 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 					append(t("\n"), pre);
 				}
 			};
-			// print = function(s) { console.log(s); }
 			var printLog = [];
 			print = function(s) { printLog.push(s); }
     	</script>
-		<script src="../node_modules/intern/node_modules/dojo/dojo.js"></script>
-		<script src="../src/c.js"></script>
-		<script>
-			// Configuration
-			// c.debug = true;
-			// c.verbose = true;
-			// c.trace = true;
-		</script>
-		<script src="../src/HashTable.js"></script>
-		<script src="../src/HashSet.js"></script>
-		<script src="../src/Error.js"></script>
-		<script src="../src/SymbolicWeight.js"></script>
-		<script src="../src/Strength.js"></script>
-		<script src="../src/Variable.js"></script>
-		<script src="../src/Point.js"></script>
-		<script src="../src/Expression.js"></script>
-		<script src="../src/Constraint.js"></script>
-		<script src="../src/EditInfo.js"></script>
-		<script src="../src/Tableau.js"></script>
-		<script src="../src/SimplexSolver.js"></script>
-		<script src="../src/parser/parser.js"></script>
-		<script src="../src/parser/api.js"></script>
 
-		<!-- Perf tests -->
-	    <script src="../src/Timer.js"></script>
-	    <script src="PerfTest.js"></script>
-	    <script>
-		    window.addEventListener("load", function() {
+    	<!-- Regular unit tests and performance tests -->
+		<script>
+			window.addEventListener("load", function() {
 		    	append(el("h2", "In-page perf test results:"));
 		    	append(el("pre", printLog.join("\n")));
 		    	printLog.length = 0;
 			}, false);
-	    </script>
+			
+			(function () {
+				require({
+					baseUrl: '../',
+					packages: [
+						{ name: 'intern', location: 'node_modules/intern' }
+					],
+					map: {
+						intern: {
+							dojo: 'intern/node_modules/dojo',
+							chai: 'intern/node_modules/chai/chai'
+						}
+					}
+				}, [ 'tests/deps', 'intern/client' ], function () {
+					require(['tests/PerfTest']);
+				});
+			})();
+		</script>
+
+		<!-- Worker performance tests -->
     	<script>
 	    	(function(scope) {
 		        // Load tests in a Worker to verify that they run there as well:
@@ -95,24 +91,6 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 				});
 			})(this);
     	</script>
-
-    	<!-- unit tests -->
-		<script>
-			(function () {
-				require({
-					baseUrl: '../',
-					packages: [
-						{ name: 'intern', location: 'node_modules/intern' }
-					],
-					map: {
-						intern: {
-							dojo: 'intern/node_modules/dojo',
-							chai: 'intern/node_modules/chai/chai'
-						}
-					}
-				}, [ 'intern/client' ]);
-			})();
-		</script>
 	</head>
 	<body>
 		<h1>Cassowary Unit + Perf Tests</h1>

@@ -8,7 +8,7 @@
 define([
 	'intern!bdd',
 	'intern/chai!assert',
-	'dojo/has!host-node?./deps'
+	'./deps'
 ], function (bdd, assert) {
 	'use strict';
 
