@@ -34,7 +34,7 @@
   "devDependencies": {
     "pegjs" : "*",
     "mocha":  "*",
-	  "chai":   "*"
+	  "chai":   "1.7.x"
   },
   "engines" : { "node" : ">=0.8.x" }
 }
