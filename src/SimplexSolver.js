@@ -916,6 +916,7 @@ c.SimplexSolver = c.inherit({
   _setExternalVariables: function() {
     if (c.trace) c.fnenterprint("_setExternalVariables:");
     if (c.trace) c.traceprint(this.toString());
+    var changed = {};
 
     // console.log("this._externalParametricVars:", this._externalParametricVars);
     this._externalParametricVars.each(function(v) {
@@ -924,6 +925,7 @@ c.SimplexSolver = c.inherit({
           console.log("Error: variable" + v + " in _externalParametricVars is basic");
       } else {
         v.value = 0;
+        changed[v.name] = 0;
       }
     }, this);
     // console.log("this._externalRows:", this._externalRows);
@@ -932,18 +934,32 @@ c.SimplexSolver = c.inherit({
       if (v.value != expr.constant) {
         // console.log(v.toString(), v.value, expr.constant);
         v.value = expr.constant;
-        // TODO(slightlyoff):
-        //    collect these into value-change records to be delivered async
+        changed[v.name] = expr.constant;
       }
       // if (c.trace) console.log("v == " + v);
       // if (c.trace) console.log("expr == " + expr);
     }, this);
+    this._changed = changed;
     this._fNeedsSolving = false;
+    this._informCallbacks();
     this.onsolved();
   },
 
   onsolved: function() {
     // Lifecycle stub. Here for dirty, dirty monkey patching.
+  },
+
+  _informCallbacks: function() {
+    if(!this._callbacks) return;
+
+    var changed = this._changed;
+    this._callbacks.forEach(function(fn) {
+      fn(changed);
+    });
+  },
+
+  _addCallback: function(fn) {
+    (this._callbacks || (this._callbacks = [])).push(fn);
   },
 
   insertErrorVar: function(cn /*c.Constraint*/, aVar /*c.AbstractVariable*/) {
