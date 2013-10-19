@@ -11,3 +11,4 @@ perf/v8.log
 out.prof
 /node_modules/*
 /dist/*
+/build/
