@@ -14,24 +14,24 @@ define([
 	var describe = bdd.describe,
 		it = bdd.it;
 
-	// NOTE: the below change-tracking code doesn't actually work yet!
-	return;
-
 	describe('new api', function () {
 		it('informs on variable changes', function () {
 			var changes = [];
 			c('a+b==c');
+      var a = c('a')[0];
+      var b = c('b')[0];
+
 			c(function (change) {
 				changes.push(change);
 			});
-			c('a==1');
-			c('b==0');
 
-			assert.equal(2, changes.length);
+			c('a=='+(a.value+1)); // forces and and b or c to change
+			assert.equal(1, changes.length);
+      assert.equal(2, Object.keys(changes[0]).length);
 			assert.property(changes[0], 'a');
-			assert.property(changes[0], 'b');
-			assert.property(changes[0], 'c');
 
+			c('b=='+(b.value+2)); // forces b and c to change
+      assert.equal(2, changes.length, "has length");
 			assert.property(changes[1], 'b');
 			assert.property(changes[1], 'c');
 		});
