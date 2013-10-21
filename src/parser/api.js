@@ -64,6 +64,8 @@ c._api = function() {
       // Parse and execute it
       var r = c.parser.parse(args[0]);
       return compile(r);
+    } else if(typeof args[0] == "function") {
+      solver._addCallback(args[0]);
     }
   }
 };

@@ -30,14 +30,14 @@ License
 -------
 
 Cassowary JS is licensed under the [Apache 2.0 license]
-(http://www.apache.org/licenses/LICENSE-2.0)
+(http://www.apache.org/licenses/LICENSE-2.0).
 
 Constraint Solver? Say What?
 ----------------------------
 
 Constraint solvers are iterative algorithms that work towards ever more ideal
 solutions, often using some variant of Dantzig's [simplex
-method](http://en.wikipedia.org/wiki/Simplex_algorithm). They are primarialy of
+method](http://en.wikipedia.org/wiki/Simplex_algorithm). They are primarily of
 interest in situations where it's possible to easily set up a set of rules
 which you would like a solution to adhere to, but when it is very difficult to
 consider all of the possible solutions yourself.
@@ -63,9 +63,9 @@ Web"](http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.101.4819)
 Getting Started Under Node
 --------------------------
 
-Cassowary is ["distributed as an NPM package"](https://npmjs.org/package/cassowary)
-and can be added as a dependency or used under node in the usual way as a
-result. Using Cassowary under node is as simple as:
+Cassowary is [distributed as an NPM package](https://npmjs.org/package/cassowary)
+and can be added as a dependency or used under node in the usual way.
+Using Cassowary under node is as simple as:
 
 ```js
 // The entire API is exported by the cassowary object
@@ -80,7 +80,7 @@ solver.addConstraint(eq);
 ```
 
 The current low (sub 0.1) version number reflects the instability of the API.
-Also, note that the NPM pacakage includes no tests or demos. For those, clone
+Also, note that the NPM package includes no tests or demos. For those, clone
 the github repo.
 
 To make an NPM package from sources, clone the github repo, follow the below
@@ -108,12 +108,14 @@ $ npm install
 ...
 $ npm test
 
-> cassowary@0.0.1 test /Users/alex/projects/cassowary-js-refactor
-> cd tests; mocha *-test.js
+> cassowary@0.0.2 test /Users/bitpshr/Projects/cassowary.js
+> node node_modules/intern/client.js config=tests/intern
 
-  ...
+Defaulting to "console" reporter
 
-  116/116 tests passed
+...
+
+121/122 tests passed
 ```
 
 If you have a working `make`, a Makefile is provided with a `test` target that
@@ -139,8 +141,8 @@ This refactoring currently runs in:
     * JSC (built into OS X)
     * Rhino (Java) js.jar included in checkout
 
-This is an unapolgetically modern reinterpretation optimized for size, low
-complexity, and speed. And litle else. No, it will not work on old versions of
+This is an unapologetically modern reinterpretation optimized for size, low
+complexity, and speed. And little else. No, it will not work on old versions of
 IE -- that's what [Chrome Frame](http://google.com/chromeframe) is for.
 
 Configuration

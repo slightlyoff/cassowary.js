@@ -12,5 +12,5 @@ define([
 	'./Constraint-test',
 	'./c-test',
 	'./parser/smoketest',
-	'./parser/api'
+	'./parser/apitest'
 ], function () {});

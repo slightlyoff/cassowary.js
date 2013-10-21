@@ -13,3 +13,4 @@ out.prof
 /dist/*
 lcov.info
 sauce_connect.log*
+/build/
