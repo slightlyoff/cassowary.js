@@ -91,10 +91,11 @@ Getting Started From Source
 ---------------------------
 
 This repo pulls in other Git repositories through
-[submodules](http://help.github.com/submodules/). After cloning the repo, run:
+[submodules](http://help.github.com/submodules/) and pulls in [intern](http://theintern.io) for testing via npm. After cloning the repo, run:
 
 ```
 $ git submodule update --init
+$ npm install
 ...
 ```
 
@@ -104,8 +105,6 @@ Running tests from the command line requires [Node](http://nodejs.org/). Once
 you've installed Node, run:
 
 ```
-$ npm install
-...
 $ npm test
 
 > cassowary@0.0.2 test /Users/bitpshr/Projects/cassowary.js
