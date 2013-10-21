@@ -27,14 +27,12 @@
     }
   ],
   "scripts": {
-    "test": "cd tests; mocha *-test.js; cd parser; mocha *test.js"
+    "test": "node node_modules/intern/client.js config=tests/intern"
   },
-  "dependencies": {
-  },
+  "dependencies": { },
   "devDependencies": {
     "pegjs" : "*",
-    "mocha":  "*",
-	  "chai":   "1.7.x"
+	  "intern": "1.2.1"
   },
   "engines" : { "node" : ">=0.8.x" }
 }

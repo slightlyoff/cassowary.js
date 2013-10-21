@@ -91,31 +91,30 @@ Getting Started From Source
 ---------------------------
 
 This repo pulls in other Git repositories through
-[submodules](http://help.github.com/submodules/). After cloning the repo, run:
+[submodules](http://help.github.com/submodules/) and pulls in [intern](http://theintern.io) for testing via npm. After cloning the repo, run:
 
 ```
 $ git submodule update --init
+$ npm install
 ...
 ```
 
-To run the tests, point your thorougly modern browser at `tests/unittests.html`
-or `demos/quad/quaddemo.html`.
+To run the tests, point your thorougly modern browser at `tests/unittests.html?config=tests/intern` and view the console. You can also check out `demos/quad/quaddemo.html`.
 
 Running tests from the command line requires [Node](http://nodejs.org/). Once
 you've installed Node, run:
 
 ```
-$ npm install
-...
 $ npm test
 
-> cassowary@0.0.1 test /Users/alex/projects/cassowary-js-refactor
-> cd tests; mocha *-test.js
+> cassowary@0.0.2 test /Users/bitpshr/Projects/cassowary.js
+> node node_modules/intern/client.js config=tests/intern
 
+Defaulting to "console" reporter
 
-  ․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․
+...
 
-  89 tests complete (38 ms)
+121/122 tests passed
 ```
 
 If you have a working `make`, a Makefile is provided with a `test` target that

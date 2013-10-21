@@ -11,4 +11,6 @@ perf/v8.log
 out.prof
 /node_modules/*
 /dist/*
+lcov.info
+sauce_connect.log*
 /build/
