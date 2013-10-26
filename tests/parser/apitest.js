@@ -14,26 +14,29 @@ define([
 	var describe = bdd.describe,
 		it = bdd.it;
 
-	// NOTE: the below change-tracking code doesn't actually work yet!
-	return;
-
 	describe('new api', function () {
 		it('informs on variable changes', function () {
+			console.log("!!!starting api test!!!")
+			c._reset();
 			var changes = [];
-			c('a+b==c');
-			c(function (change) {
+			var callback = function (change) {
 				changes.push(change);
-			});
+			};
+			c(callback);
+
+			c('a+b==c');
 			c('a==1');
 			c('b==0');
 
-			assert.equal(2, changes.length);
-			assert.property(changes[0], 'a');
-			assert.property(changes[0], 'b');
-			assert.property(changes[0], 'c');
+			// FIXME: will be in one array and delivered outside this call stack.
+			// Test should return a promise resolved with these assertions inside callback.
 
-			assert.property(changes[1], 'b');
-			assert.property(changes[1], 'c');
+			assert.equal(3, changes[0].length);
+			assert.deepEqual(["new a", "new b", "new c"], changes[0].map(function(record){ return record.type + " " + record.name; }).sort());
+
+			assert.deepEqual(["updated a", "updated b"], changes[1].map(function(record){ return record.type + " " + record.name }).sort());
+
+			assert.deepEqual(["updated b", "updated c"], changes[2].map(function(record){ return record.type + " " + record.name }).sort());
 		});
 	});
 });

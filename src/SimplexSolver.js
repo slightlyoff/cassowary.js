@@ -39,6 +39,9 @@ c.SimplexSolver = c.inherit({
     this._stkCedcns = [0]; // Stack
     if (c.trace)
       c.traceprint("objective expr == " + this.rows.get(this._objective));
+
+    this.externalState = {};
+    this._observers = [];
   },
 
   addLowerBound: function(v /*c.AbstractVariable*/, lower /*double*/) {
@@ -916,7 +919,7 @@ c.SimplexSolver = c.inherit({
   _setExternalVariables: function() {
     if (c.trace) c.fnenterprint("_setExternalVariables:");
     if (c.trace) c.traceprint(this.toString());
-    var changed = {};
+    var externalState = {};
 
     // console.log("this._externalParametricVars:", this._externalParametricVars);
     this._externalParametricVars.each(function(v) {
@@ -925,7 +928,7 @@ c.SimplexSolver = c.inherit({
           console.log("Error: variable" + v + " in _externalParametricVars is basic");
       } else {
         v.value = 0;
-        changed[v.name] = 0;
+        externalState[v.name] = 0;
       }
     }, this);
     // console.log("this._externalRows:", this._externalRows);
@@ -934,14 +937,13 @@ c.SimplexSolver = c.inherit({
       if (v.value != expr.constant) {
         // console.log(v.toString(), v.value, expr.constant);
         v.value = expr.constant;
-        changed[v.name] = expr.constant;
       }
+      externalState[v.name] = v.value;
       // if (c.trace) console.log("v == " + v);
       // if (c.trace) console.log("expr == " + expr);
     }, this);
-    this._changed = changed;
+    this._queueChanges(externalState);
     this._fNeedsSolving = false;
-    this._informCallbacks();
     this.onsolved();
   },
 
@@ -949,17 +951,53 @@ c.SimplexSolver = c.inherit({
     // Lifecycle stub. Here for dirty, dirty monkey patching.
   },
 
-  _informCallbacks: function() {
-    if(!this._callbacks) return;
+  _queueChanges: function(newState) {
+    console.log("finding changes between", this.externalState, newState);
+    var previousState = this.externalState;
+    this.externalState = newState;
 
-    var changed = this._changed;
-    this._callbacks.forEach(function(fn) {
-      fn(changed);
-    });
+    if(this._observers.length > 0) {
+      var changes = [];
+
+      Object.keys(newState).forEach(function(key) {
+        if(key in previousState) {
+          if(previousState[key] != newState[key]) {
+            changes.push({ type: "updated", name: key, object: this, oldValue: previousState[key] });
+          }
+          delete previousState[key];
+        } else {
+          changes.push({ type: "new", name: key, object: this })
+        }
+      }, this);
+
+      Object.keys(previousState).forEach(function(key) {
+        changes.push({ type: "deleted", name: key, object: this });
+      }, this);
+
+      this._observers.forEach(function(o){ 
+        o._pendingChangeRecords = o._pendingChangeRecords.concat(changes);
+      });
+    }
+
+    // FIXME: should be setting up a promise to deliver at end of call stack
+    this.informObservers();
   },
 
-  _addCallback: function(fn) {
-    (this._callbacks || (this._callbacks = [])).push(fn);
+  informObservers: function() {
+    this._observers.forEach(function (observer) {
+      var records = observer._pendingChangeRecords
+      observer._pendingChangeRecords = [];
+      observer(records);
+    }, this);
+  },
+
+  observe: function(callback) {
+    if (typeof callback !== "function") {
+      throw new TypeError("Solver observers must be functions.")
+    }
+
+    callback._pendingChangeRecords = [];
+    this._observers.push(callback);
   },
 
   insertErrorVar: function(cn /*c.Constraint*/, aVar /*c.AbstractVariable*/) {
