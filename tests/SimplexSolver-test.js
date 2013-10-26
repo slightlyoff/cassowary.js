@@ -24,5 +24,10 @@ define([
 		describe('addPointStays', function () {
 
 		});
+
+		describe('#observe', function () {
+			var solver = c.SimplexSolver();
+			var eq = 2;
+		});
 	});
 });

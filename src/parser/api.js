@@ -65,9 +65,13 @@ c._api = function() {
       var r = c.parser.parse(args[0]);
       return compile(r);
     } else if(typeof args[0] == "function") {
-      solver._addCallback(args[0]);
+      solver.observe(args[0]);
     }
   }
 };
+
+c._reset = function() {
+  solver = new c.SimplexSolver();
+}
 
 })(this["c"]||module.parent.exports||{});
