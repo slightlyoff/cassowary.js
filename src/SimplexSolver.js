@@ -113,10 +113,10 @@ c.SimplexSolver = c.inherit({
     }
   },
 
-  addEditVar: function(v /*c.Variable*/, strength /*c.Strength*/) {
-    c.trace && c.fnenterprint("addEditVar: " + v + " @ " + strength);
+  addEditVar: function(v /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
+    c.trace && c.fnenterprint("addEditVar: " + v + " @ " + strength + " {" + weight + "}");
     return this.addConstraint(
-        new c.EditConstraint(v, strength || c.Strength.strong));
+        new c.EditConstraint(v, strength || c.Strength.strong, weight));
   },
 
   beginEdit: function() {
