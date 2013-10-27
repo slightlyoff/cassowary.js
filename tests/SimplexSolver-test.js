@@ -44,6 +44,35 @@ define([
 
       assert.equal(2, a.value);
     });
+    it("works with required strength after many suggestions", function() {
+      var solver = new c.SimplexSolver();
+      var a = new c.Variable({
+        name: "a"
+      });
+      var b = new c.Variable({
+        name: "b"
+      });
+
+      solver.addConstraint(new c.StayConstraint(a, c.Strength.strong, 0))
+        .addConstraint(new c.Equation(a,b,c.Strength.required))
+        .resolve();
+      assert.equal(0, b.value);
+      assert.equal(0, a.value);
+
+      solver.addEditVar(a, c.Strength.required)
+        .beginEdit()
+        .suggestValue(a, 2)
+        .resolve();
+
+      assert.equal(2, a.value);
+      assert.equal(2, b.value);
+      
+      solver.suggestValue(a, 10)
+        .resolve();
+        
+      assert.equal(10, a.value);
+      assert.equal(10, b.value);
+    });
 		it('works with weight', function () {
 			var x = new c.Variable({ name: 'x' });
 			var y = new c.Variable({ name: 'y' });
