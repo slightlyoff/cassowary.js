@@ -351,12 +351,21 @@ c.SimplexSolver = c.inherit({
   suggestValue: function(v /*c.Variable*/, x /*double*/) {
     c.trace && console.log("suggestValue(" + v + ", " + x + ")");
     var cei = this._editVarMap.get(v);
-    if (!cei) {
-      throw new c.Error("suggestValue for variable " + v + ", but var is not an edit variable");
-    }
-    var delta = x - cei.prevEditConstant;
-    cei.prevEditConstant = x;
-    this.deltaEditConstant(delta, cei.editPlus, cei.editMinus);
+     if (!cei) {
+       throw new c.Error("suggestValue for variable " + v + ", but var is not an edit variable");
+     } 
+     if (!cei.editPlus && !cei.editMinus) {
+       // dealing with a required editVar: this is not right
+       var row = this.rows.get(v);
+       row.constant = x;
+       if (x<0) {
+         this._infeasibleRows.add(row);
+       }
+     } else {
+       var delta = x - cei.prevEditConstant;
+       cei.prevEditConstant = x;
+       this.deltaEditConstant(delta, cei.editPlus, cei.editMinus);
+     }    
     return this;
   },
 

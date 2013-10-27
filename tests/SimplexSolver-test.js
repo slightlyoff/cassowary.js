@@ -25,4 +25,38 @@ define([
 
 		});
 	});
+  describe("addEditVar", function() {
+    it("works with required strength", function() {
+      var solver = new c.SimplexSolver();
+      var a = new c.Variable({
+        name: "a"
+      });
+
+      solver.addConstraint(new c.StayConstraint(a, c.Strength.strong, 0));
+      solver.resolve();
+
+      assert.equal(0, a.value);
+
+      solver.addEditVar(a, c.Strength.required)
+        .beginEdit()
+        .suggestValue(a, 2)
+        .resolve();
+
+      assert.equal(2, a.value);
+    });
+		it('works with weight', function () {
+			var x = new c.Variable({ name: 'x' });
+			var y = new c.Variable({ name: 'y' });
+			var solver = new c.SimplexSolver();
+			solver.addStay(x).addStay(y)
+      .addConstraint(new c.Equation(x, y, c.Strength.required))
+			.addEditVar(x,c.Strength.medium,1)
+			.addEditVar(y,c.Strength.medium,10).beginEdit();
+			solver.suggestValue(x, 10)
+			.suggestValue(y, 20)
+      solver.resolve();
+			assert.isTrue(c.approx(x, 20));
+			assert.isTrue(c.approx(y, 20));
+		});        
+  });
 });
