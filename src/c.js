@@ -255,7 +255,7 @@ c.approx = function(a /*double*/, b /*double*/) {
   return (Math.abs(av - bv) < Math.abs(av) * epsilon);
 };
 
-var count = 0;
+var count = 1;
 c._inc = function() { return count++; };
 
 c.parseJSON = function(str) {
