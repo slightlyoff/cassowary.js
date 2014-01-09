@@ -8,8 +8,7 @@ others, and Cassowary figures out an optimal solution based on the current
 inputs. When the inputs or constraints change, Cassowary is particularly
 efficient at computing a new answer quickly based on the last-known solution.
 These properties together make it ideal for use in layout systems -- indeed,
-it's the algorithm at the center of Apple's new automatic layout system for
-Cocoa.
+it's the algorithm at the center of Apple's new [Auto Layout system for iOS & OS X](https://developer.apple.com/library/ios/documentation/userexperience/conceptual/AutolayoutPG/Introduction/Introduction.html).
 
 This repo hosts an improved version of [Greg Badros's
 port](http://www.badros.com/greg/cassowary/js/quaddemo.html "JS Quad Demo") of
