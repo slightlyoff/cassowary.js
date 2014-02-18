@@ -10,13 +10,14 @@
 "use strict";
 
 c.Expression = c.inherit({
+
   initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
     if (c.GC) console.log("new c.Expression");
-    this.constant = (typeof constant == "number" && !isNaN(constant)) ? constant : 0;
+    this.constant = c.checkNumber(constant, 0);
     this.terms = new c.HashTable();
 
     if (clv instanceof c.AbstractVariable) {
-      this.setVariable(clv, typeof value == 'number' ? value : 1);
+      this.setVariable(clv, c.checkNumber(value, 1) );
     } else if (typeof clv == "number") {
       if (!isNaN(clv)) {
         this.constant = clv;
@@ -113,7 +114,7 @@ c.Expression = c.inherit({
       expr = new c.Expression(expr);
       if(c.trace) console.log("addExpression: Had to cast a var to an expression");
     }
-    n = n || 1;
+    n = c.checkNumber(n, 1);
     this.constant += (n * expr.constant);
     expr.terms.each(function(clv, coeff) {
       // console.log("clv:", clv, "coeff:", coeff, "subject:", subject);
