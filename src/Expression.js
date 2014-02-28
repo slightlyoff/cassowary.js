@@ -181,7 +181,6 @@ c.Expression = c.inherit({
       c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
       c.traceprint("this = " + this);
     }
-
     var setVariable = this.setVariable.bind(this);
     var terms = this.terms;
     var multiplier = terms.get(outvar);
@@ -202,10 +201,10 @@ c.Expression = c.inherit({
           solver.noteRemovedVariable(clv, subject);
           terms.delete(clv);
         } else {
-          setVariable(clv, newCoefficient);
+          terms.set(clv, newCoefficient);
         }
       } else {
-        setVariable(clv, multiplier * coeff);
+        terms.set(clv, multiplier * coeff);
         if (solver) {
           solver.noteAddedVariable(clv, subject);
         }
