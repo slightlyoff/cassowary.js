@@ -50,11 +50,22 @@ var fireType = function(type) {
 
 var fireSolved = fireType("solved");
 var preventFireSolved = false;
+var fireSolvedScheduled = false;
+var runAndResetFireSolvedScheduled = function() {
+  fireSolved();
+  fireSolvedScheduled = false;
+};
 
 // Create a global solver
 var s = document.solver = c.extend(new c.SimplexSolver(), {
   onsolved: function() {
-    if(!preventFireSolved) fireSolved();
+    if(!preventFireSolved) {
+      if(!fireSolvedScheduled) {
+        fireSolvedScheduled = true;
+        window.rAF(runAndResetFireSolvedScheduled);
+      }
+    }
+
   }
 });
 s.autoSolve = false;
@@ -112,7 +123,7 @@ var listSetter = function(l, name, own, relativeTo, oper, strength, weight) {
 
 var valueSetter = function(item, varOrValue, oper, strength, weight) {
   var slot = "_" + item;
-  console.log("valueSetter:", slot, varOrValue, oper+"", strength+"", weight+"");
+  // console.log("valueSetter:", slot, varOrValue, oper+"", strength+"", weight+"");
   if (typeof varOrValue == "string") {
     if (typeof this[slot] == "boolean") {
       varOrValue = (varOrValue == "true");
