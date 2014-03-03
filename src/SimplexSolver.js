@@ -188,15 +188,10 @@ c.SimplexSolver = c.inherit({
     return this.addConstraint(cn);
   },
 
-  // FIXME(slightlyoff): need a removeStay!
+  // FIXME(slightlyoff): add a removeStay
 
   removeConstraint: function(cn /*c.Constraint*/) {
-    this.removeConstraintInternal(cn);
-    return this;
-  },
-
-  removeConstraintInternal: function(cn /*c.Constraint*/) {
-    // print("removeConstraintInternal('" + cn + "')");
+    // console.log("removeConstraint('", cn, "')");
     c.trace && c.fnenterprint("removeConstraintInternal: " + cn);
     c.trace && c.traceprint(this.toString());
     this._needsSolving = true;
@@ -490,14 +485,16 @@ c.SimplexSolver = c.inherit({
       if (foundUnrestricted) {
         if (!v.isRestricted) {
           if (!this.columnsHasKey(v)) {
-            return {retval: v};
+            return { retval: v };
           }
         }
       } else {
         if (v.isRestricted) {
           if (!foundNewRestricted && !v.isDummy && c < 0) {
             var col = this.columns.get(v);
-            if (col == null || (col.size == 1 && this.columnsHasKey(this._objective))) {
+            if (col == null ||
+                (col.size == 1 && this.columnsHasKey(this._objective))
+            ) {
               subject = v;
               foundNewRestricted = true;
             }
@@ -508,10 +505,13 @@ c.SimplexSolver = c.inherit({
         }
       }
     }, this);
-    if (rv && rv.retval !== undefined) return rv.retval;
+    if (rv && rv.retval !== undefined) {
+      return rv.retval;
+    }
 
-    if (subject != null)
+    if (subject != null) {
       return subject;
+    }
 
     var coeff = 0;
 
