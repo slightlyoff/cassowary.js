@@ -31,12 +31,12 @@ c.SimplexSolver = c.inherit({
     this._artificialCounter = 0;
     this._dummyCounter = 0;
     this.autoSolve = true;
-    this._fNeedsSolving = false;
+    this._needsSolving = false;
 
     this._optimizeCount = 0;
 
     this.rows.set(this._objective, new c.Expression());
-    this._stkCedcns = [0]; // Stack
+    this._editVariableStack = [0]; // Stack
     if (c.trace)
       c.traceprint("objective expr == " + this.rows.get(this._objective));
   },
@@ -65,7 +65,6 @@ c.SimplexSolver = c.inherit({
   },
 
   addConstraint: function(cn /*c.Constraint*/) {
-    // console.log("addConstraint: " + cn);
     if (c.trace) c.fnenterprint("addConstraint: " + cn);
     var eplus_eminus = new Array(2);
     var prevEConstant = new Array(1); // so it can be output to
@@ -77,7 +76,7 @@ c.SimplexSolver = c.inherit({
     }
 
 
-    this._fNeedsSolving = true;
+    this._needsSolving = true;
     if (cn.isEditConstraint) {
       var i = this._editVarMap.size;
       var cvEplus = /* c.SlackVariable */eplus_eminus[0];
@@ -124,7 +123,7 @@ c.SimplexSolver = c.inherit({
     c.assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
     this._infeasibleRows.clear();
     this._resetStayConstants();
-    this._stkCedcns.push(this._editVarMap.size);
+    this._editVariableStack.push(this._editVarMap.size);
     return this;
   },
 
@@ -132,9 +131,9 @@ c.SimplexSolver = c.inherit({
     // FIXME(slightlyoff): we shouldn't throw here. Log instead
     c.assert(this._editVarMap.size > 0, "_editVarMap.size > 0");
     this.resolve();
-    this._stkCedcns.pop();
+    this._editVariableStack.pop();
     this.removeEditVarsTo(
-      this._stkCedcns[this._stkCedcns.length - 1]
+      this._editVariableStack[this._editVariableStack.length - 1]
     );
     return this;
   },
@@ -200,7 +199,7 @@ c.SimplexSolver = c.inherit({
     // print("removeConstraintInternal('" + cn + "')");
     if (c.trace) c.fnenterprint("removeConstraintInternal: " + cn);
     if (c.trace) c.traceprint(this.toString());
-    this._fNeedsSolving = true;
+    this._needsSolving = true;
     this._resetStayConstants();
     var zRow = this.rows.get(this._objective);
     var eVars = /* Set */this._errorVars.get(cn);
@@ -361,7 +360,7 @@ c.SimplexSolver = c.inherit({
   },
 
   solve: function() {
-    if (this._fNeedsSolving) {
+    if (this._needsSolving) {
       this.optimize(this._objective);
       this._setExternalVariables();
     }
@@ -430,10 +429,6 @@ c.SimplexSolver = c.inherit({
     bstr += "_editVarMap:\n" + this._editVarMap;
     bstr += "\n";
     return bstr;
-  },
-
-  getConstraintMap: function() {
-    return this._markerVars;
   },
 
   addWithArtificialVariable: function(expr /*c.Expression*/) {
@@ -907,12 +902,16 @@ c.SimplexSolver = c.inherit({
   // Reset the Constant in this Expression to 0.
   _resetStayConstants: function() {
     c.trace && console.log("_resetStayConstants");
-    for (var i = 0; i < this._stayPlusErrorVars.length; i++) {
-      var expr = this.rows.get(/* c.AbstractVariable */this._stayPlusErrorVars[i]);
-      if (expr == null)
-        expr = this.rows.get(/* c.AbstractVariable */this._stayMinusErrorVars[i]);
-      if (expr != null)
+    var spev = this._stayPlusErrorVars;
+    var l = spev.length;
+    for (var i = 0; i < l; i++) {
+      var expr = this.rows.get(spev[i]);
+      if (expr === null) {
+        expr = this.rows.get(this._stayMinusErrorVars[i]);
+      }
+      if (expr != null) {
         expr.constant = 0;
+      }
     }
   },
 
@@ -943,7 +942,7 @@ c.SimplexSolver = c.inherit({
       // if (c.trace) console.log("expr == " + expr);
     }, this);
     this._changed = changed;
-    this._fNeedsSolving = false;
+    this._needsSolving = false;
     this._informCallbacks();
     this.onsolved();
   },
