@@ -48,24 +48,32 @@ var fireType = function(type) {
   }
 };
 
+var nextRAFList = [];
+var runOnNextRAFScheduled = false;
+var _runOnNextRAF = function() {
+  runOnNextRAFScheduled = false;
+  var i = nextRAFList.pop();
+  while(i) {
+    i();
+    i = nextRAFList.pop();
+  }
+};
+var runOnNextRAF = function(f, preventDupe) {
+  if(!preventDupe || nextRAFList.indexOf(f) == -1) {
+    nextRAFList.push(f);
+  }
+  if(!runOnNextRAFScheduled) {
+    runOnNextRAFScheduled = true;
+    window.rAF(_runOnNextRAF);
+  }
+};
 var fireSolved = fireType("solved");
 var preventFireSolved = false;
-var fireSolvedScheduled = false;
-var runAndResetFireSolvedScheduled = function() {
-  fireSolved();
-  fireSolvedScheduled = false;
-};
 
 // Create a global solver
 var s = document.solver = c.extend(new c.SimplexSolver(), {
   onsolved: function() {
-    if(!preventFireSolved) {
-      if(!fireSolvedScheduled) {
-        fireSolvedScheduled = true;
-        window.rAF(runAndResetFireSolvedScheduled);
-      }
-    }
-
+    if(!preventFireSolved) { runOnNextRAF(fireSolved, true); }
   }
 });
 s.autoSolve = false;
@@ -827,7 +835,7 @@ scope.RootPanel = c.inherit({
     var frame = 0;
     var resizeNextFrame = function() {
       var f = frame++;
-      window.rAF(function() {
+      runOnNextRAF(function() {
         if (f == frame-1) {
           reCalc();
         }
