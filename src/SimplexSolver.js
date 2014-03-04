@@ -267,7 +267,7 @@ c.SimplexSolver = c.inherit({
           col.escapingEach(function(v) {
             if (v != this._objective) {
               exitVar = v;
-              return {brk:true};
+              return { brk: true };
             }
           }, this);
         }
