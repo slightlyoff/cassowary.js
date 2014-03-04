@@ -198,6 +198,10 @@ c.assert = function(f /*boolean*/, description /*String*/) {
   }
 };
 
+c.checkNumber = function(value, otherwise){
+  return (typeof value === "number" && !isNaN(value)) ? value : otherwise;
+};
+
 c.plus = function(e1, e2) {
   if (!(e1 instanceof c.Expression)) {
     e1 = new c.Expression(e1);
