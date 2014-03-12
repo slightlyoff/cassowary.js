@@ -41,22 +41,6 @@ c.SimplexSolver = c.inherit({
       c.traceprint("objective expr == " + this.rows.get(this._objective));
   },
 
-  addLowerBound: function(v /*c.AbstractVariable*/, lower /*double*/) {
-    var cn = new c.Inequality(v, c.GEQ, new c.Expression(lower));
-    return this.addConstraint(cn);
-  },
-
-  addUpperBound: function(v /*c.AbstractVariable*/, upper /*double*/) {
-    var cn = new c.Inequality(v, c.LEQ, new c.Expression(upper));
-    return this.addConstraint(cn);
-  },
-
-  addBounds: function(v /*c.AbstractVariable*/, lower /*double*/, upper /*double*/) {
-    this.addLowerBound(v, lower);
-    this.addUpperBound(v, upper);
-    return this;
-  },
-
   add: function(/*c.Constraint, ...*/) {
     for (var x = 0; x < arguments.length; x++) {
       this.addConstraint(arguments[x]);
