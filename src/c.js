@@ -204,6 +204,7 @@ var exprFromVarOrValue = function(v) {
   } else if(v instanceof c.Variable) {
     return c.Expression.fromVariable(v);
   }
+  return v;
 };
 
 c.plus = function(e1, e2) {

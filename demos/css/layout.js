@@ -322,10 +322,10 @@ var MeasuredBox = c.inherit({
 
 var Box = c.inherit({
   initialize: function(top, left, right, bottom) {
-    this._top =    cv(top||0);
-    this._left =   cv(left||0);
-    this._right =  cv(right||0);
-    this._bottom = cv(bottom||0);
+    this._top =    cv("_top", top||0);
+    this._left =   cv("_left", left||0);
+    this._right =  cv("_right", right||0);
+    this._bottom = cv("_bottom", bottom||0);
   },
   get top()    {
     // console.log("top:", this._top.value);

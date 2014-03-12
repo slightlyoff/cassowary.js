@@ -48,7 +48,8 @@ scope.toCamelCase = function(str) {
 };
 
 var callOrOnload = function(obj, cb) {
-  if(obj.document.readyState == "complete") {
+  var doc = obj.document||obj.contentDocument;
+  if(doc && doc.readyState == "complete") {
     cb();
   } else {
     obj.addEventListener("load", cb);
@@ -59,7 +60,7 @@ scope.ready = function(cb, d) {
   cb = cb || function(){};
   if (d) { // id of an iframe
     if (typeof d == "string") {
-      var f = scope.frames[d]||document.getElementById(d).contentWindow;
+      var f = scope.frames[d] || document.getElementById(d).contentDocument;
       callOrOnload(f, cb);
     } else {
       callOrOnload(d, cb);
