@@ -48,6 +48,26 @@ c.SimplexSolver = c.inherit({
     return this;
   },
 
+  _addEditConstraint: function(cn, eplus_eminus, prevEConstant) {
+      var i = this._editVarMap.size;
+      var cvEplus = /* c.SlackVariable */eplus_eminus[0];
+      var cvEminus = /* c.SlackVariable */eplus_eminus[1];
+      /*
+      if (!cvEplus instanceof c.SlackVariable) {
+        console.warn("cvEplus not a slack variable =", cvEplus);
+      }
+      if (!cvEminus instanceof c.SlackVariable) {
+        console.warn("cvEminus not a slack variable =", cvEminus);
+      }
+      c.debug && console.log("new c.EditInfo(" + cn + ", " + cvEplus + ", " +
+                                  cvEminus + ", " + prevEConstant + ", " +
+                                  i +")");
+      */
+      var ei = new c.EditInfo(cn, cvEplus, cvEminus, prevEConstant, i)
+      this._editVarMap.set(cn.variable, ei);
+      this._editVarList[i] = { v: cn.variable, info: ei };
+  },
+
   addConstraint: function(cn /*c.Constraint*/) {
     c.trace && c.fnenterprint("addConstraint: " + cn);
     var eplus_eminus = new Array(2);
@@ -62,21 +82,7 @@ c.SimplexSolver = c.inherit({
 
     this._needsSolving = true;
     if (cn.isEditConstraint) {
-      var i = this._editVarMap.size;
-      var cvEplus = /* c.SlackVariable */eplus_eminus[0];
-      var cvEminus = /* c.SlackVariable */eplus_eminus[1];
-      if (!cvEplus instanceof c.SlackVariable) {
-        console.warn("cvEplus not a slack variable =", cvEplus);
-      }
-      if (!cvEminus instanceof c.SlackVariable) {
-        console.warn("cvEminus not a slack variable =", cvEminus);
-      }
-      c.debug && console.log("new c.EditInfo(" + cn + ", " + cvEplus + ", " +
-                                  cvEminus + ", " + prevEConstant + ", " +
-                                  i +")");
-      var ei = new c.EditInfo(cn, cvEplus, cvEminus, prevEConstant, i)
-      this._editVarMap.set(cn.variable, ei);
-      this._editVarList[i] = { v: cn.variable, info: ei };
+      this._addEditConstraint(cn, eplus_eminus, prevEConstant);
     }
     if (this.autoSolve) {
       this.optimize(this._objective);

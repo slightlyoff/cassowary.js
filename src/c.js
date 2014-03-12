@@ -247,9 +247,8 @@ c.divide = function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
 
 c.approx = function(a /*double*/, b /*double*/) {
   if (a === b) { return true; }
-  var av, bv;
-  av = (a instanceof c.Variable) ? a.value : a;
-  bv = (b instanceof c.Variable) ? b.value : b;
+  var av = +(a);
+  var bv = +(b);
   if (av == 0) {
     return (Math.abs(bv) < epsilon);
   }
