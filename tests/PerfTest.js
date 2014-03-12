@@ -138,7 +138,7 @@ var PerfTest = c.inherit({
     }
     var rgpclv = new Array(nVars+1);
     for (var i = 0; i < nVars + 1; ++i) {
-      rgpclv[i] = new c.Variable({ name: i, value: "x" });
+      rgpclv[i] = new c.Variable({ name: i, prefix: "x" });
       for (var is = 0; is < nSolvers + 1; ++is) {
         rgsolvers[is].addStay(rgpclv[i]);
       }
@@ -153,7 +153,8 @@ var PerfTest = c.inherit({
     for (j = 0; j < nCnsMade; ++j) {
       nvs = this.RandomInRange(1, maxVars);
       if (this.trace) this.traceprint("Using nvs = " + nvs);
-      var expr = new c.Expression(this.GrainedUniformRandom() * 20.0 - 10.0);
+      var expr = c.Expression.fromConstant(
+                                    this.GrainedUniformRandom() * 20.0 - 10.0);
       for (k = 0; k < nvs; k++) {
         coeff = this.GrainedUniformRandom() * 10 - 5;
         var iclv = this.RandomInRange(0, nVars);

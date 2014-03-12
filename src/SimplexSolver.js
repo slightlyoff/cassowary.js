@@ -35,7 +35,7 @@ c.SimplexSolver = c.inherit({
 
     this._optimizeCount = 0;
 
-    this.rows.set(this._objective, new c.Expression());
+    this.rows.set(this._objective, c.Expression.empty());
     this._editVariableStack = [0]; // Stack
     if (c.trace)
       c.traceprint("objective expr == " + this.rows.get(this._objective));
@@ -608,8 +608,9 @@ c.SimplexSolver = c.inherit({
   // Normalize if necessary so that the Constant is non-negative.  If
   // the constraint is non-required give its error variables an
   // appropriate weight in the objective function.
-  newExpression: function(cn /*c.Constraint*/, /** outputs to **/
-                          eplus_eminus /*Vector*/, prevEConstant /*ClDouble*/) {
+  newExpression: function(cn /*c.Constraint*/,
+                          /** outputs to **/ eplus_eminus /*Array*/,
+                          prevEConstant) {
     if (c.trace) {
       c.fnenterprint("newExpression: " + cn);
       c.traceprint("cn.isInequality == " + cn.isInequality);
@@ -617,7 +618,7 @@ c.SimplexSolver = c.inherit({
     }
 
     var cnExpr = cn.expression;
-    var expr = new c.Expression(cnExpr.constant);
+    var expr = c.Expression.fromConstant(cnExpr.constant);
     var slackVar = new c.SlackVariable();
     var dummyVar = new c.DummyVariable();
     var eminus = new c.SlackVariable();

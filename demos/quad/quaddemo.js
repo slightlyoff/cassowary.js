@@ -83,49 +83,43 @@ var QuadDemo = c.inherit({
     var cle, cleq;
 
     // Add constraints to keep midpoints at line midpoints
-    cle = new c.Expression(db[0].x);
-    cle = (cle.plus(db[1].x)).divide(2);
+    // cle = new c.Expression(db[0].x);
+    cle = c.Expression.fromConstant(db[0].x).plus(db[1].x).divide(2);
     cleq = new c.Equation(mp[0].x, cle);
 
     solver.addConstraint(cleq);
 
-    cle = new c.Expression(db[0].y);
-    cle = (cle.plus(db[1].y)).divide(2);
+    cle = c.Expression.fromConstant(db[0].y).plus(db[1].y).divide(2);
     cleq = new c.Equation(mp[0].y, cle);
 
     solver.addConstraint(cleq);
 
-    cle = new c.Expression(db[1].x);
-    cle = (cle.plus(db[2].x)).divide(2);
+    cle = c.Expression.fromConstant(db[1].x).plus(db[2].x).divide(2);
     cleq = new c.Equation(mp[1].x, cle);
 
     solver.addConstraint(cleq);
-    cle = new c.Expression(db[1].y);
-    cle = (cle.plus(db[2].y)).divide(2);
+
+    cle = c.Expression.fromConstant(db[1].y).plus(db[2].y).divide(2);
     cleq = new c.Equation(mp[1].y, cle);
 
     solver.addConstraint(cleq);
 
-    cle = new c.Expression(db[2].x);
-    cle = (cle.plus(db[3].x)).divide(2);
+    cle = c.Expression.fromConstant(db[2].x).plus(db[3].x).divide(2);
     cleq = new c.Equation(mp[2].x, cle);
 
     solver.addConstraint(cleq);
 
-    cle = new c.Expression(db[2].y);
-    cle = (cle.plus(db[3].y)).divide(2);
+    cle = c.Expression.fromConstant(db[2].y).plus(db[3].y).divide(2);
     cleq = new c.Equation(mp[2].y, cle);
 
     solver.addConstraint(cleq);
 
-    cle = new c.Expression(db[3].x);
-    cle = (cle.plus(db[0].x)).divide(2);
+    cle = c.Expression.fromConstant(db[3].x).plus(db[0].x).divide(2);
     cleq = new c.Equation(mp[3].x, cle);
 
     solver.addConstraint(cleq);
 
-    cle = new c.Expression(db[3].y);
-    cle = (cle.plus(db[0].y)).divide(2);
+    cle = c.Expression.fromConstant(db[3].y).plus(db[0].y).divide(2);
     cleq = new c.Equation(mp[3].y, cle);
 
     solver.addConstraint(cleq);

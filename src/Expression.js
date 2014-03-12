@@ -9,18 +9,24 @@
 (function(c) {
 "use strict";
 
+var checkNumber = function(value, otherwise){
+  // if(isNaN(value)) { debugger; }
+  return (typeof value === "number") ? value : otherwise;
+};
+
 c.Expression = c.inherit({
 
-  initialize: function(clv /*c.AbstractVariable*/, value /*double*/, constant /*double*/) {
-    if (c.GC) console.log("new c.Expression");
-    this.constant = c.checkNumber(constant, 0);
+  initialize: function(cvar /*c.AbstractVariable*/,
+                       value /*double*/,
+                       constant /*double*/) {
+    this.constant = checkNumber(constant, 0);
     this.terms = new c.HashTable();
-
-    if (clv instanceof c.AbstractVariable) {
-      this.setVariable(clv, c.checkNumber(value, 1) );
-    } else if (typeof clv == "number") {
-      if (!isNaN(clv)) {
-        this.constant = clv;
+    if (cvar instanceof c.AbstractVariable) {
+      value = checkNumber(value, 1);
+      this.setVariable(cvar, value);
+    } else if (typeof cvar == "number") {
+      if (!isNaN(cvar)) {
+        this.constant = cvar;
       } else {
         console.trace();
       }
@@ -54,7 +60,7 @@ c.Expression = c.inherit({
       console.log("*******************************");
     }
 
-    var e = new c.Expression();
+    var e = c.Expression.empty();
     e.initializeFromHash(this.constant, this.terms);
     return e;
   },
@@ -111,10 +117,10 @@ c.Expression = c.inherit({
     // console.log("c.Expression::addExpression()", expr, n);
     // console.trace();
     if (expr instanceof c.AbstractVariable) {
-      expr = new c.Expression(expr);
-      if(c.trace) console.log("addExpression: Had to cast a var to an expression");
+      expr = c.Expression.fromVariable(expr);
+      // if(c.trace) console.log("addExpression: Had to cast a var to an expression");
     }
-    n = c.checkNumber(n, 1);
+    n = checkNumber(n, 1);
     this.constant += (n * expr.constant);
     expr.terms.each(function(clv, coeff) {
       // console.log("clv:", clv, "coeff:", coeff, "subject:", subject);
@@ -286,5 +292,22 @@ c.Expression = c.inherit({
     return e1.divide(e2);
   },
 });
+
+c.Expression.empty = function() {
+  return new c.Expression(undefined, 1, 0);
+};
+
+c.Expression.fromConstant = function(cons) {
+  return new c.Expression(cons);
+};
+
+c.Expression.fromValue = function(v) {
+  v = +(v);
+  return new c.Expression(undefined, v, 0);
+};
+
+c.Expression.fromVariable = function(v) {
+  return new c.Expression(v, 1, 0);
+}
 
 })(this["c"]||module.parent.exports||{});

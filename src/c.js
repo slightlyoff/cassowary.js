@@ -198,55 +198,44 @@ c.assert = function(f /*boolean*/, description /*String*/) {
   }
 };
 
-c.checkNumber = function(value, otherwise){
-  return (typeof value === "number" && !isNaN(value)) ? value : otherwise;
+var exprFromVarOrValue = function(v) {
+  if (typeof v == "number" ) {
+    return c.Expression.fromConstant(v);
+  } else if(v instanceof c.Variable) {
+    return c.Expression.fromVariable(v);
+  }
 };
 
 c.plus = function(e1, e2) {
-  if (!(e1 instanceof c.Expression)) {
-    e1 = new c.Expression(e1);
-  }
-  if (!(e2 instanceof c.Expression)) {
-    e2 = new c.Expression(e2);
-  }
+  e1 = exprFromVarOrValue(e1);
+  e2 = exprFromVarOrValue(e2);
   return e1.plus(e2);
 };
 
 c.minus = function(e1, e2) {
-  if (!(e1 instanceof c.Expression)) {
-    e1 = new c.Expression(e1);
-  }
-  if (!(e2 instanceof c.Expression)) {
-    e2 = new c.Expression(e2);
-  }
-
+  e1 = exprFromVarOrValue(e1);
+  e2 = exprFromVarOrValue(e2);
   return e1.minus(e2);
 };
 
 c.times = function(e1, e2) {
-  if (typeof e1 == "number" || e1 instanceof c.Variable) {
-    e1 = new c.Expression(e1);
-  }
-  if (typeof e2 == "number" || e2 instanceof c.Variable) {
-    e2 = new c.Expression(e2);
-  }
-
+  e1 = exprFromVarOrValue(e1);
+  e2 = exprFromVarOrValue(e2);
   return e1.times(e2);
 };
 
-c.divide = function(e1 /*c.Expression*/, e2 /*c.Expression*/) {
-  if (typeof e1 == "number" || e1 instanceof c.Variable) {
-    e1 = new c.Expression(e1);
-  }
-  if (typeof e2 == "number" || e2 instanceof c.Variable) {
-    e2 = new c.Expression(e2);
-  }
-
+c.divide = function(e1, e2) {
+  e1 = exprFromVarOrValue(e1);
+  e2 = exprFromVarOrValue(e2);
   return e1.divide(e2);
 };
 
-c.approx = function(a /*double*/, b /*double*/) {
+c.approx = function(a, b) {
   if (a === b) { return true; }
+  /*
+  if (isNaN(a)) { debugger; }
+  if (isNaN(b)) { debugger; }
+  */
   var av = +(a);
   var bv = +(b);
   if (av == 0) {
