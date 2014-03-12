@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
-#
-# Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
+# Use of this source code is governed by
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Copyright (C) 2014, Alex Russell (slightlyoff@chromium.org)
 
 D8PATH=$(type -P d8)
 D8DIR=''
@@ -17,5 +17,6 @@ fi
 rm -rf v8.log
 rm -rf test.prof
 
-$D8PATH --harmony --prof ../tests/run-perf.js
+# $D8PATH --harmony --prof ../tests/run-perf.js
+$D8PATH --harmony --prof --trace-opt --trace-deopt run-perf.js
 $D8DIR/tools/mac-tick-processor v8.log > test.prof
