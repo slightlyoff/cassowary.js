@@ -232,19 +232,15 @@ c.divide = function(e1, e2) {
 
 c.approx = function(a, b) {
   if (a === b) { return true; }
-  /*
-  if (isNaN(a)) { debugger; }
-  if (isNaN(b)) { debugger; }
-  */
-  var av = +(a);
-  var bv = +(b);
-  if (av == 0) {
-    return (Math.abs(bv) < epsilon);
+  a = +(a);
+  b = +(b);
+  if (a == 0) {
+    return (Math.abs(b) < epsilon);
   }
-  if (bv == 0) {
-    return (Math.abs(av) < epsilon);
+  if (b == 0) {
+    return (Math.abs(a) < epsilon);
   }
-  return (Math.abs(av - bv) < Math.abs(av) * epsilon);
+  return (Math.abs(a - b) < Math.abs(a) * epsilon);
 };
 
 var count = 0;
