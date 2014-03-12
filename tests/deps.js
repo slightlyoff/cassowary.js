@@ -1,5 +1,5 @@
-// This is a convenience file to load all necessary cassowary dependencies in order.
-
+// This is a convenience file to load all necessary cassowary dependencies in
+// order.
 define([
 	'intern/order!../src/c',
 	'intern/order!../src/Tableau',
@@ -18,4 +18,4 @@ define([
 	'intern/order!../src/parser/parser',
 	'intern/order!../src/parser/api',
 	'intern/order!../src/Timer'
-], function () {});
+], function() {});
