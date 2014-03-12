@@ -18,5 +18,7 @@ rm -rf v8.log
 rm -rf test.prof
 
 # $D8PATH --harmony --prof ../tests/run-perf.js
-$D8PATH --harmony --prof --trace-opt --trace-deopt run-perf.js
+$D8PATH --harmony --prof --trace-opt --trace-deopt --code-comments run-perf.js > deopts.log
 $D8DIR/tools/mac-tick-processor v8.log > test.prof
+
+$D8PATH --harmony run-perf.js
