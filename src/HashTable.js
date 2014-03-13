@@ -34,7 +34,7 @@
 "use strict";
 
 var keyCode = function(key) {
-  var kc = (!!key.hashCode) ? key.hashCode : key.toString();
+  var kc = ("hashCode" in key) ? key.hashCode : key.toString();
   return kc;
 };
 
