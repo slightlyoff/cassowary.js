@@ -1,4 +1,4 @@
-/* global c */
+	/* global c */
 
 // Copyright (C) 1998-2000 Greg J. Badros
 // Use of this source code is governed by http://www.apache.org/licenses/LICENSE-2.0
@@ -19,38 +19,38 @@ define([
 		it('is constructable with 3 variables as arguments', function () {
 			var x = new c.Variable({ name: 'x', value: 167 });
 			var e = new c.Expression(x, 2, 3);
-			assert.deepEqual(e.toString(), '3 + 2*[x:167]');
+			assert.deepEqual(e+'', '3 + 2*167');
 		});
 
 		it('is constructable with one parameter', function () {
-			assert.deepEqual(new c.Expression(4).toString(), '4');
+			assert.deepEqual(new c.Expression(4)+'', '4');
 		});
 
 		it('plus', function () {
 			var x = new c.Variable({ name: 'x', value: 167 });
-			assert.deepEqual(c.plus(4, 2).toString(), '6');
-			assert.deepEqual(c.plus(x, 2).toString(), '2 + 1*[x:167]');
-			assert.deepEqual(c.plus(3, x).toString(), '3 + 1*[x:167]');
+			assert.deepEqual(c.plus(4, 2)+'', '6');
+			assert.deepEqual(c.plus(x, 2)+'', '2 + 1*167');
+			assert.deepEqual(c.plus(3, x)+'', '3 + 1*167');
 		});
 
 		it('plus_solve', function () {
 			var x = new c.Variable({ name: 'x', value: 167 });
-			assert.deepEqual(c.plus(4, 2).toString(), '6');
-			assert.deepEqual(c.plus(x, 2).toString(), '2 + 1*[x:167]');
-			assert.deepEqual(c.plus(3, x).toString(), '3 + 1*[x:167]');
+			assert.deepEqual(c.plus(4, 2)+'', '6');
+			assert.deepEqual(c.plus(x, 2)+'', '2 + 1*167');
+			assert.deepEqual(c.plus(3, x)+'', '3 + 1*167');
 		});
 
 		it('times', function () {
 			var x = new c.Variable({ name: 'x', value: 167 });
-			assert.deepEqual(c.times(x, 3).toString(), '3*[x:167]');
-			assert.deepEqual(c.times(7, x).toString(), '7*[x:167]');
+			assert.deepEqual(c.times(x, 3)+'', '3*167');
+			assert.deepEqual(c.times(7, x)+'', '7*167');
 		});
 
 		it('complex', function () {
 			var x = new c.Variable({ name: 'x', value: 167 });
 			var y = new c.Variable({ name: 'y', value: 2 });
 			var ex = c.plus(4, c.plus(c.times(x, 3), c.times(2, y)));
-			assert.deepEqual(ex.toString(), '4 + 3*[x:167] + 2*[y:2]');
+			assert.deepEqual(ex+'', '4 + 3*167 + 2*2');
 		});
 
 		it('zero_args', function () {
@@ -343,14 +343,14 @@ define([
 		it('toString', function () {
 			var v = new c.Variable({ name: 'v', value: 5 });
 
-			assert.deepEqual(new c.Expression(10).toString(), '10');
-			assert.deepEqual(new c.Expression(v, 0, 10).toString(), '10 + 0*[v:5]');
+			assert.deepEqual(c.Expression.fromConstant(10)+'', '10');
+			assert.deepEqual(new c.Expression(v, 0, 10)+'', '10 + 0*5');
 
 			var e = new c.Expression(v, 2, 10);
-			assert.deepEqual(e.toString(), '10 + 2*[v:5]');
+			assert.deepEqual(e+'', '10 + 2*5');
 
 			e.setVariable(new c.Variable({ name: 'b', value: 2 }), 4);
-			assert.deepEqual(e.toString(), '10 + 2*[v:5] + 4*[b:2]');
+			assert.deepEqual(e+'', '10 + 2*5 + 4*2');
 		});
 
 		it('equals', function () {
@@ -366,29 +366,29 @@ define([
 			var x = new c.Variable({ name: 'x', value: 167 });
 			var y = new c.Variable({ name: 'y', value: 10 });
 
-			assert.deepEqual(c.plus(2, 3).toString(), '5');
-			assert.deepEqual(c.plus(x, 2).toString(), '2 + 1*[x:167]');
-			assert.deepEqual(c.plus(3, x).toString(), '3 + 1*[x:167]');
-			assert.deepEqual(c.plus(x, y).toString(), '1*[x:167] + 1*[y:10]');
+			assert.deepEqual(c.plus(2, 3)+'', '5');
+			assert.deepEqual(c.plus(x, 2)+'', '2 + 1*167');
+			assert.deepEqual(c.plus(3, x)+'', '3 + 1*167');
+			assert.deepEqual(c.plus(x, y)+'', '1*167 + 1*10');
 		});
 
 		it('minus', function () {
 			var x = new c.Variable({ name: 'x', value: 167 });
 			var y = new c.Variable({ name: 'y', value: 10 });
 
-			assert.deepEqual(c.minus(2, 3).toString(), '-1');
-			assert.deepEqual(c.minus(x, 2).toString(), '-2 + 1*[x:167]');
-			assert.deepEqual(c.minus(3, x).toString(), '3 + -1*[x:167]');
-			assert.deepEqual(c.minus(x, y).toString(), '1*[x:167] + -1*[y:10]');
+			assert.deepEqual(c.minus(2, 3)+'', '-1');
+			assert.deepEqual(c.minus(x, 2)+'', '-2 + 1*167');
+			assert.deepEqual(c.minus(3, x)+'', '3 + -1*167');
+			assert.deepEqual(c.minus(x, y)+'', '1*167 + -1*10');
 		});
 
 		it('times', function () {
 			var x = new c.Variable({ name: 'x', value: 167 });
 			var y = new c.Variable({ name: 'y', value: 10 });
 
-			assert.deepEqual(c.times(2, 3).toString(), '6');
-			assert.deepEqual(c.times(x, 2).toString(), '2*[x:167]');
-			assert.deepEqual(c.times(3, x).toString(), '3*[x:167]');
+			assert.deepEqual(c.times(2, 3)+'', '6');
+			assert.deepEqual(c.times(x, 2)+'', '2*167');
+			assert.deepEqual(c.times(3, x)+'', '3*167');
 			assert.throws(c.times.bind(c, x, y), c.NonExpression);
 		});
 
@@ -396,8 +396,8 @@ define([
 			var x = new c.Variable({ name: 'x', value: 167 });
 			var y = new c.Variable({ name: 'y', value: 10 });
 
-			assert.deepEqual(c.divide(4, 2).toString(), '2');
-			assert.deepEqual(c.divide(x, 2).toString(), '0.5*[x:167]');
+			assert.deepEqual(c.divide(4, 2)+'', '2');
+			assert.deepEqual(c.divide(x, 2)+'', '0.5*167');
 			assert.throws(c.divide.bind(c, 4, x), c.NonExpression);
 			assert.throws(c.divide.bind(c, x, y), c.NonExpression);
 		});

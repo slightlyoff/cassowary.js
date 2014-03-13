@@ -21,15 +21,15 @@ define([
 				c.Variable._map = [];
 				new c.Variable({name: 'x'});
 				new c.Variable({name: 'y', value: 2});
-				assert.deepEqual((c.Variable._map).x + '', '[x:0]');
-				assert.deepEqual((c.Variable._map).y + '', '[y:2]');
+				assert.deepEqual((c.Variable._map).x + '', '0');
+				assert.deepEqual((c.Variable._map).y + '', '2');
 			});
 
 			it('has the correct properties', function () {
 				var x = new c.Variable({ name: 'x', value: 25 });
 
 				assert.deepEqual(x.value, 25);
-				assert.deepEqual(x + '', '[x:25]');
+				assert.deepEqual(x + '', '25');
 				assert(x.isExternal);
 				assert.isFalse(x.isDummy);
 				assert.isFalse(x.isPivotable);
@@ -42,12 +42,12 @@ define([
 		describe('ctor', function () {
 			it('serializes', function () {
 				var d = new c.DummyVariable({ name: 'foo' });
-				assert.deepEqual(d + '', '[foo:dummy]');
+				assert.deepEqual(d + '', 'dummy');
 			});
 			it('has the correct properties', function () {
 				var x = new c.DummyVariable({ name: 'x' });
 
-				assert.deepEqual(x + '', '[x:dummy]');
+				assert.deepEqual(x + '', 'dummy');
 				assert.isFalse(x.isExternal);
 				assert.isTrue(x.isDummy);
 				assert.isFalse(x.isPivotable);
@@ -60,12 +60,12 @@ define([
 		describe('ctor', function () {
 			it('serializes', function () {
 				var o = new c.ObjectiveVariable({ name: 'obj' });
-				assert.deepEqual(o + '', '[obj:obj]');
+				assert.deepEqual(o + '', 'obj');
 			});
 			it('has the correct properties', function () {
 				var x = new c.ObjectiveVariable({ name: 'x' });
 
-				assert.deepEqual(x + '', '[x:obj]');
+				assert.deepEqual(x + '', 'obj');
 				assert.isFalse(x.isExternal);
 				assert.isFalse(x.isDummy);
 				assert.isFalse(x.isPivotable);
@@ -78,7 +78,7 @@ define([
 		it('has the correct properties', function () {
 			var x = new c.SlackVariable({ name: 'x' });
 
-			assert.deepEqual(x + '', '[x:slack]');
+			assert.deepEqual(x + '', 'slack');
 			assert.isFalse(x.isExternal);
 			assert.isFalse(x.isDummy);
 			assert.isTrue(x.isPivotable);
