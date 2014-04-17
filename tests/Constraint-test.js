@@ -148,5 +148,25 @@ define([
 			ieq = new c.Inequality(e, c.LEQ, v);
 			assert.isTrue(ieq.expression.equals(c.minus(v, e)));
 		});
+
+		it('StayConstraint constant equals stay variable value', function () {
+            var stayVariable = new c.Variable({name:"stay", value:10});
+            var stayConstraint = new c.StayConstraint(stayVariable, c.Strength.weak, 1);
+
+            var solver = new c.SimplexSolver();
+            solver.autoSolve = true;
+            solver.addConstraint(stayConstraint);
+
+            solver.addEditVar(stayVariable, c.Strength.strong, 1).beginEdit();
+            solver.suggestValue(stayVariable, 20);
+            solver.resolve();
+            solver.endEdit();
+
+            var value = stayVariable.value;
+            assert.isTrue(value == 20);
+
+            var constant = stayConstraint.expression.constant;
+            assert.isTrue(constant == value);
+		});
 	});
 });
