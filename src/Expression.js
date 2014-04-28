@@ -130,12 +130,11 @@ c.Expression = c.inherit({
   },
 
   addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
-    /*
-    if (typeof cd == "undefined") debugger;
     if (cd == null) {
       cd = 1;
     }
 
+    /*
     if (c.trace) console.log("c.Expression::addVariable():", v , cd);
     */
     var coeff = this.terms.get(v);
