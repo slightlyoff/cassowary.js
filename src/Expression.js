@@ -130,11 +130,14 @@ c.Expression = c.inherit({
   },
 
   addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
+    /*
+    if (typeof cd == "undefined") debugger;
     if (cd == null) {
       cd = 1;
     }
 
     if (c.trace) console.log("c.Expression::addVariable():", v , cd);
+    */
     var coeff = this.terms.get(v);
     if (coeff) {
       var newCoefficient = coeff + cd;
@@ -184,10 +187,12 @@ c.Expression = c.inherit({
                           subject /*c.AbstractVariable*/,
                           solver  /*ClTableau*/) {
 
+    /*
     if (c.trace) {
       c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
       c.traceprint("this = " + this);
     }
+    */
     var setVariable = this.setVariable.bind(this);
     var terms = this.terms;
     var multiplier = terms.get(outvar);
@@ -217,7 +222,7 @@ c.Expression = c.inherit({
         }
       }
     });
-    if (c.trace) c.traceprint("Now this is " + this);
+    // if (c.trace) c.traceprint("Now this is " + this);
   },
 
   changeSubject: function(old_subject /*c.AbstractVariable*/,
@@ -226,7 +231,7 @@ c.Expression = c.inherit({
   },
 
   newSubject: function(subject /*c.AbstractVariable*/) {
-    if (c.trace) c.fnenterprint("newSubject:" + subject);
+    // if (c.trace) c.fnenterprint("newSubject:" + subject);
 
     var reciprocal = 1 / this.terms.get(subject);
     this.terms.delete(subject);
