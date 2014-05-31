@@ -19,11 +19,10 @@ fi
 rm -rf v8.log
 rm -rf test.prof
 
-# $D8PATH --harmony --prof ../tests/run-perf.js
+$D8PATH --harmony $BENCH_FILES
+
 $D8PATH --harmony --prof --trace-opt --trace-deopt --code-comments $BENCH_FILES > deopts.log
 $D8DIR/tools/mac-tick-processor v8.log > test.prof
-
-$D8PATH --harmony $BENCH_FILES
 
 $D8PATH --trace-hydrogen --trace-phase=Z --trace-deopt --code-comments --hydrogen-track-positions --redirect-code-traces --redirect-code-traces-to=code.asm --print-opt-code $BENCH_FILES
 
