@@ -129,7 +129,7 @@ Supported Runtimes
 
 This refactoring currently runs in:
 
-  * Chrome (and Chrome Frame)
+  * Chrome
   * Firefox 9+
   * Opera 11+
   * Safari 5+
@@ -140,8 +140,7 @@ This refactoring currently runs in:
     * Rhino (Java) js.jar included in checkout
 
 This is an unapologetically modern reinterpretation optimized for size, low
-complexity, and speed. And little else. No, it will not work on old versions of
-IE -- that's what [Chrome Frame](http://google.com/chromeframe) is for.
+complexity, and speed. It will not work on old versions of IE.
 
 Configuration
 -------------
