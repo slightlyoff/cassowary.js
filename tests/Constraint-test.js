@@ -168,9 +168,10 @@ define([
       var value = stayVariable.value;
       var constant = stayConstraint.expression.constant;
 
-      console.log(constant, value);
+      // console.log(constant, value);
+      // assert.isTrue(value == 20);
 
-      assert.isTrue(value == 20);
+      assert.isTrue(value == 10);
       assert.isTrue(constant == value);
 		});
 	});
