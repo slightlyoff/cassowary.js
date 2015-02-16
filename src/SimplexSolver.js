@@ -9,6 +9,12 @@ var tp = t.prototype;
 var epsilon = 1e-8;
 var weak = c.Strength.weak;
 
+var newExpressionInternalReturn = {
+  eplus: null,
+  eminus: null,
+  prevEConstant: null
+};
+
 c.SimplexSolver = c.inherit({
   extends: c.Tableau,
   initialize: function(){
@@ -48,10 +54,8 @@ c.SimplexSolver = c.inherit({
     return this;
   },
 
-  _addEditConstraint: function(cn, eplus_eminus, prevEConstant) {
+  _addEditConstraint: function(cn, cvEplus, cvEminus, prevEConstant) {
       var i = this._editVarMap.size;
-      var cvEplus = /* c.SlackVariable */eplus_eminus[0];
-      var cvEminus = /* c.SlackVariable */eplus_eminus[1];
       /*
       if (!cvEplus instanceof c.SlackVariable) {
         console.warn("cvEplus not a slack variable =", cvEplus);
@@ -63,17 +67,15 @@ c.SimplexSolver = c.inherit({
                                   cvEminus + ", " + prevEConstant + ", " +
                                   i +")");
       */
-      var ei = new c.EditInfo(cn, cvEplus, cvEminus, prevEConstant, i)
+      var ei = new c.EditInfo(cn, cvEplus, cvEminus, prevEConstant, i);
       this._editVarMap.set(cn.variable, ei);
       this._editVarList[i] = { v: cn.variable, info: ei };
   },
 
   addConstraint: function(cn /*c.Constraint*/) {
     c.trace && c.fnenterprint("addConstraint: " + cn);
-    var eplus_eminus = new Array(2);
-    var prevEConstant = new Array(1); // so it can be output to
-    var expr = this.newExpression(cn, /*output to*/ eplus_eminus, prevEConstant);
-    prevEConstant = prevEConstant[0];
+    var ir = newExpressionInternalReturn;
+    var expr = this.newExpression(cn);
 
     if (!this.tryAddingDirectly(expr)) {
       this.addWithArtificialVariable(expr);
@@ -82,7 +84,7 @@ c.SimplexSolver = c.inherit({
 
     this._needsSolving = true;
     if (cn.isEditConstraint) {
-      this._addEditConstraint(cn, eplus_eminus, prevEConstant);
+      this._addEditConstraint(cn, ir.eplus, ir.eminus, ir.prevEConstant);
     }
     if (this.autoSolve) {
       this.optimize(this._objective);
@@ -608,14 +610,16 @@ c.SimplexSolver = c.inherit({
   // Normalize if necessary so that the Constant is non-negative.  If
   // the constraint is non-required give its error variables an
   // appropriate weight in the objective function.
-  newExpression: function(cn /*c.Constraint*/,
-                          /** outputs to **/ eplus_eminus /*Array*/,
-                          prevEConstant) {
+  newExpression: function(cn /*c.Constraint*/) {
     if (c.trace) {
       c.fnenterprint("newExpression: " + cn);
       c.traceprint("cn.isInequality == " + cn.isInequality);
       c.traceprint("cn.required == " + cn.required);
     }
+    var ir = newExpressionInternalReturn;
+    ir.eplus = null;
+    ir.eminus = null;
+    ir.prevEConstant = null;
 
     var cnExpr = cn.expression;
     var expr = c.Expression.fromConstant(cnExpr.constant);
@@ -680,9 +684,9 @@ c.SimplexSolver = c.inherit({
           value: this._dummyCounter,
           prefix: "d"
         });
-        eplus_eminus[0] = dummyVar;
-        eplus_eminus[1] = dummyVar;
-        prevEConstant[0] = cnExpr.constant;
+        ir.eplus = dummyVar;
+        ir.eminus = dummyVar;
+        ir.prevEConstant = cnExpr.constant;
         expr.setVariable(dummyVar, 1);
         this._markerVars.set(cn, dummyVar);
         c.trace && c.traceprint("Adding dummyVar == d" + this._dummyCounter);
@@ -724,9 +728,9 @@ c.SimplexSolver = c.inherit({
           this._stayPlusErrorVars[this._stayPlusErrorVars.length] = eplus;
           this._stayMinusErrorVars[this._stayMinusErrorVars.length] = eminus;
         } else if (cn.isEditConstraint) {
-          eplus_eminus[0] = eplus;
-          eplus_eminus[1] = eminus;
-          prevEConstant[0] = cnExpr.constant;
+          ir.eplus = eplus;
+          ir.eminus = eminus;
+          ir.prevEConstant = cnExpr.constant;
         }
       }
     }
