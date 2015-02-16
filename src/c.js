@@ -53,20 +53,39 @@ var c = scope.c = function() {
 };
 
 //
-// Configuration
-//
-c.debug = false;
-c.trace = false;
-c.verbose = false;
-c.traceAdded = false;
-c.GC = false;
-
-//
 // Constants
 //
 c.GEQ = 1;
 c.LEQ = 2;
 
+var inBrowserProtoFlip = (!inBrowser) ?
+  function(realCtor, parent, rp, props) { return realCtor; } :
+  function(realCtor, parent, rp, props) {
+    // If we're in a browser, we want to support "subclassing" HTML elements.
+    // This needs some magic and we rely on a wrapped constructor hack to make
+    // it happen.
+    if (parent && parent.prototype instanceof scope.HTMLElement) {
+      var intermediateCtor = realCtor;
+      var tn = getTagName(rp);
+      var upgrade = function(el) {
+        el.__proto__ = rp;
+        intermediateCtor.apply(el, arguments);
+        if (rp["created"]) { el.created(); }
+        if (rp["decorate"]) { el.decorate(); }
+        return el;
+      };
+      c.extend(rp, { upgrade: upgrade });
+
+      realCtor = function() {
+        // We hack the constructor to always return an element with it's
+        // prototype wired to ours. Boo.
+        return upgrade(scope.document.createElement(tn));
+      }
+      realCtor.prototype = rp;
+      c.extend(realCtor, { ctor: intermediateCtor }); // HACK!!!
+    }
+    return realCtor
+  };
 
 //
 // Utility methods
@@ -101,48 +120,11 @@ c.inherit = function(props) {
   // FIXME(slightlyoff): would like to have class-side inheritance!
   // It's easy enough to do when we have __proto__, but we don't in IE 9/10.
   //   = (
-
-  /*
-  // NOTE: would happily do this except it's 2x slower. Boo!
-  props.__proto__ = parent ? parent.prototype : Object.prototype;
-  realCtor.prototype = props;
-  */
-
   var rp = realCtor.prototype = Object.create(
     ((parent) ? parent.prototype : Object.prototype)
   );
-
   c.extend(rp, props);
-
-  // If we're in a browser, we want to support "subclassing" HTML elements.
-  // This needs some magic and we rely on a wrapped constructor hack to make
-  // it happen.
-  if (inBrowser) {
-    if (parent && parent.prototype instanceof scope.HTMLElement) {
-      var intermediateCtor = realCtor;
-      var tn = getTagName(rp);
-      var upgrade = function(el) {
-        el.__proto__ = rp;
-        intermediateCtor.apply(el, arguments);
-        if (rp["created"]) { el.created(); }
-        if (rp["decorate"]) { el.decorate(); }
-        return el;
-      };
-      this.extend(rp, { upgrade: upgrade, });
-
-      realCtor = function() {
-        // We hack the constructor to always return an element with it's
-        // prototype wired to ours. Boo.
-        return upgrade(
-          scope.document.createElement(tn)
-        );
-      }
-      realCtor.prototype = rp;
-      this.extend(realCtor, { ctor: intermediateCtor, }); // HACK!!!
-    }
-  }
-
-  return realCtor;
+  return inBrowserProtoFlip(realCtor, parent, rp, props);
 };
 
 c.own = function(obj, cb, context) {
@@ -171,11 +153,6 @@ c.extend = function(obj, props) {
   });
   return obj;
 };
-
-// FIXME: legacy API to be removed
-c.traceprint = function(s /*String*/) { if (c.verbose) { console.log(s); } };
-c.fnenterprint = function(s /*String*/) { console.log("* " + s); };
-c.fnexitprint = function(s /*String*/) { console.log("- " + s); };
 
 c.assert = function(f /*boolean*/, description /*String*/) {
   if (!f) {

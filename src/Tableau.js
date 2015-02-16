@@ -35,7 +35,6 @@ c.Tableau = c.inherit({
   // then it's in the objective function). Update the column cross-indices.
   noteRemovedVariable: function(v /*c.AbstractVariable*/,
                                 subject /*c.AbstractVariable*/) {
-    c.trace && console.log("c.Tableau::noteRemovedVariable: ", v, subject);
     var column = this.columns.get(v);
     if (subject && column) {
       column.delete(subject);
@@ -43,7 +42,6 @@ c.Tableau = c.inherit({
   },
 
   noteAddedVariable: function(v /*c.AbstractVariable*/, subject /*c.AbstractVariable*/) {
-    // if (c.trace) console.log("c.Tableau::noteAddedVariable:", v, subject);
     if (subject) {
       this.insertColVar(v, subject);
     }
@@ -97,7 +95,6 @@ c.Tableau = c.inherit({
 
   addRow: function(aVar /*c.AbstractVariable*/,
                    expr /*c.Expression*/) {
-    if (c.trace) c.fnenterprint("addRow: " + aVar + ", " + expr);
     this.rows.set(aVar, expr);
     expr.terms.each(function(clv, coeff) {
       this.insertColVar(clv, aVar);
@@ -108,11 +105,9 @@ c.Tableau = c.inherit({
     if (aVar.isExternal) {
       this._externalRows.add(aVar);
     }
-    if (c.trace) c.traceprint(this.toString());
   },
 
   removeColumn: function(aVar /*c.AbstractVariable*/) {
-    if (c.trace) c.fnenterprint("removeColumn:" + aVar);
     var rows = /* Set */ this.columns.get(aVar);
     if (rows) {
       this.columns.delete(aVar);
@@ -120,8 +115,10 @@ c.Tableau = c.inherit({
         var expr = /* c.Expression */this.rows.get(clv);
         expr.terms.delete(aVar);
       }, this);
+    /*
     } else {
-      if (c.trace) console.log("Could not find var", aVar, "in columns");
+      // console.log("Could not find var", aVar, "in columns");
+    */
     }
     if (aVar.isExternal) {
       this._externalRows.delete(aVar);
@@ -130,13 +127,11 @@ c.Tableau = c.inherit({
   },
 
   removeRow: function(aVar /*c.AbstractVariable*/) {
-    if (c.trace) c.fnenterprint("removeRow:" + aVar);
     var expr = /* c.Expression */this.rows.get(aVar);
     c.assert(expr != null);
     expr.terms.each(function(clv, coeff) {
       var varset = this.columns.get(clv);
       if (varset != null) {
-        if (c.trace) console.log("removing from varset:", aVar);
         varset.delete(aVar);
       }
     }, this);
@@ -145,15 +140,11 @@ c.Tableau = c.inherit({
       this._externalRows.delete(aVar);
     }
     this.rows.delete(aVar);
-    if (c.trace) c.fnexitprint("returning " + expr);
     return expr;
   },
 
   substituteOut: function(oldVar /*c.AbstractVariable*/,
                           expr /*c.Expression*/) {
-    if (c.trace) c.fnenterprint("substituteOut:" + oldVar + ", " + expr);
-    if (c.trace) c.traceprint(this.toString());
-
     var varset = this.columns.get(oldVar);
     varset.each(function(v) {
       var row = this.rows.get(v);

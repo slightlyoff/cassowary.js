@@ -34,13 +34,6 @@ c.Expression = c.inherit({
   },
 
   initializeFromHash: function(constant /*ClDouble*/, terms /*c.Hashtable*/) {
-    if (c.verbose) {
-      console.log("*******************************");
-      console.log("clone c.initializeFromHash");
-      console.log("*******************************");
-    }
-
-    if (c.GC) console.log("clone c.Expression");
     this.constant = constant;
     this.terms = terms.clone();
     return this;
@@ -54,12 +47,6 @@ c.Expression = c.inherit({
   },
 
   clone: function() {
-    if (c.verbose) {
-      console.log("*******************************");
-      console.log("clone c.Expression");
-      console.log("*******************************");
-    }
-
     var e = c.Expression.empty();
     e.initializeFromHash(this.constant, this.terms);
     return e;
@@ -113,12 +100,9 @@ c.Expression = c.inherit({
                           n /*double*/,
                           subject /*c.AbstractVariable*/,
                           solver /*c.Tableau*/) {
-
-    // console.log("c.Expression::addExpression()", expr, n);
     // console.trace();
     if (expr instanceof c.AbstractVariable) {
       expr = c.Expression.fromVariable(expr);
-      // if(c.trace) console.log("addExpression: Had to cast a var to an expression");
     }
     n = checkNumber(n, 1);
     this.constant += (n * expr.constant);
@@ -130,13 +114,8 @@ c.Expression = c.inherit({
   },
 
   addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
-    if (cd == null) {
-      cd = 1;
-    }
+    if (cd == null) { cd = 1; }
 
-    /*
-    if (c.trace) console.log("c.Expression::addVariable():", v , cd);
-    */
     var coeff = this.terms.get(v);
     if (coeff) {
       var newCoefficient = coeff + cd;
@@ -160,7 +139,6 @@ c.Expression = c.inherit({
   },
 
   setVariable: function(v /*c.AbstractVariable*/, c /*double*/) {
-    // console.log("terms.set(", v, c, ")");
     this.terms.set(v, c);
     return this;
   },
@@ -186,12 +164,6 @@ c.Expression = c.inherit({
                           subject /*c.AbstractVariable*/,
                           solver  /*ClTableau*/) {
 
-    /*
-    if (c.trace) {
-      c.fnenterprint("CLE:substituteOut: " + outvar + ", " + expr + ", " + subject + ", ...");
-      c.traceprint("this = " + this);
-    }
-    */
     var setVariable = this.setVariable.bind(this);
     var terms = this.terms;
     var multiplier = terms.get(outvar);
@@ -221,7 +193,6 @@ c.Expression = c.inherit({
         }
       }
     });
-    // if (c.trace) c.traceprint("Now this is " + this);
   },
 
   changeSubject: function(old_subject /*c.AbstractVariable*/,
@@ -230,8 +201,6 @@ c.Expression = c.inherit({
   },
 
   newSubject: function(subject /*c.AbstractVariable*/) {
-    // if (c.trace) c.fnenterprint("newSubject:" + subject);
-
     var reciprocal = 1 / this.terms.get(subject);
     this.terms.delete(subject);
     this.multiplyMe(-reciprocal);

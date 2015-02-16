@@ -13,9 +13,9 @@ c.AbstractConstraint = c.inherit({
     this.weight = weight || 1;
   },
 
-  isEditConstraint: false,
+  isEdit:           false,
   isInequality:     false,
-  isStayConstraint: false,
+  isStay:           false,
   get required() { return (this.strength === c.Strength.required); },
 
   toString: function() {
@@ -36,14 +36,14 @@ var EditOrStayCtor = function(cv /*c.Variable*/, strength /*c.Strength*/, weight
 c.EditConstraint = c.inherit({
   extends: c.AbstractConstraint,
   initialize: function() { EditOrStayCtor.apply(this, arguments); },
-  isEditConstraint: true,
+  isEdit: true,
   toString: function() { return "edit:" + ts.call(this); },
 });
 
 c.StayConstraint = c.inherit({
   extends: c.AbstractConstraint,
   initialize: function() { EditOrStayCtor.apply(this, arguments); },
-  isStayConstraint: true,
+  isStay: true,
   toString: function() { return "stay:" + ts.call(this); },
 });
 
