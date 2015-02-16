@@ -955,7 +955,7 @@ c.SimplexSolver = c.inherit({
 
   insertErrorVar: function(cn /*c.Constraint*/, aVar /*c.AbstractVariable*/) {
     c.trace && c.fnenterprint("insertErrorVar:" + cn + ", " + aVar);
-    var constraintSet = /* Set */this._errorVars.get(aVar);
+    var constraintSet = /* Set */this._errorVars.get(cn);
     if (!constraintSet) {
       constraintSet = new c.HashSet();
       this._errorVars.set(cn, constraintSet);
