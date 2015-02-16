@@ -54,6 +54,11 @@ c.SimplexSolver = c.inherit({
 
   addEditVar: function(v /*c.Variable*/, strength /*c.Strength*/, weight /*double*/) {
     var cn = new c.EditConstraint(v, strength||c.Strength.strong, weight);
+    this.addEditConstraint(cn);
+    return this;
+  },
+
+  addEditConstraint: function(cn) {
     var ir = _newExpressionInternalReturn;
     this.addConstraint(cn);
     this._addEditConstraint(cn, ir.eplus, ir.eminus, ir.prevEConstant);

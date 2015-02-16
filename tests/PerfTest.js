@@ -212,7 +212,7 @@ var PerfTest = c.inherit({
     var ineqProb = 0.12;
     var maxVars = 3;
     var nVars = nCns;
-    print("starting timing test. nCns = " + nCns + ", nSolvers = " + nSolvers + ", nResolves = " + nResolves);
+    console.log("starting timing test. nCns = " + nCns + ", nSolvers = " + nSolvers + ", nResolves = " + nResolves);
     timer.start();
     var rgsolvers = new Array(nSolvers+1);
     for (var is = 0; is < nSolvers + 1; ++is) {
@@ -235,7 +235,6 @@ var PerfTest = c.inherit({
     var coeff;
     for (j = 0; j < nCnsMade; ++j) {
       nvs = this.randomInRange(1, maxVars);
-      if (this.trace) this.traceprint("Using nvs = " + nvs);
       var expr = c.Expression.fromConstant(
                                     this.grainedUniformRandom() * 20.0 - 10.0);
       for (k = 0; k < nvs; k++) {
@@ -248,11 +247,10 @@ var PerfTest = c.inherit({
       } else {
         rgpcns[j] = new c.Equation(expr);
       }
-      if (this.trace) this.traceprint("Constraint " + j + " is " + rgpcns[j]);
     }
     timer.stop();
-    print("done building data structures");
-    print("time = " + timer.elapsedTime());
+    console.log("done building data structures");
+    console.log("time = " + timer.elapsedTime());
     for (var is = 0; is < nSolvers; ++is) {
       var cCns = 0;
       var cExceptions = 0;
@@ -287,22 +285,22 @@ var PerfTest = c.inherit({
           rgpcns[j] = null;
         }
       }
-      print("done adding " + cCns + " constraints [" + j + " attempted, " + cExceptions + " exceptions]");
+      console.log("done adding " + cCns + " constraints [" + j + " attempted, " + cExceptions + " exceptions]");
       solver.solve();
-      print("time = " + timer.elapsedTime());
+      console.log("time = " + timer.elapsedTime());
     }
     timer.stop();
     tmAdd = timer.elapsedTime();
     var e1Index = this.randomInRange(0, nVars);
     var e2Index = this.randomInRange(0, nVars);
-    print("Editing vars with indices " + e1Index + ", " + e2Index);
+    console.log("Editing vars with indices " + e1Index + ", " + e2Index);
     var edit1 = new c.EditConstraint(rgpclv[e1Index], c.Strength.strong);
     var edit2 = new c.EditConstraint(rgpclv[e2Index], c.Strength.strong);
-    print("about to start resolves");
+    console.log("about to start resolves");
     timer.reset();
     timer.start();
     rgsolvers.forEach(function(solver) {
-      solver.addConstraint(edit1).addConstraint(edit2);
+      solver.addEditConstraint(edit1).addEditConstraint(edit2);
     });
     timer.stop();
     tmEdit = timer.elapsedTime();
@@ -315,7 +313,7 @@ var PerfTest = c.inherit({
     });
     timer.stop();
     tmResolve = timer.elapsedTime();
-    print("done resolves -- now ending edits");
+    console.log("done resolves -- now ending edits");
     timer.reset().start();
     for (var is = 0; is < nSolvers; ++is) {
       rgsolvers[is].removeConstraint(edit1).removeConstraint(edit2);
@@ -324,11 +322,11 @@ var PerfTest = c.inherit({
     tmEndEdit = timer.elapsedTime();
 
     totalTimer.stop();
-    print("total time = " + totalTimer.elapsedTime());
+    console.log("total time = " + totalTimer.elapsedTime());
 
     var s = "\n  ";
     var mspersec = 1000;
-    print(s +
+    console.log(s +
           "number of constraints: \t\t" + nCns + s +
           "number of solvers: \t\t\t" + nSolvers + s +
           "numbers of resolves: \t\t\t" + nResolves + s +
