@@ -286,7 +286,7 @@ c.SimplexSolver = c.inherit({
         }
       }
     } else if (cn.isEditConstraint) {
-      c.assert(eVars != null, "eVars != null");
+      // c.assert(eVars != null, "eVars != null");
       var cei = this._editVarMap.get(cn.variable);
       this.removeColumn(cei.editMinus);
       this._editVarMap.delete(cn.variable);
