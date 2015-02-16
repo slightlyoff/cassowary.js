@@ -525,6 +525,50 @@ define([
 			reCalc();
 		});
 
+
+        it('requiredEditVars', function () {
+            // This test stresses the edit session stack. beginEdit() starts a new
+            // "edit variable group" and "endEdit" closes it, leaving only the
+            // previously opened edit variables still active.
+            var x = new c.Variable({ name: 'x' });
+            var y = new c.Variable({ name: 'y' });
+            var w = new c.Variable({ name: 'w' });
+            var h = new c.Variable({ name: 'h' });
+            var solver = new c.SimplexSolver();
+            // Add some stays and start an editing session
+            solver.addStay(x)
+                .addStay(y)
+                .addStay(w)
+                .addStay(h)
+                .addEditVar(x, c.Strength.required)
+                .addEditVar(y, c.Strength.required).beginEdit();
+            solver.suggestValue(x, 10)
+                .suggestValue(y, 20).resolve();
+            assert.isTrue(c.approx(x, 10));
+            assert.isTrue(c.approx(y, 20));
+            assert.isTrue(c.approx(w, 0));
+            assert.isTrue(c.approx(h, 0));
+
+            // Open a second set of variables for editing
+            solver.addEditVar(w, c.Strength.required)
+                .addEditVar(h, c.Strength.required).beginEdit();
+            solver.suggestValue(w, 30)
+                .suggestValue(h, 40).endEdit();
+            // Close the second set...
+            assert.isTrue(c.approx(x, 10));
+            assert.isTrue(c.approx(y, 20));
+            assert.isTrue(c.approx(w, 30));
+            assert.isTrue(c.approx(h, 40));
+
+            // Now make sure the first set can still be edited
+            solver.suggestValue(x, 50)
+                .suggestValue(y, 60).endEdit();
+            assert.isTrue(c.approx(x, 50));
+            assert.isTrue(c.approx(y, 60));
+            assert.isTrue(c.approx(w, 30));
+            assert.isTrue(c.approx(h, 40));
+        });
+
 		it('errorWeights', function () {
 			var solver = new c.SimplexSolver();
 
