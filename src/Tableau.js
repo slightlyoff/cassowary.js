@@ -50,35 +50,30 @@ c.Tableau = c.inherit({
   },
 
   getInternalInfo: function() {
-    var retstr = "Tableau Information:\n";
-    retstr += "Rows: " + this.rows.size;
-    retstr += " (= " + (this.rows.size - 1) + " constraints)";
-    retstr += "\nColumns: " + this.columns.size;
-    retstr += "\nInfeasible Rows: " + this._infeasibleRows.size;
-    retstr += "\nExternal basic variables: " + this._externalRows.size;
-    retstr += "\nExternal parametric variables: ";
-    retstr += this._externalParametricVars.size;
-    retstr += "\n";
-    return retstr;
+    return "Tableau Information:\n" +
+           "Rows: " + this.rows.size +
+            " (= " + (this.rows.size - 1) + " constraints)" +
+            "\nColumns: " + this.columns.size +
+            "\nInfeasible Rows: " + this._infeasibleRows.size +
+            "\nExternal basic variables: " + this._externalRows.size +
+            "\nExternal parametric variables: " +
+            this._externalParametricVars.size + "\n";
   },
 
   toString: function() {
-    var bstr = "Tableau:\n";
+    var str = "Tableau:\n";
     this.rows.each(function(clv, expr) {
-      bstr += clv;
-      bstr += " <==> ";
-      bstr += expr;
-      bstr += "\n";
+      str += clv + " <==> " + expr + "\n";
     });
-    bstr += "\nColumns:\n";
-    bstr += this.columns;
-    bstr += "\nInfeasible rows: ";
-    bstr += this._infeasibleRows;
-    bstr += "External basic variables: ";
-    bstr += this._externalRows;
-    bstr += "External parametric variables: ";
-    bstr += this._externalParametricVars;
-    return bstr;
+    str += "\nColumns:\n";
+    str += this.columns;
+    str += "\nInfeasible rows: ";
+    str += this._infeasibleRows;
+    str += "External basic variables: ";
+    str += this._externalRows;
+    str += "External parametric variables: ";
+    str += this._externalParametricVars;
+    return str;
   },
 
   /*
