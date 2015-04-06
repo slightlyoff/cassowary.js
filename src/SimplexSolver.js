@@ -907,6 +907,7 @@ c.SimplexSolver = c.inherit({
     var changed = {};
 
     // console.log("this._externalParametricVars:", this._externalParametricVars);
+    /*
     this._externalParametricVars.each(function(v) {
       if (this.rows.get(v) != null) {
         // "Error: variable" + v + " in _externalParametricVars is basic"
@@ -914,6 +915,11 @@ c.SimplexSolver = c.inherit({
         v.value = 0;
         changed[v.name] = 0;
       }
+    }, this);
+    */
+    this._externalParametricVars.each(function(v) {
+      v.value = 0;
+      changed[v.name] = 0;
     }, this);
     // console.log("this._externalRows:", this._externalRows);
     this._externalRows.each(function(v) {
