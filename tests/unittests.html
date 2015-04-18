@@ -58,9 +58,12 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
         // to include extra information on this page, such as perf tests.
         require({
           baseUrl: '../',
-          packages: [{ name: 'intern', location: 'node_modules/intern' }],
+          packages: [
+            { name: 'intern', location: 'node_modules/intern' }
+          ],
           map: {
             intern: {
+              diff: 'intern/node_modules/diff/diff.js',
               dojo: 'intern/node_modules/dojo',
               chai: 'intern/node_modules/chai/chai'
             }
