@@ -135,20 +135,16 @@ c.own = function(obj, cb, context) {
 c.extend = function(obj, props) {
   c.own(props, function(x) {
     var pd = Object.getOwnPropertyDescriptor(props, x);
-    try {
-      if ( (typeof pd["get"] == "function") ||
-           (typeof pd["set"] == "function") ) {
-        Object.defineProperty(obj, x, pd);
-      } else if (typeof pd["value"] == "function" ||x.charAt(0) === "_") {
-        pd.writable = true;
-        pd.configurable = true;
-        pd.enumerable = false;
-        Object.defineProperty(obj, x, pd);
-      } else {
-          obj[x] = props[x];
-      }
-    } catch(e) {
-      // console.warn("c.extend assignment failed on property", x);
+    if ( (typeof pd["get"] == "function") ||
+         (typeof pd["set"] == "function") ) {
+      Object.defineProperty(obj, x, pd);
+    } else if (typeof pd["value"] == "function" ||x.charAt(0) === "_") {
+      pd.writable = true;
+      pd.configurable = true;
+      pd.enumerable = false;
+      Object.defineProperty(obj, x, pd);
+    } else {
+        obj[x] = props[x];
     }
   });
   return obj;
