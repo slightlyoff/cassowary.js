@@ -53,6 +53,36 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
           printLog.length = 0;
         }, false);
 
+        (function () {
+          var basePath = location.pathname.replace(/\/+[^\/]*$/, '/');
+          window.internConfig =
+          window.__internConfig = {
+            // For users running client.html directly, assume that the base
+            // path is two levels up (the parent of node_modules); this is
+            // most common. Users that need something special should provide
+            // an absolute module path for the config module (e.g.
+            // `/path/to/intern/config`) and then set `baseUrl` correctly in
+            // the `loader` configuration object of the config module
+            baseUrl: basePath.slice(-10) === '/__intern/' ? basePath.slice(0, -9) : (basePath + '../'),
+            packages: [
+              { name: 'intern', location: 'node_modules/intern' }
+            ],
+            map: {
+              intern: {
+                dojo: 'intern/node_modules/dojo',
+                chai: 'intern/node_modules/chai/chai',
+                diff: 'intern/node_modules/diff/diff'
+              },
+              '*': {
+                'intern/dojo': 'intern/node_modules/dojo'
+              }
+            }
+          };
+          require(internConfig, [ 'intern/client' ]);
+        })();
+
+
+        /*
         // Basic AMD config for Intern. Normally, we could just use Intern's
         // included browser runner instead of doing this manually, but we want
         // to include extra information on this page, such as perf tests.
@@ -72,8 +102,9 @@ Parts Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
         }, [ 'tests/deps' ], function () {
           // Load Intern's client runner, kicking off the unit tests, and also
           // load performance tests
-          require(['intern/client', 'tests/PerfTest', 'tests/WorkerPerfTest']);
+          require(['intern/client', tests/PerfTest', 'tests/WorkerPerfTest']);
         });
+        */
       })(this);
     </script>
   </head>
