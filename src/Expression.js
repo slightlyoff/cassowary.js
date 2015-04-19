@@ -21,6 +21,13 @@ c.Expression = c.inherit({
                        constant /*double*/) {
     this.constant = checkNumber(constant, 0);
     this.terms = new c.HashTable();
+    this.externalVariables = new c.HashSet();
+    Object.defineProperty(this, "solver", {
+      enumerable: false,
+      configurable: true,
+      writable: true,
+      value: null
+    });
     if (cvar instanceof c.AbstractVariable) {
       value = checkNumber(value, 1);
       this.setVariable(cvar, value);
@@ -49,6 +56,7 @@ c.Expression = c.inherit({
   clone: function() {
     var e = c.Expression.empty();
     e.initializeFromHash(this.constant, this.terms);
+    e.solver = this.solver;
     return e;
   },
 
@@ -98,30 +106,33 @@ c.Expression = c.inherit({
 
   addExpression: function(expr /*c.Expression*/,
                           n /*double*/,
-                          subject /*c.AbstractVariable*/,
-                          solver /*c.Tableau*/) {
-    // console.trace();
+                          subject /*c.AbstractVariable*/) {
     if (expr instanceof c.AbstractVariable) {
       expr = c.Expression.fromVariable(expr);
     }
     n = checkNumber(n, 1);
     this.constant += (n * expr.constant);
     expr.terms.each(function(clv, coeff) {
-      // console.log("clv:", clv, "coeff:", coeff, "subject:", subject);
-      this.addVariable(clv, coeff * n, subject, solver);
+      /*
+      if (clv.isExternal) {
+        console.log("clv:", clv, "coeff:", coeff, "subject:", subject);
+      }
+      */
+      this.addVariable(clv, coeff * n, subject);
+      this._updateIfExternal(clv);
     }, this);
     return this;
   },
 
-  addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject, solver) {
+  addVariable: function(v /*c.AbstractVariable*/, cd /*double*/, subject) {
     if (cd == null) { cd = 1; }
 
     var coeff = this.terms.get(v);
     if (coeff) {
       var newCoefficient = coeff + cd;
       if (newCoefficient == 0 || c.approx(newCoefficient, 0)) {
-        if (solver) {
-          solver.noteRemovedVariable(v, subject);
+        if (this.solver) {
+          this.solver.noteRemovedVariable(v, subject);
         }
         this.terms.delete(v);
       } else {
@@ -130,16 +141,26 @@ c.Expression = c.inherit({
     } else {
       if (!c.approx(cd, 0)) {
         this.setVariable(v, cd);
-        if (solver) {
-          solver.noteAddedVariable(v, subject);
+        if (this.solver) {
+          this.solver.noteAddedVariable(v, subject);
         }
       }
     }
     return this;
   },
 
+  _updateIfExternal: function(v) {
+    if (v.isExternal) {
+      this.externalVariables.add(v);
+      if (this.solver) {
+        this.solver._noteUpdatedExternal(v);
+      }
+    }
+  },
+
   setVariable: function(v /*c.AbstractVariable*/, c /*double*/) {
     this.terms.set(v, c);
+    this._updateIfExternal(v);
     return this;
   },
 
@@ -161,8 +182,12 @@ c.Expression = c.inherit({
 
   substituteOut: function(outvar  /*c.AbstractVariable*/,
                           expr    /*c.Expression*/,
-                          subject /*c.AbstractVariable*/,
-                          solver  /*ClTableau*/) {
+                          subject /*c.AbstractVariable*/) {
+
+    var solver = this.solver;
+    if (!solver) {
+      throw new c.InternalError("Expressions::substituteOut called without a solver");
+    }
 
     var setVariable = this.setVariable.bind(this);
     var terms = this.terms;
@@ -171,6 +196,7 @@ c.Expression = c.inherit({
     this.constant += (multiplier * expr.constant);
     /*
     console.log("substituteOut:",
+                "\n\tsolver:", typeof this.solver,
                 "\n\toutvar:", outvar,
                 "\n\texpr:", expr.toString(),
                 "\n\tmultiplier:", multiplier,
@@ -184,10 +210,10 @@ c.Expression = c.inherit({
           solver.noteRemovedVariable(clv, subject);
           terms.delete(clv);
         } else {
-          terms.set(clv, newCoefficient);
+          setVariable(clv, newCoefficient);
         }
       } else {
-        terms.set(clv, multiplier * coeff);
+        setVariable(clv, multiplier * coeff);
         if (solver) {
           solver.noteAddedVariable(clv, subject);
         }
@@ -266,21 +292,29 @@ c.Expression = c.inherit({
   },
 });
 
-c.Expression.empty = function() {
-  return new c.Expression(undefined, 1, 0);
+c.Expression.empty = function(solver) {
+  var e = new c.Expression(undefined, 1, 0);
+  e.solver = solver;
+  return e;
 };
 
-c.Expression.fromConstant = function(cons) {
-  return new c.Expression(cons);
+c.Expression.fromConstant = function(cons, solver) {
+  var e = new c.Expression(cons);
+  e.solver = solver;
+  return e;
 };
 
-c.Expression.fromValue = function(v) {
+c.Expression.fromValue = function(v, solver) {
   v = +(v);
-  return new c.Expression(undefined, v, 0);
+  var e = new c.Expression(undefined, v, 0);
+  e.solver = solver;
+  return e;
 };
 
-c.Expression.fromVariable = function(v) {
-  return new c.Expression(v, 1, 0);
+c.Expression.fromVariable = function(v, solver) {
+  var e = new c.Expression(v, 1, 0);
+  e.solver = solver;
+  return e;
 }
 
 })(this["c"]||module.parent.exports||{});

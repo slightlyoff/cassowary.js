@@ -41,8 +41,13 @@ c.SimplexSolver = c.inherit({
 
     this._optimizeCount = 0;
 
-    this.rows.set(this._objective, c.Expression.empty());
+    this.rows.set(this._objective, c.Expression.empty(this));
     this._editVariableStack = [0]; // Stack
+    this._updatedExternals = new c.HashSet();
+  },
+
+  _noteUpdatedExternal: function(v, expr) {
+    this._updatedExternals.add(v);
   },
 
   add: function(/*c.Constraint, ...*/) {
@@ -73,7 +78,16 @@ c.SimplexSolver = c.inherit({
   },
 
   addConstraint: function(cn /*c.Constraint*/) {
+    if (cn instanceof c.Constraint) {
+      // FIXME(slightlyoff): this sucks. They might not all be updated.
+      var self = this;
+      cn.expression.externalVariables.each(
+        // FIXME(slightlyoff): required?
+        function(v) { self._noteUpdatedExternal(v); }
+      );
+    }
     var expr = this.newExpression(cn);
+    expr.solver = this;
 
     if (!this.tryAddingDirectly(expr)) {
       this.addWithArtificialVariable(expr);
@@ -582,6 +596,9 @@ c.SimplexSolver = c.inherit({
       var expr = this.rows.get(basicVar);
       var c = expr.coefficientFor(minusErrorVar);
       expr.constant += (c * delta);
+      if (basicVar.isExternal) {
+        this._noteUpdatedExternal(basicVar);
+      }
       if (basicVar.isRestricted && expr.constant < 0) {
         this._infeasibleRows.add(basicVar);
       }
@@ -638,14 +655,14 @@ c.SimplexSolver = c.inherit({
     ir.prevEConstant = null;
 
     var cnExpr = cn.expression;
-    var expr = c.Expression.fromConstant(cnExpr.constant);
+    var expr = c.Expression.fromConstant(cnExpr.constant, this);
     var slackVar = new c.SlackVariable();
     var dummyVar = new c.DummyVariable();
     var eminus = new c.SlackVariable();
     var eplus = new c.SlackVariable();
     var cnTerms = cnExpr.terms;
-    // console.log(cnTerms.size);
 
+    // FIXME(slightlyoff): slow!!
     cnTerms.each(function(v, c) {
       var e = this.rows.get(v);
       if (!e) {
@@ -860,14 +877,6 @@ c.SimplexSolver = c.inherit({
     time && console.time("  substituteOut");
     this.substituteOut(entryVar, expr);
     time && console.timeEnd("  substituteOut");
-    /*
-    if (entryVar.isExternal) {
-      // entry var is no longer a parametric variable since we're moving
-      // it into the basis
-      console.log("entryVar is external!");
-      this._externalParametricVars.delete(entryVar);
-    }
-    */
 
     time && console.time("  addRow")
     this.addRow(entryVar, expr);
@@ -904,48 +913,46 @@ c.SimplexSolver = c.inherit({
   },
 
   _setExternalVariables: function() {
-    var changed = {};
-
-    // console.log("this._externalParametricVars:", this._externalParametricVars);
-    /*
-    this._externalParametricVars.each(function(v) {
-      if (this.rows.get(v) != null) {
-        // "Error: variable" + v + " in _externalParametricVars is basic"
-      } else {
+    var changes = [];
+    this._updatedExternals.each(function(v) {
+      // console.log("got updated", v.name, v.hashCode);
+      var iv = v.value;
+      // var expr = this._externalRows.get(v);
+      var expr = this._externalRows.get(v);
+      if (!expr) {
         v.value = 0;
-        changed[v.name] = 0;
+        return;
+      }
+      v.value = expr.constant;
+      if (iv !== v.value) {
+        // console.log(v.name, iv, "-->", v.value, iv === v.value);
+        changes.push({
+          type: "update",
+          name: v.name,
+          variable: v,
+          oldValue: iv
+        });
       }
     }, this);
-    */
-    this._externalParametricVars.each(function(v) {
-      v.value = 0;
-      changed[v.name] = 0;
-    }, this);
-    // console.log("this._externalRows:", this._externalRows);
-    this._externalRows.each(function(v) {
-      var expr = this.rows.get(v);
-      if (v.value != expr.constant) {
-        // console.log(v.toString(), v.value, expr.constant);
-        v.value = expr.constant;
-        changed[v.name] = expr.constant;
-      }
-    }, this);
-    this._changed = changed;
+
+    this._updatedExternals.clear();
     this._needsSolving = false;
-    this._informCallbacks();
-    this.onsolved();
+    this._informCallbacks(changes);
+    if (changes.length) {
+      this.onsolved(changes);
+    }
+    // console.log(" --");
   },
 
   onsolved: function() {
     // Lifecycle stub. Here for dirty, dirty monkey patching.
   },
 
-  _informCallbacks: function() {
+  _informCallbacks: function(changes) {
     if(!this._callbacks) return;
 
-    var changed = this._changed;
     this._callbacks.forEach(function(fn) {
-      fn(changed);
+      fn(changes);
     });
   },
 

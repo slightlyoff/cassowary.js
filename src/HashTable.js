@@ -289,6 +289,28 @@ if (false && typeof Map != "undefined") {
       this.each(function(k, v) { answer += k + " => " + v + "\n"; });
       return answer;
     },
+
+    toJSON: function() {
+      var d = {};
+      this.each(function(key, value) {
+        d[key.toString()] = (value.toJSON) ? value.toJSON : value.toString();
+      });
+      return {
+        _t: "c.HashTable",
+        store: d
+      };
+    },
+
+    fromJSON: function(o) {
+      var r = new c.HashTable();
+      /*
+      if (o.data) {
+        r.size = o.data.length;
+        r.storage = o.data;
+      }
+      */
+      return r;
+    },
   });
 }
 

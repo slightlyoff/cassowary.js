@@ -27,7 +27,6 @@ define([
 				assert.deepEqual(0, tab.rows.size);
 				assert.deepEqual(0, tab._infeasibleRows.size);
 				assert.deepEqual(0, tab._externalRows.size);
-				assert.deepEqual(0, tab._externalParametricVars.size);
 			});
 		});
 	});

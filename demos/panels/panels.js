@@ -72,8 +72,10 @@ var preventFireSolved = false;
 
 // Create a global solver
 var s = document.solver = c.extend(new c.SimplexSolver(), {
-  onsolved: function() {
-    if(!preventFireSolved) { runOnNextRAF(fireSolved, true); }
+  onsolved: function(changes) {
+    if(!preventFireSolved) {
+      runOnNextRAF(fireSolved.bind(null, changes), true);
+    }
   }
 });
 s.autoSolve = false;
