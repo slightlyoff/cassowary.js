@@ -190,9 +190,9 @@ c.divide = function(e1, e2) {
 };
 
 c.approx = function(a, b) {
-  if (a === b) { return true; }
   a = +(a);
   b = +(b);
+  if (a === b) { return true; }
   if (a == 0) {
     return (Math.abs(b) < epsilon);
   }
