@@ -9,6 +9,8 @@
 (function(c) {
 "use strict";
 
+// FIXME(slightlyoff): now that Set is in v8 and has iteration, migrate
+
 c.HashSet = c.inherit({
   _t: "c.HashSet",
 

@@ -135,20 +135,20 @@ c.own = function(obj, cb, context) {
 c.extend = function(obj, props) {
   c.own(props, function(x) {
     var pd = Object.getOwnPropertyDescriptor(props, x);
-    try {
-      if ( (typeof pd["get"] == "function") ||
-           (typeof pd["set"] == "function") ) {
-        Object.defineProperty(obj, x, pd);
-      } else if (typeof pd["value"] == "function" ||x.charAt(0) === "_") {
-        pd.writable = true;
-        pd.configurable = true;
-        pd.enumerable = false;
-        Object.defineProperty(obj, x, pd);
-      } else {
+    if ( (typeof pd["get"] == "function") ||
+         (typeof pd["set"] == "function") ) {
+      Object.defineProperty(obj, x, pd);
+    } else if (typeof pd["value"] == "function" ||x.charAt(0) === "_") {
+      pd.writable = true;
+      pd.configurable = true;
+      pd.enumerable = false;
+      Object.defineProperty(obj, x, pd);
+    } else {
+        try {
           obj[x] = props[x];
-      }
-    } catch(e) {
-      // console.warn("c.extend assignment failed on property", x);
+        } catch(e) {
+          // TODO(slightlyoff): squelch, e.g. for tagName?
+        }
     }
   });
   return obj;
@@ -194,9 +194,9 @@ c.divide = function(e1, e2) {
 };
 
 c.approx = function(a, b) {
-  if (a === b) { return true; }
   a = +(a);
   b = +(b);
+  if (a === b) { return true; }
   if (a == 0) {
     return (Math.abs(b) < epsilon);
   }

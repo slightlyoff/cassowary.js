@@ -31,8 +31,9 @@
   },
   "dependencies": { },
   "devDependencies": {
-    "pegjs" : "*",
-	  "intern": "1.2.1"
+    "pegjs": "*",
+    "uglify-js": "*",
+	  "intern": "2.2.2"
   },
   "engines" : { "node" : ">=0.8.x" }
 }

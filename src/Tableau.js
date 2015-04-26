@@ -23,11 +23,7 @@ c.Tableau = c.inherit({
 
     // the set of rows where the basic variable is external this was added to
     // the C++ version to reduce time in setExternalVariables()
-    this._externalRows = new c.HashSet();
-
-    // the set of external variables which are parametric this was added to the
-    // C++ version to reduce time in setExternalVariables()
-    this._externalParametricVars = new c.HashSet();
+    this._externalRows = new c.HashTable();
   },
 
   // Variable v has been removed from an Expression.  If the Expression is in a
@@ -53,9 +49,7 @@ c.Tableau = c.inherit({
             " (= " + (this.rows.size - 1) + " constraints)" +
             "\nColumns: " + this.columns.size +
             "\nInfeasible Rows: " + this._infeasibleRows.size +
-            "\nExternal basic variables: " + this._externalRows.size +
-            "\nExternal parametric variables: " +
-            this._externalParametricVars.size + "\n";
+            "\nExternal basic variables: " + this._externalRows.size;
   },
 
   toString: function() {
@@ -69,8 +63,6 @@ c.Tableau = c.inherit({
     str += this._infeasibleRows;
     str += "External basic variables: ";
     str += this._externalRows;
-    str += "External parametric variables: ";
-    str += this._externalParametricVars;
     return str;
   },
 
@@ -98,12 +90,11 @@ c.Tableau = c.inherit({
     this.rows.set(aVar, expr);
     expr.terms.each(function(clv, coeff) {
       this.insertColVar(clv, aVar);
-      if (clv.isExternal) {
-        this._externalParametricVars.add(clv);
-      }
     }, this);
     if (aVar.isExternal) {
-      this._externalRows.add(aVar);
+      // console.log("addRow(): aVar is external:", aVar.name, aVar.hashCode);
+      this._externalRows.set(aVar, expr);
+      this._updatedExternals.add(aVar);
     }
   },
 
@@ -122,7 +113,6 @@ c.Tableau = c.inherit({
     }
     if (aVar.isExternal) {
       this._externalRows.delete(aVar);
-      this._externalParametricVars.delete(aVar);
     }
   },
 
@@ -149,14 +139,16 @@ c.Tableau = c.inherit({
     varset.each(function(v) {
       var row = this.rows.get(v);
       row.substituteOut(oldVar, expr, v, this);
+      if (v.isExternal) {
+        this._updatedExternals.add(v);
+      }
       if (v.isRestricted && row.constant < 0) {
         this._infeasibleRows.add(v);
       }
     }, this);
 
     if (oldVar.isExternal) {
-      this._externalRows.add(oldVar);
-      this._externalParametricVars.delete(oldVar);
+      this._externalRows.set(oldVar, expr);
     }
 
     this.columns.delete(oldVar);

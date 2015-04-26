@@ -303,6 +303,9 @@ define([
 			var v1 = new c.Variable({ value: 20 });
 			var v2 = new c.Variable({ value: 2 });
 			var a = new c.Expression(v1, 2, 2); // 2*v1 + 2
+			// FIXME(slightlyoff): Add a solver to get the tests to pass
+			var solver = new c.SimplexSolver();
+			a.solver = solver;
 
 			// new variable
 			a.substituteOut(v1, new c.Expression(v2, 4, 4));
