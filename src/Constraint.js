@@ -213,7 +213,6 @@ c.Equation = c.inherit({
         a2 = new c.Expression(a2);
       }
       lc.call(this, a1, a3, a4);
-      console.log("c.Equation() ctor; this.expression.addExpression(a2, -1)");
       this.expression.addExpression(a2, -1);
 
     } else {
