@@ -78,6 +78,10 @@ if (typeof Map != "undefined" &&
       return this._store.set(key.hashCode, [key, value]);
     },
 
+    has: function(key) {
+      return this._store.has(key.hashCode);
+    },
+
     delete: function(key) {
       return this._store.delete(key.hashCode);
     },

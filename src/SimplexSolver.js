@@ -611,7 +611,7 @@ c.SimplexSolver = c.inherit({
     var zRow = this.rows.get(this._objective);
     // need to handle infeasible rows
     while (this._infeasibleRows.size) {
-      var exitVar = this._infeasibleRows.values()[0];
+      var exitVar = this._infeasibleRows.first();
       this._infeasibleRows.delete(exitVar);
       var entryVar = null;
       var expr = this.rows.get(exitVar);
