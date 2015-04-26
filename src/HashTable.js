@@ -94,13 +94,11 @@ if (typeof Map != "undefined" &&
       var context;
       var keys = [];
       var rec;
-      for(var y of this._store.keys()) {
-        keys.push(y)
-      };
+      var vi = this._store.values();
+      var rec = vi.next();
 
-      for(var k in keys) {
-        rec = this._store.get(keys[k]);
-        context = callback.call(scope||null, rec[0], rec[1]);
+      while(!rec.done) {
+        context = callback.call(scope||null, rec.value[0], rec.value[1]);
 
         if (context) {
           if (context.retval !== undefined) {
@@ -110,6 +108,7 @@ if (typeof Map != "undefined" &&
             break;
           }
         }
+        rec = vi.next();
       }
     },
 

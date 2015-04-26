@@ -6,10 +6,9 @@
 
 
 # Unglify currently doesn't understand `for(.. of ..)`, so we punt
-DEBUG=1
 
-# COMMAND='python post.py'
-COMMAND='uglifyjs --screw-ie8 -- '
+COMMAND='python post.py'
+# COMMAND='uglifyjs --screw-ie8 -- '
 
 # To invoke in debug mode, run with a debug env variable like:
 # $> DEBUG=1 ./build.sh
