@@ -33,104 +33,114 @@
 (function(c) {
 "use strict";
 
-var copyOwn = function(src, dest) {
-  Object.keys(src).forEach(function(x) {
-    dest[x] = src[x];
-  });
-};
-
-if (false && typeof Map != "undefined") {
+if (typeof Map != "undefined" &&
+    typeof Map.prototype.forEach != "undefined") {
 
   c.HashTable = c.inherit({
 
-    initialize: function() {
-      this.size = 0;
+    initialize: function(ht) {
+      this.hashCode = c._inc();
       this._store = new Map();
-      this._keys = [];
-      // this.get = this._store.get.bind(this._store);
-    },
-
-    set: function(key, value) {
-      this._store.set(key, value);
-      if (this._keys.indexOf(key) == -1) {
-        this.size++;
-        // delete this._keys[this._keys.indexOf(key)];
-        this._keys.push(key);
-      } /* else {
-        delete this._keys[this._keys.indexOf(key)];
-        this._keys.push(key);
-      }
-      */
-    },
-
-    get: function(key) {
-      return this._store.get(key);
-    },
-
-    clear: function() {
-      this.size = 0;
-      this._store = new Map();
-      this._keys = [];
-    },
-
-    delete: function(key) {
-      if (this._store.delete(key) && this.size > 0) {
-        delete this._keys[this._keys.indexOf(key)];
-        this.size--;
-      }
-    },
-
-    each: function(callback, scope) {
-      if (!this.size) { return; }
-      this._keys.forEach(function(k){
-        if (typeof k == "undefined") { return; }
-        var v = this._store.get(k);
-        if (typeof v != "undefined") {
-          callback.call(scope||null, k, v);
-        }
-      }, this);
-    },
-
-    escapingEach: function(callback, scope) {
-      if (!this.size) { return; }
-
-      var that = this;
-      var kl = this._keys.length;
-      var context;
-      for (var x = 0; x < kl; x++) {
-        if (typeof this._keys[x] != "undefined") {
-          (function(k) {
-            var v = that._store.get(k);
-            if (typeof v != "undefined") {
-              context = callback.call(scope||null, k, v);
-            }
-          })(this._keys[x]);
-
-          if (context) {
-            if (context.retval !== undefined) {
-              return context;
-            }
-            if (context.brk) {
-              break;
-            }
-          }
+      if (ht instanceof c.HashTable) {
+        if (Map.length) {
+          this._store = new Map(ht._store);
+        } else { // Hacking around Safari 8's limitations
+          var that = this._store;
+          ht._store.forEach(function(v, k) {
+            that.set(k, v);
+          });
         }
       }
     },
 
     clone: function() {
-      var n = new c.HashTable();
-      if (this.size) {
-        this.each(function(k, v) {
-          n.set(k, v);
-        });
+      return new c.HashTable(this);
+    },
+
+    get: function(key) {
+      var r = this._store.get(key.hashCode);
+      if (r === undefined) {
+        return null;
       }
-      return n;
-    }
+      return r[1];
+    },
+
+    clear: function() {
+      this._store.clear();
+    },
+
+    get size() {
+      return this._store.size;
+    },
+
+    set: function(key, value) {
+      // if (!key.hashCode) debugger;
+      return this._store.set(key.hashCode, [key, value]);
+    },
+
+    delete: function(key) {
+      return this._store.delete(key.hashCode);
+    },
+
+    each: function(callback, scope) {
+      this._store.forEach(function(v, k) {
+        return callback.call(scope||null, v[0], v[1]);
+      }, scope);
+    },
+
+    escapingEach: function(callback, scope) {
+      if (!this._store.size) { return; }
+
+      var context;
+      var keys = [];
+      var rec;
+      for(var y of this._store.keys()) {
+        keys.push(y)
+      };
+
+      for(var k in keys) {
+        rec = this._store.get(keys[k]);
+        context = callback.call(scope||null, rec[0], rec[1]);
+
+        if (context) {
+          if (context.retval !== undefined) {
+            return context;
+          }
+          if (context.brk) {
+            break;
+          }
+        }
+      }
+    },
+
+    equals: function(other) {
+      if (other === this) {
+        return true;
+      }
+
+      if (!(other instanceof c.HashTable) || other._size !== this._size) {
+        return false;
+      }
+
+      for(var x in this._store.keys()) {
+        if (other._store.get(x) == undefined) {
+          return false;
+        }
+      }
+      return true;
+    },
+
   });
+
 } else {
   // For escapingEach
   var defaultContext = {};
+  var copyOwn = function(src, dest) {
+    Object.keys(src).forEach(function(x) {
+      dest[x] = src[x];
+    });
+  };
+
 
   c.HashTable = c.inherit({
 

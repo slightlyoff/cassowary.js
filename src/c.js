@@ -144,7 +144,11 @@ c.extend = function(obj, props) {
       pd.enumerable = false;
       Object.defineProperty(obj, x, pd);
     } else {
-        obj[x] = props[x];
+        try {
+          obj[x] = props[x];
+        } catch(e) {
+          // TODO(slightlyoff): squelch, e.g. for tagName?
+        }
     }
   });
   return obj;
