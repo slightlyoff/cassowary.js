@@ -297,13 +297,17 @@ if (c._functionalMap) {
     },
 
     toJSON: function() {
+      /*
       var d = {};
       this.each(function(key, value) {
         d[key.toString()] = (value.toJSON) ? value.toJSON : value.toString();
       });
+      */
       return {
         _t: "c.HashTable",
+        /*
         store: d
+        */
       };
     },
 
@@ -312,7 +316,7 @@ if (c._functionalMap) {
       /*
       if (o.data) {
         r.size = o.data.length;
-        r.storage = o.data;
+        r._store = o.data;
       }
       */
       return r;

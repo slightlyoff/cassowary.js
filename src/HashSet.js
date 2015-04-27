@@ -74,7 +74,7 @@ if (c._functionalMap) {
     escapingEach: function(func, scope) {
       // FIXME(slightlyoff): actually escape!
       if (this.size)
-        this.storage.forEach(func, scope);
+        this._store.forEach(func, scope);
     },
 
     toString: function() {
@@ -107,7 +107,7 @@ if (c._functionalMap) {
       var r = new c.HashSet();
       if (o.data) {
         r.size = o.data.length;
-        r.storage = o.data;
+        r._store = o.data;
       }
       return r;
     },
@@ -119,52 +119,51 @@ if (c._functionalMap) {
     _t: "c.HashSet",
 
     initialize: function() {
-      this.storage = [];
+      this._store = [];
       this.size = 0;
       this.hashCode = c._inc();
     },
 
     add: function(item) {
-      var s = this.storage, io = s.indexOf(item);
+      var s = this._store, io = s.indexOf(item);
       if (s.indexOf(item) == -1) { s[s.length] = item; }
-      this.size = this.storage.length;
+      this.size = s.length;
     },
 
     values: function() {
       // FIXME(slightlyoff): is it safe to assume we won't be mutated by our caller?
-      //                     if not, return this.storage.slice(0);
-      return this.storage;
+      //                     if not, return this._store.slice(0);
+      return this._store;
     },
 
     first: function() {
-      return this.storage[0];
+      return this._store[0];
     },
 
     has: function(item) {
-      var s = this.storage;
-      return (s.indexOf(item) != -1);
+      return (this._store.indexOf(item) != -1);
     },
 
     delete: function(item) {
-      var io = this.storage.indexOf(item);
+      var io = this._store.indexOf(item);
       if (io == -1) { return null; }
-      this.storage.splice(io, 1)[0];
-      this.size = this.storage.length;
+      this._store.splice(io, 1)[0];
+      this.size = this._store.length;
     },
 
     clear: function() {
-      this.storage.length = 0;
+      this._store.length = 0;
     },
 
     each: function(func, scope) {
       if(this.size)
-        this.storage.forEach(func, scope);
+        this._store.forEach(func, scope);
     },
 
     escapingEach: function(func, scope) {
       // FIXME(slightlyoff): actually escape!
       if (this.size)
-        this.storage.forEach(func, scope);
+        this._store.forEach(func, scope);
     },
 
     toString: function() {
@@ -197,12 +196,11 @@ if (c._functionalMap) {
       var r = new c.HashSet();
       if (o.data) {
         r.size = o.data.length;
-        r.storage = o.data;
+        r._store = o.data;
       }
       return r;
     },
   });
-
 }
 
 })(this["c"]||module.parent.exports||{});
