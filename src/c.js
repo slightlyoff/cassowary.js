@@ -45,12 +45,30 @@ var walkForMethod = function(ctor, name) {
   }
 };
 
+var functionalMap = false;
+try {
+  var m = new Map();
+  m.set("foo", "bar");
+  var vi = m.values();
+  var rec = vi.next();
+  m.forEach(function() {});
+  var m2 = new Map(m);
+  if (m2.get("foo") != m.get("foo")) {
+    throw "ctor fail";
+  }
+  functionalMap = true;
+} catch(e) {
+  // Squelch
+}
+
 // Global
 var c = scope.c = function() {
   if(c._api) {
     return c._api.apply(this, arguments);
   }
 };
+
+c._functionalMap = functionalMap;
 
 //
 // Constants

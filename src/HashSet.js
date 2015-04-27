@@ -11,25 +11,17 @@
 
 // FIXME(slightlyoff): now that Set is in v8 and has iteration, migratpue
 
-if (typeof Map != "undefined" &&
-    typeof Map.prototype.forEach != "undefined") {
-
+if (c._functionalMap) {
 
   c.HashSet = c.inherit({
     _t: "c.HashSet",
 
     initialize: function(hs) {
       this.hashCode = c._inc();
-      this._store = new Map();
       if (hs instanceof c.HashSet) {
-        if (Map.length) {
-          this._store = new Map(hs._store);
-        } else { // Hacking around Safari 8's limitations
-          var that = this._store;
-          hs._store.forEach(function(item) {
-            that.add(item);
-          });
-        }
+        this._store = new Map(hs._store);
+      } else {
+        this._store = new Map();
       }
     },
 

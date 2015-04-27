@@ -33,23 +33,16 @@
 (function(c) {
 "use strict";
 
-if (typeof Map != "undefined" &&
-    typeof Map.prototype.forEach != "undefined") {
+if (c._functionalMap) {
 
   c.HashTable = c.inherit({
 
     initialize: function(ht) {
       this.hashCode = c._inc();
-      this._store = new Map();
       if (ht instanceof c.HashTable) {
-        if (Map.length) {
-          this._store = new Map(ht._store);
-        } else { // Hacking around Safari 8's limitations
-          var that = this._store;
-          ht._store.forEach(function(v, k) {
-            that.set(k, v);
-          });
-        }
+        this._store = new Map(ht._store);
+      } else {
+        this._store = new Map();
       }
     },
 
