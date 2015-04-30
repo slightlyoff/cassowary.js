@@ -94,7 +94,7 @@ c.Tableau = c.inherit({
     if (aVar.isExternal) {
       // console.log("addRow(): aVar is external:", aVar.name, aVar.hashCode);
       this._externalRows.set(aVar, expr);
-      this._updatedExternals.add(aVar);
+      // this._updatedExternals.add(aVar);
     }
   },
 
