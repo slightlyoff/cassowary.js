@@ -143,7 +143,6 @@ if (c._functionalMap) {
     initialize: function() {
       this.size = 0;
       this._store = {};
-      this._keyStrMap = {};
       this._deleted = 0;
     },
 
@@ -155,8 +154,7 @@ if (c._functionalMap) {
         // compact or go to a tree.
         this.size++;
       }
-      this._store[hash] = value;
-      this._keyStrMap[hash] = key;
+      this._store[hash] = [ key, value ];
     },
 
     get: function(key) {
@@ -166,7 +164,7 @@ if (c._functionalMap) {
 
       var v = this._store[key];
       if (typeof v != "undefined") {
-        return this._store[key];
+        return v[1];
       }
       return null;
     },
@@ -174,7 +172,6 @@ if (c._functionalMap) {
     clear: function() {
       this.size = 0;
       this._store = {};
-      this._keyStrMap = {};
     },
 
     _compact: function() {
@@ -208,9 +205,6 @@ if (c._functionalMap) {
       //    Sadly, Cassowary is hugely sensitive to iteration order changes, and
       //    "delete" preserves order when Object.keys() is called later.
       delete this._store[key];
-      // Note: we don't delete from _keyStrMap because we only get the
-      // Object.keys() from _store, so it's the only one we need to keep up-to-
-      // date.
 
       if (this.size > 0) {
         this.size--;
@@ -223,10 +217,9 @@ if (c._functionalMap) {
       this._perhapsCompact();
 
       var store = this._store;
-      var keyMap = this._keyStrMap;
       for (var x in this._store) {
         if (this._store.hasOwnProperty(x)) {
-          callback.call(scope||null, keyMap[x], store[x]);
+          callback.call(scope||null, store[x][0], store[x][1]);
         }
       }
     },
@@ -238,13 +231,12 @@ if (c._functionalMap) {
 
       var that = this;
       var store = this._store;
-      var keyMap = this._keyStrMap;
       var context = defaultContext;
       var kl = Object.keys(store);
       for (var x = 0; x < kl.length; x++) {
         (function(v) {
           if (that._store.hasOwnProperty(v)) {
-            context = callback.call(scope||null, keyMap[v], store[v]);
+            context = callback.call(scope||null, store[v][0], store[v][1]);
           }
         })(kl[x]);
 
@@ -264,7 +256,6 @@ if (c._functionalMap) {
       if (this.size) {
         n.size = this.size;
         copyOwn(this._store, n._store);
-        copyOwn(this._keyStrMap, n._keyStrMap);
       }
       return n;
     },
@@ -281,8 +272,7 @@ if (c._functionalMap) {
       var codes = Object.keys(this._store);
       for (var i = 0; i < codes.length; i++) {
         var code = codes[i];
-        if (this._keyStrMap[code] !== other._keyStrMap[code] ||
-            this._store[code] !== other._store[code]) {
+        if (this._store[code][0] !== other._store[code][0]) {
           return false;
         }
       }
