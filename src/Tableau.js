@@ -100,7 +100,7 @@ c.Tableau = c.inherit({
 
   removeColumn: function(aVar /*c.AbstractVariable*/) {
     var rows = /* Set */ this.columns.get(aVar);
-    if (rows) {
+    if (rows !== null) {
       this.columns.delete(aVar);
       rows.each(function(clv) {
         var expr = /* c.Expression */this.rows.get(clv);
