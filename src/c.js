@@ -3,7 +3,7 @@
 //
 //    http://www.apache.org/licenses/LICENSE-2.0
 //
-// Parts Copyright (C) 2011-2012, Alex Russell (slightlyoff@chromium.org)
+// Parts Copyright (C) 2011-2015, Alex Russell (slightlyoff@chromium.org)
 
 (function(scope){
 "use strict";
