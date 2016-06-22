@@ -1,5 +1,6 @@
 Cassowary JS
 ============
+[![Slack Status](https://overconstrained-slack.herokuapp.com/badge.svg)](https://overconstrained-slack.herokuapp.com)
 
 Cassowary is an algorithm that computes flexible, responsive layouts quickly
 without resorting to piles of imperative code. Just describe the preferred
@@ -169,6 +170,10 @@ each commit via Travis CI:
 
 Pull requests that do not include tests or break the build will be denied or 
 reverted, respectively.
+
+Links
+-----
+Curious about similar projects? Head over to [overconstrained.io](http://overconstrained.io) and [join us](https://overconstrained-slack.herokuapp.com/) on slack.
 
 
 <!--
