@@ -8,6 +8,10 @@ out
 *.sublime-project
 *.sublime-workspace
 perf/v8.log
+perf/test.prof
+perf/hydrogen.cfg
+perf/code.asm
+perf/*.pdf
 out.prof
 /node_modules/*
 /dist/*
