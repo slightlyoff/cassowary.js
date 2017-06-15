@@ -4,11 +4,7 @@
 #
 # Copyright (C) 2012, Alex Russell (slightlyoff@chromium.org)
 
-
-# Unglify currently doesn't understand `for(.. of ..)`, so we punt
-
-COMMAND='python post.py'
-# COMMAND='uglifyjs --screw-ie8 -- '
+COMMAND="$(npm bin)/uglifyjs"
 
 # To invoke in debug mode, run with a debug env variable like:
 # $> DEBUG=1 ./build.sh
