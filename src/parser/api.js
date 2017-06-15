@@ -18,30 +18,39 @@ var _c = function(expr) {
   if (exprs[expr]) {
     return exprs[expr];
   }
+  var i;
   switch(expr.type) {
     case "Inequality":
-      var op = (expr.operator == "<=") ? c.LEQ : c.GEQ;
-      var i = new c.Inequality(_c(expr.left), op, _c(expr.right), weak);
+      var op = (expr.operator === "<=") ? c.LEQ : c.GEQ;
+      i = new c.Inequality(_c(expr.left), op, _c(expr.right), strong);
       solver.addConstraint(i);
       return i;
     case "Equality":
-      var i = new c.Equation(_c(expr.left), _c(expr.right), weak);
+      i = new c.Equation(_c(expr.left), _c(expr.right), strong);
       solver.addConstraint(i);
       return i;
     case "MultiplicativeExpression":
-      var i = c.times(_c(expr.left), _c(expr.right));
-      solver.addConstraint(i);
+      if (expr.operator === "/") {
+          i = c.divide(_c(expr.left), _c(expr.right));
+      } else {
+          i = c.times(_c(expr.left), _c(expr.right));
+      }
       return i;
     case "AdditiveExpression":
-      if (expr.operator == "+") {
-        return c.plus(_c(expr.left), _c(expr.right));
+      if (expr.operator === "+") {
+        i = c.plus(_c(expr.left), _c(expr.right));
       } else {
-        return c.minus(_c(expr.left), _c(expr.right));
+        i = c.minus(_c(expr.left), _c(expr.right));
       }
+      return i;
     case "NumericLiteral":
       return new c.Expression(expr.value);
     case "Variable":
-      // console.log(expr);
+      // special variable to get the solver instance
+      if(expr.name === 'solver') {
+          return solver;
+      }
+
       if(!vars[expr.name]) {
         vars[expr.name] = new c.Variable({ name: expr.name });
       }
@@ -59,12 +68,28 @@ var compile = function(expressions) {
 // Global API entrypoint
 c._api = function() {
   var args = Array.prototype.slice.call(arguments);
-  if (args.length == 1) {
-    if(typeof args[0] == "string") {
+  var out = {};
+
+  if (args.length === 1) {
+    if(typeof args[0] === "string") {
       // Parse and execute it
       var r = c.parser.parse(args[0]);
-      return compile(r);
-    } else if(typeof args[0] == "function") {
+      out = compile(r);
+
+      // easy getters for solver instance and variables
+      // allows you to perform c('solver') and c('variableName')
+      if(out.length === 1 && (
+          out[0] instanceof c.SimplexSolver ||
+          out[0] instanceof c.Variable
+        )) { return out[0]; }
+
+      // attach solver and variable list
+      out.solver = solver;
+      out.vars = vars;
+
+      return out;
+
+    } else if(typeof args[0] === "function") {
       solver._addCallback(args[0]);
     }
   }

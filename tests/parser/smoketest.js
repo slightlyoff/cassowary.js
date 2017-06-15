@@ -70,5 +70,18 @@ define([
 				});
 			});
 		});
+
+        it("can parse multiplication", function() {
+            expect(c("10*a==30")[0]).to.be.instanceOf(c.Constraint);
+        });
+
+        it("can parse multiple operators along with division", function() {
+            var constraint = c("x/2 - 1 == 29")[0];
+            expect(constraint).to.be.instanceOf(c.Constraint);
+            expect(constraint.expression.terms.size).to.equal(1);
+            constraint.expression.terms.each(function(cVar) {
+                expect(cVar.value).to.equal(60);
+            });
+        });
 	});
 });
